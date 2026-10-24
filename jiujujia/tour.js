@@ -14,7 +14,7 @@
     { as: 'chen@example.com', sel: '[data-go="share"]', t: '儲存或分享給家人', d: '可以存到「我的家」，或用 LINE 把摘要分享到家人群組（只分享摘要，不含地址與作息）。' },
     { as: 'li@example.com', sel: '.card:has([data-rbook])', t: '已啟用的家庭｜主動提醒', d: '換成已經在用揪夜安的李小姐。關懷設備會主動提醒：感測器電量、夜燈年度健檢。按「一鍵預約」就送出維護工單草稿，門市確認時段後派工。', act: 'm2', btn: '帶我到「我的家」', click: '[data-rbook]', clickBtn: '幫我一鍵預約' },
     { as: 'advisor@example.com', sel: '.kp4', t: '② 門市顧問｜今天', d: '王小明登入後先看 4 張指標卡與一句洞察：今日諮詢、待審差異、待派工、方案待確認。剛剛的一鍵預約已經出現在「待派工」。' },
-    { as: 'advisor@example.com', sel: '[data-board]', t: '今日到府：合併到府', d: '張女士家今天兩個施工包：陳師傅先裝夜燈與門檻提示燈條（B，已完成），吳師傅再裝關懷設備（A）。點進去看方案圖面。', click: '[data-board]' },
+    { as: 'advisor@example.com', sel: '[data-board]', t: '今日到府：合併到府', d: '林女士家今天兩個施工包：陳師傅先裝夜燈與門檻提示燈條（B，已完成），吳師傅再裝關懷設備（A）。點進去看方案圖面。', click: '[data-board]' },
     { as: 'advisor@example.com', sel: '.pm', t: '規劃：同一張圖，分施工包', d: '每個標記屬於 A 關懷設備或 B 夜間照明；點標記再點圖面可移動位置。長輩確認後鎖定版本，之後的變更都有版本紀錄。' },
     { as: 'tech@example.com', sel: '.card.focus', t: '③ 技師｜今日工作', d: '吳師傅只看到自己的工單，今天的工單聚焦、其他淡化；水電技師的施工包是灰色、只能查看。', click: '.card.focus' },
     { as: 'tech@example.com', sel: '.tmapc', t: '照著裝：圖上只標號碼', d: '施工圖只標施工順序號碼，顏色代表狀態：紅色待施工、酒紅打勾已完成、珊瑚色差異、灰色是水電技師負責的項目。下面依區域分組，點開就看到該區的工作。', click: '[data-tgrp="玄關"]', clickBtn: '幫我展開「玄關」' },
