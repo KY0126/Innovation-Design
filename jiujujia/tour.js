@@ -1,7 +1,7 @@
 // 揪居家 3 分鐘導覽：遮罩＋功能卡，邊導覽邊操作；切換角色是真的登出再登入（不是沙盒切換器）
 (function () {
   const PAGE = /admin\.html/.test(location.pathname) ? 'admin' : 'app';
-  const K = 'jjj_tour_step';
+  const K = 'jjj_tour_step', OFF = 'jjj_tour_off';
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
   const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（門市顧問）', 'tech@example.com': '吳師傅（技師）', 'manager@example.com': '張經理（總部）' };
   const STEPS = [
@@ -30,24 +30,24 @@
   // ---------- 樣式 ----------
   const css = document.createElement('style');
   css.textContent = `#jjjDemo{position:fixed;right:0;top:46%;z-index:9998;display:flex;flex-direction:column;align-items:flex-end;font:12.5px/1.4 "Noto Sans TC",system-ui,sans-serif}
-#jjjDemo>button{background:#2B2B29;color:#fff;border:0;border-radius:10px 0 0 10px;padding:8px 6px;writing-mode:vertical-rl;letter-spacing:2px;cursor:pointer;opacity:.82}
+#jjjDemo>button{background:#D4003C;color:#fff;border:0;border-radius:10px 0 0 10px;padding:9px 10px 9px 12px;white-space:nowrap;letter-spacing:1px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:-2px 2px 10px rgba(0,0,0,.2)}
 #jjjDemo .pn{display:none;background:#fff;color:#2B2B29;border:1px solid #ddd;border-right:0;border-radius:10px 0 0 10px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:190px}
 #jjjDemo.open .pn{display:block}#jjjDemo .pn b{display:block;margin-bottom:6px}#jjjDemo .pn button{display:block;width:100%;margin-top:6px;border:1px solid #ddd;border-radius:8px;background:#fff;padding:6px;cursor:pointer;font:inherit}
 #jjjDemo .pn button.p{background:#D4003C;border-color:#D4003C;color:#fff}
 #jjjMask{position:fixed;z-index:9996;border-radius:12px;box-shadow:0 0 0 9999px rgba(20,20,24,.55);pointer-events:none;transition:all .25s;outline:3px solid #FFFFFF}
-#jjjCard{position:fixed;z-index:9997;width:min(340px,calc(100vw - 24px));background:#fff;color:#2B2B29;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.3);padding:14px 14px 12px;font:14px/1.55 "Noto Sans TC",system-ui,sans-serif}
+#jjjCard{position:fixed;padding-right:34px!important;z-index:9997;width:min(340px,calc(100vw - 24px));background:#fff;color:#2B2B29;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.3);padding:14px 14px 12px;font:14px/1.55 "Noto Sans TC",system-ui,sans-serif}
 #jjjCard .n{font-size:12px;color:#D4003C;font-weight:700}#jjjCard h3{margin:2px 0 6px;font-size:16px}#jjjCard p{margin:0 0 10px;color:#4A4945}
 #jjjCard .r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}#jjjCard button{border:1px solid #DDD;background:#fff;border-radius:9px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
-#jjjCard button.p{background:#D4003C;color:#fff;border-color:#D4003C}#jjjCard button.x{margin-left:auto;border:0;color:#888}#jjjCard .who{font-size:12.5px;background:#FCE6EC;color:#8F0029;border-radius:8px;padding:6px 8px;margin-bottom:8px}`;
+#jjjCard button.p{background:#D4003C;color:#fff;border-color:#D4003C}#jjjCard button.x{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border:0;border-radius:50%;color:#6A6A66;font-size:20px;line-height:28px;background:transparent}#jjjCard button.x:hover{background:#F1F1F1}#jjjCard .who{font-size:12.5px;background:#FCE6EC;color:#8F0029;border-radius:8px;padding:6px 8px;margin-bottom:8px}`;
   document.head.appendChild(css);
   // ---------- 示範工具（取代原本擋住按鈕的右下角浮層） ----------
   const old = document.getElementById('webDemo'); if (old) old.remove();
   const dm = document.createElement('div'); dm.id = 'jjjDemo';
-  dm.innerHTML = `<button aria-expanded="false" title="示範工具">示範工具</button><div class="pn"><b>瀏覽器展示版</b><span style="color:#777">資料存在這台瀏覽器</span><button class="p" data-t="start">3 分鐘導覽</button><button data-t="reset">重設示範資料</button></div>`;
+  dm.innerHTML = `<button aria-expanded="false" title="導覽與示範工具">導覽</button><div class="pn"><b>瀏覽器展示版</b><span style="color:#777">資料存在這台瀏覽器</span><button class="p" data-t="start">3 分鐘導覽</button><button data-t="reset">重設示範資料</button></div>`;
   document.body.appendChild(dm);
   dm.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.t === 'start') { LS.set(K, '0'); dm.classList.remove('open'); show(); }
-    else if (b.dataset.t === 'reset') { if (b.dataset.arm) { LS.del(K); window.JJJWEB && JJJWEB.reset(); } else { b.dataset.arm = 1; b.textContent = '再按一次確認重設'; } }
+    else if (b.dataset.t === 'reset') { if (b.dataset.arm) { LS.del(K); LS.del(OFF); window.JJJWEB && JJJWEB.reset(); } else { b.dataset.arm = 1; b.textContent = '再按一次確認重設'; } }
     else { dm.classList.toggle('open'); b.setAttribute('aria-expanded', dm.classList.contains('open')); } });
   // ---------- 導覽 ----------
   let mask, card, timer, me = null, scrolled = false;
@@ -79,7 +79,7 @@
     if (!right) act = `<div class="who">這一步要用 <b>${WHO[s.as]}</b> 的帳號${page !== PAGE ? '，在' + (page === 'admin' ? '企業營運資訊平台' : '手機 App') : ''}操作。導覽會幫你登出，再用示範帳號真的登入。</div><button class="p" data-tt="switch">幫我切換</button>`;
     else if (s.act && LS.get('jjj_tour_acted') !== String(i)) act = `<button class="p" data-tt="act">${s.btn || '幫我做'}</button>${s.click ? `<button data-tt="click">${s.clickBtn || '幫我點'}</button>` : ''}`;
     else if (s.click) act = `<button class="p" data-tt="click">${s.clickBtn || '幫我點'}</button>`;
-    card.innerHTML = `<div class="n">導覽 ${i + 1}／${STEPS.length}｜${WHO[s.as]}</div><h3>${s.t}</h3><p>${s.d}</p><div class="r">${act}${i ? '<button data-tt="prev">上一步</button>' : ''}<button ${act ? '' : 'class="p"'} data-tt="next">${i === STEPS.length - 1 ? '完成' : '下一步'}</button><button class="x" data-tt="stop">結束</button></div>`;
+    card.innerHTML = `<div class="n">導覽 ${i + 1}／${STEPS.length}｜${WHO[s.as]}</div><h3>${s.t}</h3><p>${s.d}</p><div class="r">${act}${i ? '<button data-tt="prev">上一步</button>' : ''}<button ${act ? '' : 'class="p"'} data-tt="next">${i === STEPS.length - 1 ? '完成' : '下一步'}</button></div><button class="x" data-tt="stop" aria-label="關閉導覽" title="關閉導覽">×</button>`;
     scrolled = false; clearInterval(timer); timer = setInterval(place, 350); setTimeout(place, 30);
   }
   async function doAct(s) {
@@ -92,8 +92,8 @@
   }
   document.addEventListener('click', async e => {
     const b = e.target.closest && e.target.closest('#jjjCard [data-tt]'); if (!b) return; const i = +LS.get(K), s = STEPS[i], t = b.dataset.tt;
-    if (t === 'stop') return stop();
-    if (t === 'next') { if (i >= STEPS.length - 1) return stop(); LS.set(K, String(i + 1)); const n = STEPS[i + 1]; if ((n.page || 'app') !== PAGE && me && me.email === n.as) { location.href = n.page === 'admin' ? 'admin.html' : 'app.html'; return; } return show(); }
+    if (t === 'stop') { LS.set(OFF, '1'); return stop(); }
+    if (t === 'next') { if (i >= STEPS.length - 1) { LS.set(OFF, '1'); return stop(); } LS.set(K, String(i + 1)); const n = STEPS[i + 1]; if ((n.page || 'app') !== PAGE && me && me.email === n.as) { location.href = n.page === 'admin' ? 'admin.html' : 'app.html'; return; } return show(); }
     if (t === 'prev') { LS.set(K, String(i - 1)); return show(); }
     b.disabled = true;
     try {
@@ -104,6 +104,8 @@
   });
   addEventListener('resize', place);
   // 頁面載入（含切換帳號後）自動接續導覽
+  // 預設自動開始導覽；按 × 關掉後不再自動出現（可從右側「導覽」重新開始）
+  if (LS.get(K) == null && LS.get(OFF) == null) LS.set(K, '0');
   if (LS.get(K) != null) setTimeout(show, 1600);
   window.JJJTOUR = { start() { LS.set(K, '0'); show(); }, stop };
 })();
