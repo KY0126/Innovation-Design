@@ -3,7 +3,7 @@
   const PAGE = /admin\.html/.test(location.pathname) ? 'admin' : 'app';
   const K = 'jjj_tour_step', OFF = 'jjj_tour_off';
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
-  const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（門市顧問）', 'tech@example.com': '吳師傅（技師）', 'manager@example.com': '張經理（總部）' };
+  const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（生活顧問）', 'tech@example.com': '吳師傅（技師）', 'manager@example.com': '張經理（總部）' };
   const STEPS = [
     { as: 'chen@example.com', sel: '.agq', t: '① 消費者｜從 AI 顧問阿國開始', d: '陳小姐的媽媽剛開始一個人住。全國電子 App 首頁就有全國電子 AI 顧問阿國，點「幫長輩家做居家診斷」。', click: '.agq [data-go="b1"]' },
     { as: 'chen@example.com', sel: '[data-a="loginChild"]', t: '由子女代填', d: '長輩不用操作手機；選「幫長輩填」。', click: '[data-a="loginChild"]' },
@@ -13,7 +13,7 @@
     { as: 'chen@example.com', sel: '#cmp_b3h', t: '夜間走道實景', d: '同一段 AR 掃描畫面，模擬晚上起床時夜燈一路亮到浴室門口。' },
     { as: 'chen@example.com', sel: '[data-go="share"]', t: '儲存或分享給家人', d: '可以存到「我的家」，或用 LINE 把摘要分享到家人群組（只分享摘要，不含地址與作息）。' },
     { as: 'li@example.com', sel: '.card:has([data-rbook])', t: '已啟用的家庭｜主動提醒', d: '換成已經在用揪夜安的李小姐。關懷設備會主動提醒：感測器電量、夜燈年度健檢。按「一鍵預約」就送出維護工單草稿，門市確認時段後派工。', act: 'm2', btn: '帶我到「我的家」', click: '[data-rbook]', clickBtn: '幫我一鍵預約' },
-    { as: 'advisor@example.com', sel: '.kp4', t: '② 門市顧問｜今天', d: '王小明登入後先看 4 張指標卡與一句洞察：今日諮詢、待審差異、待派工、方案待確認。剛剛的一鍵預約已經出現在「待派工」。' },
+    { as: 'advisor@example.com', sel: '.kp4', t: '② 生活顧問｜今天', d: '王小明登入後先看 4 張指標卡與一句洞察：今日諮詢、待審差異、待派工、方案待確認。剛剛的一鍵預約已經出現在「待派工」。' },
     { as: 'advisor@example.com', sel: '[data-board]', t: '今日到府：合併到府', d: '林女士家今天兩個施工包：陳師傅先裝夜燈與門檻提示燈條（B，已完成），吳師傅再裝關懷設備（A）。點進去看方案圖面。', click: '[data-board]' },
     { as: 'advisor@example.com', sel: '.pm', t: '規劃：同一張圖，分施工包', d: '每個標記屬於 A 關懷設備或 B 夜間照明；點標記再點圖面可移動位置。長輩確認後鎖定版本，之後的變更都有版本紀錄。' },
     { as: 'tech@example.com', sel: '.card.focus', t: '③ 技師｜今日工作', d: '吳師傅只看到自己的工單，今天的工單聚焦、其他淡化；水電技師的施工包是灰色、只能查看。', click: '.card.focus' },
