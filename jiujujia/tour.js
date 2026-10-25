@@ -8,7 +8,7 @@
     { as: 'chen@example.com', sel: '.agq', t: '① 消費者｜從 AI 顧問阿國開始', d: '陳小姐的媽媽剛開始一個人住。全國電子 App 首頁就有全國電子 AI 顧問阿國，點「幫長輩家做居家診斷」。', click: '.agq [data-go="b1"]' },
     { as: 'chen@example.com', sel: '[data-a="loginChild"]', t: '由子女代填', d: '長輩不用操作手機；選「幫長輩填」。', click: '[data-a="loginChild"]' },
     { as: 'chen@example.com', sel: '#arBtn', t: 'AR 掃描（場勘）', d: '手機對著走廊掃一次，量走道寬與門檻高度。只保存尺寸，不保存影像。', click: '#arBtn' },
-    { as: 'chen@example.com', sel: '.arres', t: '量測結果', d: '走道 92 cm、門檻 2 cm。接著回答阿國 5 題；導覽可以幫你一次填完。', act: 'diag', btn: '幫我完成診斷' },
+    { as: 'chen@example.com', sel: '.arres', t: '量測結果', d: '走道 92 cm、門檻 2 cm。接著回答全國電子 AI 顧問阿國 5 題；導覽可以幫你一次填完。', act: 'diag', btn: '幫我完成診斷' },
     { as: 'chen@example.com', sel: '#cmp_b3', t: '看懂：安裝前後對比', d: '左右拖曳中間把手：左邊是現在的紅黃綠燈，右邊是安裝後的設備位置。切到「夜間」看感應夜燈亮起的範圍。' },
     { as: 'chen@example.com', sel: '#cmp_b3h', t: '夜間走道實景', d: '同一段 AR 掃描畫面，模擬晚上起床時夜燈一路亮到浴室門口。' },
     { as: 'chen@example.com', sel: '[data-go="share"]', t: '儲存或分享給家人', d: '可以存到「我的家」，或用 LINE 把摘要分享到家人群組（只分享摘要，不含地址與作息）。' },
