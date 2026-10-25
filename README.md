@@ -6,7 +6,7 @@
 
 | 項目 | 連結 |
 |---|---|
-| Demo 影片 | https://youtu.be/aSZN5FemxHg |
+| Demo 影片 | https://youtu.be/BWO1hCpEwwU |
 | 設計思考流程與九大工具 | `jiujujia/design-thinking/` |
 | 消費者端 APP | `jiujujia/app.html` |
 | 企業營運資訊平台 | `jiujujia/admin.html` |
