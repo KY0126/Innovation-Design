@@ -335,7 +335,7 @@ export function mountServiceMap(root, opt = {}) {
       else if (k === 'pilot') { const g = groups().find(x => x.rows.some(r => r.s.pilot)); if (g) openGroup(g.id); S.selGroup = allRows().filter(r => r.s.pilot).map(r => r.key); S.sel = null; applyDim(); panel(); }
       else if (k === 'all') { S.open = null; S.selGroup = null; S.sel = null; applyDim(); panel(); }
       else { const g = groups().find(x => x.st === k); if (g) { openGroup(g.id); S.sel = null; applyDim(); panel(); } else toast('目前沒有符合的家庭'); } }
-    else if (a === 'draft') { b.disabled = true; try { const d = await api('/advisor/households/' + b.dataset.id + '/draft', { method: 'POST', body: { device: '感應小夜燈｜走道', kind: '年度健檢', reason: '服務地圖建立' } }); toast('已建立維護工單草稿 ' + d.code + '，門市顧問確認後派工'); await loadLive(); S.open = undefined; build(); } catch (x) { toast(x.message); b.disabled = false; } }
+    else if (a === 'draft') { b.disabled = true; try { const d = await api('/advisor/households/' + b.dataset.id + '/draft', { method: 'POST', body: { device: '感應小夜燈｜走道', kind: '年度健檢', reason: '服務地圖建立' } }); toast('已建立維護工單草稿 ' + d.code + '，生活顧問確認後派工'); await loadLive(); S.open = undefined; build(); } catch (x) { toast(x.message); b.disabled = false; } }
   });
   root.addEventListener('change', e => { const t = e.target;
     if (t.dataset.smt) { S.types[t.dataset.smt] = t.checked ? 1 : 0; S.open = undefined; build(); }
