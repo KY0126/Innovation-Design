@@ -2,6 +2,7 @@
 (function () {
   const PAGE = /admin\.html/.test(location.pathname) ? 'admin' : 'app';
   const K = 'jjj_tour_step', OFF = 'jjj_tour_off';
+  const NAV = 'jjj_tour_nav';
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
   const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（生活顧問）', 'tech@example.com': '吳師傅（技師）', 'manager@example.com': '張經理（總部）' };
   const STEPS = [
@@ -27,6 +28,9 @@
     { as: 'manager@example.com', page: 'admin', sel: '#nav [data-tab="ops"]', t: '服務地圖', d: '全台 316 家門市 → 縣市 → 逢甲店街區，三層往下鑽、往上捲；選取後其他區塊轉灰。', click: '#nav [data-tab="ops"]' },
     { as: 'manager@example.com', page: 'admin', sel: '#mapView .smmain', t: '三層服務地圖', d: '圖上只放顏色、高度、建築與號碼，細節都在右側分組清單；點清單或地圖都會聚焦、其他轉灰。點台中市 →「進入」→ 點逢甲店 →「進入街區」，每一戶的號碼對應清單，可直接建立維護工單草稿。導覽到這裡結束。' },
   ];
+  const A0 = STEPS.findIndex(s => s.page === 'admin');
+  const isAdm = i => (STEPS[i] && STEPS[i].page) === 'admin';
+  const START = PAGE === 'admin' ? A0 : 0;
   // ---------- 樣式 ----------
   const css = document.createElement('style');
   css.textContent = `#jjjDemo{position:fixed;right:0;top:46%;z-index:9998;display:flex;flex-direction:column;align-items:flex-end;font:12.5px/1.4 "Noto Sans TC",system-ui,sans-serif}
@@ -43,10 +47,11 @@
   // ---------- 示範工具（取代原本擋住按鈕的右下角浮層） ----------
   const old = document.getElementById('webDemo'); if (old) old.remove();
   const dm = document.createElement('div'); dm.id = 'jjjDemo';
-  dm.innerHTML = `<button aria-expanded="false" title="導覽與示範工具">導覽</button><div class="pn"><b>瀏覽器展示版</b><span style="color:#777">資料存在這台瀏覽器</span><button class="p" data-t="start">3 分鐘導覽</button><button data-t="reset">重設示範資料</button></div>`;
+  dm.innerHTML = `<button aria-expanded="false" title="導覽與示範工具">導覽</button><div class="pn"><b>瀏覽器展示版</b><span style="color:#777">資料存在這台瀏覽器</span>${PAGE === 'admin' ? '<button class="p" data-t="start">企業平台導覽</button><button data-t="full">完整導覽（從 App 開始）</button>' : '<button class="p" data-t="start">3 分鐘導覽</button>'}<button data-t="reset">重設示範資料</button></div>`;
   document.body.appendChild(dm);
   dm.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.t === 'start') { LS.set(K, '0'); dm.classList.remove('open'); show(); }
+    if (b.dataset.t === 'start') { LS.set(K, String(START)); dm.classList.remove('open'); show(); }
+    else if (b.dataset.t === 'full') { LS.set(K, '0'); dm.classList.remove('open'); show(); }
     else if (b.dataset.t === 'reset') { if (b.dataset.arm) { LS.del(K); LS.del(OFF); window.JJJWEB && JJJWEB.reset(); } else { b.dataset.arm = 1; b.textContent = '再按一次確認重設'; } }
     else { dm.classList.toggle('open'); b.setAttribute('aria-expanded', dm.classList.contains('open')); } });
   // ---------- 導覽 ----------
@@ -57,10 +62,13 @@
   async function switchTo(email, page) {
     try { await api('/auth/logout', { method: 'POST' }); } catch (e) {}
     await api('/auth/login', { method: 'POST', body: { email, password: 'demo1234' } });
-    location.href = (page === 'admin' ? 'admin.html' : 'app.html');
+    LS.set(NAV, '1'); location.href = (page === 'admin' ? 'admin.html' : 'app.html');
   }
+  let lastWho = 0, busy = false;
   function place() {
     const i = +LS.get(K), s = STEPS[i]; if (!s || !card) return;
+    // 在頁面上自行登入後，導覽卡跟著更新（不必再按「幫我切換」）
+    if (!(me && me.email === s.as) && !busy && Date.now() - lastWho > 1500) { lastWho = Date.now(); busy = true; who().then(u => { busy = false; if (u && u.email === s.as) show(); }); }
     const el = s.sel && document.querySelector(s.sel), ok = el && el.getClientRects().length && (s.page || 'app') === PAGE && me && me.email === s.as;
     if (ok) { const r = el.getBoundingClientRect(); if (!scrolled || r.bottom < 0 || r.top > innerHeight) { el.scrollIntoView({ block: 'center' }); scrolled = true; }
       const q = el.getBoundingClientRect(); Object.assign(mask.style, { display: '', left: q.left - 6 + 'px', top: q.top - 6 + 'px', width: q.width + 12 + 'px', height: q.height + 12 + 'px' });
@@ -79,7 +87,8 @@
     if (!right) act = `<div class="who">這一步要用 <b>${WHO[s.as]}</b> 的帳號${page !== PAGE ? '，在' + (page === 'admin' ? '企業營運資訊平台' : '手機 App') : ''}操作。導覽會幫你登出，再用示範帳號真的登入。</div><button class="p" data-tt="switch">幫我切換</button>`;
     else if (s.act && LS.get('jjj_tour_acted') !== String(i)) act = `<button class="p" data-tt="act">${s.btn || '幫我做'}</button>${s.click ? `<button data-tt="click">${s.clickBtn || '幫我點'}</button>` : ''}`;
     else if (s.click) act = `<button class="p" data-tt="click">${s.clickBtn || '幫我點'}</button>`;
-    card.innerHTML = `<div class="n">導覽 ${i + 1}／${STEPS.length}｜${WHO[s.as]}</div><h3>${s.t}</h3><p>${s.d}</p><div class="r">${act}${i ? '<button data-tt="prev">上一步</button>' : ''}<button ${act ? '' : 'class="p"'} data-tt="next">${i === STEPS.length - 1 ? '完成' : '下一步'}</button></div><button class="x" data-tt="stop" aria-label="關閉導覽" title="關閉導覽">×</button>`;
+    const lab = PAGE === 'admin' && isAdm(i) ? `企業平台導覽 ${i - A0 + 1}／${STEPS.length - A0}` : `導覽 ${i + 1}／${STEPS.length}`;
+    card.innerHTML = `<div class="n">${lab}｜${WHO[s.as]}</div><h3>${s.t}</h3><p>${s.d}</p><div class="r">${act}${i && !(PAGE === 'admin' && i === A0) ? '<button data-tt="prev">上一步</button>' : ''}<button ${act ? '' : 'class="p"'} data-tt="next">${i === STEPS.length - 1 ? '完成' : '下一步'}</button></div><button class="x" data-tt="stop" aria-label="關閉導覽" title="關閉導覽">×</button>`;
     scrolled = false; clearInterval(timer); timer = setInterval(place, 350); setTimeout(place, 30);
   }
   async function doAct(s) {
@@ -93,7 +102,7 @@
   document.addEventListener('click', async e => {
     const b = e.target.closest && e.target.closest('#jjjCard [data-tt]'); if (!b) return; const i = +LS.get(K), s = STEPS[i], t = b.dataset.tt;
     if (t === 'stop') { LS.set(OFF, '1'); return stop(); }
-    if (t === 'next') { if (i >= STEPS.length - 1) { LS.set(OFF, '1'); return stop(); } LS.set(K, String(i + 1)); const n = STEPS[i + 1]; if ((n.page || 'app') !== PAGE && me && me.email === n.as) { location.href = n.page === 'admin' ? 'admin.html' : 'app.html'; return; } return show(); }
+    if (t === 'next') { if (i >= STEPS.length - 1) { LS.set(OFF, '1'); return stop(); } LS.set(K, String(i + 1)); const n = STEPS[i + 1]; if ((n.page || 'app') !== PAGE && me && me.email === n.as) { LS.set(NAV, '1'); location.href = n.page === 'admin' ? 'admin.html' : 'app.html'; return; } return show(); }
     if (t === 'prev') { LS.set(K, String(i - 1)); return show(); }
     b.disabled = true;
     try {
@@ -105,7 +114,10 @@
   addEventListener('resize', place);
   // 頁面載入（含切換帳號後）自動接續導覽
   // 預設自動開始導覽；按 × 關掉後不再自動出現（可從右側「導覽」重新開始）
-  if (LS.get(K) == null && LS.get(OFF) == null) LS.set(K, '0');
+  // 直接打開某一端（不是導覽帶過來的）時，導覽從這一端的第一步開始：企業平台不會跳出消費者步驟
+  const viaTour = LS.get(NAV) === '1'; LS.del(NAV);
+  if (!viaTour && LS.get(K) != null && isAdm(+LS.get(K)) !== (PAGE === 'admin')) LS.set(K, String(START));
+  if (LS.get(K) == null && LS.get(OFF) == null) LS.set(K, String(START));
   if (LS.get(K) != null) setTimeout(show, 1600);
-  window.JJJTOUR = { start() { LS.set(K, '0'); show(); }, stop };
+  window.JJJTOUR = { start() { LS.set(K, String(START)); show(); }, stop };
 })();
