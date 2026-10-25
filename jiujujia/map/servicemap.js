@@ -294,7 +294,7 @@ export function mountServiceMap(root, opt = {}) {
     return `<div class="smcard"><div class="smph"><span class="nb" style="--c:${HSC[r.st][0]}">${r.no}</span>${esc(real.name)}${x}<small>${HSC[r.st][1]}｜${esc(r.sub)}</small></div><div class="smpb"><div class="kv"><span>長輩</span><b>${esc(real.elder_note || '—')}</b></div><div class="kv"><span>子女帳號</span><b>${esc(real.owner)}</b></div>
       ${wo.map(o => `<div class="kv"><span>${esc(o.kind)}</span><b>${esc(o.status)}${o.label && o.label !== '待排程' ? '｜' + esc(o.label) : ''}</b></div>`).join('')}
       ${rem.map(y => `<div class="kv"><span>${esc(y.device)}｜${esc(y.kind)}</span><b>${esc(y.status)}</b></div>`).join('')}
-      <button class="smgo" data-sm="draft" data-id="${real.id}">建立維護工單草稿</button><div class="mu">草稿送到門市顧問，確認時段後派工；地址只有負責顧問與技師看得到</div></div></div>`;
+      <button class="smgo" data-sm="draft" data-id="${real.id}">建立維護工單草稿</button><div class="mu">草稿送到生活顧問，確認時段後派工；地址只有負責顧問與技師看得到</div></div></div>`;
   }
   function panel() {
     const G2 = groups(), color = r => S.level === 3 ? HSC[r.st][0] : S.level === 2 ? TYC[r.s.type] : ramp(AGE[r.key] || 15);
