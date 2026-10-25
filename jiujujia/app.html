@@ -433,7 +433,7 @@ b1:()=>`${hdr('揪居家｜居家安全評估')}<div class="scroll" style="paddi
  <div class="card c3"><b>同一位生活顧問陪你的家，從居家安全開始</b>
  <div class="row"><span class="n3">①</span><span><b style="font-weight:500">先評估</b><div class="muted" style="font-size:.88em">AR 掃描（場勘）量尺寸、標位置；全國電子 AI 顧問阿國依診斷推薦方案；居安規劃師把夜間動線照明與關懷設備整合成一張報價</div></span></div>
  <div class="row"><span class="n3">②</span><span><b style="font-weight:500">再改善</b><div class="muted" style="font-size:.88em">統一排程、合併到府安裝，完工驗收並教長輩按「我很好」</div></span></div>
- <div class="row"><span class="n3">③</span><span><b style="font-weight:500">後關心</b><div class="muted" style="font-size:.88em">長輩關懷不裝鏡頭，異常先問長輩，每週語音電話</div></span></div></div>
+ <div class="row"><span class="n3">③</span><span><b style="font-weight:500">後關心</b><div class="muted" style="font-size:.88em">長輩關懷預設不裝鏡頭，異常先問長輩，每週語音電話</div></span></div></div>
  <div class="muted" style="font-size:.88em;margin:0 16px 12px;line-height:1.5">試點先做揪夜安：臥室到浴室的夜間動線；想要的其他東西，可以用揪心願說出來。</div>
  <div class="sec">這次由誰填寫？</div>
  <div class="pad"><button class="btn" data-a="loginChild">幫長輩填（我是子女）</button><button class="btn ghost" data-a="loginSelf">我是長輩本人（自動大字模式）</button><p class="muted" style="text-align:center">資料只給您的家人與綁定門市；也可以直接到門市，由顧問陪同填寫</p></div></div>`,
@@ -463,7 +463,7 @@ b3:()=>{const as=S.hh&&S.hh.assessment;if(!as)return V.b1();const r=as.rec,m=as.
  ${cmpPlan('b3',{L:as.lights,pins:DPINS(r.id==='morning'?{morning:1}:{night:1},m.threshold_cm),path:r.path})}
  ${r.path?cmpHall('b3h'):''}
  <div class="card">${r.items.map(([a,b])=>`<div class="row"><span>${esc(a)}</span><b style="font-weight:500;text-align:right">${esc(b)}</b></div>`).join('')}
-  <div style="margin-top:10px"><span class="tag ok">整組不含鏡頭</span></div><div class="muted" style="font-size:.85em;margin-top:6px">擴展期可加購「緊急查看」：平時不看影像，長輩沒回應時家屬才能查看約 30 秒，須長輩事先書面同意</div></div>
+  <div style="margin-top:10px"><span class="tag ok">預設不含鏡頭</span></div><div class="muted" style="font-size:.85em;margin-top:6px">可選影像確認版：平常只在本機錄影；異常且長輩沒回應時，LINE 通知家人、片段在 App 觀看，須長輩書面同意</div></div>
  ${Object.keys(m).length?`<div class="card"><b>AR 掃描（場勘）量測</b>${measRows(m)}</div>`:''}
  <div class="card" style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 90 90" width="78" height="78" role="img"><title>您的揪居家同心圓</title><circle cx="45" cy="45" r="43" fill="none" stroke="#8A8983" stroke-width="1"/><circle cx="45" cy="45" r="32" fill="#8F0029" fill-opacity=".22" stroke="#8F0029" stroke-width="1"/><circle cx="45" cy="45" r="21" fill="#B80C40" fill-opacity=".22" stroke="#B80C40" stroke-width="1"/><circle cx="45" cy="45" r="10" fill="#D4003C" fill-opacity=".45" stroke="#D4003C" stroke-width="1"/></svg><div class="muted" style="font-size:.88em;line-height:1.7"><div><b style="color:#D4003C">●</b> 家電檔案（免費）</div><div><b style="color:#B80C40">●</b> 家電保養：擴展期開放</div><div><b style="color:#8F0029">●</b> 長輩關懷：${esc(r.n)}</div><div>○ 家電換新：擴展期開放</div></div></div>
  <div class="card" style="background:var(--note)"><b>下一步：到門市做居安規劃</b><div class="muted" style="margin-top:4px">診斷與 AR 掃描（場勘）結果會自動帶給生活顧問；居安規劃師把夜間動線照明與關懷設備整合成一張報價，到店不用再講一次。</div></div>
@@ -563,7 +563,7 @@ const CAT=[
  {ring:2,id:'morning',n:'晨起平安確認',d:'門窗感測 1、人體感測 1',p:2400,g:1},
  {ring:2,id:'power',n:'用電異常提醒',d:'智慧插座 3、溫度感測 1',p:1500,g:1},
  {ring:2,id:'alert',n:'異常時依序通知家人',d:'先問長輩，再通知子女、成年家人與就近聯絡人',p:0,g:1},
- {ring:2,id:'cam',n:'緊急查看（擴展期加購）',d:'鏡頭附實體遮蔽蓋，平時不看影像；長輩沒回應時，家屬才能查看約 30 秒，須長輩事先書面同意',p:0,later:1},
+ {ring:2,id:'cam',n:'影像確認（選配）',d:'走廊或門口攝影機，有動靜才在本機錄影，平常不上傳、保存 6 個月；異常且長輩沒回應時，LINE 官方帳號通知指定家人並附截圖預覽，片段在 App 觀看；須長輩書面同意，攝影機選配另計',p:0},
  {ring:3,id:'ac',n:'家電換新',d:'擴展期開放',p:0,exp:1}
 ];
 const RING=[['家電檔案｜免費','#D4003C'],['家電保養｜單次或年繳','#B80C40'],['長輩關懷｜設定費＋月付','#E0A030'],['家電換新｜擴展期','#888780']];
@@ -646,7 +646,7 @@ a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scro
   <p class="rs" style="margin:6px 0 0">付款人可以是子女或長輩本人，也可由兄弟姊妹分攤月費；不論誰付款，都須長輩本人同意才成交。家電換新與以租代買於擴展期開放</p></div>
  <div class="ly"><h3>第二聯絡人（必填）</h3><label class="rs">姓名<input class="fld" id="c2n" value="${a.c2n}" placeholder="例如：${CN('第二聯絡人','第二聯絡人')}"></label><label class="rs" style="display:block;margin-top:8px">電話<input class="fld" id="c2p" inputmode="tel" value="${a.c2p}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">依序通知：長輩本人 → 主要聯絡人 → 第二聯絡人 → 就近聯絡人。</div></div>`:'<div class="ly"><h3>關懷方案</h3><div class="rs">本次未選長輩關懷項目，無月費。</div></div>'}
  </div>${sumbar('下一步：確認','advConfirm',hasGuard()&&!a.c2n.trim(),'請填寫第二聯絡人姓名')}`},
-a5:()=>{const a=A(),L=[a.sel.cam?'已向長輩說明門口攝影機平常遮蓋、異常時才開放家人查看，並取得本人同意':'已向長輩說明設備會記錄活動、不拍攝影像，並取得本人同意','已說明本服務為生活關懷，非醫療照護；緊急請撥 119','付款人（子女或長輩本人）同意服務條款與資料使用說明'];return `${stf('確認方案')}<div class="scroll">
+a5:()=>{const a=A(),L=[a.sel.cam?'已向長輩說明攝影機平常只在本機錄影、保存 6 個月；異常且沒回應時經 LINE 官方帳號通知家人，片段只在 App 內觀看；長輩可隨時暫停或要求刪除，並取得本人書面同意':'已向長輩說明設備會記錄活動、不拍攝影像，並取得本人同意','已說明本服務為生活關懷，非醫療照護；緊急請撥 119','付款人（子女或長輩本人）同意服務條款與資料使用說明'];return `${stf('確認方案')}<div class="scroll">
  <div class="step">步驟 4／4｜同意事項皆須勾選</div>
  <div class="ly">${L.map((l,i)=>`<button class="it" data-cons="${i}"><span class="ck ${a.cons[i]?'on':''}">${a.cons[i]?'✓':''}</span><span style="flex:1">${l}</span></button>`).join('')}</div>
  <div class="ly"><h3>方案內容</h3>${CAT.filter(c=>a.sel[c.id]).map(c=>`<div class="rs">・${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div class="rs">・${c.n}（之後再評估）</div>`).join('')}</div>
@@ -928,7 +928,7 @@ pl:()=>{const H=S.hh,p=H&&H.plan;if(!p)return `${hdr('專屬居家方案')}<div 
  <div class="card"><div class="rs">${esc(p.created_at.slice(5,10).replace('-','/'))}｜${esc(h.store)}｜由生活顧問${esc(p.advisor||'')}規劃</div><b style="font-size:1.12em">${EN()}家｜${esc(planName(p.plan).split('｜')[0])}</b><div class="rs">${a.sel.morning?'臥室與晨起作息':'臥室到浴室'}｜由場域組合的專屬方案</div>
   <div style="display:flex;gap:12px;align-items:center;margin-top:8px">${ringSVG(a)}<div class="rs" style="line-height:1.75">${CAT.filter(c=>a.sel[c.id]).map(c=>`<div><span class="dot" style="background:${RING[c.ring][1]}"></span> ${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div>○ ${c.n}（之後評估）</div>`).join('')}</div></div></div>
  <div class="card" style="padding:4px 14px"><div class="row"><span>一次性費用</span><b>${fmt(p.one_time)}</b></div>${p.monthly?`<div class="row"><span>關懷月費</span><span style="text-align:right"><b>${fmt(p.monthly)}／月</b><span class="muted" style="display:block;font-size:.85em">不綁約；年繳 ${fmt(p.yearly)}（10 付 12）</span></span></div><div class="row"><span>兄弟姊妹分攤</span><span class="muted">2 人各約 ${fmt(Math.round(p.monthly/2))}／月</span></div>`:''}<div class="rs" style="padding:4px 0 8px">試點定價，實際依門市盤點；費用於門市或 App 行動支付付款</div></div>
- ${a.sel.cam?'<div class="card okbox" style="margin:0 12px 12px">'+EN()+'本人同意加裝門口攝影機：平常遮蓋不錄影，只在異常時開放給'+ON()+'查看；臥室與浴室不裝鏡頭。</div>':'<div class="card okbox" style="margin:0 12px 12px">設備不含鏡頭，只記錄門窗與活動；'+EN()+'本人可在門市親自確認。</div>'}
+ ${a.sel.cam?'<div class="card okbox" style="margin:0 12px 12px">'+EN()+'本人同意加裝影像確認：平常只在本機錄影、保存 6 個月；異常且沒回應時，LINE 通知'+ON()+'，片段在 App 觀看；臥室與浴室不裝鏡頭。</div>':'<div class="card okbox" style="margin:0 12px 12px">設備不含鏡頭，只記錄門窗與活動；'+EN()+'本人可在門市親自確認。</div>'}
  ${H.pv?`<div class="card" style="padding:10px 14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>方案圖面</b>${verTag(H.pv)}</div><div class="muted" style="font-size:.88em;margin-top:2px">${H.pv.status==='長輩已確認'||H.pv.status==='差異已核准'?EN()+'已在門市看過安裝前後對比並同意（'+esc((H.pv.locked_at||'').slice(5,16).replace('-','/'))+'）；施工依這個版本':H.pv.status==='草稿'?'顧問規劃中，長輩確認後鎖定版本':esc(H.pv.reason||'')}</div>${(H.versions||[]).length>1?`<div class="rs" style="margin-top:4px">版本歷程：${H.versions.map(v=>'v'+v.ver+' '+esc(v.status)).join(' → ')}</div>`:''}</div>
  ${cmpPlan('pl',{L:H.assessment?H.assessment.lights:[],pins:H.pv.pins,path:!!a.sel.night})}`:''}
  <div class="card" style="display:flex;gap:10px;align-items:center"><div class="avt" style="background:var(--brand);width:40px;height:40px;font-size:1em">顧</div><div style="flex:1"><b>${esc(p.advisor||'生活顧問')}</b><div class="muted" style="font-size:.88em">${esc(h.store)}｜生活顧問認證</div></div><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div>
@@ -1050,9 +1050,9 @@ apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
  return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">
  <div class="step">把手機轉給${EN()}看｜大字顯示</div>
- ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。設備都不含鏡頭。'})}
+ ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。臥室與浴室不含鏡頭。'})}
  <div class="card"><b>會裝這些</b>${pins.filter(p=>p.k!=='note').map(p=>`<div class="row"><span><span class="dot" style="background:${PKC[p.pkg]}"></span> ${esc(p.label)}</span><span class="rs">${esc(p.room||'')}</span></div>`).join('')}</div>
- <div class="card okbox" style="margin:0 12px 12px">不裝鏡頭、不錄音。晚上起床燈會自己亮；沒事時按一下「我很好」就好。</div>
+ <div class="card okbox" style="margin:0 12px 12px">${(pins.some(p=>/攝影機/.test(p.label||''))||!!(B.plan&&B.plan.sel&&B.plan.sel.cam))?'臥室浴室不裝鏡頭；走廊攝影機平常只在本機錄影、沒人看。':'不裝鏡頭、不錄音。'}晚上起床燈會自己亮；沒事時按一下「我很好」就好。</div>
  <div class="pad"><button class="btn" data-a="elderOk">${EN()}同意，鎖定這個版本</button><button class="btn ghost" data-a="back">還要再調整</button></div></div>`},
 // 技師：施工（上圖只標號碼、下方依區域展開清單）／案場資訊
 tc:()=>{const o=S.order;if(!o)return V.t1();const tab=S.ttab==='info'?'info':'work';
