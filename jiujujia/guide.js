@@ -180,6 +180,14 @@ body.jgSheet{padding-bottom:48vh!important}body.jgSheet #view .scroll{padding-bo
 .jgb i{position:absolute;left:-15px;top:-15px;width:26px;height:26px;border-radius:50%;background:#C42D5A;color:#fff;font:900 14px/26px "Noto Sans TC",sans-serif;text-align:center;font-style:normal;box-shadow:0 0 0 3px #fff}
 #jgOpen{position:fixed;right:16px;bottom:16px;z-index:9993;background:#C42D5A;color:#fff;border:0;border-radius:22px;padding:10px 16px;font:700 14px "Noto Sans TC",system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer}
 body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDock #gate{right:var(--jgm,420px)}
+#jg .jgn{border:2px solid #C42D5A;background:#F7E9EE;border-radius:12px;padding:8px 12px;margin:2px 0 10px;color:#8E1E42;font-weight:700;line-height:1.5}
+#jg .jgn small{display:block;font-weight:400;color:#6F6670;font-size:13px}
+#jg .jgn.big{font-size:16px}
+#jg .jbt{display:block;width:100%;border-radius:10px;padding:9px;font:inherit;font-weight:700;margin:8px 0;cursor:pointer;border:1.5px solid #DDD5D0;background:#fff;color:#3D3A40}
+#jg .jbt.p{background:#C42D5A;border-color:#C42D5A;color:#fff}
+#jg.nc .bd>.who,#jg.nc .bd>h2,#jg.nc .bd>.sec:first-of-type,#jg.nc .rest,#jg.nc .ft [data-t=act]{display:none}
+#jg.nc .li,#jg.nd .li{opacity:.45}
+#jg.nd .ft [data-t=prev]{border:2px solid #C42D5A;color:#C42D5A}
 `;
   document.head.appendChild(css);
   // ---------- 小工具 ----------
@@ -200,7 +208,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   }
   const clipRect = () => { let c = { left: 0, top: 0, right: innerWidth, bottom: innerHeight }; if (PAGE === 'app') { const v = document.getElementById('view'); if (v) { const r = v.getBoundingClientRect(); c = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; } } if (panel && !panel.hidden && panel.classList.contains('sheet')) c.bottom = Math.min(c.bottom, panel.getBoundingClientRect().top); return c; };
   // ---------- 狀態 ----------
-  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760, showTok = 0, moving = false;
+  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760, showTok = 0, moving = false, mode = '', flash = null, lastKey = null, folded = false, followT = 0, autoT = 0, pendingA = false;
   // 換步驟或執行動作時鎖住面板按鈕，避免連點跳步、兩次更新互相覆蓋
   const lock = on => { moving = on; if (panel) panel.querySelectorAll('.ft button').forEach(b => { b.disabled = on; }); };
   const stepI = () => { const v = LS.get(K); return v == null ? null : +v; };
@@ -215,7 +223,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     panel.addEventListener('click', onClick);
   }
   function stop() { LS.del(K); LS.set(OFF, '1'); if (panel) panel.hidden = true; boxes.forEach(b => b.style.display = 'none'); document.body.classList.remove('jgDock', 'jgSheet'); openBtn(true); relayout(); }
-  function openBtn(show) { let b = document.getElementById('jgOpen'); if (!show) { if (b) b.remove(); return; } if (!b) { b = document.createElement('button'); b.id = 'jgOpen'; b.textContent = '開啟導覽'; b.onclick = () => start(); document.body.appendChild(b); } }
+  function openBtn(show) { let b = document.getElementById('jgOpen'); if (!show) { if (b) b.remove(); return; } if (!b) { b = document.createElement('button'); b.id = 'jgOpen'; b.textContent = '開啟導覽'; b.onclick = () => { if (stepI() != null && !LS.get(OFF)) { folded = false; openBtn(false); show(); } else start(); }; document.body.appendChild(b); } b.textContent = stepI() != null && !LS.get(OFF) ? '繼續導覽' : '開啟導覽'; }
   function relayout() { if (window.JJJFRAME && window.JJJFRAME.lay) window.JJJFRAME.lay(); place(); }
   function start(i) { LS.del(OFF); LS.set(K, String(i == null ? Math.max(0, firstOf(PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin')) : i)); openBtn(false); show(); }
   function tlHtml(ch) { return `<div class="tl">${CH.map((c, k) => `<div class="${k < ch ? 'dn' : k === ch ? 'cu' : ''}"><i></i>${c}</div>`).join('')}</div>`; }
@@ -233,6 +241,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const head = `<div class="grab"></div><div class="hd"><span><b>導覽 ${i + 1}／${STEPS.length}</b>｜${ENDS[s.end].n}</span><span><button data-t="min" aria-label="收合">${mini ? '展開' : '收合'}</button><button data-t="stop" aria-label="關閉導覽">✕</button></span></div>`;
     let body = '', foot = '';
     const onPage = ENDS[s.end].page === PAGE && (PAGE !== 'app' || END_NOW === s.end);
+    mode = '';
     if (!onPage) {
       body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>下一段在${ENDS[s.end].n}</h2><div class="why">四端各自登入。導覽會先登出，帶你到<b>${ENDS[s.end].n}的登入頁</b>，再用示範帳號登入。</div>`;
       foot = `${i ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="goend">前往${ENDS[s.end].n}</button>`;
@@ -246,7 +255,8 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     } else {
       const items = s.items.map((it, k) => `<div class="li" data-k="${k}"><i>${k + 1}</i><span>${it[1]}</span></div>`).join('');
       const flow = s.flow.map((f, k) => `<span class="${k === s.flow.length - 1 && s.flow.length === 1 || f === ENDS[s.end].n ? 'me' : ''}">${f}</span>`).join('<em>→</em>');
-      body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">這筆資料會送到</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
+      const fl = flash; flash = null;
+      body = `${fl ? `<div class="jgn">${fl.t}${fl.sub ? `<small>${fl.sub}</small>` : ''}</div>` : ''}${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">這筆資料會送到</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
       const nxt = STEPS[i + 1];
       const nextLabel = !nxt ? '完成導覽' : (nxt.end !== s.end || nxt.as !== s.as) ? `下一步：到${ENDS[nxt.end].n}` : '下一步';
       foot = `${i ? '<button data-t="prev">上一步</button>' : ''}${s.act && !s._done ? `<button class="p" data-t="act">${s.act.label}</button>` : ''}<button ${s.act && !s._done ? '' : 'class="p"'} data-t="next">${nextLabel}</button>`;
@@ -254,7 +264,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
       if (s.nav && !s._navved) { s._navved = true; await doNav(s); }
       if (s.pre && !s._pre && PAGE === 'app' && window.JJJ) { s._pre = true; try { s.pre(window.JJJ); } catch (e) {} await wait(500); }
       if (tok !== showTok) return;
+      mode = 'step'; s._where = where(); lastKey = screenKey();
     }
+    panel.classList.remove('nc', 'nd');
     panel.innerHTML = head + `<div class="bd">${body}</div><div class="ft">${foot}</div>`; moving = false;
     panel.classList.toggle('min', mini);
     relayout(); setTimeout(() => scrollFirst(), 200);
@@ -300,6 +312,8 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const b = e.target.closest('button'); if (!b) return; const t = b.dataset.t, i = stepI(), s = STEPS[i];
     if (b.dataset.go) { const k = +b.dataset.go; STEPS.forEach(x => { x._navved = false; x._done = false; x._pre = false; }); LS.set(K, String(k)); return show(); }
     if (t === 'stop') return stop();
+    if (t === 'back') { const w = s && s._where; clearNote(); if (w) await goWhere(w); lastKey = screenKey(); place(); return; }
+    if (t === 'fold') { folded = true; panel.hidden = true; boxes.forEach(x => x.style.display = 'none'); openBtn(true); return; }
     if (moving && t !== 'min') return;
     if (t === 'min') { mini = !mini; panel.classList.toggle('min', mini); b.textContent = mini ? '展開' : '收合'; return; }
     if (t === 'prev') { const p = STEPS[i - 1]; if (p) { p._navved = false; p._done = false; p._pre = false; } LS.set(K, String(i - 1)); return show(); }
@@ -318,7 +332,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
         s._done = true;
         // 點完會換畫面的動作，直接進下一步
         const n = STEPS[i + 1];
-        if (n && n.end === s.end && n.as === s.as && !n.nav) { n._navved = true; LS.set(K, String(i + 1)); }
+        if (n && n.end === s.end && n.as === s.as && (!n.nav || s.act.click)) { n._navved = !n.nav || allFound(n); n._done = false; n._pre = false; LS.set(K, String(i + 1)); }
       } catch (x) { const m = panel.querySelector('.bd'); if (m) m.insertAdjacentHTML('beforeend', `<div class="msg">${x.message}</div>`); }
       busy = false; show();
     }
@@ -327,10 +341,93 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   addEventListener('resize', relayout);
   document.addEventListener('scroll', place, true);
   document.addEventListener('click', e => { if (!e.target.closest('#jg')) setTimeout(place, 350); }, true);
-  const mo = new MutationObserver(() => place());
+  const mo = new MutationObserver(() => { place(); scheduleFollow(); });
   const target = document.getElementById('view') || document.body; mo.observe(target, { childList: true, subtree: true });
-  setInterval(() => { if (panel && !panel.hidden) place(); }, 1200);
+  setInterval(() => { if (panel && !panel.hidden) { place(); follow(); } }, 1200);
   // 頁面載入（含切換帳號後）自動接續導覽；第一次打開自動開始，按 ✕ 關掉後不再自動出現
+  // ---------- 跟著畫面走 ----------
+  // A 自己點了「幫我點」要點的按鈕 → 算完成，自動下一步
+  // B 走到某一步專屬的畫面（往後）→ 卡片跟上
+  // C 走到導覽沒介紹的畫面 → 提示，不亂跳
+  // D 退回前面步驟的畫面 → 不自動倒退，提示可按「上一步」
+  function atOf(x) {
+    const n = x.nav; if (!n) return null;
+    if (Array.isArray(n)) return n[n.length - 1];
+    if (ENDS[x.end].page === 'adm') return n.tab;
+    return n.view === 'case' ? `case:${n.hid}:${n.tab}` : n.view;
+  }
+  function uniqAt(x) { const a = atOf(x); if (!a) return null; return STEPS.filter(y => y.end === x.end && y.as === x.as && atOf(y) === a).length === 1 ? a : null; }
+  function screenKey() {
+    try {
+      if (PAGE === 'app') { const st = window.JJJ && window.JJJ.S.stack; return st && st.length ? st[st.length - 1] : null; }
+      if (PAGE === 'con') { const S = window.JCON && window.JCON.ST; return S ? (S.view === 'case' ? `case:${S.hid}:${S.tab}` : S.view) : null; }
+      const b = document.querySelector('#nav [data-tab][aria-current="page"]'); return b ? b.dataset.tab : null;
+    } catch (e) { return null; }
+  }
+  function screenName() {
+    const pick = q => { const e = document.querySelector(q); return e && e.innerText.trim().split('\n')[0]; };
+    return (PAGE === 'app' ? pick('#view .top h1') : PAGE === 'con' ? pick('#nav [aria-current="page"]') || pick('main h2') : pick('#title')) || '目前畫面';
+  }
+  function where() {
+    try {
+      if (PAGE === 'app' && window.JJJ) return { stack: window.JJJ.S.stack.slice(), home: window.JJJ.S.home };
+      if (PAGE === 'con' && window.JCON) { const S = window.JCON.ST; return { view: S.view, hid: S.hid, tab: S.tab }; }
+      return { tab: screenKey() };
+    } catch (e) { return null; }
+  }
+  async function goWhere(w) {
+    try {
+      if (PAGE === 'app' && window.JJJ) { window.JJJ.tourGo(w.stack, w.home); }
+      else if (PAGE === 'con' && window.JCON) { Object.assign(window.JCON.ST, w); window.JCON.render(); }
+      else { const b = document.querySelector(`#nav [data-tab="${w.tab}"]`); if (b) b.click(); }
+    } catch (e) {}
+    await wait(500);
+  }
+  const anyFound = x => (x.items || []).some(it => find(it[0]));
+  const allFound = x => (x.items || []).length > 0 && x.items.every(it => find(it[0]));
+  function clearNote() { if (!panel) return; panel.classList.remove('nc', 'nd'); panel.querySelectorAll('.jgnote').forEach(n => n.remove()); }
+  function note(kind, i, s) {
+    if (!panel || panel.classList.contains(kind === 'C' ? 'nc' : 'nd')) return;
+    clearNote(); const bd = panel.querySelector('.bd'); if (!bd) return;
+    const html = kind === 'C'
+      ? `<div class="jgnote"><div class="jgn big">這個畫面不在導覽裡<small>你目前在：${screenName()}<br>導覽停在：第 ${i + 1} 步「${s.t}」</small></div><button class="jbt p" data-t="back">帶我回第 ${i + 1} 步</button><button class="jbt" data-t="fold">先收合導覽，我自己逛</button><div class="sec">回到導覽有介紹的畫面時</div><div class="why">卡片會自動跟上，不必再按任何按鈕。</div><div class="sec">原本第 ${i + 1} 步的編號</div></div>`
+      : `<div class="jgnote"><div class="jgn">你回到上一個畫面<small>卡片不會自動倒退，以免來回跳動。要看第 ${i} 步，請按下方「上一步」。</small></div></div>`;
+    bd.insertAdjacentHTML('afterbegin', html);
+    panel.classList.add(kind === 'C' ? 'nc' : 'nd');
+  }
+  function follow() {
+    if (!panel || panel.hidden || folded || busy || moving || pendingA || mode !== 'step') return;
+    const i = stepI(), s = STEPS[i]; if (!s || !ready(s)) return;
+    const key = screenKey(); if (key == null || key === lastKey) return;
+    const j = STEPS.findIndex(x => x.end === s.end && x.as === s.as && uniqAt(x) === key);
+    if (j > i) { // B
+      lastKey = key; const n = STEPS[j]; n._navved = true; n._done = false; n._pre = false;
+      flash = { t: `已跟上你的畫面：第 ${i + 1} 步 → 第 ${j + 1} 步`, sub: j - i > 1 ? '跳過的步驟可從「目錄」回看' : '' };
+      LS.set(K, String(j)); show(); return;
+    }
+    const sAt = uniqAt(s); const ok = sAt ? key === sAt : anyFound(s);
+    if (ok) { lastKey = key; clearNote(); return; }
+    if (j >= 0 && j < i) { lastKey = key; note('D', i, s); return; }
+    if (sAt || !anyFound(s)) { lastKey = key; note('C', i, s); }
+  }
+  const scheduleFollow = () => { clearTimeout(followT); followT = setTimeout(follow, 700); };
+  // A：使用者自己點到這一步「幫我點」要點的按鈕
+  document.addEventListener('click', e => {
+    if (busy || moving || mode !== 'step' || !panel || panel.hidden || e.target.closest('#jg')) return;
+    const i = stepI(), s = STEPS[i]; if (!s || !ready(s) || !s.act || !s.act.click || s._done) return;
+    const el = find(s.act.click); if (!el || !(el === e.target || el.contains(e.target))) return;
+    const label = (el.innerText || el.getAttribute('aria-label') || '').trim().split('\n')[0].slice(0, 16);
+    s._done = true; pendingA = true; lock(true); clearTimeout(autoT);
+    autoT = setTimeout(() => {
+      pendingA = false; if (stepI() !== i) { lock(false); return; } const n = STEPS[i + 1];
+      if (!n || n.end !== s.end || n.as !== s.as) { show(); return; }
+      n._navved = !n.nav || allFound(n); n._done = false; n._pre = false;
+      flash = { t: `✓ 已完成第 ${i + 1} 步，自動前往第 ${i + 2} 步`, sub: label ? `偵測到你點了「${label}」` : '' };
+      LS.set(K, String(i + 1)); show();
+    }, s.act.wait || 800);
+  }, true);
+  document.addEventListener('click', scheduleFollow, true);
+  addEventListener('popstate', scheduleFollow);
   window.JJJGUIDE = { start, stop, show, place, steps: STEPS, isOpen: () => panel && !panel.hidden };
   const begin = () => {
     if (LS.get(OFF)) { openBtn(true); return; }

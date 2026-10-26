@@ -13,8 +13,9 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-24.04   # 固定版本：Playwright 1.56 尚未支援 Ubuntu 26
-    timeout-minutes: 20
+    # 固定版本：Playwright 1.56 尚未支援 Ubuntu 26（ubuntu-latest 自 2026/10 起逐步切換）
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: e2e
@@ -25,16 +26,27 @@ jobs:
         with:
           node-version: 22
 
-      - name: 安裝中文字型（讓版面與真實裝置一致）
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
-
-      - name: 安裝 Playwright
+      - name: 安裝 Playwright 與瀏覽器（含中文字型）
+        timeout-minutes: 10
         run: |
-          npm install --no-audit --no-fund
-          npx playwright install --with-deps chromium
+          set -o pipefail
+          npm install --no-audit --no-fund 2>&1 | tee ../install.log
+          npx playwright install --with-deps chromium 2>&1 | tee -a ../install.log
 
       - name: 執行測試
-        run: npm test
+        timeout-minutes: 12
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee ../test.log
+
+      - name: 失敗時把最後幾行輸出標在這次執行上
+        if: ${{ failure() }}
+        working-directory: .
+        run: |
+          for f in install.log test.log; do
+            [ -f "$f" ] || continue
+            tail -n 25 "$f" | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error title=$f::$l"; done
+          done
 
       - name: 上傳測試報告
         if: ${{ !cancelled() }}
@@ -45,3 +57,4 @@ jobs:
             e2e/report/
             e2e/test-results/
           retention-days: 14
+          if-no-files-found: ignore
