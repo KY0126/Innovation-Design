@@ -16,6 +16,8 @@ jobs:
     # 固定版本：Playwright 1.56 尚未支援 Ubuntu 26（ubuntu-latest 自 2026/10 起逐步切換）
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    env:
+      TZ: Asia/Taipei   # 示範資料的「今天」與台灣時間一致
     defaults:
       run:
         working-directory: e2e

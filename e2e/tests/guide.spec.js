@@ -76,7 +76,8 @@ test('導覽 30 步跨四端走完：每步編號框都找得到、沒有錯誤�
   console.log(log.join('\n'));
   expect(seen.size, '導覽每一步都有走到').toBe(require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8').match(/^\s+[FATLM]\(\{ ch:/gm).length);
   // ---- 資料串接 ----
-  const W = s => s.wo.orders.find(o => o.code === 'W-20261027-06');
+  // 工單編號含日期（W-年月日-序號），改用家庭＋類型找，避免跨日或時區不同對不到
+  const W = s => s.wo.orders.find(o => o.household === '林女士家' && o.kind === '到府安裝' && /^W-\d{8}-06$/.test(o.code));
   // ① 消費者端送出 → 生活顧問端「待整合報價」收到
   expect(S.handoff.length, '消費者端送出的改善選擇有存下來').toBeGreaterThan(0);
   expect(S.handoff[0].items.map(i => i.space).join('、'), '交付內容含走道與浴室').toMatch(/走道.*浴室|浴室.*走道/);

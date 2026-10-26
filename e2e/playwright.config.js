@@ -7,7 +7,7 @@ module.exports = defineConfig({
   retries: process.env.CI ? 1 : 0,
   forbidOnly: !!process.env.CI,
   reporter: [['list'], ['json', { outputFile: 'results.json' }], ['html', { open: 'never', outputFolder: 'report' }]],
-  use: { baseURL: 'http://127.0.0.1:8766', trace: 'retain-on-failure', screenshot: 'only-on-failure', locale: 'zh-TW' },
+  use: { baseURL: 'http://127.0.0.1:8766', timezoneId: 'Asia/Taipei', trace: 'retain-on-failure', screenshot: 'only-on-failure', locale: 'zh-TW' },
   webServer: { command: 'python3 -m http.server 8766 --bind 127.0.0.1 --directory ' + (process.env.REPO || '..') + '', url: 'http://127.0.0.1:8766/index.html', reuseExistingServer: true },
   projects: [
     { name: 'desktop', use: { viewport: { width: 1440, height: 900 } } },
