@@ -15,6 +15,10 @@ npm test
 - 跑完用 `npm run report` 打開 HTML 報告。
 - 只跑一個檔：`npx playwright test tests/guide.spec.js --project desktop`
 
+## 自動執行
+
+每次推送到 `main` 或開 PR，GitHub Actions（`.github/workflows/e2e.yml`）會自動跑全部測試；結果在 GitHub 的 Actions 分頁，報告可在該次執行的「e2e-report」下載。也可以在 Actions 分頁手動按「Run workflow」。
+
 ## 測什麼
 
 | 檔案 | 內容 |
