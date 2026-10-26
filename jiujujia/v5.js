@@ -131,7 +131,7 @@
       <div class="card"><b>已選的改善方式</b>${all.map(([k, o]) => `<div class="row"><span><span class="v5chip">${/夥伴/.test(o.t) ? '施工夥伴' : /全國/.test(o.t) ? '全國電子' : o.t === '免費調整' ? '自行調整' : '—'}</span>${e(SP[k].n)}｜${e(o.n)}</span><span class="muted" style="font-size:.85em">${e(o.d)}</span></div>`).join('')}
         <div class="row"><span>六個空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
         <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由施工夥伴先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div></div>
-      <div class="card"><b>進度</b><div class="v5st">${['選方式', '估價', '長輩確認', '施工', '驗收'].map((s, i) => `<span class="${i === 0 ? 'dn' : i === 1 ? 'cu' : ''}"><i></i>${s}</span>`).join('')}</div>
+      <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '施工夥伴先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
         <div class="muted" style="font-size:.82em;margin-top:6px">長輩本人同意才成交；先施工、再安裝設備。夥伴工程附書面保固；符合資格者可申請長照居家無障礙改善補助，生活顧問協助轉介 1966，不保證核准。</div></div>
       <div class="muted" style="font-size:.8em;padding:0 16px">燈號只協助排序、不取代專業評估；對比為示意、不是施工圖。</div>
       <div class="v5bar"><div class="r"><span>一張報價（${est ? '含夥伴工程' : '全國電子＋施工夥伴'}）</span><b>${PR[lv] || '免費'}${est ? '・需到府估價' : ''}</b></div>
@@ -142,11 +142,8 @@
   // ---------- 安裝進度頁：四端分工的服務進度 ----------
   const ip0 = J.V.ip;
   if (ip0) J.V.ip = function () {
-    const html = ip0(); const H = J.S.hh || {}, o = H.install || {}, st = o.status || '';
-    const pk = (o.packages || []); const done = st === '已完成' ? 6 : st === '待驗收' ? 5 : ((o.progress || 0) > 0 || pk.some(k => k.status === '已完成') || /已完成/.test(html)) ? 4 : 3;
-    const L = [['生活顧問', '整合報價'], ['長輩本人', '確認同意'], ['施工夥伴', '先做需動工項目'], ['全國電子技師', '安裝設備'], ['長輩', '逐區驗收']];
-    const card = `<div class="card"><b>服務進度</b><div style="margin-top:8px">${L.map(([w, t], i) => `<div class="row" style="align-items:center"><span><span style="display:inline-block;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;font-size:12px;color:#fff;background:${i < done - 1 ? 'var(--ok)' : i === done - 1 ? 'var(--brand)' : 'var(--line)'};margin-right:8px">${i < done - 1 ? '✓' : i + 1}</span><b>${w}</b>｜${t}</span><span class="tag ${i < done - 1 ? 'ok' : ''}">${i < done - 1 ? '完成' : i === done - 1 ? '進行中' : '等待'}</span></div>`).join('')}</div><div class="muted" style="font-size:.82em;margin-top:6px">需要動工的項目由施工夥伴先完成，全國電子技師再安裝設備；前一步沒完成，後一步顯示等待。</div></div>`;
-    return html.replace('<div class="scroll" style="padding-top:12px">', '<div class="scroll" style="padding-top:12px">' + card);
+    const html = ip0();
+    return html;
   };
 
   // ---------- 互動 ----------
