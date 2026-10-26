@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js?v=20261027f"></script>
+<script src="backend.js?v=20261027g"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜企業營運資訊平台</title>
@@ -246,7 +246,7 @@ svg text[font-size="8.5"],svg text[font-size="9"],svg text[font-size="9.5"],svg 
 /* 上線版：登入與即時營運 */
 .gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 .gate[hidden]{display:none}
-.gbox{width:min(400px,100%);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 20px}
+.gbox{width:min(480px,100%);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 20px}
 .glogo{font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;margin-bottom:4px}.glogo i{width:6px;height:20px;background:var(--brand);display:inline-block;border-radius:2px}
 .gerr{color:var(--brand);font-size:13px;margin:0 0 8px}.gerr:empty{display:none}
 .demo-accounts{border:1px dashed var(--muted);border-radius:8px;padding:10px 12px;margin-top:14px;font-size:13.5px}
@@ -308,13 +308,13 @@ td.nw{white-space:nowrap}
 </style>
 </head>
 <body>
-<div id="gate" class="gate" hidden><div class="gbox"><div class="glogo"><i></i>揪居家企業營運資訊平台</div><p class="c-mu" style="margin:0 0 14px"><b>企業管理端登入</b>：總部與門市主管使用。家庭請用<a href="app.html?end=family">全國電子 App</a>；技師請用<a href="app.html?end=tech">技師端</a>；生活顧問請用<a href="consultant.html">生活顧問端</a>。</p><form id="gForm" novalidate><div class="f"><label for="gEmail">Email</label><input class="fld" id="gEmail" name="email" type="email" autocomplete="username"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password"></div><div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit" style="width:100%;padding:9px">登入</button></form><p class="c-mu" style="font-size:12.5px;margin:10px 0 0">忘記密碼請洽總部重設。</p><div id="gDemo"></div></div></div>
+<div id="gate" class="gate" hidden><div class="gbox"><div class="glogo"><i></i>揪居家企業營運資訊平台</div><p class="c-mu" style="margin:0 0 14px"><b>企業管理端（電腦版）</b>：總部、門市主管，以及生活顧問在門市電腦使用。家庭與技師請用<a href="app.html">揪居家 App（手機）</a>。</p><form id="gForm" novalidate><div class="f"><label for="gEmail">Email</label><input class="fld" id="gEmail" name="email" type="email" autocomplete="username"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password"></div><div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit" style="width:100%;padding:9px">登入</button></form><p class="c-mu" style="font-size:12.5px;margin:10px 0 0">忘記密碼請洽總部重設。</p><div id="gDemo"></div></div></div>
 <div id="envBadge" hidden>示範環境</div>
 <div class="app">
  <aside class="side" aria-label="主選單">
   <div class="logo"><i></i>揪居家企業營運資訊平台</div>
   <div class="nav" id="nav"></div>
-  <div class="sec">連結</div><div class="nav"><button onclick="window.open('../consumer','_blank')">消費者端 /consumer ›</button><button onclick="window.open('../consultant','_blank')">生活顧問端 /consultant ›</button><button onclick="window.open('../technician','_blank')">技師端 /technician ›</button></div>
+  <div class="sec">連結</div><div class="nav"><button onclick="window.open('../app','_blank')">揪居家 App（手機） /app ›</button><button onclick="window.open('../consultant','_blank')">生活顧問（門市電腦） /consultant ›</button></div>
  </aside>
  <div>
   <div class="top"><h1 id="title">即時總覽</h1><div class="meta"><span>使用者 <b id="who">—</b></span><span id="scope">門市 <b>—</b></span></div><span class="pv live" id="pv">即時資料</span><button class="b" id="logoutBtn">登出</button></div>
@@ -756,7 +756,7 @@ partner:()=>{const P=[['泥作（含防水）','示範泥作 A','打除門檻、
  <div class="panel"><div class="ph">協力工班名單 <small>每類每店一家</small></div><div class="pb" style="overflow-x:auto"><table><thead><tr><th>類別</th><th>協力工班（示範）</th><th>試點可接</th><th>進行中</th><th>準時率</th><th>投保／保固</th></tr></thead><tbody>${P.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="c-mu">—</td><td><span class="badge ${r[4]==='有效'?'c-ok':'c-am'}">${r[4]}</span></td></tr>`).join('')}</tbody></table>
  <div class="c-mu" style="font-size:12px;margin-top:6px">準時率於試點開始後累積；保單到期前 30 天提醒生活顧問。要求：合法登記、公共意外責任保險、書面保固、防水由合格業者承作；全國電子為客訴單一窗口；介紹費與管理費待全國電子確認。</div></div></div>
  <div class="panel"><div class="ph">協力工班工單 <small>先工程、後設備</small></div><div class="pb"><table><thead><tr><th>家庭</th><th>項目</th><th>狀態</th></tr></thead><tbody>${J.map(r=>`<tr><td>${r[0]}</td><td>${tag(r[1])} ${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</tbody></table>
- <div class="c-mu" style="font-size:12px;margin-top:6px">AR 尺寸與材質辨識結果隨工單傳給協力工班；個案報價與排程由生活顧問端 /consultant 協調。</div></div></div>
+ <div class="c-mu" style="font-size:12px;margin-top:6px">AR 尺寸與材質辨識結果隨工單傳給協力工班；個案報價與排程由生活顧問在電腦版（/consultant）協調。</div></div></div>
  <div class="panel"><div class="ph">改善選項統計 <small>試點累計（示範）</small></div><div class="pb">${B.map(([n,v,c])=>`<div style="display:flex;align-items:center;gap:10px;margin:7px 0"><span style="width:96px">${n}</span><span style="flex:1;height:10px;background:var(--head);border-radius:5px;overflow:hidden"><i style="display:block;height:100%;width:${v}%;background:${c}"></i></span><b style="width:40px;text-align:right">${v}%</b></div>`).join('')}
  <div class="c-mu" style="font-size:12px">可複選；比例為示範，試點後以實際資料呈現（樣本不足顯示「資料不足」，見「改善選項統計」）。</div></div></div>
  <div class="panel"><div class="ph">未成交原因與需求雷達 <small>示範</small></div><div class="pb"><table><thead><tr><th>原因</th><th>次數</th><th>後續</th></tr></thead><tbody>${R.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div></div>
@@ -951,10 +951,11 @@ acct:()=>{const U=LD.users;if(!U)return LOADING;const st=(CFG&&CFG.stores)||[];
  <div class="panel"><div class="ph">變更我的密碼</div><form class="pb" id="myPwForm" novalidate><div class="f"><label for="pOld">目前密碼</label><input class="fld" id="pOld" name="old" type="password" autocomplete="current-password"></div><div class="f"><label for="pNew">新密碼（至少 8 個字元）</label><input class="fld" id="pNew" name="password" type="password" autocomplete="new-password"></div><button class="b pri" type="submit">更新密碼</button></form></div></div></div>`}
 });
 function showGate(msg){ME=null;document.getElementById('gate').hidden=false;const e=document.querySelector('#gate .gerr');if(e)e.textContent=msg||'';const d=document.getElementById('gDemo');
- d.innerHTML=CFG&&CFG.demo?`<div class="demo-accounts" style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px;margin-top:10px"><b>示範帳號</b><button type="button" data-demo="manager@example.com" style="display:block;width:100%;margin-top:8px;padding:9px;border-radius:10px;border:2px solid #C42D5A;background:#F7E9EE;color:#8E1E42;font-weight:900;cursor:pointer">▶ 一鍵登入｜張經理（總部）</button></div>`:''}
+ const BT='display:block;width:100%;margin-top:8px;padding:8px;border-radius:10px;border:2px solid #C42D5A;background:#F7E9EE;color:#8E1E42;font-weight:900;cursor:pointer';
+ d.innerHTML=CFG&&CFG.demo?`<div class="demo-accounts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px"><b>總部／門市主管</b><div class="c-mu" style="font-size:12px">即時總覽、派工、試點指標</div><button type="button" data-demo="manager@example.com" style="${BT}">▶ 一鍵登入｜張經理</button></div><div style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px"><b>生活顧問（門市電腦）</b><div class="c-mu" style="font-size:12px">整合報價、排工作包、版本紀錄</div><button type="button" data-demo="advisor@example.com" style="${BT}">▶ 一鍵登入｜王小明</button></div></div>`:''}
 async function enterHQ(u){ME=u;
- if(u.role==='family'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是家庭帳號，請改用全國電子 App 的家庭登入。');return}
- if(u.role==='tech'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是技師帳號，請改用技師端登入。');return}
+ if(u.role==='family'||u.role==='tech'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是'+(u.role==='tech'?'技師':'家庭')+'帳號，請改用揪居家 App（手機）。');return}
+ if(u.role==='advisor'){location.href='consultant.html';return}
  document.getElementById('gate').hidden=true;
  document.getElementById('who').textContent=(ROLE[u.role]||'')+'｜'+u.name;
  document.getElementById('scope').innerHTML='門市 <b>'+esc(u.role==='hq'?'全部試點門市':SHORT(u.store))+'</b>';
@@ -1024,5 +1025,5 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('.gb');if(g){const r=g.getBoundingClientRect();show(g,r.left,r.bottom)}});
 document.addEventListener('focusout',()=>{if(!pinned)hide()});
 addEventListener('scroll',()=>{if(!pinned)hide()},true)})();</script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261027f"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261027g"></script></body>
 </html>

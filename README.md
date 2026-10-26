@@ -8,13 +8,12 @@
 |---|---|
 | Demo 影片 | https://ky0126.github.io/Innovation-Design/demo |
 | 設計思考流程與九大工具 | `/dt`（`jiujujia/design-thinking/`） |
-| 消費者端 | `/consumer`（以示範帳號登入 `jiujujia/app.html`） |
-| 生活顧問端 | `/consultant`（`jiujujia/consultant.html`） |
-| 技師端 | `/technician`（以技師示範帳號登入 `jiujujia/app.html`） |
-| 企業管理端 | `/admin`（`jiujujia/admin.html`） |
-| 舊網址 | `/app` 仍可使用，導向消費者端（家庭登入），技師請由技師端登入 |
+| 揪居家 App（手機） | `/app`（`jiujujia/app.html`）：家庭、生活顧問、技師同一個登入頁，依帳號身分分流；手機掃碼開啟後可「加入主畫面」 |
+| 企業管理端（電腦版） | `/admin`（`jiujujia/admin.html`）：總部與門市主管；生活顧問在門市電腦用 `/consultant`（`jiujujia/consultant.html`） |
+| 舊網址 | `/consumer`、`/technician` 導向揪居家 App；`/consultant` 仍為生活顧問電腦版 |
 
-四端各自登入，資料即時串接（`jiujujia/backend.js`，瀏覽器內模擬後端）。
+一個揪居家 App（手機）＋企業管理端（電腦版），資料即時串接（`jiujujia/backend.js`，瀏覽器內模擬後端）。
+生活顧問分工：手機版用在到店與到府（問診、同意事項、把手機轉給長輩大字確認），只產出方案草稿；電腦版整合正式報價（有版本號）、排工作包、核准差異，長輩同意的是正式版本。
 
 ### 原型說明
 - 資料存在這台瀏覽器，可按右側「導覽」→「重設資料」回到示範狀態；不是正式雲端多人協作。
@@ -23,4 +22,4 @@
 
 ## 端到端測試
 
-`e2e/` 資料夾是 Playwright 端到端測試，涵蓋四端入口、登入、30 步導覽與四端資料串接。執行方式見 [e2e/README.md](e2e/README.md)。
+`e2e/` 資料夾是 Playwright 端到端測試，涵蓋 App 與企業管理端入口、登入分流、30 步導覽與資料串接。執行方式見 [e2e/README.md](e2e/README.md)。

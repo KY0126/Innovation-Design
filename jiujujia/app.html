@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js?v=20261027f"></script>
+<script src="backend.js?v=20261027g"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜消費者端 APP</title>
@@ -263,7 +263,7 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
 .demo1{border:2px dashed #E6B3C3;margin:0 0 10px}.demo1 button{display:block;width:100%;margin-top:8px;border-radius:10px;padding:9px 10px;text-align:center}
 .demo1 .demo0{background:var(--brand-soft);color:var(--brand-ink);border:2px solid var(--brand);font-weight:900}.demo1 .demo2{border:1px solid var(--line);font-size:.92em;color:var(--muted)}
 .lgh .eh{flex:none}
-/* 標準手機框 393×852（電腦上）＋四端切換列 */
+/* 標準手機框 393×852（電腦上）＋切換列：揪居家 App｜企業管理端 */
 #ends,.sbar{display:none}
 @media (min-width:560px){
  html,body{height:auto;min-height:100%}
@@ -281,9 +281,15 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
  #webDemo{display:none!important}
 }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C42D5A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="揪居家">
+<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-<div id="ends"><b>揪居家原型</b><a href="app.html?end=family" data-end="family">消費者端</a><a href="consultant.html">生活顧問端</a><a href="app.html?end=tech" data-end="tech">技師端</a><a href="admin.html">企業管理端</a><span class="sp"></span><button type="button" id="endsGuide">導覽</button><button type="button" id="endsReset">重設示範資料</button></div>
+<div id="ends"><b>揪居家原型</b><a href="app.html" class="on">揪居家 App（手機）</a><a href="admin.html">企業管理端（電腦版）</a><span class="sp"></span><button type="button" id="endsGuide">導覽</button><button type="button" id="endsReset">重設示範資料</button></div>
 <div id="envBadge" hidden>示範環境</div>
 <div class="shell" id="app">
   <div class="sbar" aria-hidden="true"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5" width="3" height="6" rx="1" fill="currentColor"/><rect x="10" y="2.5" width="3" height="8.5" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx="1" fill="currentColor"/></svg><svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor"/><rect x="22.5" y="4" width="1.8" height="4" rx="1" fill="currentColor" opacity=".45"/></svg></span></div>
@@ -309,9 +315,10 @@ async function busy(btn,fn,errEl){if(BUSY)return;BUSY=true;let txt='';if(btn){tx
  try{await fn()}catch(e){if(errEl&&errEl.isConnected)errEl.textContent=e.message;else toast(e.message||'發生錯誤')}
  finally{BUSY=false;if(btn&&btn.isConnected){btn.disabled=false;btn.textContent=txt}}}
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-const END=(()=>{const q=new URLSearchParams(location.search).get('end');if(q==='tech'||q==='family'){LS.set('jjj_end',q);return q}return LS.get('jjj_end')||'family'})();
-const roleOK=r=>END==='tech'?r==='tech':r==='family';
-const WRONG={tech:'這是技師帳號，請改用 <a href="app.html?end=tech">技師端登入</a>。',family:'這是家庭帳號，請改用 <a href="app.html?end=family">家庭登入</a>（全國電子 App）。',advisor:'這是生活顧問帳號，請改用 <a href="consultant.html">生活顧問端</a>。',hq:'這是總部帳號，請改用 <a href="admin.html">企業管理端</a>。'};
+// 一個揪居家 App：家庭、生活顧問、技師都從同一個登入頁進來，依帳號身分分流；總部改用企業管理端（電腦版）
+const END='app';try{localStorage.setItem('jjj_end','app')}catch(e){}
+const roleOK=r=>r==='family'||r==='advisor'||r==='tech';
+const WRONG={hq:'這是總部帳號，請改用 <a href="admin.html">企業管理端（電腦版）</a>。'};
 async function silentOut(){try{await api('/auth/logout',{method:'POST',noAuthRedirect:true})}catch(e){}}
 function EN(){return esc((S.ctx&&S.ctx.elder)||'長輩')}
 function ON(){return esc((S.ctx&&S.ctx.owner)||'子女')}
@@ -470,19 +477,18 @@ function nav(cur){const it=[['home','首頁',icon.home],['news','最新',icon.ne
  return `<nav class="nav" aria-label="主選單">${it.map(([k,l,i])=>`<button data-nav="${k}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`).join('')}</nav>`}
 const V={
 boot:()=>`<div class="ld">載入中…</div>`,
-login:()=>{const tech=END==='tech';const acc=tech?[['tech@example.com','吳技師','關懷設備'],['tech2@example.com','陳技師','夜間照明']]:[['chen@example.com','陳小姐','子女・林女士家'],['li@example.com','李小姐','關懷中家庭']];
- const head=tech?`<div class="top" style="background:#8E1E42;border:0"><h1 style="color:#fff">🔧 全國電子｜技師端</h1></div><div style="background:#8E1E42;color:#fff;padding:0 16px 12px;font-size:.88em;opacity:.9">今日工單・施工圖・長輩驗收</div>`:`<div class="top"><h1 style="color:var(--brand)">全國電子</h1></div>`;
- return `${head}<div class="scroll" style="padding-top:16px"><div class="pad">
- <div class="lgh"><span class="eh" ${tech?'style="background:#8E1E42;color:#fff"':''}>${tech?'工':'♥'}</span><div><div class="big" style="margin:0">${tech?'技師登入':'家庭登入｜揪居家'}</div><div class="muted">${tech?'全國電子技師帳號，由門市建立':'子女與長輩家人使用'}</div></div></div>
+login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','子女・林女士家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','台中逢甲店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]]];let k=0;
+ return `<div class="top"><h1 style="color:var(--brand)">全國電子</h1></div><div class="scroll" style="padding-top:16px"><div class="pad">
+ <div class="lgh"><span class="eh">♥</span><div><div class="big" style="margin:0">登入揪居家</div><div class="muted">家庭、生活顧問、技師都從這裡登入</div></div></div>
  <form id="loginForm" class="card" style="margin:14px 0 10px" novalidate>
-  <label class="muted">${tech?'員工 Email':'Email'}<input class="fld" id="lgEmail" name="email" type="email" autocomplete="username" inputmode="email" required></label>
+  <label class="muted">Email<input class="fld" id="lgEmail" name="email" type="email" autocomplete="username" inputmode="email" required></label>
   <label class="muted" style="display:block;margin-top:10px">密碼<input class="fld" id="lgPw" name="password" type="password" autocomplete="current-password" required></label>
   <div class="err" role="alert"></div>
-  <button class="btn" id="lgBtn" type="submit" style="margin-top:12px${tech?';background:#8E1E42':''}">${tech?'登入技師端':'登入'}</button>
+  <button class="btn" id="lgBtn" type="submit" style="margin-top:12px">登入</button>
  </form>
- <div class="card demo1"><b style="font-size:.85em;color:var(--brand-ink)">示範帳號</b>${acc.map(([e,n,r],k)=>`<button type="button" class="${k?'demo2':'demo0'}" data-demo="${e}">${k?'':'▶ 一鍵登入｜'}${n}（${r}）</button>`).join('')}</div>
- ${tech?'':'<button class="btn ghost" data-go="register">第一次使用？建立家庭帳號</button>'}
- <p class="muted" style="text-align:center;font-size:.88em">${tech?'家庭用戶 → <a href="app.html?end=family">全國電子 App</a>　生活顧問 → <a href="consultant.html">生活顧問端</a>':'我是技師 → <a href="app.html?end=tech">技師端登入</a>　我是生活顧問 → <a href="consultant.html">生活顧問端</a>'}</p>
+ <div class="card demo1"><b style="font-size:.85em;color:var(--brand-ink)">示範帳號</b>${G.map(([g,L])=>`<div class="muted" style="font-size:.78em;margin:8px 0 2px">${g}</div>${L.map(([e,n,r])=>`<button type="button" class="${k++?'demo2':'demo0'}" data-demo="${e}">${k===1?'▶ 一鍵登入｜':''}${n}（${r}）</button>`).join('')}`).join('')}</div>
+ <button class="btn ghost" data-go="register">第一次使用？建立家庭帳號</button>
+ <p class="muted" style="text-align:center;font-size:.88em">總部與門市主管 → <a href="admin.html">企業管理端（電腦版）</a></p>
 </div></div>`},
 register:()=>{const st=(S.cfg&&S.cfg.stores)||[];return `${hdr('建立家庭帳號',{aplus:false})}<div class="scroll" style="padding-top:12px"><div class="pad">
  <form id="regForm" class="card" style="margin:0 0 10px" novalidate>
@@ -659,10 +665,11 @@ function clock(){const a=A();if(!a||!a.t0)return '00:00';const t=Math.floor(((a.
 function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
 function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar" id="hintbar" style="display:${dis&&hint?'block':'none'}">${hint||''}</div><div class="sum"><div style="font-size:.9em"><div>一次性 ${fmt(t.one)}</div><div class="muted">${t.m?'＋每月 '+fmt(t.m):'無月費'}</div></div><button class="btn" data-a="${act}" ${dis?'disabled':''}>${label}</button></div>`}
 Object.assign(V,{
-a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;return `${stf('揪居家｜門市端・今天',false)}<div class="scroll">
+a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;return `${stf('揪居家｜生活顧問・今天',false)}<div class="scroll">
  <div class="step">${esc(S.me.store||'全部門市')}｜生活顧問 ${esc(S.me.name)}${H?'｜'+esc(H.today):''}</div>
  ${K?`<div class="kp4">${[['今日諮詢',K.consults,'#advC'],['待審差異',K.review,'#advD'],['待派工',K.dispatch,'#advR'],['方案待確認',K.waiting,'#advW']].map(([n,v,h])=>`<button data-jump="${h}" class="${v&&n!=='今日諮詢'?'hot':''}"><span class="muted" style="font-size:.85em">${n}</span><b>${v}</b></button>`).join('')}</div><div class="insight">💡 ${esc(H.insight)}</div>`:''}
- ${H&&H.diffs.length?`<div class="sec" id="advD">技師差異回報（${H.diffs.length}）</div><div class="ly">${H.diffs.map(diffRow).join('')}</div>`:''}
+ ${(()=>{const P=H?H.diffs.filter(d=>d.status==='待審核'):[];return P.length?`<div class="card" id="advD" style="border-left:4px solid var(--brand)"><b style="color:var(--brand-ink)">待審差異 ${P.length} 則</b><div style="margin:4px 0">${P.slice(0,2).map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.by||'技師')}｜${esc(d.household||'')}：${esc(d.text)}</div>`).join('')}</div><div class="rs">請到<b style="color:var(--brand)">電腦版</b>（企業管理端）核准，核准後更新圖面版本</div></div>`:''})()}
+ ${(()=>{let D=[];try{D=JSON.parse(localStorage.getItem('jjj_adv_drafts')||'[]')}catch(e){}return D.length?`<div class="card"><b>方案草稿 ${D.length} 份</b>${D.map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.household)}・${esc(d.at)} 到店陪同</div>`).join('')}<div class="rs">待電腦版整合成正式報價（有版本號），長輩同意的是正式版本</div></div>`:''})()}
  ${H&&(H.drafts.length||H.reminders.length)?`<div class="sec" id="advR">設備維護與提醒待派工（${H.drafts.length+H.reminders.length}）</div><div class="ly">${H.drafts.map(d=>`<div class="it" style="align-items:flex-start"><span style="flex:1"><b style="font-weight:500">${esc(d.household)}｜${esc(d.note||'')}</b><div class="rs">${esc(d.code)}｜${d.by_family?'家人在 App 一鍵預約':'門市建立'}｜${esc(d.packages.join('、'))}</div><div style="margin-top:4px">${(H.techs||[]).map(t=>`<button class="tag" data-ddisp="${d.id}" data-tid="${t.id}" style="border:0;margin:0 6px 4px 0;background:#F7E9EE;color:#8E1E42">明天 14:00｜${esc(t.name)}</button>`).join('')}</div></span><span class="tag">草稿</span></div>`).join('')}${H.reminders.map(r=>`<div class="it" style="align-items:center"><span style="flex:1"><b style="font-weight:500">${esc(r.household)}｜${esc(r.device)}${esc(r.kind)}</b><div class="rs">${esc(r.reason||'')}${r.due?'｜'+esc(r.due.slice(5).replace('-','/'))+' 前':''}</div></span><button class="tag" data-rdraft="${r.id}" style="border:0">建立工單草稿</button></div>`).join('')}</div>`:''}
  ${H&&H.installs.length?`<div class="sec">今日到府</div>${H.installs.map(w=>`<button class="card" data-board="${w.household_id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(w.label)}　${esc(w.household)}</b><span class="tag">${esc(w.status)}</span></div><div>${w.packages.map(k=>`<span class="pk" style="background:${k.status==='已完成'?'var(--ok)':PKC[k.code]}">${esc(k.name.split('（')[0])}${k.assignee?'｜'+esc(k.assignee):''}｜${esc(k.status)}</span>`).join('')}</div></button>`).join('')}`:''}
  ${H&&H.waiting.length?`<div class="sec" id="advW">方案待子女確認（${H.waiting.length}）</div>${H.waiting.map(w=>`<button class="card" data-board="${w.household_id}" style="display:flex;justify-content:space-between;align-items:center;width:calc(100% - 24px)"><span><b>${esc(w.household)}</b><span class="muted" style="display:block;font-size:.88em">${esc(w.since)} 送出｜${fmt(w.one_time)}＋每月 ${fmt(w.monthly)}</span></span><span>${verTag(w.pv)} <span class="chev">›</span></span></button>`).join('')}`:''}
@@ -1144,10 +1151,11 @@ apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
  return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">
  <div class="step">把手機轉給${EN()}看｜大字顯示</div>
+ ${(()=>{let Q={};try{Q=JSON.parse(localStorage.getItem('jjj_v5_quotes')||'{}')}catch(e){}const L=Q[B.household_id]||[],v=L[L.length-1];return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
  ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。臥室與浴室不含鏡頭。'})}
  <div class="card"><b>會裝這些</b>${pins.filter(p=>p.k!=='note').map(p=>`<div class="row"><span><span class="dot" style="background:${PKC[p.pkg]}"></span> ${esc(p.label)}</span><span class="rs">${esc(p.room||'')}</span></div>`).join('')}</div>
  <div class="card okbox" style="margin:0 12px 12px">${(pins.some(p=>/攝影機/.test(p.label||''))||!!(B.plan&&B.plan.sel&&B.plan.sel.cam))?'臥室浴室不裝鏡頭；走廊攝影機平常只在本機錄影、沒人看。':'不裝鏡頭、不錄音。'}晚上起床燈會自己亮；沒事時按一下「我很好」就好。</div>
- <div class="pad"><button class="btn" data-a="elderOk">${EN()}同意，鎖定這個版本</button><button class="btn ghost" data-a="back">還要再調整</button></div></div>`},
+ <div class="pad"><button class="btn" data-a="elderOk">${EN()}同意這一版</button><button class="btn ghost" data-a="back">還要再調整</button></div></div>`},
 // 技師：施工（上圖只標號碼、下方依區域展開清單）／案場資訊
 tc:()=>{const o=S.order;if(!o)return V.t1();const tab=S.ttab==='info'?'info':'work';
  const tabs=`<div class="tabs" role="tablist">${[['work','施工'],['info','案場資訊']].map(([k,n])=>`<button role="tab" aria-selected="${tab===k}" data-ttab="${k}">${n}</button>`).join('')}</div>`;
@@ -1391,7 +1399,7 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='advReport')toast('已回報給總部知識管理');
  else if(a==='advQuote')go('a4');
  else if(a==='advConfirm'){go('a5')}
- else if(a==='advDone'){const x=A(),c=S.case;busy(t,async()=>{const dur=Math.round((Date.now()-x.t0)/1000);await api('/advisor/plans',{method:'POST',body:{household_id:c.household_id,booking_id:c.id,sel:x.sel,later:x.later,plan:x.plan,pay:x.pay,c2n:x.c2n,c2p:x.c2p,ewish:x.ewish||'',escort:!!x.escort,duration_s:dur}});x.t1=Date.now();S.cases=null;S.stack=['a1','a6'];render()})}
+ else if(a==='advDone'){const x=A(),c=S.case;busy(t,async()=>{const dur=Math.round((Date.now()-x.t0)/1000);await api('/advisor/plans',{method:'POST',body:{household_id:c.household_id,booking_id:c.id,sel:x.sel,later:x.later,plan:x.plan,pay:x.pay,c2n:x.c2n,c2p:x.c2p,ewish:x.ewish||'',escort:!!x.escort,duration_s:dur}});x.t1=Date.now();try{const D=JSON.parse(localStorage.getItem('jjj_adv_drafts')||'[]').filter(d=>d.hid!==c.household_id);const n=new Date();D.push({hid:c.household_id,household:c.household,at:(n.getMonth()+1)+'/'+n.getDate()});localStorage.setItem('jjj_adv_drafts',JSON.stringify(D))}catch(e){}S.cases=null;S.stack=['a1','a6'];render()})}
  else if(a==='advPrint')window.print();
  else if(a==='advAgain'){S.stack=['a1'];S.cases=null;render();Promise.all([loadCases(),loadAdvHome()]).then(render).catch(x=>toast(x.message))}
  else if(a==='famGrand'){S.fam=S.fam||{grand:true};S.fam.grand=!S.fam.grand;toast(S.fam.grand?'已開放孫輩查看簡化摘要':'已取消孫輩查看權限');render();savePrefs({grand:S.fam.grand})}
@@ -1427,12 +1435,11 @@ async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach
 window.JJJ={S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027f"></script>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027g"></script>
 <script>
 // 手機框：電腦上固定 393×852，視窗較矮時等比例縮小；右側留給導覽面板
 (function(){const sh=document.getElementById('app');const F=window.JJJFRAME={};
  function end(){try{return localStorage.getItem('jjj_end')||'family'}catch(e){return 'family'}}
- document.querySelectorAll('#ends a[data-end]').forEach(a=>a.classList.toggle('on',a.dataset.end===end()));
  F.lay=function(){if(innerWidth<560){sh.style.transform='';sh.style.left='';F.side=false;return}
   const g=document.getElementById('jg'),gOpen=g&&!g.hidden;const k=Math.min(1,(innerHeight-68-16)/876);const pw=417*k,gw=400;
   F.side=gOpen&&innerWidth>=pw+gw+28+40;const tot=pw+(F.side?gw+28:0);const left=Math.max(16,(innerWidth-tot)/2);
@@ -1442,5 +1449,5 @@ window.JJJ={S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheet
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="guide.js?v=20261027f"></script></body>
+<script src="guide.js?v=20261027g"></script></body>
 </html>

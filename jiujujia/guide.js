@@ -1,16 +1,17 @@
 // 揪居家導覽：右側說明面板＋畫面上的編號框（和 Demo 影片同一套呈現方式）
-// 不加遮罩、不跳視窗；四端各自登入，換端時真的登出再到該端登入頁
+// 不加遮罩、不跳視窗；一個揪居家 App（家庭／生活顧問／技師）＋企業管理端（電腦版），換身分時真的登出再登入
 (function () {
   const PAGE = /admin\.html/.test(location.pathname) ? 'adm' : /consultant\.html/.test(location.pathname) ? 'con' : 'app';
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
   const K = 'jjj_g_step', OFF = 'jjj_g_off';
-  const END_NOW = PAGE === 'app' ? (LS.get('jjj_end') || 'family') : PAGE === 'con' ? 'advisor' : 'admin';
+  const END_NOW = PAGE === 'app' ? 'family' : PAGE === 'con' ? 'advisor' : 'admin';
   const ENDS = {
-    family: { n: '消費者端', page: 'app', url: 'app.html?end=family' },
-    tech: { n: '技師端', page: 'app', url: 'app.html?end=tech' },
-    advisor: { n: '生活顧問端', page: 'con', url: 'consultant.html' },
-    admin: { n: '企業管理端', page: 'adm', url: 'admin.html' },
+    family: { n: '揪居家 App', page: 'app', url: 'app.html' },
+    tech: { n: '揪居家 App', page: 'app', url: 'app.html' },
+    advisor: { n: '企業管理端（電腦版）', page: 'con', url: 'consultant.html' },
+    admin: { n: '企業管理端（電腦版）', page: 'adm', url: 'admin.html' },
   };
+  const PLACE = { app: '揪居家 App', con: '企業管理端（電腦版）', adm: '企業管理端（電腦版）' };
   const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（生活顧問）', 'tech@example.com': '吳技師（全國電子技師）', 'manager@example.com': '張經理（總部）' };
   const CH = ['先評估', '再改善', '後關心', '總部'];
   const F = (o) => Object.assign({ end: 'family', as: 'chen@example.com' }, o);
@@ -118,7 +119,7 @@
       flow: ['消費者端', '企業管理端｜揪心願彙整'], last: '最後到企業管理端，看總部怎麼看這些資料。' }),
     M({ ch: 3, t: '企業管理端｜即時總覽', nav: { tab: 'live' },
       items: [['#nav', '側欄：今日工作、服務家庭、揪心願、門市與人員、試點與分析'], ['#view', '總部與門市主管看到的是<b>同一份即時資料</b>']],
-      why: '四端各自登入，資料即時串接；總部不用等月報，就能看到每一戶走到哪一步。',
+      why: '揪居家 App 與企業管理端資料即時串接；總部不用等月報，就能看到每一戶走到哪一步。',
       flow: ['消費者端', '生活顧問端', '技師端', '企業管理端'] }),
     M({ ch: 3, t: '預約與派工', nav: { tab: 'bk' },
       items: [['~門市諮詢預約@.panel', '剛才的報價請求與一鍵預約，出現在這裡'], ['~到府工單@.panel', '合併到府：同一天排好技師']],
@@ -214,7 +215,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   const stepI = () => { const v = LS.get(K); return v == null ? null : +v; };
   const firstOf = (end) => STEPS.findIndex(s => s.end === end);
   function endOf(i) { return STEPS[i] && STEPS[i].end; }
-  function ready(s) { return s && ENDS[s.end].page === PAGE && (PAGE !== 'app' || END_NOW === s.end) && me && me.email === s.as; }
+  function ready(s) { return s && ENDS[s.end].page === PAGE && me && me.email === s.as; }
   // ---------- 面板 ----------
   function ensure() {
     if (panel) return;
@@ -240,18 +241,26 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     if (tok !== showTok) return;
     const head = `<div class="grab"></div><div class="hd"><span><b>導覽 ${i + 1}／${STEPS.length}</b>｜${ENDS[s.end].n}</span><span><button data-t="min" aria-label="收合">${mini ? '展開' : '收合'}</button><button data-t="stop" aria-label="關閉導覽">✕</button></span></div>`;
     let body = '', foot = '';
-    const onPage = ENDS[s.end].page === PAGE && (PAGE !== 'app' || END_NOW === s.end);
+    const onPage = ENDS[s.end].page === PAGE;
     mode = '';
     if (!onPage) {
-      body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>下一段在${ENDS[s.end].n}</h2><div class="why">四端各自登入。導覽會先登出，帶你到<b>${ENDS[s.end].n}的登入頁</b>，再用示範帳號登入。</div>`;
+      body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>下一段在${ENDS[s.end].n}</h2><div class="why">導覽會先登出，帶你到<b>${PLACE[ENDS[s.end].page]}</b>的登入頁，再用示範帳號登入。</div>`;
       foot = `${i ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="goend">前往${ENDS[s.end].n}</button>`;
       setBoxes([]);
     } else if (!(me && me.email === s.as)) {
-      const demoSel = PAGE === 'app' ? `[data-demo="${s.as}"]` : PAGE === 'con' ? `[data-demo="${s.as}"]` : `[data-demo="${s.as}"]`;
-      body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${ENDS[s.end].n}登入</h2><div class="sec">看畫面上的編號</div><div class="li"><i>1</i><span>這是<b>${ENDS[s.end].n}</b>自己的登入頁，只列這一端的帳號</span></div><div class="li"><i>2</i><span>示範帳號<b>一鍵登入｜${WHO[s.as]}</b></span></div><div class="sec">為什麼這樣設計</div><div class="why">四端各自登入，帳號放錯入口會提示改用哪一端；登入後工單與資料即時串接。</div>`;
-      foot = `${i ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="login">幫我登入 ②</button>`;
-      s._items = [[PAGE === 'app' ? '#loginForm' : PAGE === 'con' ? '#cLogin' : '#gForm'], [demoSel]];
-      setBoxes(s._items);
+      const demoSel = `[data-demo="${s.as}"]`;
+      if (me && PAGE === 'app') {
+        body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>下一段換成${WHO[s.as]}</h2><div class="why">同一個揪居家 App，登入後依帳號身分進到各自的首頁。導覽會幫你<b>登出再用示範帳號登入</b>，不用換網頁。</div>`;
+        foot = `${i ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="login">幫我換帳號</button>`;
+        s._items = []; setBoxes([]);
+      } else {
+        const L1 = PAGE === 'app' ? '這是<b>揪居家 App</b>的登入頁：家庭、生活顧問、技師都從這裡登入' : PAGE === 'con' ? '這是<b>企業管理端（電腦版）</b>的生活顧問登入頁，在門市電腦整合報價、排工作包' : '這是<b>企業管理端（電腦版）</b>的登入頁，總部與門市主管使用';
+        const W1 = PAGE === 'app' ? '一個 App 依帳號身分分流；總部帳號會提示改用企業管理端（電腦版）。' : '手機用揪居家 App，電腦用企業管理端；帳號放錯入口會提示改用哪一邊，資料即時串接。';
+        body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${PLACE[PAGE]}登入</h2><div class="sec">看畫面上的編號</div><div class="li"><i>1</i><span>${L1}</span></div><div class="li"><i>2</i><span>示範帳號<b>一鍵登入｜${WHO[s.as]}</b></span></div><div class="sec">為什麼這樣設計</div><div class="why">${W1}</div>`;
+        foot = `${i ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="login">幫我登入 ②</button>`;
+        s._items = [[PAGE === 'app' ? '#loginForm' : PAGE === 'con' ? '#cLogin' : '#gForm'], [demoSel]];
+        setBoxes(s._items);
+      }
     } else {
       const items = s.items.map((it, k) => `<div class="li" data-k="${k}"><i>${k + 1}</i><span>${it[1]}</span></div>`).join('');
       const flow = s.flow.map((f, k) => `<span class="${k === s.flow.length - 1 && s.flow.length === 1 || f === ENDS[s.end].n ? 'me' : ''}">${f}</span>`).join('<em>→</em>');
@@ -443,7 +452,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   const begin = () => {
     if (LS.get(OFF)) { openBtn(true); return; }
     if (stepI() == null) LS.set(K, String(Math.max(0, firstOf(PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin'))));
-    else { const s = STEPS[stepI()]; if (s && s.end !== (PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin')) { const f = firstOf(PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin'); const viaGuide = LS.get('jjj_g_nav') === '1'; if (!viaGuide && f >= 0) LS.set(K, String(f)); } }
+    else { const s = STEPS[stepI()]; if (s && ENDS[s.end].page !== PAGE) { const f = firstOf(PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin'); const viaGuide = LS.get('jjj_g_nav') === '1'; if (!viaGuide && f >= 0) LS.set(K, String(f)); } }
     LS.del('jjj_g_nav'); show();
   };
   setTimeout(begin, 1400);

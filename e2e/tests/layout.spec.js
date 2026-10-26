@@ -20,9 +20,10 @@ test('電腦版：標準手機框 393×852 等比縮放，導覽面板在手機�
 });
 
 for (const [name, url, demo] of [
-  ['消費者端', '/jiujujia/app.html?end=family', '[data-demo="chen@example.com"]'],
-  ['技師端', '/jiujujia/app.html?end=tech', '[data-demo="tech@example.com"]'],
-  ['生活顧問端', '/jiujujia/consultant.html', '#cLogin [data-demo]'],
+  ['揪居家 App｜家庭', '/jiujujia/app.html', '[data-demo="chen@example.com"]'],
+  ['揪居家 App｜技師', '/jiujujia/app.html', '[data-demo="tech@example.com"]'],
+  ['揪居家 App｜生活顧問', '/jiujujia/app.html', '[data-demo="advisor@example.com"]'],
+  ['生活顧問（門市電腦）', '/jiujujia/consultant.html', '#cLogin [data-demo]'],
   ['企業管理端', '/jiujujia/admin.html', '#gate [data-demo="manager@example.com"]'],
 ]) {
   test(`${name}：登入頁與首頁沒有左右溢出`, async ({ page }) => {
