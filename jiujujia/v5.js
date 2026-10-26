@@ -16,7 +16,7 @@
       combo: { fast: 'h_inst', cheap: 'h_inst', nodrill: 'h_inst' },
       opts: [
         { id: 'h_inst', t: '全國電子安裝', n: '感應夜燈', p: '千元內', lv: 1, d: '當天', by: '全國電子安裝', r: 'g', rec: 1 },
-        { id: 'h_part', t: '夥伴施工', n: '感應夜燈＋止滑卡扣地板', p: '一到三千元', lv: 2, d: '半天', by: '施工夥伴', r: 'g', floor: 'click', note: '不拆除、可復原，適合租屋' },
+        { id: 'h_part', t: '簡易施工', n: '感應夜燈＋止滑卡扣地板', p: '一到三千元', lv: 2, d: '半天', by: '協力工班', r: 'g', floor: 'click', note: '不拆除、可復原，適合租屋' },
         { id: 'h_free', t: '免費調整', n: '鞋櫃移出走廊', p: '免費', lv: 0, d: '當天', by: '家人自行調整', r: 'r', note: '走道變寬，但暗的問題還在', more: 1 },
         { id: 'h_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'r', note: '保留紅燈與風險說明', more: 1 }
       ] },
@@ -24,11 +24,11 @@
       combo: { fast: 'b_inst', cheap: 'b_inst', nodrill: 'b_inst' },
       opts: [
         { id: 'b_inst', t: '全國電子安裝', n: '斜坡墊＋止滑地墊', p: '千元內', lv: 1, d: '當天', by: '全國電子安裝', r: 'g', ramp: 1, rec: 1 },
-        { id: 'b_part', t: '夥伴施工', n: '木作斜坡＋地面止滑', p: '一到三千元', lv: 2, d: '半天', by: '施工夥伴', r: 'g', ramp: 1 },
-        { id: 'b_eng', t: '夥伴工程', n: '打除門檻、換止滑磚', p: '三千元以上', lv: 3, d: '約 3 天', by: '需到府估價', r: 'g', floor: 'tile', est: 1, sub: 1 },
+        { id: 'b_part', t: '簡易施工', n: '木作斜坡＋地面止滑', p: '一到三千元', lv: 2, d: '半天', by: '協力工班', r: 'g', ramp: 1 },
+        { id: 'b_eng', t: '改造工程', n: '打除門檻、換止滑磚', p: '三千元以上', lv: 3, d: '約 3 天', by: '需到府估價', r: 'g', floor: 'tile', est: 1, sub: 1 },
         { id: 'b_free', t: '免費調整', n: '移除浴室地墊', p: '免費', lv: 0, d: '當天', by: '家人自行調整', r: 'y', note: '仍為黃燈：門檻高差還在', more: 1 },
-        { id: 'b_door2', t: '夥伴施工', n: '浴室門｜可從外側解鎖的把手', p: '一到三千元', lv: 2, d: '半天', by: '施工夥伴', r: 'y', note: '長輩若在浴室跌倒擋住門，家人可從外側開門', more: 1, door: 1 },
-        { id: 'b_door3', t: '夥伴工程', n: '浴室門｜改外開門或橫拉門', p: '三千元以上', lv: 3, d: '約 1–3 天', by: '需到府估價', r: 'y', est: 1, more: 1, door: 1 },
+        { id: 'b_door2', t: '簡易施工', n: '浴室門｜可從外側解鎖的把手', p: '一到三千元', lv: 2, d: '半天', by: '協力工班', r: 'y', note: '長輩若在浴室跌倒擋住門，家人可從外側開門', more: 1, door: 1 },
+        { id: 'b_door3', t: '改造工程', n: '浴室門｜改外開門或橫拉門', p: '三千元以上', lv: 3, d: '約 1–3 天', by: '需到府估價', r: 'y', est: 1, more: 1, door: 1 },
         { id: 'b_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留黃燈與風險說明', more: 1 }
       ] }
   };
@@ -114,7 +114,7 @@
       <div class="pad" style="padding-top:0;padding-bottom:0"><span class="seg">${[['fast', '最快轉綠'], ['cheap', '最省錢'], ['nodrill', '不鑽孔']].map(([k, n]) => `<button data-v5combo="${k}" aria-pressed="${ST.combo === k}">${n}</button>`).join('')}</span></div>
       ${main.map(x => optRow(sp, x)).join('')}
       ${ST.more ? more.map(x => optRow(sp, x)).join('') : `<div class="pad" style="padding-top:0;text-align:center"><button class="muted" data-v5more style="text-decoration:underline">更多選擇：免費調整${sp === 'bath' ? '、浴室門' : ''}、不處理</button></div>`}
-      <div class="muted" style="font-size:.8em;padding:0 16px">價格與工期為示範資料；夥伴工程需到府估價，正式以生活顧問報價為準。</div>
+      <div class="muted" style="font-size:.8em;padding:0 16px">價格與工期為示範資料；改造工程需到府估價，正式以生活顧問報價為準。</div>
       <div class="v5bar"><div class="r"><span>${e(S0.n)} <span style="color:${LC[S0.l][1]}">${LC[S0.l][0]}</span> → <b style="color:${LC[o.r][1]}">${LC[o.r][0]}</b></span><b>${o.lv ? PR[o.lv] : '免費'}</b></div>
         <button class="btn" data-v5ok>確定這個方式</button></div></div>`;
   };
@@ -128,13 +128,13 @@
     const sel = J.S.hh && J.S.hh.plan ? J.S.hh.plan.sel : { night: 1 };
     return `${CSS}${J.hdr('改善方案｜林女士家')}<div class="scroll" style="padding-top:10px">
       ${J.cmpPlan ? J.cmpPlan('v5c', { L: lights(), pins: J.DPINS(sel && sel.night ? sel : { night: 1 }, picks.find(([k]) => k === 'bath')[1].ramp ? 0 : 2), path: true, title: '全屋改善前後（示意）' }) : ''}
-      <div class="card"><b>已選的改善方式</b>${all.map(([k, o]) => `<div class="row"><span><span class="v5chip">${/夥伴/.test(o.t) ? '施工夥伴' : /全國/.test(o.t) ? '全國電子' : o.t === '免費調整' ? '自行調整' : '—'}</span>${e(SP[k].n)}｜${e(o.n)}</span><span class="muted" style="font-size:.85em">${e(o.d)}</span></div>`).join('')}
+      <div class="card"><b>已選的改善方式</b>${all.map(([k, o]) => `<div class="row"><span><span class="v5chip">${/簡易施工|改造工程/.test(o.t) ? '協力工班' : /全國/.test(o.t) ? '全國電子' : o.t === '免費調整' ? '自行調整' : '—'}</span>${e(SP[k].n)}｜${e(o.n)}</span><span class="muted" style="font-size:.85em">${e(o.d)}</span></div>`).join('')}
         <div class="row"><span>六個空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
-        <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由施工夥伴先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div></div>
-      <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '施工夥伴先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
-        <div class="muted" style="font-size:.82em;margin-top:6px">長輩本人同意才成交；先施工、再安裝設備。夥伴工程附書面保固；符合資格者可申請長照居家無障礙改善補助，生活顧問協助轉介 1966，不保證核准。</div></div>
+        <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由協力工班先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div></div>
+      <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '協力工班先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
+        <div class="muted" style="font-size:.82em;margin-top:6px">長輩本人同意才成交；先施工、再安裝設備。協力工班施工附書面保固；符合資格者可申請長照居家無障礙改善補助，生活顧問協助轉介 1966，不保證核准。</div></div>
       <div class="muted" style="font-size:.8em;padding:0 16px">燈號只協助排序、不取代專業評估；對比為示意、不是施工圖。</div>
-      <div class="v5bar"><div class="r"><span>一張報價（${est ? '含夥伴工程' : '全國電子＋施工夥伴'}）</span><b>${PR[lv] || '免費'}${est ? '・需到府估價' : ''}</b></div>
+      <div class="v5bar"><div class="r"><span>一張報價（${est ? '含改造工程' : '全國電子＋協力工班'}）</span><b>${PR[lv] || '免費'}${est ? '・需到府估價' : ''}</b></div>
         <button class="btn" data-v5handoff>請生活顧問確認並報價</button></div></div>`;
   };
   if (J.TIP) { J.TIP.optA = '先看哪裡要處理：點走道或浴室，一次只看一個空間。'; J.TIP.opt = '拖曳前後對比，選一種改善方式，按「確定這個方式」。'; J.TIP.optC = '確認清單與進度，交給生活顧問整合成一張報價。'; }
