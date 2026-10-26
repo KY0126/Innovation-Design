@@ -200,7 +200,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   }
   const clipRect = () => { let c = { left: 0, top: 0, right: innerWidth, bottom: innerHeight }; if (PAGE === 'app') { const v = document.getElementById('view'); if (v) { const r = v.getBoundingClientRect(); c = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; } } if (panel && !panel.hidden && panel.classList.contains('sheet')) c.bottom = Math.min(c.bottom, panel.getBoundingClientRect().top); return c; };
   // ---------- 狀態 ----------
-  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760;
+  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760, showTok = 0, moving = false;
+  // 換步驟或執行動作時鎖住面板按鈕，避免連點跳步、兩次更新互相覆蓋
+  const lock = on => { moving = on; if (panel) panel.querySelectorAll('.ft button').forEach(b => { b.disabled = on; }); };
   const stepI = () => { const v = LS.get(K); return v == null ? null : +v; };
   const firstOf = (end) => STEPS.findIndex(s => s.end === end);
   function endOf(i) { return STEPS[i] && STEPS[i].end; }
@@ -225,7 +227,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   }
   async function show() {
     const i = stepI(); if (i == null || LS.get(OFF)) return; const s = STEPS[i]; if (!s) { stop(); return; }
-    ensure(); panel.hidden = false; cur = i; await who();
+    const tok = ++showTok; ensure(); panel.hidden = false; cur = i; lock(true);
+    try { await who(); } catch (e) {}
+    if (tok !== showTok) return;
     const head = `<div class="grab"></div><div class="hd"><span><b>導覽 ${i + 1}／${STEPS.length}</b>｜${ENDS[s.end].n}</span><span><button data-t="min" aria-label="收合">${mini ? '展開' : '收合'}</button><button data-t="stop" aria-label="關閉導覽">✕</button></span></div>`;
     let body = '', foot = '';
     const onPage = ENDS[s.end].page === PAGE && (PAGE !== 'app' || END_NOW === s.end);
@@ -248,9 +252,10 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
       foot = `${i ? '<button data-t="prev">上一步</button>' : ''}${s.act && !s._done ? `<button class="p" data-t="act">${s.act.label}</button>` : ''}<button ${s.act && !s._done ? '' : 'class="p"'} data-t="next">${nextLabel}</button>`;
       s._items = s.items; setBoxes(s.items);
       if (s.nav && !s._navved) { s._navved = true; await doNav(s); }
-      if (s.pre && !s._pre && PAGE === 'app' && window.JJJ) { s._pre = true; try { s.pre(window.JJJ); } catch (e) {} await wait(500); place(); }
+      if (s.pre && !s._pre && PAGE === 'app' && window.JJJ) { s._pre = true; try { s.pre(window.JJJ); } catch (e) {} await wait(500); }
+      if (tok !== showTok) return;
     }
-    panel.innerHTML = head + `<div class="bd">${body}</div><div class="ft">${foot}</div>`;
+    panel.innerHTML = head + `<div class="bd">${body}</div><div class="ft">${foot}</div>`; moving = false;
     panel.classList.toggle('min', mini);
     relayout(); setTimeout(() => scrollFirst(), 200);
   }
@@ -295,13 +300,14 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const b = e.target.closest('button'); if (!b) return; const t = b.dataset.t, i = stepI(), s = STEPS[i];
     if (b.dataset.go) { const k = +b.dataset.go; STEPS.forEach(x => { x._navved = false; x._done = false; x._pre = false; }); LS.set(K, String(k)); return show(); }
     if (t === 'stop') return stop();
+    if (moving && t !== 'min') return;
     if (t === 'min') { mini = !mini; panel.classList.toggle('min', mini); b.textContent = mini ? '展開' : '收合'; return; }
     if (t === 'prev') { const p = STEPS[i - 1]; if (p) { p._navved = false; p._done = false; p._pre = false; } LS.set(K, String(i - 1)); return show(); }
     if (t === 'next') { const n = STEPS[i + 1]; if (!n) return stop(); n._navved = false; n._done = false; n._pre = false; LS.set(K, String(i + 1)); return show(); }
     if (t === 'goend') { LS.set('jjj_g_nav', '1'); try { await api('/auth/logout', { method: 'POST' }); } catch (x) {} if (s.end === 'family' || s.end === 'tech') LS.set('jjj_end', s.end); location.href = ENDS[s.end].url; return; }
     if (t === 'login') { b.disabled = true; try { await demoLogin(s.as); await who(); s._navved = false; show(); } catch (x) { b.disabled = false; } return; }
     if (t === 'act' && s.act) {
-      if (busy) return; busy = true; b.disabled = true;
+      if (busy) return; busy = true; lock(true);
       try {
         const J = window.JJJ;
         if (s.act.click) { const el = find(s.act.click); if (el) { el.click(); await wait(s.act.wait || 800); } }
