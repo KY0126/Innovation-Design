@@ -6,7 +6,7 @@
 
 | 項目 | 連結 |
 |---|---|
-| Demo 影片 | https://youtu.be/BWO1hCpEwwU |
+| Demo 影片 | https://ky0126.github.io/Innovation-Design/demo |
 | 設計思考流程與九大工具 | `/dt`（`jiujujia/design-thinking/`） |
 | 消費者端 | `/consumer`（以示範帳號登入 `jiujujia/app.html`） |
 | 生活顧問端 | `/consultant`（`jiujujia/consultant.html`） |
