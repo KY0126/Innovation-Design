@@ -46,3 +46,25 @@ test('手機版：導覽抽屜不蓋住第 1 個編號框', async ({ page }, inf
   expect(sb.height, '抽屜不超過畫面一半').toBeLessThanOrEqual(page.viewportSize().height * 0.5);
   expect(bb.y + bb.height, '編號框在抽屜上方').toBeLessThanOrEqual(sb.y + 2);
 });
+
+// 「瀏覽器展示版」標籤固定在右下角：不可蓋住導覽面板按鈕、「開啟導覽」按鈕、App 底部選單
+const rect = (page, sel) => page.evaluate(s => { const e = [...document.querySelectorAll(s)].find(x => x.getClientRects().length); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; }, sel);
+const hit = (a, b) => !!(a && b && a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b);
+for (const [name, url] of [['企業管理端', '/jiujujia/admin.html'], ['消費者端', '/consumer.html']]) {
+  test(`${name}：展示版標籤不遮擋導覽按鈕、「開啟導覽」與底部選單`, async ({ page }) => {
+    await page.goto('/index.html'); await page.evaluate(() => localStorage.clear());
+    await page.goto(url);
+    const login = page.locator('#jg [data-t="login"]'); await expect(login).toBeVisible({ timeout: 10_000 });
+    await login.click(); await expect(page.locator('#jg [data-t="next"]')).toBeEnabled({ timeout: 15_000 });
+    await page.waitForTimeout(800);
+    const demo = await rect(page, '#webDemo');
+    expect(hit(demo, await rect(page, '#jg .ft')), '導覽面板按鈕').toBe(false);
+    await page.click('#jg [data-t="stop"]'); await page.waitForTimeout(800);
+    const demo2 = await rect(page, '#webDemo'), open = await rect(page, '#jgOpen');
+    expect(open, '「開啟導覽」按鈕要看得到').not.toBeNull();
+    expect(hit(demo2, open), '「開啟導覽」按鈕').toBe(false);
+    const nav = await page.evaluate(() => { const v = document.getElementById('view'); if (!v || !v.closest('#app')) return null; const vb = v.getBoundingClientRect().bottom; const n = [...v.querySelectorAll('nav.nav')].find(x => { const r = x.getBoundingClientRect(); return r.height && Math.abs(r.bottom - vb) < 4; }); if (!n) return null; const r = n.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; });
+    expect(hit(demo2, nav), 'App 底部選單').toBe(false);
+    expect(hit(open, nav), '「開啟導覽」與 App 底部選單').toBe(false);
+  });
+}

@@ -223,7 +223,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     panel.addEventListener('click', onClick);
   }
   function stop() { LS.del(K); LS.set(OFF, '1'); if (panel) panel.hidden = true; boxes.forEach(b => b.style.display = 'none'); document.body.classList.remove('jgDock', 'jgSheet'); openBtn(true); relayout(); }
-  function openBtn(show) { let b = document.getElementById('jgOpen'); if (!show) { if (b) b.remove(); return; } if (!b) { b = document.createElement('button'); b.id = 'jgOpen'; b.textContent = '開啟導覽'; b.onclick = () => { if (stepI() != null && !LS.get(OFF)) { folded = false; openBtn(false); show(); } else start(); }; document.body.appendChild(b); } b.textContent = stepI() != null && !LS.get(OFF) ? '繼續導覽' : '開啟導覽'; }
+  function openBtn(show) { let b = document.getElementById('jgOpen'); if (!show) { if (b) b.remove(); return; } if (!b) { b = document.createElement('button'); b.id = 'jgOpen'; b.textContent = '開啟導覽'; b.onclick = () => { if (stepI() != null && !LS.get(OFF)) { folded = false; openBtn(false); show(); } else start(); }; document.body.appendChild(b); } b.textContent = stepI() != null && !LS.get(OFF) ? '繼續導覽' : '開啟導覽'; b.style.bottom = demoLift(16) + 'px'; }
   function relayout() { if (window.JJJFRAME && window.JJJFRAME.lay) window.JJJFRAME.lay(); place(); }
   function start(i) { LS.del(OFF); LS.set(K, String(i == null ? Math.max(0, firstOf(PAGE === 'app' ? END_NOW : PAGE === 'con' ? 'advisor' : 'admin')) : i)); openBtn(false); show(); }
   function tlHtml(ch) { return `<div class="tl">${CH.map((c, k) => `<div class="${k < ch ? 'dn' : k === ch ? 'cu' : ''}"><i></i>${c}</div>`).join('')}</div>`; }
@@ -271,18 +271,29 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     panel.classList.toggle('min', mini);
     relayout(); setTimeout(() => scrollFirst(), 200);
   }
+  // 「瀏覽器展示版」標籤固定在右下角：導覽面板與「開啟導覽」按鈕要讓出它的高度，避免互相遮擋
+  // 手機版 App 底部有選單列：展示版標籤放在選單列上方，不蓋住「會員中心」等按鈕
+  function placeDemo() {
+    const d = document.getElementById('webDemo'); if (!d) return;
+    const v = PAGE === 'app' && document.getElementById('view'), vb = v && v.getBoundingClientRect().bottom;
+    const nv = v && [...v.querySelectorAll('nav.nav')].find(n => { const r = n.getBoundingClientRect(); return r.height && Math.abs(r.bottom - vb) < 4; });
+    const want = nv ? Math.max(10, Math.round(innerHeight - nv.getBoundingClientRect().top) + 6) + 'px' : '10px';
+    if (d.style.bottom !== want) d.style.bottom = want;
+  }
+  function demoLift(base) { placeDemo(); const d = document.getElementById('webDemo'); if (!d) return base; const r = d.getBoundingClientRect(); if (!r.height) return base; return Math.max(base, Math.round(innerHeight - r.top) + 8); }
   function setBoxes(items) { boxes.forEach((b, k) => { b.dataset.sel = items[k] ? items[k][0] : ''; }); place(); }
   function scrollFirst() { const b = boxes[0]; const el = b && b.dataset.sel && find(b.dataset.sel); if (!el) return; const r = el.getBoundingClientRect(), c = clipRect(); if (r.top < c.top || r.bottom > c.bottom) el.scrollIntoView({ block: panel && panel.classList.contains('sheet') ? 'start' : 'center' }); place(); }
   function place() {
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => {
+      placeDemo(); const ob = document.getElementById('jgOpen'); if (ob) ob.style.bottom = demoLift(16) + 'px';
       // 面板位置：手機頁放在手機右側，電腦頁固定在右側；空間不夠就改成底部抽屜
       if (panel && !panel.hidden) {
         const F = window.JJJFRAME;
         const B = document.body.classList;
-        if (PAGE === 'app' && F && F.side) { panel.classList.remove('sheet'); Object.assign(panel.style, { left: F.gx + 'px', top: F.top + 'px', width: F.gw + 'px', height: F.h + 'px', right: 'auto', bottom: 'auto' }); B.remove('jgDock', 'jgSheet'); }
-        else if (PAGE !== 'app' && innerWidth >= 900) { const w = innerWidth >= 1180 ? 388 : 330; panel.classList.remove('sheet'); Object.assign(panel.style, { left: 'auto', right: '16px', top: '16px', bottom: '16px', width: w + 'px', height: 'auto' }); document.body.style.setProperty('--jgm', w + 32 + 'px'); B.add('jgDock'); B.remove('jgSheet'); }
-        else { panel.classList.add('sheet'); Object.assign(panel.style, { height: 'auto' }); B.remove('jgDock'); B.add('jgSheet'); }
+        if (PAGE === 'app' && F && F.side) { panel.classList.remove('sheet'); panel.style.removeProperty('bottom'); Object.assign(panel.style, { left: F.gx + 'px', top: F.top + 'px', width: F.gw + 'px', height: F.h + 'px', right: 'auto', bottom: 'auto' }); B.remove('jgDock', 'jgSheet'); }
+        else if (PAGE !== 'app' && innerWidth >= 900) { const w = innerWidth >= 1180 ? 388 : 330; panel.classList.remove('sheet'); Object.assign(panel.style, { left: 'auto', right: '16px', top: '16px', bottom: demoLift(16) + 'px', width: w + 'px', height: 'auto' }); document.body.style.setProperty('--jgm', w + 32 + 'px'); B.add('jgDock'); B.remove('jgSheet'); }
+        else { panel.classList.add('sheet'); Object.assign(panel.style, { height: 'auto' }); panel.style.setProperty('bottom', demoLift(8) + 'px', 'important'); B.remove('jgDock'); B.add('jgSheet'); }
       }
       const c = clipRect();
       boxes.forEach((b, k) => {
