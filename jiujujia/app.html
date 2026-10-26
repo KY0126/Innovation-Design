@@ -191,7 +191,7 @@ select.fld{appearance:auto;-webkit-appearance:auto}
 .archips{display:flex;gap:6px;flex-wrap:wrap}
 .archips span{font-size:13px;border-radius:15px;padding:5px 11px;background:rgba(58,58,56,.78);color:#fff;white-space:nowrap}
 .archips .go{background:#E0A030}
-.archips .ok{background:#6E1A35}
+.archips .ok{background:#6E1A35} .archips .ai{background:rgba(58,58,56,.86)} .archips .ai:before{content:'AI';background:#D4003C;color:#fff;font-weight:700;font-size:11px;border-radius:5px;padding:0 5px;margin-right:6px} .armat .mi{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px} .armat .mi .r{display:flex;align-items:center;gap:6px} .armat .mi b{flex:1} .armat .mi .e{font-size:.86em;color:var(--brand);margin-top:2px} .armat .mi button{border:1px solid var(--line);border-radius:8px;padding:2px 9px;font-size:.85em} .armat .mi button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
 .arsheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;padding:12px 12px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(0,0,0,.18)}
 .arseg{display:flex;gap:6px;margin-bottom:8px}
 .arseg span{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;font-size:.9em;color:var(--muted)}
@@ -318,6 +318,8 @@ function arViewHTML(){const p=k=>`left:${ARP[k][0]}%;top:${ARP[k][1]}%`,t=S.arT|
  <span class="arlab" id="arLW" style="${p('wlab')}">寬 0 cm</span>
  <span class="arlab" id="arLD" style="${p('door')}"><i style="background:#FFD23F"></i>浴室門 80 cm</span>
  <span class="arlab" id="arLT" style="${p('th')}"><i style="background:#FF9F1C"></i>門檻 2 cm</span>
+ <span class="arlab" id="arLF" style="left:30%;top:60%"><i style="background:#D4003C"></i>地板｜磁磚 93%</span>
+ <span class="arlab" id="arLM" style="left:62%;top:30%"><i style="background:#D4003C"></i>門框｜鋁框 88%</span>
  <span class="arlab" id="arLO1" style="${p('o1')}"><i style="background:#FF7A9C"></i>插座</span>
  <span class="arlab" id="arLO2" style="${p('o2')}"><i style="background:#FF7A9C"></i>插座</span>
  <div class="reticle" id="arRet"></div></div>
@@ -326,10 +328,12 @@ function arViewHTML(){const p=k=>`left:${ARP[k][0]}%;top:${ARP[k][1]}%`,t=S.arT|
   <div class="arprog"><div class="r"><span>本段已掃描</span><b id="arPct">0%</b></div><div class="pb"><i id="arBar"></i></div></div>
   <div class="archips"><span id="arC1">對準走廊，準備開始掃描</span><span id="arC2" class="go" style="display:none">慢慢往前，對準門框</span></div></div>
  <div class="arsheet" id="arSheet">${arSheetInner()}</div></div>`}
+const MATS=[['bath','浴室地板','磁磚','濕滑風險：加止滑條'],['wall','走廊牆面','水泥牆','夜燈可用螺絲固定'],['door','大門門框','鋁框','門窗感測器改用背膠']];
+function matCard(){const M=S.mat||(S.mat={});return `<div class="armat" style="margin-top:6px"><b>材質辨識</b> <span class="artag" style="background:#2B2B29;color:#fff">AI 判讀・請確認</span>${MATS.map(([k,n,m,e])=>`<div class="mi"><div class="r"><b>${n}｜${m}</b><button data-mat="${k}|1" aria-pressed="${M[k]===1}">對</button><button data-mat="${k}|0" aria-pressed="${M[k]===0}">改</button></div><div class="e">→ ${e}</div></div>`).join('')}<div class="arnote" style="margin:6px 0 0">辨識在手機上完成；原始影像分析完即清除，只保存尺寸與材質文字。判讀不確定請按「改」，或由顧問在門市確認；不取代專業評估。</div></div>`}
 function arSheetInner(){const t=S.arT||0,done=t>=AR_T,run=t>0&&!done;
  return `<div class="arseg"><span class="dn">① 臥室 ✓</span><span class="${done?'dn':'cu'}">② 走廊${done?' ✓':''}</span><span class="${done?'dn':''}">③ 浴室門口${done?' ✓':''}</span></div>
- ${done?`<div class="arres"><div class="row"><span>床邊到浴室走道寬</span><b>${AR_RES.corridor_cm} cm</b></div><div class="row"><span>浴室門檻高度</span><b>${AR_RES.threshold_cm} cm</b></div><div class="row"><span>床邊到浴室門口</span><b>約 ${AR_RES.bed_bath_m} 公尺</b></div><div class="row"><span>沿路插座</span><b>${AR_RES.outlets} 個</b></div></div>`:''}
- ${run?'':'<div class="arnote">只保存尺寸，不保存影像；浴室只掃門口與走道。</div>'}
+ ${done?`<div class="arres"><div class="row"><span>床邊到浴室走道寬</span><b>${AR_RES.corridor_cm} cm</b></div><div class="row"><span>浴室門檻高度</span><b>${AR_RES.threshold_cm} cm</b></div><div class="row"><span>床邊到浴室門口</span><b>約 ${AR_RES.bed_bath_m} 公尺</b></div><div class="row"><span>沿路插座</span><b>${AR_RES.outlets} 個</b></div></div>${matCard()}`:''}
+ ${run||done?'':'<div class="arnote">原始影像只為分析暫存、分析完即清除；浴室只掃門口與走道。</div>'}
  <button class="btn" data-a="${done?'arUse':'arScan'}" id="arBtn" ${run?'disabled':''}>${done?'帶入掃描結果':run?'掃描中…':'開始 AR 掃描'}</button>
  ${run?'':`<button class="arlink" data-armode="manual">${done?'重新量測或改用手動輸入':'改用手動輸入'}</button>`}`}
 function arApply(t){const $=id=>document.getElementById(id);if(!$('arGrid'))return;
@@ -337,13 +341,13 @@ function arApply(t){const $=id=>document.getElementById(id);if(!$('arGrid'))retu
  $('arGrid').style.opacity=c(0.9,1.5);
  const pct=t<=0?0:t<1.2?Math.round(c(0,1.2)*22):t<5.6?Math.round(22+c(1.2,5.6)*78):100;
  $('arPct').textContent=pct+'%';$('arBar').style.width=pct+'%';
- $('arC1').textContent=t<=0?'對準走廊，準備開始掃描':t<1.2?'移動手機，偵測地面與牆面…':'● 已偵測地面與牆面';
+ $('arC1').textContent=t<=0?'對準走廊，準備開始掃描':t<1.2?'移動手機，偵測地面與牆面…':t<4.6?'● 已偵測地面與牆面':'AI 地板 磁磚・門框 鋁框';$('arC1').className=t>=4.6?'ai':'';
  const c2=$('arC2');if(t>=5.6){c2.style.display='';c2.className='ok';c2.textContent='✓ 走廊量測完成'}else if(t>=3.2){c2.style.display='';c2.className='go';c2.textContent='慢慢往前，對準門框'}else c2.style.display='none';
  const w=c(1.8,2.8),L=$('arLine');L.setAttribute('x2',ARP.wl[0]+(ARP.wr[0]-ARP.wl[0])*w);L.setAttribute('y2',ARP.wl[1]+(ARP.wr[1]-ARP.wl[1])*w);L.style.opacity=w>0?1:0;
  $('arD1').style.opacity=w>0?1:0;$('arD2').style.opacity=w>=1?1:0;
  const lw=$('arLW');lw.textContent='寬 '+Math.round(AR_RES.corridor_cm*w)+' cm';lw.classList.toggle('on',w>0);
  $('arDoor').setAttribute('opacity',c(3.2,3.6));$('arLD').classList.toggle('on',t>=3.5);
- $('arLT').classList.toggle('on',t>=4.3);$('arLO1').classList.toggle('on',t>=4.7);$('arLO2').classList.toggle('on',t>=5.0);
+ $('arLT').classList.toggle('on',t>=4.3);$('arLF').classList.toggle('on',t>=4.6);$('arLM').classList.toggle('on',t>=4.9);$('arLO1').classList.toggle('on',t>=4.7);$('arLO2').classList.toggle('on',t>=5.0);
  $('arRet').style.display=t>=5.6?'none':''}
 let arRaf=null;
 function arStart(){if(arRaf)return;const t0=performance.now();S.arT=0.001;const sh=document.getElementById('arSheet');if(sh)sh.innerHTML=arSheetInner();
@@ -444,7 +448,7 @@ ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&
  <div class="card" style="margin-top:12px">${AR_SVG}<div class="muted" style="font-size:.85em;margin-top:6px">從床邊走到浴室門口，量 A 走道寬度、B 浴室門檻高度、C 距離，也數一下沿路有幾個插座。</div></div>
  <div class="card"><div class="meas">${f('corridor_cm','A｜走道寬度','cm','例如 92','1')}${f('threshold_cm','B｜浴室門檻高度','cm','例如 2','0.5')}${f('bed_bath_m','C｜床邊到浴室門口','公尺','例如 5','0.5')}</div>
   <div class="mf" style="margin-top:12px"><span>沿路可用的插座</span><div style="margin-top:6px">${[['0','沒有'],['1','1 個'],['2','2 個以上']].map(([v,l])=>`<button class="chip" data-outlet="${v}" aria-pressed="${String(m.outlets??'')===v}">${l}</button>`).join('')}</div></div>
-  <div class="okbox" style="background:var(--note);color:var(--muted)">AR 掃描目前為模擬示範；正式版接手機 AR 掃描，結果一樣帶入這裡，也可用捲尺量好後輸入。只記錄尺寸，不拍人、不存影像。</div></div>
+  <div class="okbox" style="background:var(--note);color:var(--muted)">AR 掃描目前為模擬示範；正式版接手機 AR 掃描，結果一樣帶入這裡，也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「我的家」、「長輩家」或這次先不儲存。</div></div>
  <div class="pad"><button class="btn" data-a="arNext">下一步：全國電子 AI 顧問阿國問答</button><button class="btn ghost" data-a="arSkip">先略過，到門市再請顧問量</button></div></div>`},
 b2:()=>{const i=S.qi||0,q=Q[i],sel=S.ans[q.k],qt=S.self?QS[q.k]:q.q;return `${hdr('全國電子 AI 顧問阿國居家診斷',{aplus:true})}<div class="scroll" style="padding-top:14px"><div class="pad">
  <div class="muted" style="margin-bottom:6px">步驟 2／2｜第 ${i+1} 題，共 ${Q.length} 題</div><div class="bar" aria-hidden="true"><i style="width:${30+(i+1)/Q.length*70}%"></i></div>
@@ -468,7 +472,7 @@ b3:()=>{const as=S.hh&&S.hh.assessment;if(!as)return V.b1();const r=as.rec,m=as.
  <div class="card" style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 90 90" width="78" height="78" role="img"><title>您的揪居家同心圓</title><circle cx="45" cy="45" r="43" fill="none" stroke="#8A8983" stroke-width="1"/><circle cx="45" cy="45" r="32" fill="#8F0029" fill-opacity=".22" stroke="#8F0029" stroke-width="1"/><circle cx="45" cy="45" r="21" fill="#B80C40" fill-opacity=".22" stroke="#B80C40" stroke-width="1"/><circle cx="45" cy="45" r="10" fill="#D4003C" fill-opacity=".45" stroke="#D4003C" stroke-width="1"/></svg><div class="muted" style="font-size:.88em;line-height:1.7"><div><b style="color:#D4003C">●</b> 家電檔案（免費）</div><div><b style="color:#B80C40">●</b> 家電保養：擴展期開放</div><div><b style="color:#8F0029">●</b> 長輩關懷：${esc(r.n)}</div><div>○ 家電換新：擴展期開放</div></div></div>
  <div class="card" style="background:var(--note)"><b>下一步：到門市做居安規劃</b><div class="muted" style="margin-top:4px">診斷與 AR 掃描（場勘）結果會自動帶給生活顧問；生活顧問把夜間動線照明與關懷設備整合成一張報價，到店不用再講一次。</div></div>
  ${dv.length?`<div class="card"><b>順便看看家裡的家電</b>${dv.map(d=>`<div class="muted" style="margin-top:4px">${esc(d.name)}：${esc(d.status)}${d.years?'（使用 '+d.years+' 年）':''}</div>`).join('')}</div>`:''}
- <div class="pad">${S.ph>=2?'<button class="btn" data-go="m2">到「我的家」看方案</button>':`<button class="btn" data-go="b4">${S.booked?'更改門市預約':'預約門市免費諮詢'}</button>`}<button class="btn ghost" data-a="save">儲存到「我的家」</button><button class="btn ghost" data-go="share">分享摘要給家人（LINE）</button>${S.ph<2?'<button class="btn ghost" data-a="redo">重新做一次評估</button>':''}</div></div>`},
+ <div class="pad">${S.ph>=2?'<button class="btn" data-go="m2">到「我的家」看方案</button>':`<button class="btn" data-go="b4">${S.booked?'更改門市預約':'預約門市免費諮詢'}</button>`}<button class="btn ghost" data-go="optA">選改善方式（四類做法）</button><div class="card" style="margin:4px 0 8px;padding:12px"><b>分析成果要存在哪裡？</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">原始影像已在分析完清除；存入的成果與截圖保存六個月，期滿由新資料覆蓋。</div><button class="btn ghost" data-a="save">存入「長輩家」</button><button class="btn ghost" data-a="saveMine">存入「我的家」</button><button class="btn ghost" data-a="saveNone">這次先不儲存，只查看結果</button></div><button class="btn ghost" data-go="share">分享摘要給家人（LINE）</button>${S.ph<2?'<button class="btn ghost" data-a="redo">重新做一次評估</button>':''}</div></div>`},
 b4:()=>{const stores=(S.cfg&&S.cfg.stores)||[],st=S.store||(S.hh&&S.hh.household.store)||(stores[0]&&stores[0].name),sl=S.slot,L=S.slots;return `${hdr('預約門市諮詢')}<div class="scroll" style="padding-top:12px">
  <div class="sec">選擇門市</div>
  ${stores.map(s=>`<button class="card opt" style="width:calc(100% - 24px);margin:0 12px 10px" data-store="${esc(s.name)}" aria-pressed="${st===s.name}"><b>${esc(s.name)}</b><div class="muted">${esc(s.note)}${S.hh&&S.hh.household.store===s.name?'｜綁定門市':''}</div></button>`).join('')}
@@ -563,7 +567,7 @@ const CAT=[
  {ring:2,id:'morning',n:'晨起平安確認',d:'門窗感測 1、人體感測 1',p:2400,g:1},
  {ring:2,id:'power',n:'用電異常提醒',d:'智慧插座 3、溫度感測 1',p:1500,g:1},
  {ring:2,id:'alert',n:'異常時依序通知家人',d:'先問長輩，再通知子女、成年家人與就近聯絡人',p:0,g:1},
- {ring:2,id:'cam',n:'影像確認（選配）',d:'走廊或門口攝影機，有動靜才在本機錄影，平常不上傳、保存 6 個月；異常且長輩沒回應時，LINE 官方帳號通知指定家人並附截圖預覽，片段在 App 觀看；須長輩書面同意，攝影機選配另計',p:0},
+ {ring:2,id:'cam',n:'影像確認（選配）',d:'走廊或門口攝影機，有動靜才在本機錄影，平常不上傳；錄下的影像與異常紀錄保存 6 個月、期滿由新資料覆蓋；異常且長輩沒回應時，LINE 官方帳號通知指定家人並附截圖預覽，片段在 App 觀看；須長輩書面同意，攝影機選配另計',p:0},
  {ring:3,id:'ac',n:'家電換新',d:'擴展期開放',p:0,exp:1}
 ];
 const RING=[['家電檔案｜免費','#D4003C'],['家電保養｜單次或年繳','#B80C40'],['長輩關懷｜設定費＋月付','#E0A030'],['家電換新｜擴展期','#888780']];
@@ -646,7 +650,7 @@ a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scro
   <p class="rs" style="margin:6px 0 0">付款人可以是子女或長輩本人，也可由兄弟姊妹分攤月費；不論誰付款，都須長輩本人同意才成交。家電換新與以租代買於擴展期開放</p></div>
  <div class="ly"><h3>第二聯絡人（必填）</h3><label class="rs">姓名<input class="fld" id="c2n" value="${a.c2n}" placeholder="例如：${CN('第二聯絡人','第二聯絡人')}"></label><label class="rs" style="display:block;margin-top:8px">電話<input class="fld" id="c2p" inputmode="tel" value="${a.c2p}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">依序通知：長輩本人 → 主要聯絡人 → 第二聯絡人 → 就近聯絡人。</div></div>`:'<div class="ly"><h3>關懷方案</h3><div class="rs">本次未選長輩關懷項目，無月費。</div></div>'}
  </div>${sumbar('下一步：確認','advConfirm',hasGuard()&&!a.c2n.trim(),'請填寫第二聯絡人姓名')}`},
-a5:()=>{const a=A(),L=[a.sel.cam?'已向長輩說明攝影機平常只在本機錄影、保存 6 個月；異常且沒回應時經 LINE 官方帳號通知家人，片段只在 App 內觀看；長輩可隨時暫停或要求刪除，並取得本人書面同意':'已向長輩說明設備會記錄活動、不拍攝影像，並取得本人同意','已說明本服務為生活關懷，非醫療照護；緊急請撥 119','付款人（子女或長輩本人）同意服務條款與資料使用說明'];return `${stf('確認方案')}<div class="scroll">
+a5:()=>{const a=A(),L=[a.sel.cam?'已向長輩說明攝影機平常只在本機錄影，影像與異常紀錄保存 6 個月、期滿由新資料覆蓋；異常且沒回應時經 LINE 官方帳號通知家人，片段只在 App 內觀看；長輩可隨時暫停或要求刪除，並取得本人書面同意':'已向長輩說明設備會記錄活動、不拍攝影像，並取得本人同意','已說明本服務為生活關懷，非醫療照護；緊急請撥 119','付款人（子女或長輩本人）同意服務條款與資料使用說明'];return `${stf('確認方案')}<div class="scroll">
  <div class="step">步驟 4／4｜同意事項皆須勾選</div>
  <div class="ly">${L.map((l,i)=>`<button class="it" data-cons="${i}"><span class="ck ${a.cons[i]?'on':''}">${a.cons[i]?'✓':''}</span><span style="flex:1">${l}</span></button>`).join('')}</div>
  <div class="ly"><h3>方案內容</h3>${CAT.filter(c=>a.sel[c.id]).map(c=>`<div class="rs">・${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div class="rs">・${c.n}（之後再評估）</div>`).join('')}</div>
@@ -839,7 +843,7 @@ obsR:()=>{const o=S.obs,r=obsRisks(o).slice(0,3);return `${hdr('居家安全檢�
  <div class="card"><div class="rs">長輩家｜${o.type||''}｜由校園大使與家人完成</div><b style="font-size:1.1em">最需要注意的 ${r.length} 件事</b>
   ${r.map(([a,b],i)=>`<div class="row"><span><b>${i+1}. ${a}</b><span class="muted" style="display:block;font-size:.88em">建議：${b}</span></span></div>`).join('')}</div>
  <div class="card"><b>各空間燈號</b><div class="rs" style="margin-bottom:4px">依勾選結果自動標示；紅燈優先處理</div>${obsLights(o).map(([n,c,t])=>`<div class="row"><span><span class="dot" style="width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px;background:${c==='r'?'#D4003C':c==='y'?'#E0A030':'#138F3B'}"></span>${n}</span><span class="muted" style="font-size:.88em">${t}</span></div>`).join('')}<div class="muted" style="font-size:.85em;margin-top:6px">這是 ① 先評估的結果。預約後，生活顧問依檢核結果與 AR 掃描尺寸，把家電與無障礙改善整合成一張報價；尺寸不足時才安排技師到府複量。</div></div>
- ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" style="border-left:4px solid #8F0029"><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#FCE6EC;color:#8F0029">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；只存尺寸，不存影像。</div></div>`})()}
+ ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" style="border-left:4px solid #8F0029"><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#FCE6EC;color:#8F0029">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；原始影像分析完即清除，存入的成果保存六個月。</div></div>`})()}
  <div class="sec">推薦的生活顧問</div>${advCard('Digital City 台中逢甲店',true)}
  <div class="pad"><button class="btn" data-go="b4">帶著檢核結果預約門市</button><button class="btn ghost" data-a="obsWish">把觀察到的需求送出為揪心願</button><button class="btn ghost" data-a="obsShare">分享檢核結果給家人（示意）</button>
  <p class="muted" style="font-size:.85em">觀察結果以去識別化方式彙整，用於改善情境模板與服務；不包含任何個人資料。</p></div></div>`},
@@ -928,7 +932,7 @@ pl:()=>{const H=S.hh,p=H&&H.plan;if(!p)return `${hdr('專屬居家方案')}<div 
  <div class="card"><div class="rs">${esc(p.created_at.slice(5,10).replace('-','/'))}｜${esc(h.store)}｜由生活顧問${esc(p.advisor||'')}規劃</div><b style="font-size:1.12em">${EN()}家｜${esc(planName(p.plan).split('｜')[0])}</b><div class="rs">${a.sel.morning?'臥室與晨起作息':'臥室到浴室'}｜由場域組合的專屬方案</div>
   <div style="display:flex;gap:12px;align-items:center;margin-top:8px">${ringSVG(a)}<div class="rs" style="line-height:1.75">${CAT.filter(c=>a.sel[c.id]).map(c=>`<div><span class="dot" style="background:${RING[c.ring][1]}"></span> ${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div>○ ${c.n}（之後評估）</div>`).join('')}</div></div></div>
  <div class="card" style="padding:4px 14px"><div class="row"><span>一次性費用</span><b>${fmt(p.one_time)}</b></div>${p.monthly?`<div class="row"><span>關懷月費</span><span style="text-align:right"><b>${fmt(p.monthly)}／月</b><span class="muted" style="display:block;font-size:.85em">不綁約；年繳 ${fmt(p.yearly)}（10 付 12）</span></span></div><div class="row"><span>兄弟姊妹分攤</span><span class="muted">2 人各約 ${fmt(Math.round(p.monthly/2))}／月</span></div>`:''}<div class="rs" style="padding:4px 0 8px">試點定價，實際依門市盤點；費用於門市或 App 行動支付付款</div></div>
- ${a.sel.cam?'<div class="card okbox" style="margin:0 12px 12px">'+EN()+'本人同意加裝影像確認：平常只在本機錄影、保存 6 個月；異常且沒回應時，LINE 通知'+ON()+'，片段在 App 觀看；臥室與浴室不裝鏡頭。</div>':'<div class="card okbox" style="margin:0 12px 12px">設備不含鏡頭，只記錄門窗與活動；'+EN()+'本人可在門市親自確認。</div>'}
+ ${a.sel.cam?'<div class="card okbox" style="margin:0 12px 12px">'+EN()+'本人同意加裝影像確認：平常只在本機錄影，影像與異常紀錄保存 6 個月、期滿由新資料覆蓋；異常且沒回應時，LINE 通知'+ON()+'，片段在 App 觀看；臥室與浴室不裝鏡頭。</div>':'<div class="card okbox" style="margin:0 12px 12px">設備不含鏡頭，只記錄門窗與活動；'+EN()+'本人可在門市親自確認。</div>'}
  ${H.pv?`<div class="card" style="padding:10px 14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>方案圖面</b>${verTag(H.pv)}</div><div class="muted" style="font-size:.88em;margin-top:2px">${H.pv.status==='長輩已確認'||H.pv.status==='差異已核准'?EN()+'已在門市看過安裝前後對比並同意（'+esc((H.pv.locked_at||'').slice(5,16).replace('-','/'))+'）；施工依這個版本':H.pv.status==='草稿'?'顧問規劃中，長輩確認後鎖定版本':esc(H.pv.reason||'')}</div>${(H.versions||[]).length>1?`<div class="rs" style="margin-top:4px">版本歷程：${H.versions.map(v=>'v'+v.ver+' '+esc(v.status)).join(' → ')}</div>`:''}</div>
  ${cmpPlan('pl',{L:H.assessment?H.assessment.lights:[],pins:H.pv.pins,path:!!a.sel.night})}`:''}
  <div class="card" style="display:flex;gap:10px;align-items:center"><div class="avt" style="background:var(--brand);width:40px;height:40px;font-size:1em">顧</div><div style="flex:1"><b>${esc(p.advisor||'生活顧問')}</b><div class="muted" style="font-size:.88em">${esc(h.store)}｜生活顧問認證</div></div><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div>
@@ -1014,7 +1018,7 @@ function cmpHall(id){const p=(CMP[id]&&CMP[id].p)||50;const G=[[31,80,'床邊'],
   <div class="cmpa"><div class="hs"><img src="ar/ar_plain.jpg" alt="夜間走道安裝後：感應小夜燈照亮動線" class="lt">${G.map(([x,y])=>`<i class="glow" style="left:${x}%;top:${y}%"></i>`).join('')}${G.map(([x,y,n])=>`<span class="nl" style="left:${x}%;top:${y-5}%">● ${n}夜燈</span>`).join('')}</div></div>
   <div class="cmph"><span>‹ ›</span></div><span class="cmpt l">安裝前</span><span class="cmpt r">安裝後</span>
   <input type="range" min="0" max="100" value="${p}" data-cmpr="${id}" aria-label="左右滑動，比較夜間走道安裝前與安裝後"></div>
- <div class="muted" style="font-size:.85em;margin-top:6px">起身時夜燈自動亮起，從床邊一路亮到浴室門口；只保存尺寸，不保存影像。</div></div>`}
+ <div class="muted" style="font-size:.85em;margin-top:6px">起身時夜燈自動亮起，從床邊一路亮到浴室門口；前後對比為示意，不是施工圖。</div></div>`}
 // 方案圖面（顧問編輯、技師施工圖層共用）
 function planMap(pins,o={}){return `<div class="hpw pm ${o.edit?'edit':''}" ${o.edit?'data-pmap="1"':''}><img src="home/plan.jpg" alt="${EN()}家方案圖面"><svg viewBox="${HPV.join(' ')}" ${o.edit?'data-pmsvg="1"':''}>${o.path?hpPath():''}${hpPins(pins,{...o,click:true})}</svg></div>`}
 function lightBasis(){return `<details class="basis"><summary>燈號依據</summary><div class="rs" style="line-height:1.6;margin-top:4px">
@@ -1116,12 +1120,13 @@ const ACHK={'臥室':'從床上起身，床邊夜燈會自己亮','走道':'走�
 const PIN_SPEC={light:'感應小夜燈｜離地約 30 cm、朝走道方向',door:'門窗感測器｜貼在門框上緣，磁條對齊',btn:'浴室緊急按鈕｜馬桶旁，坐著伸手按得到',gw:'閘道器｜客廳插座旁，離地 1 公尺以上',motion:'人體感測器｜牆角約 2 公尺高',strip:'門檻提示燈條｜貼在門檻前緣',outlet:'床邊插座｜由水電技師加裝'};
 function pkMine(o,c){const k=(o.packages||[]).find(x=>x.code===c);return !!(k&&k.mine)}
 function tState(t){if(t.done)return 'done';if(t.pin&&t.pin.st==='diff'||t.paused)return 'diff';if(!t.mine||t.locked)return 'other';return 'todo'}
+const MATI={D2:'安裝方式：背膠固定。門框為鋁框，不鑽孔；先清潔表面再貼合（AI 辨識・子女已確認）',N1:'地板：磁磚。選磁磚用止滑條，貼在門檻內側（AI 辨識・子女已確認）'};
 function taskList(o){const pins=(o.pv?o.pv.pins:[]).filter(p=>p.k!=='note'),pk=o.packages||[],P=c=>pk.find(k=>k.code===c),st=o.steps||{},T=[];
  const add=(group,pkg,key,label,detail,done,extra={})=>{const k=P(pkg);T.push({group,pkg,key,label,detail,done,mine:!!(k&&k.mine),locked:!!(k&&k.locked),paused:!!(k&&k.status==='暫停'),...extra})};
  const A=P('A'),B=P('B'),RO=['臥室','走道','浴室','玄關','客廳'];
  if(B)add('開工','B','B:0','確認床邊與走道插座','沒有插座的位置改用電池型夜燈',!!(B.steps||{})[0]);
  if(A){add('開工','A','A:ph0','施工前整體照片','只拍設備位置，不拍人；浴室內部須長輩同意',!!st.ph0,{photo:1});add('開工','A','A:m','複核走道寬與門檻高','和 AR 掃描（場勘）的尺寸比對，差太多就回報差異',!!st.m)}
- pins.slice().sort((a,b)=>(a.pkg===b.pkg?0:a.pkg==='B'?-1:1)).forEach(p=>add(RO.includes(p.room)?p.room:'客廳',p.pkg,'pin:'+p.id,p.label,(PIN_SPEC[p.k]||'')+(p.note?'｜圖面備註：'+p.note:''),p.st==='done',{pin:p}));
+ pins.slice().sort((a,b)=>(a.pkg===b.pkg?0:a.pkg==='B'?-1:1)).forEach(p=>add(RO.includes(p.room)?p.room:'客廳',p.pkg,'pin:'+p.id,p.label,(MATI[p.id]||PIN_SPEC[p.k]||'')+(p.note?'｜圖面備註：'+p.note:''),p.st==='done',{pin:p}));
  if(B){add('收尾','B','B:3','關燈測試感應距離與亮度','從床邊走到浴室，三盞夜燈依序亮起',!!(B.steps||{})[3]);add('收尾','B','B:4','夜間照明完工照片','只拍夜燈位置',!!(B.steps||{})[4],{photo:1})}
  if(A){add('收尾','A','A:fine','請長輩按一次「我很好」','確認長輩知道怎麼結束詢問',!!st.fine);add('收尾','A','A:test','送出測試通知給家人','家人的 App 收到測試訊息',!!st.test);add('收尾','A','A:teach','一對一教學與說明卡','說明卡貼在床邊',!!st.teach);add('收尾','A','A:ph1','完工整體照片','和施工前同角度',!!st.ph1,{photo:1});add('收尾','A','A:rc','包材與廢電池帶回','帶回門市回收',!!st.rc)}
  if(!A&&!B&&pk[0])(pk[0].step_names||[]).forEach((n,i)=>add('檢修',pk[0].code,pk[0].code+':'+i,n,'',!!(pk[0].steps||{})[i]));
@@ -1237,6 +1242,7 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.pay){A().pay=t.dataset.pay;render();return}
  if(t.dataset.cons){const c=A().cons,i=+t.dataset.cons;c[i]=c[i]?0:1;render();return}
  if(t.dataset.armode){S.armode=t.dataset.armode;S.arT=0;render();return}
+ if(t.dataset.mat){const [k,v]=t.dataset.mat.split('|');(S.mat||(S.mat={}))[k]=+v;const sh=document.getElementById('arSheet');if(sh)sh.innerHTML=arSheetInner();return}
  const a=t.dataset.a;
  if(a==='back')back();
  else if(a==='logout')logout();
@@ -1252,7 +1258,7 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='repairList')toast('線上報修維持原 App 功能');
  else if(a==='prev'){S.qi--;render()}
  else if(a==='next'){if(S.qi<Q.length-1){S.qi++;render()}else busy(t,async()=>{const dur=S.d0?Math.round((Date.now()-S.d0)/1000):null;applyHome(await api('/assessments',{method:'POST',body:{answers:S.ans,measures:S.meas,filled_by:S.self?'self':'child',duration_s:dur}}));S.d0=null;const i=S.stack.indexOf('b1');S.stack=(i>=0?S.stack.slice(0,i):S.stack.slice(0,1)).concat('b3');render()})}
- else if(a==='save'){toast('已存到「我的家」');S.home='parents';S.stack=['home','m2'];render()}
+ else if(a==='save'){toast('已存入「長輩家」，成果保存六個月');S.home='parents';S.stack=['home','m2'];render()}  else if(a==='saveMine'){toast('已存入「我的家」，成果保存六個月');S.home='mine';S.stack=['home','m2'];render()}  else if(a==='saveNone'){toast('這次先不儲存：不建立家庭紀錄，原始影像已清除')}
  else if(a==='book')busy(t,async()=>{const st=S.store||S.hh.household.store;const d=await api('/bookings',{method:'POST',body:{store:st,slot:S.slot}});applyHome(d.home);S.slot=null;S.slots=null;S.stack=['home','b5'];render()});
  else if(a==='toHome2'){S.home='parents';S.stack=['home','m2'];render()}
  else if(a==='invite')busy(t,async()=>{const d=await api('/home/invite',{method:'POST'});S.invite=d.code;render()});
@@ -1318,7 +1324,7 @@ boot();
 async function tourDiag(){if(!S.meas||!Object.keys(S.meas).length)S.meas={corridor_cm:AR_RES.corridor_cm,threshold_cm:AR_RES.threshold_cm,bed_bath_m:AR_RES.bed_bath_m,outlets:AR_RES.outlets};
  const ans={live:'剛開始一個人住',night:'一晚兩次以上',light:'偏暗',phone:'只會接電話',worry:'夜間跌倒沒人知道'};
  applyHome(await api('/assessments',{method:'POST',body:{answers:ans,measures:S.meas,filled_by:'child',duration_s:S.d0?Math.round((Date.now()-S.d0)/1000):240}}));S.d0=null;S.stack=['home','b3'];render()}
-async function tourDiff(){await tourOrder();const o=S.order;S.order=await api('/tech/orders/'+o.id+'/diffs',{method:'POST',body:{pin_id:'D2',level:'暫停',text:'大門為鋁框，感測器改用強力背膠並往內移 3 cm',photo:true}});S.tpin='D2';S.ttab='work';S.tsel='pin:D2';S.topen='玄關';S.stack=['t1','tc'];render();toast('已送出：A 施工包暫停，等待生活顧問核准')}
+async function tourDiff(){await tourOrder();const o=S.order;S.order=await api('/tech/orders/'+o.id+'/diffs',{method:'POST',body:{pin_id:'L2',level:'暫停',text:'走道插座被衣櫃擋住，夜燈改用電池款',photo:true}});S.tpin='L2';S.ttab='work';S.tsel='pin:D2';S.topen='玄關';S.stack=['t1','tc'];render();toast('已送出：A 施工包暫停，等待生活顧問核准')}
 async function tourOrder(){if(!S.order){const d=await api('/tech/orders');S.orders=d.orders;S.today=d.today;S.order=d.orders.find(o=>o.status!=='已完成')||d.orders[0]}if(!S.order)throw new Error('沒有工單');S.order=await api('/tech/orders/'+S.order.id)}
 async function tourFinish(){await tourOrder();let T=taskList(S.order);await techStart('A');
  for(const t of T.filter(x=>x.pkg==='A'&&!x.done&&x.pin))S.order=await api('/tech/orders/'+S.order.id+'/pins/'+t.pin.id,{method:'POST',body:{st:'done'}});
@@ -1326,8 +1332,9 @@ async function tourFinish(){await tourOrder();let T=taskList(S.order);await tech
  S.order=await api('/tech/orders/'+S.order.id+'/complete',{method:'POST',body:{steps:all}});S.stack=['t1','tc'];S.ttab='work';S.topen='收尾';render()}
 async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach(t=>{if(t.group!=='開工')S.acc[t.group]=1});S.stack=['t1','tc','tacc'];render();await new Promise(r=>setTimeout(r,900));
  S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});S.stack=['t1','t4'];render();toast(EN()+'驗收完成，摘要已同步給家人')}
-window.JJJ={S,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
+window.JJJ={S,V,TIP,hdr,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="tour.js?v=20261025b"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261026"></script>
+<script src="tour.js?v=20261026"></script></body>
 </html>

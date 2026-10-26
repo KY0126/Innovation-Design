@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FJU 創新思考與設計</title>
+<title>創新思考與設計｜五子登科</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap">
 <style>
 :root{--bg:#F1F1F1;--paper:#fff;--ink:#303030;--muted:#585C64;--line:#DCDCDC;--red:#D4003C;--tint:#FCE6EC;
@@ -15,7 +15,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line
 header{padding:48px 0 20px}
 .eyebrow{font-size:13px;letter-spacing:.08em;color:var(--muted)}
 h1{font-size:clamp(28px,6vw,42px);margin:4px 0 8px;font-weight:900}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px;margin-bottom:16px}
 .card h2{margin:0;font-size:22px}
 .card h2 small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
 .links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -23,24 +23,33 @@ h1{font-size:clamp(28px,6vw,42px);margin:4px 0 8px;font-weight:900}
 .links a:hover{background:var(--tint)}
 .links a:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 .links b{font-size:16px}.links span{font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
 @media (max-width:560px){.links{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">輔仁大學｜五子登科</div>
-    <h1>FJU 創新思考與設計</h1>
-    <p>團隊在創新思考與設計課程中的提案、「設計思考流程與九大工具」與可操作原型。</p>
+    <div class="eyebrow">五子登科</div>
+    <h1>創新思考與設計</h1>
+    <p>團隊的提案、「設計思考流程與九大工具」與可操作原型。</p>
   </header>
   <section class="card" aria-labelledby="p1">
     <h2 id="p1">全國電子．揪居家<small>2026 InnoConnect+ 全國服務創新跨界共創大賽</small></h2>
     <div class="links">
-      <a href="https://youtu.be/BWO1hCpEwwU"><b>Demo 影片</b><span>2 分 58 秒，從 AR 掃描（場勘）到派工</span></a>
-      <a href="jiujujia/design-thinking/"><b>設計思考流程與九大工具</b><span>同理、定義、發想、原型，共 8 頁</span></a>
-      <a href="jiujujia/app.html"><b>消費者端 APP</b><span>AR 掃描（場勘）、全國電子 AI 顧問阿國推薦、揪夜安、揪心願</span></a>
-      <a href="jiujujia/admin.html"><b>企業營運資訊平台</b><span>門市營運、派工、揪心願與試點指標</span></a>
+      <a href="https://youtu.be/BWO1hCpEwwU"><b>Demo 影片</b><span>從 AR 掃描（場勘）、AI 智慧分析到施工派工</span></a>
+      <a href="dt"><b>設計思考流程與九大工具</b><span>同理、定義、發想、原型，共 9 頁</span></a>
     </div>
+  </section>
+  <section class="card" aria-labelledby="p2">
+    <h2 id="p2">四端原型<small>四端共用同一套後端與核心資料模型</small></h2>
+    <div class="links">
+      <a href="consumer"><b>消費者端 /consumer</b><span>需求問卷、AR 掃描（場勘）、AI 智慧分析與改善建議、選改善方式、成果保存選擇</span></a>
+      <a href="consultant"><b>生活顧問端 /consultant</b><span>顧問工作台、案件、改善方案、整合報價、長輩確認、施工協調與售後</span></a>
+      <a href="technician"><b>技師端 /technician</b><span>工單、現場核對、差異回報、安裝與長輩驗收</span></a>
+      <a href="admin"><b>企業管理端 /admin</b><span>門市與人員、施工夥伴、工單監控、KPI 與服務地圖</span></a>
+    </div>
+    <p class="note">原型為瀏覽器展示版：資料存在這台瀏覽器（模擬後端），不是正式雲端多人協作；價格、工期、夥伴與百分比為示範資料。</p>
   </section>
 </div>
 </body>

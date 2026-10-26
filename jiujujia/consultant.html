@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<script src="backend.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>揪居家｜生活顧問端</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#D4003C;--brand-soft:#FCE6EC;--ink:#1F2328;--muted:#6A717C;--line:#E2E5EA;--bg:#F3F4F6;--card:#FFFFFF;--head:#F8F9FB;--side:#1F2328;--sideink:#C9CED6;
+ --r:#D4003C;--y:#D9971F;--g:#138F3B;--note:#FAF6EE;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}}
+:root[data-theme="dark"]{--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}
+*,*:before,*:after{box-sizing:inherit}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:14px;line-height:1.55}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:6px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100%}
+.side{background:var(--side);color:var(--sideink);padding:14px 10px;position:sticky;top:0;height:100vh}
+.logo{color:#fff;font-weight:700;font-size:14px;display:flex;gap:8px;align-items:center;padding:4px 8px 4px}
+.logo i{width:6px;height:18px;background:var(--brand);border-radius:2px}
+.role{font-size:12px;color:#fff;background:var(--brand);border-radius:9px;padding:1px 8px;margin:4px 8px 14px;display:inline-block}
+.nav button{display:flex;justify-content:space-between;width:100%;text-align:left;padding:9px 10px;border-radius:6px;font-size:14px;color:var(--sideink)}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
+.nav .n{font-size:12px;background:var(--brand);color:#fff;border-radius:9px;padding:0 6px}
+.side .sec{font-size:12px;opacity:.6;padding:12px 10px 4px}
+.side a{color:var(--sideink);font-size:13px;display:block;padding:6px 10px;text-decoration:none}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 18px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top h1{font-size:16px;margin:0}.meta{color:var(--muted);font-size:13px;display:flex;gap:12px;flex-wrap:wrap}
+.proto{margin-left:auto;font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:2px 8px}
+.b{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 12px;font-size:13px}
+.b.pri{background:var(--brand);border-color:var(--brand);color:#fff}.b:disabled{opacity:.45;cursor:not-allowed}
+main{padding:16px 18px 80px;max-width:1180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ph{padding:10px 14px;font-weight:700;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline;background:var(--head)}
+.ph small{font-weight:400;color:var(--muted);font-size:12px}
+.pb{padding:12px 14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:24px;font-weight:700}
+.item{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.item:first-child{border-top:0}.item .t{flex:1;min-width:0}.item .s{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;border-radius:9px;padding:1px 8px;background:var(--brand-soft);color:#8F0029;white-space:nowrap}
+.tag.gray{background:var(--head);color:var(--muted);border:1px solid var(--line)}.tag.ok{background:#E3F2E8;color:#0E6B2D}.tag.am{background:#FFF1D6;color:#8A5A00}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:10px 0 14px}
+.tabs button{padding:8px 12px;border-bottom:3px solid transparent;color:var(--muted);font-size:13.5px}
+.tabs button[aria-selected="true"]{border-color:var(--brand);color:var(--ink);font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}th{background:var(--head);font-weight:500;color:var(--muted);border-top:0}
+.mu{color:var(--muted)}.sm{font-size:12px}
+.note{background:var(--note);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.ver{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.ver.sent{background:var(--head)}
+.steps{display:flex;gap:6px;flex-wrap:wrap}.steps span{font-size:12px;border:1px solid var(--line);border-radius:14px;padding:2px 10px}
+.steps span.on{background:var(--brand);border-color:var(--brand);color:#fff}.steps span.done{background:#E3F2E8;border-color:#BFE3CB;color:#0E6B2D}
+.flow{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap}.flow .pk{flex:1;min-width:180px;border:1px solid var(--line);border-radius:10px;padding:10px}
+.flow .ar{align-self:center;color:var(--muted)}
+.mtabs{display:none}
+#guide{position:fixed;right:16px;bottom:16px;width:min(340px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.2);padding:14px;z-index:20}
+#guide h3{margin:0 0 4px;font-size:15px}#guide .n{font-size:12px;color:var(--brand);font-weight:700}
+.hl{outline:3px solid var(--brand);outline-offset:3px;border-radius:10px}
+@media (max-width:860px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;overflow-x:auto;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:52px;z-index:4}
+ .mtabs button{white-space:nowrap;border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:13px}.mtabs button[aria-current="page"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+ main{padding:12px}.proto{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside class="side" aria-label="生活顧問端選單">
+  <div class="logo"><i></i>揪居家｜生活顧問端</div><span class="role">/consultant</span>
+  <div class="nav" id="nav"></div>
+  <div class="sec">其他端</div>
+  <a href="../consumer">消費者端 /consumer ›</a><a href="../technician">技師端 /technician ›</a><a href="../admin">企業管理端 /admin ›</a>
+ </aside>
+ <div>
+  <div class="top"><h1 id="title">顧問工作台</h1><div class="meta"><span>生活顧問 <b id="who">—</b></span><span id="store">—</span></div><span class="proto">原型：資料存在這台瀏覽器，非正式雲端</span><button class="b" id="guideBtn">顧問端導覽</button></div>
+  <div class="mtabs" id="mtabs"></div>
+  <main id="view" aria-live="polite">載入中…</main>
+ </div>
+</div>
+<script>
+(function(){
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const api=async(p,o={})=>{const r=await fetch('/api'+p,{method:o.method||'GET',headers:{'Content-Type':'application/json','X-JJJ':'1'},body:o.body?JSON.stringify(o.body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'操作失敗');return d};
+const LC={r:['紅燈','var(--r)'],y:['黃燈','var(--y)'],g:['綠燈','var(--g)']};
+const NAV=[['wb','顧問工作台'],['cases','案件管理'],['prod','商品與改善方案'],['quote','整合報價'],['sched','排程與服務協調'],['after','確認、驗收與售後']];
+const TABS=['案件摘要','AI 分析','空間與成果','改善方案','商品與款式','報價','確認與同意','工單與排程','驗收與售後'];
+const ST={view:'wb',hid:3,tab:0,me:null,home:null,todos:null,plans:{}};
+// 四類改善方式（示範資料）：顧問依個案逐項調整
+const OPTS={
+ '走道':{why:'夜間偏暗、有門檻，寬 92 cm',l:'r',items:[
+  {t:'免費調整',n:'鞋櫃移出走廊',p:0,est:false,d:'當天',by:'家人自行調整',dep:'—',acc:'顧問電話確認',chk:'無'},
+  {t:'全國電子安裝',n:'感應夜燈',p:900,est:false,d:'當天',by:'全國電子技師',dep:'確認插座位置',acc:'關燈測試感應距離與亮度',chk:'插座是否被家具擋住'},
+  {t:'夥伴施工',n:'止滑卡扣地板（淺橡木）',p:2400,est:false,d:'半天',by:'施工夥伴｜地坪止滑',dep:'先於夜燈安裝',acc:'不拆除、可復原；夥伴書面保固',chk:'地面平整度'}]},
+ '浴室':{why:'門檻 2 cm、磁磚地',l:'y',items:[
+  {t:'全國電子安裝',n:'斜坡墊＋止滑地墊',p:800,est:false,d:'當天',by:'全國電子技師',dep:'—',acc:'長輩實際走一次',chk:'門檻實際高度'},
+  {t:'夥伴施工',n:'木製斜坡＋地面止滑',p:2600,est:false,d:'半天',by:'施工夥伴｜木作、地坪止滑',dep:'先於感測器安裝',acc:'夥伴書面保固',chk:'門框材質'},
+  {t:'夥伴工程',n:'移除門檻、更換止滑磁磚',p:null,est:true,d:'約 3 天',by:'施工夥伴｜泥作（含防水）',dep:'需事前核准的補助，核准前不施工',acc:'防水測試＋夥伴書面保固',chk:'需到府估價、確認防水層'}]},
+ '浴室門':{why:'門往內開，長輩若在浴室跌倒可能擋住門',l:'y',items:[
+  {t:'全國電子安裝',n:'防夾門擋',p:300,est:false,d:'當天',by:'全國電子技師',dep:'—',acc:'開關門測試',chk:'無'},
+  {t:'夥伴施工',n:'可從外側解鎖的把手',p:1800,est:false,d:'半天',by:'施工夥伴｜門窗（限浴室門）',dep:'—',acc:'外側解鎖測試',chk:'門扇材質'},
+  {t:'夥伴工程',n:'改為外開門或橫拉門',p:null,est:true,d:'約 1–3 天',by:'施工夥伴｜門窗（限浴室門）',dep:'租屋須房東同意',acc:'夥伴書面保固',chk:'需到府估價'}]}};
+const SEL=LS.get('jjj_v5_csel',{3:{'走道':[1],'浴室':[0],'浴室門':[1]}});
+const QUO=LS.get('jjj_v5_quotes',{});
+const SUB=LS.get('jjj_v5_subsidy',{});
+const save=()=>{LS.set('jjj_v5_csel',SEL);LS.set('jjj_v5_quotes',QUO);LS.set('jjj_v5_subsidy',SUB)};
+const fmt=n=>n==null?'待估價':n===0?'免費':'NT$'+n.toLocaleString();
+const addM=(d,m)=>{const x=new Date(d.replace(' ','T'));x.setMonth(x.getMonth()+m);return x.toISOString().slice(0,10)};
+
+async function boot(){
+ try{ST.me=(await api('/me')).user}catch(e){ST.me=null}
+ if(!ST.me||ST.me.role!=='advisor'){try{await api('/auth/logout',{method:'POST'})}catch(e){}await api('/auth/login',{method:'POST',body:{email:'advisor@example.com',password:'demo1234'}});ST.me=(await api('/me')).user}
+ document.getElementById('who').textContent=ST.me.name;document.getElementById('store').textContent=ST.me.store;
+ const [h,t]=await Promise.all([api('/advisor/home'),api('/advisor/todos')]);ST.home=h;ST.todos=t;
+ for(const id of [2,3,4]){try{ST.plans[id]=await api('/advisor/plan/'+id)}catch(e){}}
+ const q=new URLSearchParams(location.search);if(q.get('view'))ST.view=q.get('view');if(q.get('hid'))ST.hid=+q.get('hid');if(q.get('tab'))ST.tab=+q.get('tab');
+ render();if(q.get('guide')==='1')guide(0);
+}
+const handoffs=()=>LS.get('jjj_v5_handoff',[]);
+function cases(){return [2,3,4].map(id=>ST.plans[id]).filter(Boolean)}
+function stage(p){if(!p)return ['—','gray'];if(p.phase>=9)return ['關懷中｜售後','ok'];if(p.phase>=3){const pv=p.pv||{};return [pv.status==='差異已核准'?'施工中｜差異已核准':'待施工排程','am']}if(p.phase===2)return ['待長輩確認','am'];if(p.phase===1)return ['新進案件｜待查看 AI 分析',''];return ['尚未評估','gray']}
+function nav(){const cnt={wb:0,cases:cases().length,quote:handoffs().length};
+ const h=NAV.map(([k,n])=>`<button data-v="${k}" ${ST.view===k?'aria-current="page"':''}><span>${n}</span>${cnt[k]?`<span class="n">${cnt[k]}</span>`:''}</button>`).join('');
+ document.getElementById('nav').innerHTML=h;document.getElementById('mtabs').innerHTML=NAV.map(([k,n])=>`<button data-v="${k}" ${ST.view===k?'aria-current="page"':''}>${n}</button>`).join('')}
+function render(){nav();const T={wb:'顧問工作台',cases:'案件管理',prod:'商品與改善方案',quote:'整合報價',sched:'排程與服務協調',after:'確認、驗收與售後',case:'案件詳細'};
+ document.getElementById('title').textContent=T[ST.view]||'';const v=document.getElementById('view');
+ v.innerHTML=ST.view==='case'?vCase():ST.view==='wb'?vWb():ST.view==='cases'?vCases():ST.view==='prod'?vProd():ST.view==='quote'?vQuoteList():ST.view==='sched'?vSched():vAfter()}
+function row(p,sub,tag){return `<button class="item" data-case="${p.household_id}"><span class="t"><b>${esc(p.household)}</b>｜${esc(p.elder_name)}　<span class="s">${esc(sub||'')}</span></span>${tag||''}<span class="mu">›</span></button>`}
+function vWb(){const h=ST.home,k=h.kpi,ho=handoffs(),P=cases();
+ const by=s=>P.filter(p=>stage(p)[0].startsWith(s));
+ return `<div class="kpis">${[['今日預約',(h.consults||[]).length],['待查看 AI 分析',by('新進').length],['待整合報價',ho.length],['待長輩確認',by('待長輩').length],['待施工排程',by('待施工').length+by('施工中').length],['售後待處理',(ST.todos.requests||[]).length+(ST.todos.care||[]).length]].map(([l,n])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${n}</div></div>`).join('')}</div>
+ <div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量由共用後端取得，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
+ <div class="grid">
+  <div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
+  <div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map((x,i)=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。可在消費者端「選改善方式」後按「交給生活顧問整合報價」。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林女士家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>
+  <div class="panel"><div class="ph">新進案件與 AI 分析 <small>未查看優先</small></div><div class="pb">${P.map(p=>row(p,stage(p)[0],`<span class="tag ${stage(p)[1]}">${stage(p)[0].split('｜')[0]}</span>`)).join('')}</div></div>
+  <div class="panel"><div class="ph">售後與待補充現場資訊</div><div class="pb">${(ST.todos.requests||[]).map(r=>`<div class="item"><span class="t"><b>${esc(r.household)}</b>｜${esc(r.kind)}<div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')}${(ST.todos.care||[]).map(c=>`<div class="item"><span class="t"><b>${esc(c.household)}</b>｜${esc(c.title)}<div class="s">${esc(c.when)}｜${esc(c.outcome)}</div></span><span class="tag ok">事後關心</span></div>`).join('')}</div></div>
+ </div>`}
+function vCases(){return `<div class="panel"><div class="ph">已授權案件 <small>只顯示消費者授權分享、與本門市服務相關的案件</small></div><div class="pb">${cases().map(p=>row(p,(p.elder_note||'')+'｜'+stage(p)[0])).join('')}</div></div>`}
+function sel(hid){return SEL[hid]||(SEL[hid]={'走道':[1],'浴室':[0],'浴室門':[]})}
+function chosen(hid){const s=sel(hid);return Object.keys(OPTS).flatMap(sp=>(s[sp]||[]).map(i=>Object.assign({sp},OPTS[sp].items[i])))}
+function vCase(){const p=ST.plans[ST.hid];if(!p)return '找不到案件';const [sg,cl]=stage(p);
+ return `<button class="b" data-v="cases">‹ 案件列表</button>
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><h2 style="margin:0;font-size:20px">${esc(p.household)}</h2><span class="tag ${cl}">${esc(sg)}</span><span class="mu">${esc(p.elder_note||'')}</span></div>
+ <div class="tabs" role="tablist">${TABS.map((t,i)=>`<button role="tab" data-tab="${i}" aria-selected="${ST.tab===i}">${i+1} ${t}</button>`).join('')}</div>
+ <div>${[tSum,tAI,tSpace,tOpt,tProd,tQuote,tConfirm,tWork,tAfter][ST.tab](p)}</div>`}
+function tSum(p){const pl=p.plan||{};return `<div class="grid"><div class="panel"><div class="ph">案件摘要</div><div class="pb"><table>
+ <tr><th>住宅</th><td>${esc(p.household)}（${esc(p.elder_note||'')}）</td></tr><tr><th>服務需求</th><td>揪夜安｜臥室到浴室夜間動線</td></tr>
+ <tr><th>負責顧問</th><td>${esc(pl.advisor||ST.me.name)}｜${esc(ST.me.store)}</td></tr><tr><th>案件狀態</th><td>${esc(stage(p)[0])}</td></tr>
+ <tr><th>方案</th><td>${pl.monthly?`月付 ${pl.monthly} 元｜設定費 ${pl.one_time.toLocaleString()} 元（示範資料）`:'尚未建立'}</td></tr></table></div></div>
+ <div class="panel"><div class="ph">接手方式</div><div class="pb"><div class="steps">${['分享規劃成果','確認權限','討論需求','解讀 AI 分析','必要時現場核對','商品與改善方式','整合報價','長輩本人確認','協調施工','驗收與售後'].map((s,i)=>`<span class="${i<(p.phase>=3?8:p.phase>=2?7:p.phase>=1?2:0)?'done':''}">${i+1} ${s}</span>`).join('')}</div>
+ <p class="mu sm" style="margin:10px 0 0">消費者未存入「我的家」或「長輩家」的成果，顧問不能自行加入家庭履歷；需保存時須明確告知並取得授權。</p></div></div></div>`}
+function tAI(p){const a=p.assessment;if(!a)return '<div class="note">家庭尚未完成 AR 掃描與 AI 分析。</div>';const m=a.measures||{},A=a.answers||{};
+ return `<div class="grid"><div class="panel"><div class="ph">AI 智慧分析與改善建議 <small>依明確規則判斷燈號</small></div><div class="pb"><table><tr><th>空間</th><th>燈號</th><th>分析理由</th></tr>
+ ${a.lights.map(([n,l,w])=>`<tr><td>${esc(n)}</td><td><span class="dot" style="background:${LC[l][1]}"></span>${LC[l][0]}</td><td>${esc(w)}</td></tr>`).join('')}</table>
+ <p class="mu sm">規則：門檻高差 ≤ 0.5 cm 綠燈、0.5–3 cm 黃燈、＞ 3 cm 紅燈；走道昏暗合併門檻或寬度小於 80 cm 判為紅燈。燈號只協助排序，不取代專業評估。</p></div></div>
+ <div class="panel"><div class="ph">AR 掃描（場勘）與問卷</div><div class="pb"><table><tr><th>走道寬</th><td>${m.corridor_cm} cm</td></tr><tr><th>浴室門檻</th><td>${m.threshold_cm} cm</td></tr><tr><th>床邊到浴室</th><td>約 ${m.bed_bath_m} 公尺</td></tr><tr><th>沿路插座</th><td>${m.outlets} 個</td></tr>
+ ${Object.entries(A).map(([k,v])=>`<tr><th>${({live:'獨居時間',night:'夜間起床',light:'走道照明',phone:'手機能力',worry:'最擔心'})[k]||k}</th><td>${esc(v)}</td></tr>`).join('')}</table></div></div>
+ <div class="panel"><div class="ph">待現場確認</div><div class="pb"><div class="item"><span class="t">門檻實際高度與門框材質</span><span class="tag am">技師核對</span></div><div class="item"><span class="t">插座是否被家具擋住</span><span class="tag am">技師核對</span></div><div class="item"><span class="t">地面材質與止滑係數</span><span class="tag am">AI 無法可靠判定</span></div>
+ <p class="mu sm">AI 初始分析、使用者修正與技師現場核對分開保存，用來計算「AI 分析結果與現場核對一致率」。</p></div></div></div>`}
+function tSpace(p){const created=(p.assessment||{}).created_at||'2026-10-17 21:10:00';
+ return `<div class="grid"><div class="panel"><div class="ph">空間成果 <small>2D 平面圖｜示意，不是施工圖</small></div><div class="pb"><img src="home/plan.jpg" alt="${esc(p.household)}平面圖示意" style="width:100%;border-radius:8px"></div></div>
+ <div class="panel"><div class="ph">資料保存狀態</div><div class="pb"><table><tr><th>資料類型</th><th>狀態</th></tr>
+ <tr><td>AR 掃描原始影像</td><td><span class="tag ok">分析完已清除</span><div class="sm mu">只為產生平面圖與 AI 分析暫存</div></td></tr>
+ <tr><td>成果與截圖</td><td><span class="tag">已存入「長輩家」</span><div class="sm mu">保存六個月，至 ${addM(created,6)}；期滿由新資料覆蓋</div></td></tr>
+ <tr><td>影像確認版錄影與異常紀錄</td><td>${(p.plan&&p.plan.sel&&p.plan.sel.cam)?'<span class="tag">保存六個月</span>':'<span class="tag gray">未加裝（無鏡頭版）</span>'}</td></tr>
+ <tr><td>2D／3D 模型、尺寸、風險紀錄</td><td><span class="tag gray">依住宅履歷規則管理</span></td></tr></table>
+ <p class="mu sm">顧問只能查看已授權的成果。原型未接正式後端，自動清理與到期覆蓋標示為待實作。</p></div></div></div>`}
+function tOpt(p){const s=sel(p.household_id);return `<div class="note" style="margin-bottom:12px">四類改善方式：免費調整、全國電子安裝、夥伴施工、夥伴工程（需到府估價）。勾選後同步到報價；價格與工期為示範資料。</div>
+ ${Object.entries(OPTS).map(([sp,o])=>`<div class="panel" style="margin-bottom:12px"><div class="ph">${esc(sp)} <span class="dot" style="background:${LC[o.l][1]};margin-left:4px"></span><small>${LC[o.l][0]}｜${esc(o.why)}</small></div><div class="pb" style="overflow-x:auto"><table><tr><th></th><th>方式</th><th>內容</th><th>價格</th><th>工期</th><th>執行單位</th><th>前置／依賴</th><th>驗收與保固</th><th>需現場核對</th></tr>
+ ${o.items.map((it,i)=>`<tr><td><input type="checkbox" data-opt="${esc(sp)}|${i}" ${(s[sp]||[]).includes(i)?'checked':''} aria-label="選擇${esc(it.n)}"></td><td><span class="tag ${it.t==='夥伴工程'?'am':it.t==='免費調整'?'gray':''}">${esc(it.t)}</span></td><td>${esc(it.n)}</td><td>${fmt(it.p)}</td><td>${esc(it.d)}</td><td>${esc(it.by)}</td><td>${esc(it.dep)}</td><td>${esc(it.acc)}</td><td>${esc(it.chk)}</td></tr>`).join('')}</table></div></div>`).join('')}`}
+function tProd(){const st=LS.get('jjj_v5_opt',{style:{}}).style||{};return `<div class="grid"><div class="panel"><div class="ph">揪夜安設備 <small>商品規格與供貨（示範資料）</small></div><div class="pb"><table><tr><th>商品</th><th>規格</th><th>安裝限制</th><th>供貨</th></tr>
+ <tr><td>感應小夜燈</td><td>插電／電池兩款</td><td>插座被擋住改用電池款</td><td><span class="tag ok">現貨</span></td></tr>
+ <tr><td>門窗感測器</td><td>背膠或螺絲固定</td><td>鋁框不鑽孔用背膠</td><td><span class="tag ok">現貨</span></td></tr>
+ <tr><td>浴室緊急按鈕</td><td>防潑水</td><td>長輩坐姿可按到的高度</td><td><span class="tag ok">現貨</span></td></tr>
+ <tr><td>門檻提示燈條</td><td>門檻＞0.5 cm 加裝</td><td>需電源</td><td><span class="tag am">調貨 3 天</span></td></tr></table></div></div>
+ <div class="panel"><div class="ph">地板款式 <small>換款式只改畫面與價格，燈號不變</small></div><div class="pb">
+ ${[['止滑卡扣地板（夥伴施工）',[['淺橡木','#D8B888'],['深胡桃','#6B4A33'],['灰木紋','#A39E95']],'h_part'],['止滑磁磚（夥伴工程）',[['霧面灰','#A9ABAE'],['木紋','#C08A55'],['米白','#E8E1D2']],'b_eng']].map(([n,L,id])=>`<div style="margin-bottom:10px"><b>${n}</b><div style="display:flex;gap:12px;margin-top:6px">${L.map(([s,c])=>`<span style="text-align:center;font-size:12px"><span style="display:block;width:38px;height:38px;border-radius:50%;background:${c};margin:0 auto 3px;${(st[id]||L[0][0])===s?'outline:3px solid var(--brand);outline-offset:2px':''}"></span>${s}</span>`).join('')}</div></div>`).join('')}
+ <p class="mu sm">家庭在 App 選的款式會帶到這裡；實際色差以門市樣品為準。</p></div></div></div>`}
+function quotes(hid){return QUO[hid]||(QUO[hid]=[])}
+function tQuote(p){const hid=p.household_id,items=chosen(hid),L=quotes(hid),pl=p.plan||{};
+ const dev=pl.one_time||5900,known=items.filter(i=>!i.est).reduce((a,b)=>a+(b.p||0),0),pend=items.filter(i=>i.est);
+ const ho=handoffs()[0];
+ return `${ho&&hid===3?`<div class="note" style="margin-bottom:12px">家庭交付（${esc(ho.at)}）：${ho.items.map(i=>esc(i.space+'｜'+i.type+'：'+i.name+(i.style?'（'+i.style+'）':''))).join('、')}</div>`:''}
+ <div class="grid"><div class="panel"><div class="ph">整合報價（編輯中）</div><div class="pb"><table><tr><th>項目</th><th>執行單位</th><th>價格來源</th><th>金額</th></tr>
+ <tr><td>揪夜安設備＋設定費</td><td>全國電子</td><td>方案定價</td><td>NT$${dev.toLocaleString()}</td></tr>
+ ${items.map(i=>`<tr><td>${esc(i.sp)}｜${esc(i.n)}</td><td>${esc(i.by)}</td><td>${i.est?'需到府估價':'示範資料'}</td><td>${fmt(i.p)}</td></tr>`).join('')}
+ <tr><td colspan="3"><b>已確認小計</b></td><td><b>NT$${(dev+known).toLocaleString()}</b></td></tr>${pend.length?`<tr><td colspan="4" class="mu">另有 ${pend.length} 項「待估價」，到府估價後另出新版本，不自動套用示範價格。</td></tr>`:''}
+ <tr><td colspan="3">長輩關懷月費</td><td>NT$${pl.monthly||299}／月</td></tr></table>
+ <div style="display:flex;gap:8px;margin-top:10px"><button class="b pri" data-q="send">建立並送出新版本</button></div></div></div>
+ <div class="panel"><div class="ph">報價版本 <small>已送出的版本不會被覆蓋</small></div><div class="pb">${L.length?L.map(v=>`<div class="ver sent"><b>v${v.v}</b>｜${esc(v.at)}｜NT$${v.total.toLocaleString()}${v.pending?`＋${v.pending} 項待估價`:''} <span class="tag ok">已送出</span><div class="sm mu">${v.items.map(esc).join('、')}</div></div>`).join(''):'<div class="mu">尚未送出報價。</div>'}</div></div></div>`}
+function tConfirm(p){const pl=p.plan||{},pv=p.pv||{};const vs=p.versions||[];
+ return `<div class="grid"><div class="panel"><div class="ph">長輩本人確認</div><div class="pb"><table>
+ <tr><th>確認狀態</th><td>${pl.status==='已確認'?'<span class="tag ok">長輩本人已確認</span>':'<span class="tag am">待長輩到門市確認</span>'}</td></tr>
+ <tr><th>確認時間</th><td>${esc(pl.confirmed_at||'—')}</td></tr><tr><th>方案圖面</th><td>${pv.ver?`v${pv.ver}｜${esc(pv.status)}<div class="sm mu">${esc(pv.reason||'')}</div>`:'—'}</td></tr>
+ <tr><th>必要文件</th><td>影像確認版需長輩書面同意（本案為無鏡頭版）</td></tr><tr><th>施工前置</th><td>夥伴工程需到府估價；需事前核准的補助，核准前不施工</td></tr></table>
+ <p class="mu sm">長輩不同意，子女不能代為下單。</p></div></div>
+ <div class="panel"><div class="ph">圖面版本紀錄</div><div class="pb">${vs.length?vs.map(v=>`<div class="ver"><b>v${v.ver}</b>｜${esc(v.status)}<div class="sm mu">${esc(v.reason||'')}</div></div>`).join(''):'<div class="mu">—</div>'}</div></div></div>`}
+function pins(p,pk){const L=((p.pv||{}).pins||[]).filter(x=>x.pkg===pk);return [L.filter(x=>x.st==='done').length,L.length]}
+function tWork(p){const [bd,bn]=pins(p,'B'),[ad,an]=pins(p,'A'),ch=chosen(p.household_id).filter(i=>i.t.startsWith('夥伴'));
+ const pk=(code,name,team,st,body)=>`<div class="pk"><div class="sm mu">工作包 ${code}</div><b>${name}</b><div class="sm">${team}</div><div style="margin-top:6px">${st}</div><div class="sm mu" style="margin-top:4px">${body}</div></div>`;
+ return `<div class="panel"><div class="ph">工作包與依賴順序 <small>需要動工的項目由施工夥伴先完成，全國電子技師再安裝設備</small></div><div class="pb"><div class="flow">
+ ${pk('P','夥伴施工',ch.length?ch.map(i=>esc(i.n)).join('、'):'本案無',ch.length?'<span class="tag am">待排程（示範資料）</span>':'<span class="tag gray">不適用</span>','夥伴完工並拍照後，後續工作包才解鎖')}<span class="ar">→</span>
+ ${pk('B','夜間照明','全國電子水電技師',bn?`<span class="tag ${bd===bn?'ok':'am'}">${bd}／${bn} 完成</span>`:'—','感應夜燈、門檻提示燈條')}<span class="ar">→</span>
+ ${pk('A','關懷設備','全國電子安裝技師',an?`<span class="tag ${ad===an?'ok':'am'}">${ad}／${an} 完成</span>`:'—','門窗感測、緊急按鈕、閘道器')}<span class="ar">→</span>
+ ${pk('驗收','長輩逐區驗收','技師陪同','<span class="tag gray">待驗收</span>','有問題就退回相關項目')}</div>
+ <p class="mu sm" style="margin-top:10px">前置工作未完成時，後續工單顯示等待；支援待料、延期、客戶改期與異常。技師現場差異回報後由顧問核准，顧問不能覆蓋技師的原始核對紀錄。</p></div></div>`}
+function tAfter(p){const hid=p.household_id,s=SUB[hid]||{};const rq=(ST.todos.requests||[]).filter(r=>r.household===p.household);
+ return `<div class="grid"><div class="panel"><div class="ph">補助轉介 <small>長照居家無障礙改善補助</small></div><div class="pb">
+ <div class="item"><span class="t">長輩是否已有長照服務</span><select data-sub="has" aria-label="是否已有長照服務"><option ${s.has==='未確認'||!s.has?'selected':''}>未確認</option><option ${s.has==='有'?'selected':''}>有</option><option ${s.has==='沒有'?'selected':''}>沒有</option></select></div>
+ <div class="item"><span class="t">已轉介 1966</span><input type="checkbox" data-sub="ref" ${s.ref?'checked':''} aria-label="已轉介 1966"></div>
+ <div class="item"><span class="t">核准狀態</span><select data-sub="ok" aria-label="核准狀態"><option ${!s.ok||s.ok==='待評估'?'selected':''}>待評估</option><option ${s.ok==='已核准'?'selected':''}>已核准</option><option ${s.ok==='不符資格'?'selected':''}>不符資格</option></select></div>
+ <p class="mu sm">生活顧問協助轉介，不代辦、不保證核准；需事前核准的工程，核准前不派工。</p></div></div>
+ <div class="panel"><div class="ph">驗收、保固與後續需求</div><div class="pb">${rq.map(r=>`<div class="item"><span class="t"><b>${esc(r.kind)}</b><div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')||'<div class="mu">目前沒有售後需求。</div>'}
+ <div class="item"><span class="t">設備保固</span><span class="tag gray">依商品保固</span></div><div class="item"><span class="t">夥伴施工保固</span><span class="tag gray">夥伴書面保固</span></div></div></div></div>`}
+function vProd(){ST.hid=ST.hid||3;return `<div class="note" style="margin-bottom:12px">以林女士家為例；實際操作請從「案件管理」進入個案。</div>${tProd()}<div style="height:12px"></div>${tOpt(ST.plans[3])}`}
+function vQuoteList(){return `<div class="panel"><div class="ph">報價總覽</div><div class="pb">${cases().map(p=>{const L=quotes(p.household_id);return `<button class="item" data-case="${p.household_id}" data-tabgo="5"><span class="t"><b>${esc(p.household)}</b><div class="s">${L.length?`最新 v${L[0].v}｜NT$${L[0].total.toLocaleString()}`:'尚未送出報價'}</div></span><span class="tag ${L.length?'ok':'gray'}">${L.length?L.length+' 個版本':'待報價'}</span></button>`}).join('')}</div></div>`}
+function vSched(){return cases().filter(p=>p.phase>=3).map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tWork(p)}</div>`).join('')}
+function vAfter(){return cases().map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tAfter(p)}</div>`).join('')}
+
+document.addEventListener('click',e=>{const t=e.target.closest('[data-v],[data-case],[data-tab],[data-q]');if(!t)return;
+ if(t.dataset.v){ST.view=t.dataset.v}else if(t.dataset.case){ST.hid=+t.dataset.case;ST.tab=t.dataset.tabgo?+t.dataset.tabgo:0;ST.view='case'}
+ else if(t.dataset.tab){ST.tab=+t.dataset.tab}
+ else if(t.dataset.q==='send'){const p=ST.plans[ST.hid],items=chosen(ST.hid),L=quotes(ST.hid),dev=(p.plan||{}).one_time||5900;
+  const d=new Date(),at=`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  L.unshift({v:L.length+1,at,total:dev+items.filter(i=>!i.est).reduce((a,b)=>a+(b.p||0),0),pending:items.filter(i=>i.est).length,items:['揪夜安設備＋設定費'].concat(items.map(i=>i.sp+'｜'+i.n))});save()}
+ render();window.scrollTo(0,0)});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.opt){const [sp,i]=t.dataset.opt.split('|'),s=sel(ST.hid);s[sp]=s[sp]||[];const n=+i;s[sp]=t.checked?[...new Set(s[sp].concat(n))]:s[sp].filter(x=>x!==n);save()}
+ if(t.dataset.sub){const s=SUB[ST.hid]||(SUB[ST.hid]={});s[t.dataset.sub]=t.type==='checkbox'?t.checked:t.value;save()}});
+
+// 顧問端導覽
+const G=[['wb',null,'顧問工作台','首頁直接列出今天要做的事：今日預約、家庭交付的改善選擇、新進 AI 分析與售後。'],
+ ['case',1,'AI 分析','先解釋燈號與分析理由；AI 無法判定的項目列為待現場確認，不直接當成正式鑑定。'],
+ ['case',3,'改善方案','四類改善方式逐項勾選：免費調整、全國電子安裝、夥伴施工、夥伴工程（需到府估價）。'],
+ ['case',5,'整合報價','一張報價整合設備、安裝與施工夥伴；待估價項目不套用示範價格，送出後保留版本。'],
+ ['case',6,'長輩確認','長輩本人到門市確認才成交；影像確認版需書面同意。'],
+ ['case',7,'工單與排程','施工夥伴先做需要動工的項目，全國電子技師再安裝設備，前置未完成就等待。'],
+ ['case',8,'驗收與售後','記錄補助轉介 1966、核准狀態、保固與後續需求。導覽到這裡結束，可以自由操作。']];
+function guide(i){let g=document.getElementById('guide');if(i>=G.length){if(g)g.remove();return}const [v,tab,h,d]=G[i];
+ if(v==='case'){ST.view='case';ST.hid=3;ST.tab=tab}else ST.view=v;render();
+ if(!g){g=document.createElement('div');g.id='guide';document.body.appendChild(g)}
+ g.innerHTML=`<div class="n">顧問端導覽 ${i+1}／${G.length}</div><h3>${h}</h3><p class="mu" style="margin:0 0 10px">${d}</p><div style="display:flex;gap:6px"><button class="b pri" id="gN">${i===G.length-1?'完成':'下一步'}</button><button class="b" id="gX">關閉</button></div>`;
+ g.querySelector('#gN').onclick=()=>guide(i+1);g.querySelector('#gX').onclick=()=>g.remove()}
+document.getElementById('guideBtn').onclick=()=>guide(0);
+boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
+})();
+</script>
+</body>
+</html>

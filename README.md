@@ -7,8 +7,16 @@
 | 項目 | 連結 |
 |---|---|
 | Demo 影片 | https://youtu.be/BWO1hCpEwwU |
-| 設計思考流程與九大工具 | `jiujujia/design-thinking/` |
-| 消費者端 APP | `jiujujia/app.html` |
-| 企業營運資訊平台 | `jiujujia/admin.html` |
+| 設計思考流程與九大工具 | `/dt`（`jiujujia/design-thinking/`） |
+| 消費者端 | `/consumer`（以示範帳號登入 `jiujujia/app.html`） |
+| 生活顧問端 | `/consultant`（`jiujujia/consultant.html`） |
+| 技師端 | `/technician`（以技師示範帳號登入 `jiujujia/app.html`） |
+| 企業管理端 | `/admin`（`jiujujia/admin.html`） |
+| 舊網址 | `/app` 仍可使用，導向消費者、顧問、技師共用的 App |
 
-原型為瀏覽器展示版，資料存在瀏覽器本機，可按右下角「重設資料」回到示範狀態。
+四端共用同一套後端與核心資料模型（`jiujujia/backend.js`，瀏覽器內模擬後端）。
+
+### 原型說明
+- 資料存在這台瀏覽器，可按右側「導覽」→「重設資料」回到示範狀態；不是正式雲端多人協作。
+- AR 掃描原始影像只為分析暫存、分析完即清除；成果可存入「我的家」、「長輩家」或這次先不儲存，存入的成果保存六個月。原型未接正式後端，自動清理與到期覆蓋標示為待實作。
+- 價格、工期、施工夥伴與百分比為示範資料。
