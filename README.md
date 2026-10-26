@@ -12,9 +12,9 @@
 | 生活顧問端 | `/consultant`（`jiujujia/consultant.html`） |
 | 技師端 | `/technician`（以技師示範帳號登入 `jiujujia/app.html`） |
 | 企業管理端 | `/admin`（`jiujujia/admin.html`） |
-| 舊網址 | `/app` 仍可使用，導向消費者、顧問、技師共用的 App |
+| 舊網址 | `/app` 仍可使用，導向消費者端（家庭登入），技師請由技師端登入 |
 
-四端共用同一套後端與核心資料模型（`jiujujia/backend.js`，瀏覽器內模擬後端）。
+四端各自登入，資料即時串接（`jiujujia/backend.js`，瀏覽器內模擬後端）。
 
 ### 原型說明
 - 資料存在這台瀏覽器，可按右側「導覽」→「重設資料」回到示範狀態；不是正式雲端多人協作。

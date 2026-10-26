@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js"></script>
+<script src="backend.js?v=20261027b"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜生活顧問端</title>
@@ -80,8 +80,27 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
  .mtabs button{white-space:nowrap;border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:13px}.mtabs button[aria-current="page"]{background:var(--brand);color:#fff;border-color:var(--brand)}
  main{padding:12px}.proto{margin-left:0}}
 </style>
+<style>
+#cGate{position:fixed;inset:0;z-index:9000;background:#ECE7E3;display:flex;align-items:center;justify-content:center;padding:24px}
+#cGate[hidden]{display:none}
+#cGate .box{width:min(920px,100%);min-height:460px;display:flex;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(61,58,64,.2);background:#fff}
+#cGate .sd{width:44%;background:linear-gradient(160deg,#B23A62,#8E1E42 60%,#6E1634);color:#fff;padding:40px 32px}
+#cGate .sd .tg{display:inline-block;background:rgba(255,255,255,.18);border-radius:8px;padding:2px 10px;font-size:14px;font-weight:700}
+#cGate .sd h2{margin:10px 0 6px;font-size:28px}#cGate .sd p{margin:0 0 14px;opacity:.9}#cGate .sd li{margin:8px 0}
+#cGate form{flex:1;padding:44px 40px;background:#FBFAF9;color:#3D3A40}#cGate h3{margin:0 0 4px;font-size:22px}#cGate .sub{font-size:14px;color:#6F6670;margin-bottom:14px}
+#cGate label{display:block;font-size:14px;color:#6F6670;margin-top:10px}#cGate input{display:block;width:100%;margin-top:4px;height:40px;border:1px solid #DDD5D0;border-radius:8px;padding:0 10px;font:inherit}
+#cGate .go{display:block;width:100%;height:42px;margin-top:14px;border:0;border-radius:10px;background:#C42D5A;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+#cGate .dm{margin-top:14px;border:2px dashed #E6B3C3;border-radius:12px;padding:10px}#cGate .dm b{font-size:13px;color:#8E1E42}
+#cGate .dm button{display:block;width:100%;margin-top:8px;height:44px;border-radius:10px;border:2px solid #C42D5A;background:#F7E9EE;color:#8E1E42;font:inherit;font-weight:900;cursor:pointer}
+#cGate .er{color:#B33A1C;font-size:14px;margin-top:8px;min-height:1em}#cGate .oth{font-size:13px;color:#6F6670;margin-top:12px}#cGate .oth a{color:#C42D5A;font-weight:700}
+@media (max-width:700px){#cGate .box{flex-direction:column}#cGate .sd{width:auto;padding:24px}}
+</style>
 </head>
 <body>
+<div id="cGate" hidden><div class="box"><div class="sd"><span class="tg">揪居家｜生活顧問端</span><h2>今天的家庭，一次看完</h2><p>門市人員帳號登入</p><ul><li>新進案件與 AI 分析</li><li>整合報價、版本紀錄</li><li>工作包與施工順序、差異核准</li></ul></div>
+<form id="cLogin" novalidate><h3>生活顧問登入</h3><div class="sub">請用門市配發的帳號；需已取得居安規劃認證</div><label>Email<input name="email" type="email" autocomplete="username"></label><label>密碼<input name="password" type="password" autocomplete="current-password"></label><div class="er" role="alert"></div><button class="go" type="submit">登入生活顧問端</button>
+<div class="dm"><b>示範帳號</b><button type="button" data-demo="advisor@example.com">▶ 一鍵登入｜王小明（台中逢甲店）</button></div>
+<div class="oth">家庭用戶 → <a href="app.html?end=family">全國電子 App</a>　技師 → <a href="app.html?end=tech">技師端</a>　總部 → <a href="admin.html">企業管理端</a></div></form></div></div>
 <div class="app">
  <aside class="side" aria-label="生活顧問端選單">
   <div class="logo"><i></i>揪居家｜生活顧問端</div><span class="role">/consultant</span>
@@ -125,14 +144,21 @@ const save=()=>{LS.set('jjj_v5_csel',SEL);LS.set('jjj_v5_quotes',QUO);LS.set('jj
 const fmt=n=>n==null?'待估價':n===0?'免費':'NT$'+n.toLocaleString();
 const addM=(d,m)=>{const x=new Date(d.replace(' ','T'));x.setMonth(x.getMonth()+m);return x.toISOString().slice(0,10)};
 
+// 生活顧問端自己的登入頁（四端各自登入）
+function gateLogin(){return new Promise(res=>{const g=document.getElementById('cGate'),f=document.getElementById('cLogin'),er=f.querySelector('.er');g.hidden=false;
+ const WR={family:'這是家庭帳號，請改用 <a href="app.html?end=family">全國電子 App</a>。',tech:'這是技師帳號，請改用 <a href="app.html?end=tech">技師端</a>。',hq:'這是總部帳號，請改用 <a href="admin.html">企業管理端</a>。'};
+ async function go(email,pw){er.textContent='';try{const d=await api('/auth/login',{method:'POST',body:{email,password:pw}});if(d.user.role!=='advisor'){try{await api('/auth/logout',{method:'POST'})}catch(e){}er.innerHTML=WR[d.user.role]||'這個帳號不能在這裡登入。';return}g.hidden=true;res(d.user)}catch(x){er.textContent=x.message}}
+ f.onsubmit=e=>{e.preventDefault();go(f.email.value.trim(),f.password.value)};
+ f.querySelector('[data-demo]').onclick=e=>go(e.currentTarget.dataset.demo,'demo1234')})}
 async function boot(){
  try{ST.me=(await api('/me')).user}catch(e){ST.me=null}
- if(!ST.me||ST.me.role!=='advisor'){try{await api('/auth/logout',{method:'POST'})}catch(e){}await api('/auth/login',{method:'POST',body:{email:'advisor@example.com',password:'demo1234'}});ST.me=(await api('/me')).user}
+ if(ST.me&&ST.me.role!=='advisor'){try{await api('/auth/logout',{method:'POST'})}catch(e){}ST.me=null}
+ if(!ST.me){ST.me=await gateLogin()}
  document.getElementById('who').textContent=ST.me.name;document.getElementById('store').textContent=ST.me.store;
  const [h,t]=await Promise.all([api('/advisor/home'),api('/advisor/todos')]);ST.home=h;ST.todos=t;
  for(const id of [2,3,4]){try{ST.plans[id]=await api('/advisor/plan/'+id)}catch(e){}}
  const q=new URLSearchParams(location.search);if(q.get('view'))ST.view=q.get('view');if(q.get('hid'))ST.hid=+q.get('hid');if(q.get('tab'))ST.tab=+q.get('tab');
- render();if(q.get('guide')==='1')guide(0);
+ render();
 }
 const handoffs=()=>LS.get('jjj_v5_handoff',[]);
 function cases(){return [2,3,4].map(id=>ST.plans[id]).filter(Boolean)}
@@ -149,7 +175,7 @@ function row(p,sub,tag){return `<button class="item" data-case="${p.household_id
 function vWb(){const h=ST.home,k=h.kpi,ho=handoffs(),P=cases();
  const by=s=>P.filter(p=>stage(p)[0].startsWith(s));
  return `<div class="kpis">${[['今日預約',(h.consults||[]).length],['待查看 AI 分析',by('新進').length],['待整合報價',ho.length],['待長輩確認',by('待長輩').length],['待施工排程',by('待施工').length+by('施工中').length],['售後待處理',(ST.todos.requests||[]).length+(ST.todos.care||[]).length]].map(([l,n])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${n}</div></div>`).join('')}</div>
- <div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量由共用後端取得，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
+ <div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量即時串接各端資料，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
  <div class="grid">
   <div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
   <div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map((x,i)=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。可在消費者端「選改善方式」後按「交給生活顧問整合報價」。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林女士家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>
@@ -269,9 +295,11 @@ function guide(i){let g=document.getElementById('guide');if(i>=G.length){if(g)g.
  if(!g){g=document.createElement('div');g.id='guide';document.body.appendChild(g)}
  g.innerHTML=`<div class="n">顧問端導覽 ${i+1}／${G.length}</div><h3>${h}</h3><p class="mu" style="margin:0 0 10px">${d}</p><div style="display:flex;gap:6px"><button class="b pri" id="gN">${i===G.length-1?'完成':'下一步'}</button><button class="b" id="gX">關閉</button></div>`;
  g.querySelector('#gN').onclick=()=>guide(i+1);g.querySelector('#gX').onclick=()=>g.remove()}
-document.getElementById('guideBtn').onclick=()=>guide(0);
+document.getElementById('guideBtn').onclick=()=>window.JJJGUIDE&&JJJGUIDE.start();
+window.JCON={ST,render};
 boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
 })();
 </script>
+<script src="guide.js?v=20261027b"></script>
 </body>
 </html>

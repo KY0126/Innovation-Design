@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js"></script>
+<script src="backend.js?v=20261027b"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜企業營運資訊平台</title>
@@ -308,7 +308,7 @@ td.nw{white-space:nowrap}
 </style>
 </head>
 <body>
-<div id="gate" class="gate" hidden><div class="gbox"><div class="glogo"><i></i>揪居家企業營運資訊平台</div><p class="c-mu" style="margin:0 0 14px">總部與門市人員登入。家庭用戶與全國電子技師請使用手機 App。</p><form id="gForm" novalidate><div class="f"><label for="gEmail">Email</label><input class="fld" id="gEmail" name="email" type="email" autocomplete="username"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password"></div><div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit" style="width:100%;padding:9px">登入</button></form><p class="c-mu" style="font-size:12.5px;margin:10px 0 0">忘記密碼請洽總部重設。</p><div id="gDemo"></div></div></div>
+<div id="gate" class="gate" hidden><div class="gbox"><div class="glogo"><i></i>揪居家企業營運資訊平台</div><p class="c-mu" style="margin:0 0 14px"><b>企業管理端登入</b>：總部與門市主管使用。家庭請用<a href="app.html?end=family">全國電子 App</a>；技師請用<a href="app.html?end=tech">技師端</a>；生活顧問請用<a href="consultant.html">生活顧問端</a>。</p><form id="gForm" novalidate><div class="f"><label for="gEmail">Email</label><input class="fld" id="gEmail" name="email" type="email" autocomplete="username"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password"></div><div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit" style="width:100%;padding:9px">登入</button></form><p class="c-mu" style="font-size:12.5px;margin:10px 0 0">忘記密碼請洽總部重設。</p><div id="gDemo"></div></div></div>
 <div id="envBadge" hidden>示範環境</div>
 <div class="app">
  <aside class="side" aria-label="主選單">
@@ -951,10 +951,10 @@ acct:()=>{const U=LD.users;if(!U)return LOADING;const st=(CFG&&CFG.stores)||[];
  <div class="panel"><div class="ph">變更我的密碼</div><form class="pb" id="myPwForm" novalidate><div class="f"><label for="pOld">目前密碼</label><input class="fld" id="pOld" name="old" type="password" autocomplete="current-password"></div><div class="f"><label for="pNew">新密碼（至少 8 個字元）</label><input class="fld" id="pNew" name="password" type="password" autocomplete="new-password"></div><button class="b pri" type="submit">更新密碼</button></form></div></div></div>`}
 });
 function showGate(msg){ME=null;document.getElementById('gate').hidden=false;const e=document.querySelector('#gate .gerr');if(e)e.textContent=msg||'';const d=document.getElementById('gDemo');
- d.innerHTML=CFG&&CFG.demo?`<div class="demo-accounts"><b>示範帳號</b><div class="c-mu" style="font-size:12.5px">示範環境才會顯示；密碼皆為 ${esc(CFG.demo_password)}，點一下自動帶入</div>${CFG.demo_accounts.filter(a=>a.role==='hq'||a.role==='advisor').map(a=>`<button type="button" data-fill="${esc(a.email)}"><b style="font-weight:500">${esc(a.label)}</b> <span class="c-mu">${esc(a.email)}</span></button>`).join('')}</div>`:''}
+ d.innerHTML=CFG&&CFG.demo?`<div class="demo-accounts" style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px;margin-top:10px"><b>示範帳號</b><button type="button" data-demo="manager@example.com" style="display:block;width:100%;margin-top:8px;padding:9px;border-radius:10px;border:2px solid #C42D5A;background:#F7E9EE;color:#8E1E42;font-weight:900;cursor:pointer">▶ 一鍵登入｜張經理（總部）</button></div>`:''}
 async function enterHQ(u){ME=u;
- if(u.role==='family'){showGate('家庭帳號請使用手機 App（/app/）');return}
- if(u.role==='tech'){showGate('技師請使用手機 App 查看工單（/app/）');return}
+ if(u.role==='family'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是家庭帳號，請改用全國電子 App 的家庭登入。');return}
+ if(u.role==='tech'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是技師帳號，請改用技師端登入。');return}
  document.getElementById('gate').hidden=true;
  document.getElementById('who').textContent=(ROLE[u.role]||'')+'｜'+u.name;
  document.getElementById('scope').innerHTML='門市 <b>'+esc(u.role==='hq'?'全部試點門市':SHORT(u.store))+'</b>';
@@ -970,7 +970,7 @@ async function authStart(){
  enterHQ(u)}
 document.getElementById('gForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]'),er=f.querySelector('.gerr');er.textContent='';b.disabled=true;
  try{const d=await api('/auth/login',{method:'POST',body:{email:f.email.value.trim(),password:f.password.value},noGate:true});f.password.value='';await enterHQ(d.user)}catch(x){er.textContent=x.message}finally{b.disabled=false}});
-document.getElementById('gate').addEventListener('click',e=>{const b=e.target.closest('button[data-fill]');if(!b)return;const f=document.getElementById('gForm');f.email.value=b.dataset.fill;f.password.value=(CFG&&CFG.demo_password)||''});
+document.getElementById('gate').addEventListener('click',async e=>{const dm=e.target.closest('button[data-demo]');if(dm){dm.disabled=true;try{const d=await api('/auth/login',{method:'POST',body:{email:dm.dataset.demo,password:(CFG&&CFG.demo_password)||'demo1234'},noGate:true});await enterHQ(d.user)}catch(x){const er=document.querySelector('#gate .gerr');if(er)er.textContent=x.message}finally{dm.disabled=false}return}const b=e.target.closest('button[data-fill]');if(!b)return;const f=document.getElementById('gForm');f.email.value=b.dataset.fill;f.password.value=(CFG&&CFG.demo_password)||''});
 document.getElementById('logoutBtn').addEventListener('click',async()=>{try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}for(const k of ['ov','bk','staff','wl','hh','users'])delete LD[k];document.getElementById('gForm').reset();location.hash='';cur='live';showGate()});
 document.addEventListener('submit',e=>{if(e.target.id!=='myPwForm')return;e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]');
  lbusy(b,async()=>{await api('/me/password',{method:'POST',body:{old:f.old.value,password:f.password.value}});f.reset();toast('密碼已更新')})});
@@ -1024,5 +1024,5 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('.gb');if(g){const r=g.getBoundingClientRect();show(g,r.left,r.bottom)}});
 document.addEventListener('focusout',()=>{if(!pinned)hide()});
 addEventListener('scroll',()=>{if(!pinned)hide()},true)})();</script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="tour.js?v=20261026"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261027b"></script></body>
 </html>

@@ -1,16 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>消費者端</title>
-<script src="jiujujia/backend.js"></script>
-</head><body style="font-family:system-ui,sans-serif;padding:24px;color:#555">
-<p>正在以示範帳號登入消費者端…</p><p><a href="jiujujia/app.html?v=20261026e">若沒有自動前往，請點這裡</a></p>
-<script>
-(async () => {
-  const call = (p, b) => fetch('/api' + p, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' }, body: JSON.stringify(b || {}) });
-  try { await call('/auth/logout'); } catch (e) {}
-  try { await call('/auth/login', { email: 'chen@example.com', password: 'demo1234' }); } catch (e) {}
-  
-  location.replace('jiujujia/app.html?v=20261026e' + location.hash);
-})();
-</script></body></html>
+<meta http-equiv="refresh" content="0; url=jiujujia/app.html?end=family&v=20261027b">
+<title>揪居家｜消費者端｜全國電子 App 家庭登入</title>
+<script>location.replace('jiujujia/app.html?end=family&v=20261027b' + location.hash)</script>
+</head><body style="font-family:system-ui,sans-serif;padding:24px;color:#555"><p><a href="jiujujia/app.html?end=family">前往揪居家｜消費者端｜全國電子 App 家庭登入</a></p></body></html>
