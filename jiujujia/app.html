@@ -128,7 +128,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .okbox{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.9em}
 .sum{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px}
 .sum .btn{width:auto;flex:1}
-.tsum .rs{font-size:.92em}.tsum b{font-size:1.05em}
 .fld{display:block;resize:vertical;width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;background:var(--card);color:var(--ink);margin-top:4px}
 .seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
 .seg button{flex:1;text-align:center;padding:9px;font-size:.95em}
@@ -252,7 +251,7 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
 .insight{margin:0 12px 10px;background:var(--note);border-left:4px solid var(--brand);border-radius:10px;padding:9px 12px;font-size:.93em}
 .focus{border-left:5px solid var(--brand)!important}.dimmed{opacity:.5}
 .tmapc{position:sticky;top:0;z-index:3;box-shadow:0 6px 14px rgba(0,0,0,.08)}.tmapc .pm{width:72%;margin:4px auto 0}.tmapc .tlg{justify-content:center;margin-top:4px}
-.pkrow{display:flex;gap:6px;flex-wrap:wrap;margin:0 12px 10px}.pkc{font-size:14.5px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:5px 9px;color:var(--muted)}.pkc b{display:block;color:var(--ink);font-size:15.5px}.pkc.me{border-color:var(--brand)}
+.pkrow{display:flex;gap:6px;flex-wrap:wrap;margin:0 12px 10px}.pkc{font-size:12.5px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:5px 9px;color:var(--muted)}.pkc b{display:block;color:var(--ink);font-size:13px}.pkc.me{border-color:var(--brand)}
 .tlg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:12.5px;color:var(--muted)}.tlg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 .tgrp{background:var(--card);border-radius:14px;margin:0 12px 8px;overflow:hidden}.tgh{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;text-align:left}.tgn{font-weight:700;min-width:44px}.tgd{flex:1;display:flex;gap:4px;flex-wrap:wrap}.tgd{align-items:center}.tgn2{font-style:normal;min-width:22px;height:22px;border-radius:11px;color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}.tgok{color:var(--ok);font-size:.88em;font-weight:700}.tgdf{font-size:12px;background:#FFE3DA;color:#B33A1C;border-radius:9px;padding:1px 7px}
 .tgrp.open .tgh{border-bottom:1px solid var(--line);background:var(--brand-soft)}.trow{border-bottom:1px solid var(--line)}.trow:last-child{border-bottom:0}.trow.sel{background:#FFF7F9}
@@ -627,7 +626,7 @@ function totals(){const a=A();let one=0;CAT.forEach(c=>{if(a.sel[c.id])one+=c.p}
 function planName(p){return {basic:'揪夜安｜單一場域關懷',two:'揪夜安＋揪食光｜兩場域關懷',adv:'揪全家｜全屋套餐'}[p||'basic']}
 function clock(){const a=A();if(!a||!a.t0)return '00:00';const t=Math.floor(((a.t1||Date.now())-a.t0)/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
-function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar" id="hintbar" style="display:${dis&&hint?'block':'none'}">${hint||''}</div><div class="sum tsum"><div style="font-size:1.12em"><div>一次性 ${fmt(t.one)}</div><div class="muted">${t.m?'＋每月 '+fmt(t.m):'無月費'}</div></div><button class="btn" data-a="${act}" ${dis?'disabled':''}>${label}</button></div>`}
+function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar" id="hintbar" style="display:${dis&&hint?'block':'none'}">${hint||''}</div><div class="sum"><div style="font-size:.9em"><div>一次性 ${fmt(t.one)}</div><div class="muted">${t.m?'＋每月 '+fmt(t.m):'無月費'}</div></div><button class="btn" data-a="${act}" ${dis?'disabled':''}>${label}</button></div>`}
 Object.assign(V,{
 a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;return `${stf('揪居家｜門市端・今天',false)}<div class="scroll">
  <div class="step">${esc(S.me.store||'全部門市')}｜生活顧問 ${esc(S.me.name)}${H?'｜'+esc(H.today):''}</div>
@@ -1149,7 +1148,7 @@ tacc:()=>{const o=S.order;if(!o)return V.t1();const T=taskList(o),areas=[...new 
   <div style="display:flex;gap:8px"><button class="btn ${A[g]===1?'':'ghost'}" style="margin:0" data-acc="${g}|1">沒問題</button><button class="btn ghost" style="margin:0;${A[g]===0?'border-color:var(--brand);color:var(--brand)':''}" data-acc="${g}|0">有問題</button></div></div>`).join('')}
  ${bad.length?`<div class="card"><b>哪裡有問題？</b><textarea class="fld" id="accNote" rows="2" placeholder="例如：浴室門口夜燈太亮">${esc(S.accNote||'')}</textarea></div>`:''}
  <div class="card okbox" style="margin:0 12px 12px">驗收結果會同步到${ON()}的 App；${ON()}也可以在 App 上確認。</div></div>
- <div class="sum tsum"><div style="font-size:1.12em"><b>${areas.filter(g=>A[g]===1).length}／${areas.length} 區沒問題</b></div>${bad.length?`<button class="btn" data-a="accNo" style="width:auto;padding:12px 16px;margin:0">退回修正</button>`:`<button class="btn" data-a="accOk" ${all?'':'disabled'} style="width:auto;padding:12px 16px;margin:0">${EN()}確認，驗收完成</button>`}</div>`},
+ <div class="sum"><div style="font-size:.9em"><b>${areas.filter(g=>A[g]===1).length}／${areas.length} 區沒問題</b></div>${bad.length?`<button class="btn" data-a="accNo" style="width:auto;padding:12px 16px;margin:0">退回修正</button>`:`<button class="btn" data-a="accOk" ${all?'':'disabled'} style="width:auto;padding:12px 16px;margin:0">${EN()}確認，驗收完成</button>`}</div>`},
 // 技師：B／C／S 施工包步驟（一次只亮一步）
 tp:()=>{const o=S.order,k=o&&(o.packages||[]).find(x=>x.code===S.tpkg);if(!k)return V.tc();const names=k.step_names||[],st=S.pst||{},cur=names.findIndex((_,i)=>!st[i]),all=cur<0;
  return `${stf(k.code+'｜'+esc(k.name))}<div class="scroll"><div class="step">${esc(o.household)}｜已完成 ${names.filter((_,i)=>st[i]).length}／${names.length}</div>
@@ -1196,11 +1195,11 @@ function numMap(T,{sel,open}={}){let g='';for(const t of T){if(!t.pin)continue;c
   g+=`<g data-tpin="${t.key}" style="cursor:pointer;opacity:${dim?.28:1}" transform="translate(${x.toFixed(0)},${y.toFixed(0)})">${on?`<circle r="${r+12}" fill="none" stroke="${c}" stroke-width="5"/>`:''}<circle r="${r}" fill="${c}" stroke="#fff" stroke-width="5"/><text y="${r*.36}" font-size="${r*1.05}" font-weight="700" text-anchor="middle" fill="#fff">${t.done?'✓':t.no}</text></g>`}
  return `<div class="hpw pm"><img src="home/plan.jpg" alt="${EN()}家施工圖"><svg viewBox="${HPV.join(' ')}">${hpPath()}${g}</svg></div>`}
 function techBar(o,T){const me=(o.packages||[]).filter(k=>k.mine);if(!me.length)return '';
- if(o.status==='待驗收')return `<div class="sum tsum"><div style="font-size:1.12em"><b>全部完成</b><div class="rs">等待${EN()}驗收</div></div><button class="btn" data-a="tAccGo" style="width:auto;padding:12px 16px;margin:0">請${EN()}驗收</button></div>`;
+ if(o.status==='待驗收')return `<div class="sum"><div style="font-size:.9em"><b>全部完成</b><div class="rs">等待${EN()}驗收</div></div><button class="btn" data-a="tAccGo" style="width:auto;padding:12px 16px;margin:0">請${EN()}驗收</button></div>`;
  if(o.status==='已完成')return '';
- const k=me.find(x=>x.status!=='已完成');if(!k)return `<div class="sum tsum"><div style="font-size:1.12em"><b>我的部分已完成</b><div class="rs">等待其他團隊</div></div></div>`;
+ const k=me.find(x=>x.status!=='已完成');if(!k)return `<div class="sum"><div style="font-size:.9em"><b>我的部分已完成</b><div class="rs">等待其他團隊</div></div></div>`;
  const L=T.filter(t=>t.pkg===k.code),d=L.filter(t=>t.done).length,all=d===L.length;
- return `<div class="sum tsum"><div style="font-size:1.12em"><b>${esc(k.name)}｜${d}／${L.length}</b><div class="rs">${all?'都完成了':'下一項：'+esc((L.find(t=>!t.done)||{}).label||'')}</div></div><button class="btn" data-pkfin="${k.code}" ${all?'':'disabled'} style="width:auto;padding:12px 16px;margin:0">${k.code==='A'?'完成安裝':'完成，交給下一位'}</button></div>`}
+ return `<div class="sum"><div style="font-size:.9em"><b>${esc(k.name)}｜${d}／${L.length}</b><div class="rs">${all?'都完成了':'下一項：'+esc((L.find(t=>!t.done)||{}).label||'')}</div></div><button class="btn" data-pkfin="${k.code}" ${all?'':'disabled'} style="width:auto;padding:12px 16px;margin:0">${k.code==='A'?'完成安裝':'完成，交給下一位'}</button></div>`}
 async function techStart(code){let o=S.order;const k=(o.packages||[]).find(x=>x.code===code);if(!k)return;
  if(code==='A'){if(o.status==='已指派'||k.status==='未開始')S.order=await api('/tech/orders/'+o.id+'/start',{method:'POST'})}
  else if(k.status!=='進行中'&&k.status!=='暫停')S.order=await api('/tech/orders/'+o.id+'/packages/'+code+'/start',{method:'POST'})}
