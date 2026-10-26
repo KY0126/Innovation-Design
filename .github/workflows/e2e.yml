@@ -39,14 +39,20 @@ jobs:
           set -o pipefail
           npm test 2>&1 | tee ../test.log
 
-      - name: 失敗時把最後幾行輸出標在這次執行上
+      - name: 失敗時把失敗的測試標在這次執行上
         if: ${{ failure() }}
-        working-directory: .
         run: |
-          for f in install.log test.log; do
-            [ -f "$f" ] || continue
-            tail -n 25 "$f" | sed 's/\x1b\[[0-9;]*m//g' | grep -v '^\s*$' | while IFS= read -r l; do echo "::error title=$f::$l"; done
-          done
+          if [ -f results.json ]; then
+            node -e '
+              const r = require("./results.json"); const out = [];
+              const walk = (s, p) => { (s.suites || []).forEach(x => walk(x, p.concat(x.title))); (s.specs || []).forEach(sp => sp.tests.forEach(t => { const last = t.results[t.results.length - 1] || {}; if (t.status === "unexpected" || t.status === "flaky") { const msg = ((last.error && last.error.message) || "").replace(/\x1b\[[0-9;]*m/g, "").split("\n").filter(Boolean).slice(0, 3).join(" ／ "); out.push(`${t.projectName}｜${p.concat(sp.title).filter(Boolean).join(" › ")}｜${t.status === "flaky" ? "重跑才過" : "失敗"}：${msg}`); } })); };
+              walk(r, []);
+              console.log(`::error title=測試結果::${r.stats.expected} 通過、${r.stats.unexpected} 失敗、${r.stats.flaky} 重跑才過`);
+              out.slice(0, 9).forEach(l => console.log("::error title=失敗項目::" + l.slice(0, 900)));
+            '
+          else
+            tail -n 9 ../install.log | sed 's/\x1b\[[0-9;]*m//g' | while IFS= read -r l; do echo "::error title=安裝::$l"; done
+          fi
 
       - name: 上傳測試報告
         if: ${{ !cancelled() }}

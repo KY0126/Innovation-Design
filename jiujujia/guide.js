@@ -183,9 +183,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
 #jg .jgn{border:2px solid #C42D5A;background:#F7E9EE;border-radius:12px;padding:8px 12px;margin:2px 0 10px;color:#8E1E42;font-weight:700;line-height:1.5}
 #jg .jgn small{display:block;font-weight:400;color:#6F6670;font-size:13px}
 #jg .jgn.big{font-size:16px}
-#jg .jbt{display:block;width:100%;border-radius:10px;padding:9px;font:inherit;font-weight:700;margin:8px 0;cursor:pointer;border:1.5px solid #DDD5D0;background:#fff;color:#3D3A40}
+#jg .jbt{display:block;width:100%;text-align:center;border-radius:10px;padding:9px;font:inherit;font-weight:700;margin:8px 0;cursor:pointer;border:1.5px solid #DDD5D0;background:#fff;color:#3D3A40}
 #jg .jbt.p{background:#C42D5A;border-color:#C42D5A;color:#fff}
-#jg.nc .bd>.who,#jg.nc .bd>h2,#jg.nc .bd>.sec:first-of-type,#jg.nc .rest,#jg.nc .ft [data-t=act]{display:none}
+#jg.nc .bd>.who,#jg.nc .bd>h2,#jg.nc .s1,#jg.nc .rest,#jg.nc .ft [data-t=act]{display:none}
 #jg.nc .li,#jg.nd .li{opacity:.45}
 #jg.nd .ft [data-t=prev]{border:2px solid #C42D5A;color:#C42D5A}
 `;
@@ -256,7 +256,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
       const items = s.items.map((it, k) => `<div class="li" data-k="${k}"><i>${k + 1}</i><span>${it[1]}</span></div>`).join('');
       const flow = s.flow.map((f, k) => `<span class="${k === s.flow.length - 1 && s.flow.length === 1 || f === ENDS[s.end].n ? 'me' : ''}">${f}</span>`).join('<em>→</em>');
       const fl = flash; flash = null;
-      body = `${fl ? `<div class="jgn">${fl.t}${fl.sub ? `<small>${fl.sub}</small>` : ''}</div>` : ''}${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">這筆資料會送到</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
+      body = `${tlHtml(s.ch)}${fl ? `<div class="jgn">${fl.t}${fl.sub ? `<small>${fl.sub}</small>` : ''}</div>` : ''}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec s1">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">這筆資料會送到</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
       const nxt = STEPS[i + 1];
       const nextLabel = !nxt ? '完成導覽' : (nxt.end !== s.end || nxt.as !== s.as) ? `下一步：到${ENDS[nxt.end].n}` : '下一步';
       foot = `${i ? '<button data-t="prev">上一步</button>' : ''}${s.act && !s._done ? `<button class="p" data-t="act">${s.act.label}</button>` : ''}<button ${s.act && !s._done ? '' : 'class="p"'} data-t="next">${nextLabel}</button>`;
@@ -392,7 +392,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const html = kind === 'C'
       ? `<div class="jgnote"><div class="jgn big">這個畫面不在導覽裡<small>你目前在：${screenName()}<br>導覽停在：第 ${i + 1} 步「${s.t}」</small></div><button class="jbt p" data-t="back">帶我回第 ${i + 1} 步</button><button class="jbt" data-t="fold">先收合導覽，我自己逛</button><div class="sec">回到導覽有介紹的畫面時</div><div class="why">卡片會自動跟上，不必再按任何按鈕。</div><div class="sec">原本第 ${i + 1} 步的編號</div></div>`
       : `<div class="jgnote"><div class="jgn">你回到上一個畫面<small>卡片不會自動倒退，以免來回跳動。要看第 ${i} 步，請按下方「上一步」。</small></div></div>`;
-    bd.insertAdjacentHTML('afterbegin', html);
+    const tl = bd.querySelector(':scope > .tl'); if (tl) tl.insertAdjacentHTML('afterend', html); else bd.insertAdjacentHTML('afterbegin', html);
     panel.classList.add(kind === 'C' ? 'nc' : 'nd');
   }
   function follow() {
@@ -416,7 +416,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     if (busy || moving || mode !== 'step' || !panel || panel.hidden || e.target.closest('#jg')) return;
     const i = stepI(), s = STEPS[i]; if (!s || !ready(s) || !s.act || !s.act.click || s._done) return;
     const el = find(s.act.click); if (!el || !(el === e.target || el.contains(e.target))) return;
-    const label = (el.innerText || el.getAttribute('aria-label') || '').trim().split('\n')[0].slice(0, 16);
+    const label = (el.innerText || el.getAttribute('aria-label') || '').trim().split('\n')[0].replace(/[\s›>→]+$/, '').slice(0, 16);
     s._done = true; pendingA = true; lock(true); clearTimeout(autoT);
     autoT = setTimeout(() => {
       pendingA = false; if (stepI() !== i) { lock(false); return; } const n = STEPS[i + 1];
