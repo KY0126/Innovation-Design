@@ -9,7 +9,7 @@
     { as: 'chen@example.com', sel: '.agq', t: '① 消費者｜從 AI 顧問阿國開始', d: '陳小姐的媽媽剛開始一個人住。全國電子 App 首頁就有全國電子 AI 顧問阿國，點「幫長輩家做居家診斷」。', click: '.agq [data-go="b1"]' },
     { as: 'chen@example.com', sel: '[data-a="loginChild"]', t: '由子女代填', d: '長輩不用操作手機；選「幫長輩填」。', click: '[data-a="loginChild"]' },
     { as: 'chen@example.com', sel: '#arBtn', t: 'AR 掃描（場勘）', d: '手機對著走廊掃一次，量走道寬與門檻高度。原始影像只為分析暫存，分析完即清除。', click: '#arBtn' },
-    { as: 'chen@example.com', sel: '.arres', t: '量測結果', d: '走道 92 cm、門檻 2 cm；AI 同時判讀地板、牆面與門框材質，請按「對」或「改」。接著回答全國電子 AI 顧問阿國 5 題；導覽可以幫你一次填完。', act: 'diag', btn: '幫我完成診斷' },
+    { as: 'chen@example.com', sel: '.arres', t: '量測結果', d: '走道 92 cm、門檻 2 cm；AI 同時判讀地板、牆面與門框材質，請按「對，是磁磚」或「不是，換一個」。接著回答全國電子 AI 顧問阿國 5 題；導覽可以幫你一次填完。', act: 'diag', btn: '幫我完成診斷' },
     { as: 'chen@example.com', sel: '#cmp_b3', t: '看懂：安裝前後對比', d: '左右拖曳中間把手：左邊是現在的紅黃綠燈，右邊是安裝後的設備位置。切到「夜間」看感應夜燈亮起的範圍。' },
     { as: 'chen@example.com', sel: '#cmp_b3h', t: '夜間走道實景', d: '同一段 AR 掃描畫面，模擬晚上起床時夜燈一路亮到浴室門口。' },
     { as: 'chen@example.com', sel: '[data-go="optA"]', t: '看結果：哪裡需要處理', d: '先講結論：林女士家有 2 個地方建議處理。點進去一次只看一個空間。', click: '[data-go="optA"]', clickBtn: '幫我打開' },
@@ -41,15 +41,15 @@
   // ---------- 樣式 ----------
   const css = document.createElement('style');
   css.textContent = `#jjjDemo{position:fixed;right:0;top:46%;z-index:9998;display:flex;flex-direction:column;align-items:flex-end;font:12.5px/1.4 "Noto Sans TC",system-ui,sans-serif}
-#jjjDemo>button{background:#D4003C;color:#fff;border:0;border-radius:10px 0 0 10px;padding:9px 10px 9px 12px;white-space:nowrap;letter-spacing:1px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:-2px 2px 10px rgba(0,0,0,.2)}
-#jjjDemo .pn{display:none;background:#fff;color:#2B2B29;border:1px solid #ddd;border-right:0;border-radius:10px 0 0 10px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:190px}
+#jjjDemo>button{background:#C42D5A;color:#fff;border:0;border-radius:10px 0 0 10px;padding:9px 10px 9px 12px;white-space:nowrap;letter-spacing:1px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:-2px 2px 10px rgba(0,0,0,.2)}
+#jjjDemo .pn{display:none;background:#fff;color:#3D3A40;border:1px solid #ddd;border-right:0;border-radius:10px 0 0 10px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:190px}
 #jjjDemo.open .pn{display:block}#jjjDemo .pn b{display:block;margin-bottom:6px}#jjjDemo .pn button{display:block;width:100%;margin-top:6px;border:1px solid #ddd;border-radius:8px;background:#fff;padding:6px;cursor:pointer;font:inherit}
-#jjjDemo .pn button.p{background:#D4003C;border-color:#D4003C;color:#fff}
+#jjjDemo .pn button.p{background:#C42D5A;border-color:#C42D5A;color:#fff}
 #jjjMask{position:fixed;z-index:9996;border-radius:12px;box-shadow:0 0 0 9999px rgba(20,20,24,.55);pointer-events:none;transition:all .25s;outline:3px solid #FFFFFF}
-#jjjCard{position:fixed;padding-right:34px!important;z-index:9997;width:min(340px,calc(100vw - 24px));background:#fff;color:#2B2B29;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.3);padding:14px 14px 12px;font:14px/1.55 "Noto Sans TC",system-ui,sans-serif}
-#jjjCard .n{font-size:12px;color:#D4003C;font-weight:700}#jjjCard h3{margin:2px 0 6px;font-size:16px}#jjjCard p{margin:0 0 10px;color:#4A4945}
+#jjjCard{position:fixed;padding-right:34px!important;z-index:9997;width:min(340px,calc(100vw - 24px));background:#fff;color:#3D3A40;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.3);padding:14px 14px 12px;font:14px/1.55 "Noto Sans TC",system-ui,sans-serif}
+#jjjCard .n{font-size:12px;color:#C42D5A;font-weight:700}#jjjCard h3{margin:2px 0 6px;font-size:16px}#jjjCard p{margin:0 0 10px;color:#4A4945}
 #jjjCard .r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}#jjjCard button{border:1px solid #DDD;background:#fff;border-radius:9px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
-#jjjCard button.p{background:#D4003C;color:#fff;border-color:#D4003C}#jjjCard button.x{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border:0;border-radius:50%;color:#6A6A66;font-size:20px;line-height:28px;background:transparent}#jjjCard button.x:hover{background:#F1F1F1}#jjjCard .who{font-size:12.5px;background:#FCE6EC;color:#8F0029;border-radius:8px;padding:6px 8px;margin-bottom:8px}`;
+#jjjCard button.p{background:#C42D5A;color:#fff;border-color:#C42D5A}#jjjCard button.x{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border:0;border-radius:50%;color:#6A6A66;font-size:20px;line-height:28px;background:transparent}#jjjCard button.x:hover{background:#F1F1F1}#jjjCard .who{font-size:12.5px;background:#F7E9EE;color:#8E1E42;border-radius:8px;padding:6px 8px;margin-bottom:8px}`;
   document.head.appendChild(css);
   // ---------- 示範工具（取代原本擋住按鈕的右下角浮層） ----------
   const old = document.getElementById('webDemo'); if (old) old.remove();
@@ -116,7 +116,7 @@
       if (t === 'switch') await switchTo(s.as, s.page || 'app');
       else if (t === 'click') { const el = document.querySelector(s.click); if (el) el.click(); else alert('畫面上找不到這個按鈕，請先照說明操作'); await new Promise(r => setTimeout(r, 700)); LS.set(K, String(i + 1)); show(); }
       else if (t === 'act') { await doAct(s); await new Promise(r => setTimeout(r, 500)); if (!s.click) { LS.set(K, String(i + 1)); } else LS.set('jjj_tour_acted', String(i)); show(); }
-    } catch (x) { b.disabled = false; const p = card && card.querySelector('p'); if (p) p.insertAdjacentHTML('beforeend', `<br><span style="color:#D4003C">${x.message}</span>`); }
+    } catch (x) { b.disabled = false; const p = card && card.querySelector('p'); if (p) p.insertAdjacentHTML('beforeend', `<br><span style="color:#C42D5A">${x.message}</span>`); }
   });
   addEventListener('resize', place);
   // 頁面載入（含切換帳號後）自動接續導覽

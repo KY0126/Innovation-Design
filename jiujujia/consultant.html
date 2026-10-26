@@ -7,8 +7,8 @@
 <title>揪居家｜生活顧問端</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--brand:#D4003C;--brand-soft:#FCE6EC;--ink:#1F2328;--muted:#6A717C;--line:#E2E5EA;--bg:#F3F4F6;--card:#FFFFFF;--head:#F8F9FB;--side:#1F2328;--sideink:#C9CED6;
- --r:#D4003C;--y:#D9971F;--g:#138F3B;--note:#FAF6EE;box-sizing:border-box}
+:root{--brand:#C42D5A;--brand-soft:#F7E9EE;--ink:#3D3A40;--muted:#6F6670;--line:#E7E2E4;--bg:#F6F4F2;--card:#FFFFFF;--head:#F8F9FB;--side:#3D3A40;--sideink:#C9CED6;
+ --r:#C42D5A;--y:#D9971F;--g:#138F3B;--note:#FAF6EE;box-sizing:border-box}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}}
 :root[data-theme="dark"]{--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}
 *,*:before,*:after{box-sizing:inherit}
@@ -42,7 +42,7 @@ main{padding:16px 18px 80px;max-width:1180px}
 .kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:24px;font-weight:700}
 .item{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);width:100%;text-align:left}
 .item:first-child{border-top:0}.item .t{flex:1;min-width:0}.item .s{font-size:12px;color:var(--muted)}
-.tag{display:inline-block;font-size:12px;border-radius:9px;padding:1px 8px;background:var(--brand-soft);color:#8F0029;white-space:nowrap}
+.tag{display:inline-block;font-size:12px;border-radius:9px;padding:1px 8px;background:var(--brand-soft);color:#8E1E42;white-space:nowrap}
 .tag.gray{background:var(--head);color:var(--muted);border:1px solid var(--line)}.tag.ok{background:#E3F2E8;color:#0E6B2D}.tag.am{background:#FFF1D6;color:#8A5A00}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:10px 0 14px}
@@ -60,11 +60,11 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
 .jt .it:not(:last-child) .dt:after{content:"";position:absolute;left:13px;top:15px;bottom:-3px;width:2px;background:#DDDBD7}
 .jt .t{font-size:13.5px;color:#A8A5A0;padding-left:4px;line-height:1.35}.jt .t small{display:block;font-size:12px;color:#B8B5B0}
 .jt .dn .d{color:var(--muted)}.jt .dn .dt i,.jt .dn .dt:after{background:var(--brand)!important}.jt .dn .t{color:var(--brand);font-weight:700}.jt .dn .t small{color:var(--muted);font-weight:400}
-.jt .cu .d{color:var(--ink);font-weight:700}.jt .cu .dt i{background:var(--brand);width:16px;height:16px;left:6px;top:1px;box-shadow:0 0 0 5px #FFD84D}.jt .cu .t{color:var(--brand);font-weight:900}.jt .cu .t small{color:var(--ink);font-weight:400}
+.jt .cu .d{color:var(--ink);font-weight:700}.jt .cu .dt i{background:var(--brand);width:16px;height:16px;left:6px;top:1px;box-shadow:0 0 0 5px #F2C94C}.jt .cu .t{color:var(--brand);font-weight:900}.jt .cu .t small{color:var(--ink);font-weight:400}
 .jh{display:flex;align-items:flex-start;margin:4px 0 8px}.jh .s{flex:1;position:relative;height:20px}
 .jh .s i{display:block;width:12px;height:12px;border-radius:50%;background:#C9C7C3;margin:4px auto;position:relative;z-index:1}
 .jh .s:not(:last-child):after{content:"";position:absolute;top:9px;left:50%;right:-50%;height:2px;background:#DDDBD7}
-.jh .dn i,.jh .dn:after{background:var(--brand)!important}.jh .cu i{background:var(--brand);width:16px;height:16px;margin:2px auto;box-shadow:0 0 0 5px #FFD84D}
+.jh .dn i,.jh .dn:after{background:var(--brand)!important}.jh .cu i{background:var(--brand);width:16px;height:16px;margin:2px auto;box-shadow:0 0 0 5px #F2C94C}
 .wk{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start}.wk .pk{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .wk .pk.open{border:1.5px solid var(--brand)}.wk .tg{float:right;font-size:12.5px;font-weight:700;color:var(--brand);background:none;border:0;cursor:pointer;padding:0}
 .wk .acc{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px;font-size:12.5px;line-height:1.8}.wk .acc .ok{color:var(--brand)}.wk .acc .now{color:var(--brand);font-weight:700}.wk .acc .no{color:#A8A5A0}.wk .acc .df{color:#C25A00}

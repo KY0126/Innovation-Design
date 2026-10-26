@@ -32,7 +32,7 @@
         { id: 'b_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留黃燈與風險說明', more: 1 }
       ] }
   };
-  const LC = { r: ['紅燈', '#D4003C'], y: ['黃燈', '#E0A030'], g: ['綠燈', '#138F3B'] };
+  const LC = { r: ['紅燈', '#C42D5A'], y: ['黃燈', '#E0A030'], g: ['綠燈', '#138F3B'] };
   const ST = Object.assign({ sp: 'hall', sel: {}, ok: {}, style: {}, combo: 'fast', more: false, pct: 50, view: 'ar', door: {} }, LSX.get('jjj_v5_opt2') || {});
   const save = () => LSX.set('jjj_v5_opt2', ST);
   const optOf = (sp, id) => SP[sp].opts.find(o => o.id === id);
