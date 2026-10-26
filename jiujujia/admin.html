@@ -713,8 +713,8 @@ amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
  return `<div class="grid4">
  <div class="panel pb kpi"><div class="l">完成居家觀察</div><div class="n">${n} 戶</div><div class="d">均已取得家人與長輩同意</div></div>
  <div class="panel pb kpi"><div class="l">參與校園大使</div><div class="n">${12+Math.round(m*2.5)} 人</div><div class="d">3 所大學｜示意</div></div>
- <div class="panel pb kpi"><div class="l">推薦碼帶來的預約</div><div class="n">${Math.round(n*0.27)} 戶</div><div class="d">轉訂閱 ${Math.round(n*0.27*0.2)} 戶｜示意</div></div>
- <div class="panel pb kpi"><div class="l">送出的揪心願</div><div class="n">${Math.round(n*0.4)} 件</div><div class="d">併入揪心願漏斗</div></div></div>
+ <div class="panel pb kpi"><div class="l">推薦碼帶來的預約評估</div><div class="n">${Math.round(n*0.27)} 戶</div><div class="d">只計預約評估、不計成交｜示意</div></div>
+ <div class="panel pb kpi"><div class="l">社區夜間防跌健檢</div><div class="n">${2+Math.round(m*0.8)} 場</div><div class="d">服務長輩 ${Math.round((2+m*0.8)*18)} 位｜示意</div></div></div>
  <div class="grid2"><div class="panel"><div class="ph">居家現況（去識別化彙總） <small>只記錄環境，不含個人資料</small></div><div class="pb">
   <div class="c-mu" style="font-size:13px;margin-bottom:6px">最常見的居家風險</div>
   ${risks.map(([k,v])=>`<div class="kv"><span>${k}</span><span style="display:flex;align-items:center;gap:8px;width:45%"><span class="bar" style="flex:1;margin:0"><i style="width:${v*100}%;background:#C42D5A"></i></span><b style="width:38px;text-align:right">${pct(v)}</b></span></div>`).join('')}
