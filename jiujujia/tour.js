@@ -6,27 +6,27 @@
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
   const WHO = { 'chen@example.com': '陳小姐（子女）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（生活顧問）', 'tech@example.com': '吳技師（全國電子技師）', 'manager@example.com': '張經理（總部）' };
   const STEPS = [
-    { as: 'chen@example.com', sel: '.agq', t: '① 消費者｜從 AI 顧問阿國開始', d: '陳小姐的媽媽剛開始一個人住。全國電子 App 首頁就有全國電子 AI 顧問阿國，點「幫長輩家做居家診斷」。', click: '.agq [data-go="b1"]' },
-    { as: 'chen@example.com', sel: '[data-a="loginChild"]', t: '由子女代填', d: '長輩不用操作手機；選「幫長輩填」。', click: '[data-a="loginChild"]' },
-    { as: 'chen@example.com', sel: '#arBtn', t: 'AR 掃描（場勘）', d: '手機對著走廊掃一次，量走道寬與門檻高度。原始影像只為分析暫存，分析完即清除。', click: '#arBtn' },
+    { as: 'chen@example.com', sel: '.agq', t: '① 消費者｜從 AI 顧問阿國開始', d: '陳小姐的媽媽剛開始一個人住。全國電子 App 首頁就有全國電子 AI 顧問阿國，點「幫長輩家做居家診斷」。', click: '.agq [data-go="b1"]', nav: ['home'] },
+    { as: 'chen@example.com', sel: '[data-a="loginChild"]', t: '由子女代填', d: '長輩不用操作手機；選「幫長輩填」。', click: '[data-a="loginChild"]', nav: ['home','b1'] },
+    { as: 'chen@example.com', sel: '#arBtn', t: 'AR 掃描（場勘）', d: '手機對著走廊掃一次，量走道寬與門檻高度。原始影像只為分析暫存，分析完即清除。', click: '#arBtn', nav: ['home','ar'] },
     { as: 'chen@example.com', sel: '.arres', t: '量測結果', d: '走道 92 cm、門檻 2 cm；AI 同時判讀地板、牆面與門框材質，請按「對，是磁磚」或「不是，換一個」。接著回答全國電子 AI 顧問阿國 5 題；導覽可以幫你一次填完。', act: 'diag', btn: '幫我完成診斷' },
     { as: 'chen@example.com', sel: '#cmp_b3', t: '看懂：安裝前後對比', d: '左右拖曳中間把手：左邊是現在的紅黃綠燈，右邊是安裝後的設備位置。切到「夜間」看感應夜燈亮起的範圍。' },
     { as: 'chen@example.com', sel: '#cmp_b3h', t: '夜間走道實景', d: '同一段 AR 掃描畫面，模擬晚上起床時夜燈一路亮到浴室門口。' },
-    { as: 'chen@example.com', sel: '[data-go="optA"]', t: '看結果：哪裡需要處理', d: '先講結論：林女士家有 2 個地方建議處理。點進去一次只看一個空間。', click: '[data-go="optA"]', clickBtn: '幫我打開' },
-    { as: 'chen@example.com', sel: '[data-v5go="hall"]', t: '選改善方式', d: '每個紅黃燈都有四類做法：免費調整、全國電子安裝、簡易施工、改造工程（需到府估價）。', click: '[data-v5go="hall"]', clickBtn: '看走道' },
+    { as: 'chen@example.com', sel: '[data-go="optA"]', t: '看結果：哪裡需要處理', d: '先講結論：林女士家有 2 個地方建議處理。點進去一次只看一個空間。', click: '[data-go="optA"]', nav: ['home','b3'], clickBtn: '幫我打開' },
+    { as: 'chen@example.com', sel: '[data-v5go="hall"]', t: '選改善方式', d: '每個紅黃燈都有四類做法：免費調整、全國電子安裝、簡易施工、改造工程（需到府估價）。', click: '[data-v5go="hall"]', nav: ['home','b3','optA'], clickBtn: '看走道' },
     { as: 'chen@example.com', sel: '[data-v5opt="hall|h_part"]', t: '挑材質款式', d: '選「感應夜燈＋止滑卡扣地板」會出現三種款式；左右拖曳看前後對比，換款式燈號不變。', click: '[data-v5opt="hall|h_part"]', clickBtn: '幫我選這個' },
     { as: 'chen@example.com', sel: '[data-v5ok]', t: '確定這個方式', d: '底部固定顯示燈號變化與價格級距；確定後自動換到下一個空間（浴室）。', click: '[data-v5ok]', clickBtn: '幫我確定' },
     { as: 'chen@example.com', sel: '[data-v5ok]', t: '浴室：斜坡墊就能轉綠燈', d: '浴室推薦「斜坡墊＋止滑地墊」，千元內、當天安裝。確定後回到總覽。', click: '[data-v5ok]', clickBtn: '幫我確定' },
     { as: 'chen@example.com', sel: '[data-v5toC]', t: '交給生活顧問', d: '全國電子和協力工班的項目放在同一張清單，看得到進度：選方式 → 估價 → 長輩確認 → 施工 → 驗收。', click: '[data-v5toC]', clickBtn: '幫我打開' },
-    { as: 'chen@example.com', sel: '[data-v5handoff]', t: '請生活顧問報價', d: '一張報價含改造工程；生活顧問在顧問端整合、送出報價版本，長輩本人同意才成交。', click: '[data-v5handoff]', clickBtn: '幫我送出' },
+    { as: 'chen@example.com', sel: '[data-v5handoff]', t: '請生活顧問報價', d: '一張報價含改造工程；生活顧問在顧問端整合、送出報價版本，長輩本人同意才成交。', click: '[data-v5handoff]', nav: ['home','b3','optA','optC'], clickBtn: '幫我送出' },
     { as: 'chen@example.com', sel: '[data-go="share"]', t: '儲存或分享給家人', d: '分析成果可存入「長輩家」、「我家」，或這次先不儲存；也能用 LINE 把摘要分享到家人群組（只分享摘要，不含地址與作息）。' },
     { as: 'li@example.com', sel: '.card:has([data-rbook])', t: '已啟用的家庭｜主動提醒', d: '換成已經在用揪夜安的李小姐。關懷設備會主動提醒：感測器電量、夜燈年度健檢。按「一鍵預約」就送出維護工單草稿，門市確認時段後派工。', act: 'm2', btn: '帶我到「揪居家」', click: '[data-rbook]', clickBtn: '幫我一鍵預約' },
     { as: 'advisor@example.com', sel: '.kp4', t: '② 生活顧問｜今天', d: '王小明登入後先看 4 張指標卡與一句洞察：今日諮詢、待審差異、待派工、方案待確認。剛剛的一鍵預約已經出現在「待派工」。' },
     { as: 'advisor@example.com', sel: '[data-board]', t: '今日到府：合併到府', d: '林女士家今天兩個工作包：陳技師先裝夜燈與門檻提示燈條（B，已完成），吳技師再裝關懷設備（A）。點進去看方案圖面。', click: '[data-board]' },
     { as: 'advisor@example.com', sel: '.pm', t: '規劃：同一張圖，分工作包', d: '每個標記屬於 A 關懷設備或 B 夜間照明；點標記再點圖面可移動位置。長輩確認後鎖定版本，之後的變更都有版本紀錄。' },
-    { as: 'tech@example.com', sel: '.card.focus', t: '③ 技師｜今日工作', d: '吳技師只看到自己的工單，今天的工單聚焦、其他淡化；陳技師的工作包是灰色、只能查看。', click: '.card.focus' },
+    { as: 'tech@example.com', sel: '.card.focus', t: '③ 技師｜今日工作', d: '吳技師只看到自己的工單，今天的工單聚焦、其他淡化；陳技師的工作包是灰色、只能查看。', click: '.card.focus', nav: ['t1'] },
     { as: 'tech@example.com', sel: '.tmapc', t: '照著裝：圖上只標號碼', d: '施工圖只標施工順序號碼，顏色代表狀態：紅色待施工、酒紅打勾已完成、珊瑚色差異、灰色是其他人員負責的項目。下面依區域分組，點開就看到該區的工作。', click: '[data-tgrp="玄關"]', clickBtn: '幫我展開「玄關」' },
-    { as: 'tech@example.com', sel: '.tgrp.open', t: '點項目：完成或回報差異', d: '每一項都有安裝位置與注意事項，做完按「完成」。走道插座被衣櫃擋住，夜燈要改用電池款——導覽幫你送出一則「需暫停」的差異回報。', act: 'diff', btn: '幫我回報差異' },
+    { as: 'tech@example.com', sel: '.tgrp.open', t: '點項目：完成或回報差異', d: '每一項都有安裝位置與注意事項，做完按「完成」。浴室門是推拉門，門窗感測器要改用側裝支架——導覽幫你送出一則「需暫停」的差異回報。', act: 'diff', btn: '幫我回報差異' },
     { as: 'advisor@example.com', sel: '#advD', t: '顧問核准差異 → 新版本', d: '差異回報即時出現在顧問的「今天」。核准後圖面產生新版本，技師的工作包自動恢復。', click: '[data-dfok]', clickBtn: '幫我核准' },
     { as: 'tech@example.com', sel: '.sum', t: '全部完成 → 請長輩驗收', d: '吳技師把其餘項目做完、按「完成安裝」，工單變成「待驗收」。技師不能自己結案，要由長輩確認。', act: 'finish', btn: '幫我做完其餘項目', click: '[data-a="tAccGo"]', clickBtn: '請長輩驗收' },
     { as: 'tech@example.com', sel: '.tacc', t: '長輩逐區驗收', d: '手機轉給長輩看，大字逐區確認：夜燈會不會亮、按鈕按不按得到。全部沒問題才按「驗收完成」，摘要同步到子女的 App；有問題就退回，相關項目改回待施工。', act: 'accept', btn: '幫長輩逐區確認並驗收' },
@@ -114,7 +114,11 @@
     b.disabled = true;
     try {
       if (t === 'switch') await switchTo(s.as, s.page || 'app');
-      else if (t === 'click') { const el = document.querySelector(s.click); if (el) el.click(); else alert('畫面上找不到這個按鈕，請先照說明操作'); await new Promise(r => setTimeout(r, 700)); LS.set(K, String(i + 1)); show(); }
+      else if (t === 'click') { let el = document.querySelector(s.click);
+        // 畫面不在這一步（例如重新整理、自己點到別頁）：先帶回正確畫面再點，找不到也不跳出視窗
+        if (!el && s.nav && window.JJJ) { const J = window.JJJ, st = s.nav.slice(); const last = st.pop(); J.tourGo(st); if (J.go) J.go(last); else J.tourGo(s.nav); await new Promise(r => setTimeout(r, 1200)); el = document.querySelector(s.click); }
+        if (!el) { b.disabled = false; const p = card && card.querySelector('p'); if (p && !p.querySelector('.miss')) p.insertAdjacentHTML('beforeend', '<br><span class="miss" style="color:#C42D5A">畫面還沒到這一步：可以按「上一步」重做，或自己在畫面上操作後按「下一步」。</span>'); return; }
+        el.click(); await new Promise(r => setTimeout(r, 700)); LS.set(K, String(i + 1)); show(); }
       else if (t === 'act') { await doAct(s); await new Promise(r => setTimeout(r, 500)); if (!s.click) { LS.set(K, String(i + 1)); } else LS.set('jjj_tour_acted', String(i)); show(); }
     } catch (x) { b.disabled = false; const p = card && card.querySelector('p'); if (p) p.insertAdjacentHTML('beforeend', `<br><span style="color:#C42D5A">${x.message}</span>`); }
   });

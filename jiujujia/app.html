@@ -1384,7 +1384,7 @@ boot();
 async function tourDiag(){if(!S.meas||!Object.keys(S.meas).length)S.meas={corridor_cm:AR_RES.corridor_cm,threshold_cm:AR_RES.threshold_cm,bed_bath_m:AR_RES.bed_bath_m,outlets:AR_RES.outlets};
  const ans={live:'剛開始一個人住',night:'一晚兩次以上',light:'偏暗',phone:'只會接電話',worry:'夜間跌倒沒人知道'};
  applyHome(await api('/assessments',{method:'POST',body:{answers:ans,measures:S.meas,filled_by:'child',duration_s:S.d0?Math.round((Date.now()-S.d0)/1000):240}}));S.d0=null;S.stack=['home','b3'];render()}
-async function tourDiff(){await tourOrder();const o=S.order;S.order=await api('/tech/orders/'+o.id+'/diffs',{method:'POST',body:{pin_id:'L2',level:'暫停',text:'走道插座被衣櫃擋住，夜燈改用電池款',photo:true}});S.tpin='L2';S.ttab='work';S.tsel='pin:D2';S.topen='玄關';S.stack=['t1','tc'];render();toast('已送出：A 工作包暫停，等待生活顧問核准')}
+async function tourDiff(){await tourOrder();const o=S.order;S.order=await api('/tech/orders/'+o.id+'/diffs',{method:'POST',body:{pin_id:'D1',level:'暫停',text:'浴室門是推拉門，門窗感測器改用側裝支架',photo:true}});S.tpin='D1';S.ttab='work';S.tsel='pin:D1';S.topen='浴室';S.stack=['t1','tc'];render();toast('已送出：A 工作包暫停，等待生活顧問核准')}
 async function tourOrder(){if(!S.order){const d=await api('/tech/orders');S.orders=d.orders;S.today=d.today;S.order=d.orders.find(o=>o.status!=='已完成')||d.orders[0]}if(!S.order)throw new Error('沒有工單');S.order=await api('/tech/orders/'+S.order.id)}
 async function tourFinish(){await tourOrder();let T=taskList(S.order);await techStart('A');
  for(const t of T.filter(x=>x.pkg==='A'&&!x.done&&x.pin))S.order=await api('/tech/orders/'+S.order.id+'/pins/'+t.pin.id,{method:'POST',body:{st:'done'}});
