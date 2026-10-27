@@ -22,4 +22,4 @@
 
 ## 端到端測試
 
-`e2e/` 資料夾是 Playwright 端到端測試，涵蓋 App 與企業管理端入口、登入分流、30 步導覽與資料串接。執行方式見 [e2e/README.md](e2e/README.md)。
+`e2e/` 資料夾是 Playwright 端到端測試，涵蓋 App 與企業管理端入口、登入分流、31 步導覽與資料串接。執行方式見 [e2e/README.md](e2e/README.md)。

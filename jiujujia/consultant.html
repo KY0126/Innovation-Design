@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js?v=20261027g"></script>
+<script src="backend.js?v=20261027i"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜生活顧問端</title>
@@ -234,7 +234,7 @@ function tQuote(p){const hid=p.household_id,items=chosen(hid),L=quotes(hid),pl=p
  <tr><td colspan="3"><b>已確認小計</b></td><td><b>NT$${(dev+known).toLocaleString()}</b></td></tr>${pend.length?`<tr><td colspan="4" class="mu">另有 ${pend.length} 項「待估價」，到府估價後另出新版本，不自動套用示範價格。</td></tr>`:''}
  <tr><td colspan="3">長輩關懷月費</td><td>NT$${pl.monthly||299}／月</td></tr></table>
  <div style="display:flex;gap:8px;margin-top:10px"><button class="b pri" data-q="send">建立並送出新版本</button></div></div></div>
- <div class="panel"><div class="ph">報價版本 <small>最新一版為正式版本；長輩在 App 大字確認的是這一版</small></div><div class="pb">${L.length?L.map((v,k)=>`<div class="ver sent"><b>v${v.v}</b>｜${esc(v.at)}｜NT$${v.total.toLocaleString()}${v.pending?`＋${v.pending} 項待估價`:''} ${k===L.length-1?'<span class="tag ok">正式</span>':'<span class="tag">舊版</span>'}<div class="sm mu">${v.items.map(esc).join('、')}</div></div>`).join(''):'<div class="mu">尚未送出報價。</div>'}${(()=>{const D=LS.get('jjj_adv_drafts',[]).filter(d=>d.hid===hid);return D.length?`<div class="sm mu" style="margin-top:8px">手機草稿（${esc(D[0].at)} 到店陪同）已匯入，整合後送出正式版本</div>`:''})()}</div></div></div>`}
+ <div class="panel"><div class="ph">報價版本 <small>最新一版為正式版本；長輩在 App 大字確認的是這一版</small></div><div class="pb">${L.length?L.map(v=>`<div class="ver sent"><b>v${v.v}</b>｜${esc(v.at)}｜NT$${v.total.toLocaleString()}${v.pending?`＋${v.pending} 項待估價`:''} ${v.v===Math.max(...L.map(x=>x.v))?'<span class="tag ok">正式</span>':'<span class="tag">舊版</span>'}<div class="sm mu">${v.items.map(esc).join('、')}</div></div>`).join(''):'<div class="mu">尚未送出報價。</div>'}${(()=>{const D=LS.get('jjj_adv_drafts',[]).filter(d=>d.hid===hid);return D.length?`<div class="sm mu" style="margin-top:8px">手機草稿（${esc(D[0].at)} 到店陪同）已匯入，整合後送出正式版本</div>`:''})()}</div></div></div>`}
 function tConfirm(p){const pl=p.plan||{},pv=p.pv||{};const vs=p.versions||[];
  return `<div class="grid"><div class="panel"><div class="ph">長輩本人確認</div><div class="pb"><table>
  <tr><th>確認狀態</th><td>${pl.status==='已確認'?'<span class="tag ok">長輩本人已確認</span>':'<span class="tag am">待長輩到門市確認</span>'}</td></tr>
@@ -300,6 +300,6 @@ window.JCON={ST,render};
 boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
 })();
 </script>
-<script src="guide.js?v=20261027g"></script>
+<script src="guide.js?v=20261027i"></script>
 </body>
 </html>

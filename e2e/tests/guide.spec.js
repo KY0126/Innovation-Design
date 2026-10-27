@@ -33,7 +33,7 @@ const snap = async page => ({
   ov: await peek(page, 'manager@example.com', '/api/admin/overview'),
 });
 
-test('導覽 30 步跨 App 與企業管理端走完：每步編號框都找得到、沒有錯誤或對話框，資料即時串接', async ({ page }, info) => {
+test('導覽全部步驟跨 App 與企業管理端走完：每步編號框都找得到、沒有錯誤或對話框，資料即時串接', async ({ page }, info) => {
   test.setTimeout(420_000);
   const errs = [];
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -52,9 +52,9 @@ test('導覽 30 步跨 App 與企業管理端走完：每步編號框都找得�
     if (process.env.WALKLOG) console.log('STEP', JSON.stringify(st)); log.push(`${st.n}｜${st.h}｜框 ${st.boxes}${st.miss.length ? '｜找不到：' + st.miss.join('／') : ''}`);
     expect.soft(st.miss, `${st.n} ${st.h} 的編號項目要找得到`).toEqual([]);
     seen.add(st.n);
-    if (st.h === '生活顧問端｜今天') ui.kpiQuote = await page.locator('.kpis > *', { hasText: '待整合報價' }).first().innerText();
+    if (st.h === '生活顧問（電腦版）｜今天') ui.kpiQuote = await page.locator('.kpis > *', { hasText: '待整合報價' }).first().innerText();
     if (st.h === '整合成一張報價') ui.handoffNote = await page.getByText('家庭交付').count();
-    if (st.h === '技師端｜今日工單') ui.techCard = await page.locator('.card.focus').first().innerText();
+    if (st.h === '技師｜今日工單') ui.techCard = await page.locator('.card.focus').first().innerText();
     const has = t => st.btns.includes(t);
     if (has('goend')) { await Promise.all([page.waitForNavigation(), page.click('#jg [data-t="goend"]')]); await expect(page.locator('#jg')).toBeVisible({ timeout: 10_000 }); continue; }
     if (has('login')) { await page.click('#jg [data-t="login"]'); await expect.poll(async () => { const p = await panel(page).catch(() => null); return !!p && !p.busy && !p.btns.includes('login'); }, { timeout: 20_000 }).toBeTruthy(); continue; }
@@ -74,7 +74,7 @@ test('導覽 30 步跨 App 與企業管理端走完：每步編號框都找得�
   }
   await info.attach('walk.txt', { body: log.join('\n'), contentType: 'text/plain' });
   console.log(log.join('\n'));
-  expect(seen.size, '導覽每一步都有走到').toBe(require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8').match(/^\s+[FATLM]\(\{ ch:/gm).length);
+  expect(seen.size, '導覽每一步都有走到').toBe(require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8').match(/^\s+[A-Z]\(\{ ch:/gm).length);
   // ---- 資料串接 ----
   // 工單編號含日期（W-年月日-序號），改用家庭＋類型找，避免跨日或時區不同對不到
   const W = s => s.wo.orders.find(o => o.household === '林女士家' && o.kind === '到府安裝' && /^W-\d{8}-06$/.test(o.code));

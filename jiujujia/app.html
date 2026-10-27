@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="backend.js?v=20261027g"></script>
+<script src="backend.js?v=20261027i"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜消費者端 APP</title>
@@ -1151,7 +1151,7 @@ apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
  return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">
  <div class="step">把手機轉給${EN()}看｜大字顯示</div>
- ${(()=>{let Q={};try{Q=JSON.parse(localStorage.getItem('jjj_v5_quotes')||'{}')}catch(e){}const L=Q[B.household_id]||[],v=L[L.length-1];return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
+ ${(()=>{let Q={};try{Q=JSON.parse(localStorage.getItem('jjj_v5_quotes')||'{}')}catch(e){}const L=Q[B.household_id]||[],v=L.reduce((a,b)=>!a||b.v>a.v?b:a,null);return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
  ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。臥室與浴室不含鏡頭。'})}
  <div class="card"><b>會裝這些</b>${pins.filter(p=>p.k!=='note').map(p=>`<div class="row"><span><span class="dot" style="background:${PKC[p.pkg]}"></span> ${esc(p.label)}</span><span class="rs">${esc(p.room||'')}</span></div>`).join('')}</div>
  <div class="card okbox" style="margin:0 12px 12px">${(pins.some(p=>/攝影機/.test(p.label||''))||!!(B.plan&&B.plan.sel&&B.plan.sel.cam))?'臥室浴室不裝鏡頭；走廊攝影機平常只在本機錄影、沒人看。':'不裝鏡頭、不錄音。'}晚上起床燈會自己亮；沒事時按一下「我很好」就好。</div>
@@ -1432,10 +1432,10 @@ async function tourFinish(){await tourOrder();let T=taskList(S.order);await tech
  S.order=await api('/tech/orders/'+S.order.id+'/complete',{method:'POST',body:{steps:all}});S.stack=['t1','tc'];S.ttab='work';S.topen='收尾';render()}
 async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach(t=>{if(t.group!=='開工')S.acc[t.group]=1});S.stack=['t1','tc','tacc'];render();await new Promise(r=>setTimeout(r,900));
  S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});S.stack=['t1','t4'];render();toast(EN()+'驗收完成，摘要已同步給家人')}
-window.JJJ={S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
+window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027g"></script>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027i"></script>
 <script>
 // 手機框：電腦上固定 393×852，視窗較矮時等比例縮小；右側留給導覽面板
 (function(){const sh=document.getElementById('app');const F=window.JJJFRAME={};
@@ -1449,5 +1449,5 @@ window.JJJ={S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheet
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="guide.js?v=20261027g"></script></body>
+<script src="guide.js?v=20261027i"></script></body>
 </html>

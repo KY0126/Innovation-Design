@@ -29,7 +29,7 @@ test('C 走到導覽沒介紹的畫面 → 提示，不跳；按「帶我回」�
   await page.evaluate(() => JJJ.go('fam'));
   await expect(page.locator('#jg')).toContainText('這個畫面不在導覽裡', { timeout: 10_000 });
   await expect(page.locator('#jg')).toContainText('你目前在：家庭成員');
-  await expect(page.locator('#jg .hd b')).toHaveText('導覽 1／30');
+  await expect(page.locator('#jg .hd b')).toHaveText(/^導覽 1／\d+$/);
   await page.click('#jg [data-t="back"]');
   await expect(page.locator('#jg')).not.toContainText('這個畫面不在導覽裡');
   expect(await page.evaluate(() => JJJ.S.stack.at(-1))).toBe('home');
@@ -64,7 +64,8 @@ test('企業管理端：點側欄跳到後面的分頁 → 卡片跟上；點導
   await expect(page.locator('#jg [data-t="next"]')).toBeEnabled();
   await page.click('#nav [data-tab="wo"]');
   await expect(h2(page)).toHaveText('工單', { timeout: 10_000 });
-  await expect(note(page)).toContainText('第 25 步 → 第 27 步');
+  const live = await page.evaluate(() => JJJGUIDE.steps.findIndex(s => s.end === 'admin' && s.nav && s.nav.tab === 'live') + 1), wo = await page.evaluate(() => JJJGUIDE.steps.findIndex(s => s.end === 'admin' && s.nav && s.nav.tab === 'wo') + 1);
+  await expect(note(page)).toContainText(`第 ${live} 步 → 第 ${wo} 步`);
   await expect(page.locator('#jg [data-t="next"]')).toBeEnabled();
   const other = await page.evaluate(() => { const used = new Set(JJJGUIDE.steps.filter(s => s.end === 'admin' && s.nav).map(s => s.nav.tab)); return [...document.querySelectorAll('#nav [data-tab]')].map(b => b.dataset.tab).find(t => !used.has(t)); });
   await page.click(`#nav [data-tab="${other}"]`);
