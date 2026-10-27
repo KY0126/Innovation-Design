@@ -28,12 +28,30 @@ jobs:
         with:
           node-version: 22
 
-      - name: 安裝 Playwright 與瀏覽器（含中文字型）
-        timeout-minutes: 10
+      - name: 安裝 Playwright
+        timeout-minutes: 5
         run: |
           set -o pipefail
           npm install --no-audit --no-fund 2>&1 | tee ../install.log
-          npx playwright install --with-deps chromium 2>&1 | tee -a ../install.log
+
+      - name: 快取瀏覽器
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-chromium-${{ runner.os }}-1.56.0
+
+      - name: 下載瀏覽器
+        timeout-minutes: 8
+        run: npx playwright install chromium 2>&1 | tail -n 3 | tee -a ../install.log
+
+      - name: 安裝系統套件與中文字型（失敗自動重試）
+        timeout-minutes: 15
+        run: |
+          for i in 1 2 3; do
+            sudo npx playwright install-deps chromium > ../deps.log 2>&1 && break
+            echo "第 $i 次安裝失敗，30 秒後重試"; sleep 30
+          done
+          tail -n 3 ../deps.log | tee -a ../install.log
 
       - name: 執行測試
         timeout-minutes: 12
