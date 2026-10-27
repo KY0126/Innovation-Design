@@ -94,7 +94,7 @@ test.describe('生活顧問：手機版與電腦版分工', () => {
     await fresh(page); await page.goto('/jiujujia/app.html');
     await page.evaluate(async H => {
       await fetch('/api/auth/login', { method: 'POST', headers: H, body: JSON.stringify({ email: 'tech@example.com', password: 'demo1234' }) });
-      const o = (await (await fetch('/api/tech/orders', { headers: H })).json()).orders.find(x => x.household === '林女士家');
+      const o = (await (await fetch('/api/tech/orders', { headers: H })).json()).orders.find(x => x.household === '林媽媽家');
       await fetch(`/api/tech/orders/${o.id}/diffs`, { method: 'POST', headers: H, body: JSON.stringify({ pin_id: 'D1', level: '輕微', text: '浴室門是推拉門，門窗感測器改用側裝支架', photo: true }) });
       await fetch('/api/auth/logout', { method: 'POST', headers: H });
     }, H);

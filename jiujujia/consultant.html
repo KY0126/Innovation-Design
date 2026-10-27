@@ -178,7 +178,7 @@ function vWb(){const h=ST.home,k=h.kpi,ho=handoffs(),P=cases();
  <div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量即時串接各端資料，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
  <div class="grid">
   <div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
-  <div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map((x,i)=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。可在消費者端「選改善方式」後按「交給生活顧問整合報價」。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林女士家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>
+  <div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map((x,i)=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。可在消費者端「選改善方式」後按「交給生活顧問整合報價」。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林媽媽家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>
   <div class="panel"><div class="ph">新進案件與 AI 分析 <small>未查看優先</small></div><div class="pb">${P.map(p=>row(p,stage(p)[0],`<span class="tag ${stage(p)[1]}">${stage(p)[0].split('｜')[0]}</span>`)).join('')}</div></div>
   <div class="panel"><div class="ph">售後與待補充現場資訊</div><div class="pb">${(ST.todos.requests||[]).map(r=>`<div class="item"><span class="t"><b>${esc(r.household)}</b>｜${esc(r.kind)}<div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')}${(ST.todos.care||[]).map(c=>`<div class="item"><span class="t"><b>${esc(c.household)}</b>｜${esc(c.title)}<div class="s">${esc(c.when)}｜${esc(c.outcome)}</div></span><span class="tag ok">事後關心</span></div>`).join('')}</div></div>
  </div>`}
@@ -240,7 +240,7 @@ function tConfirm(p){const pl=p.plan||{},pv=p.pv||{};const vs=p.versions||[];
  <tr><th>確認狀態</th><td>${pl.status==='已確認'?'<span class="tag ok">長輩本人已確認</span>':'<span class="tag am">待長輩到門市確認</span>'}</td></tr>
  <tr><th>確認時間</th><td>${esc(pl.confirmed_at||'—')}</td></tr><tr><th>方案圖面</th><td>${pv.ver?`v${pv.ver}｜${esc(pv.status)}<div class="sm mu">${esc(pv.reason||'')}</div>`:'—'}</td></tr>
  <tr><th>必要文件</th><td>影像確認版需長輩書面同意（本案為無鏡頭版）</td></tr><tr><th>施工前置</th><td>改造工程需到府估價；需事前核准的補助，核准前不施工</td></tr></table>
- <p class="mu sm">長輩不同意，子女不能代為下單。</p></div></div>
+ <p class="mu sm">長輩不同意，家人不能代為下單。</p></div></div>
  <div class="panel"><div class="ph">圖面版本紀錄</div><div class="pb">${vs.length?vs.map(v=>`<div class="ver"><b>v${v.ver}</b>｜${esc(v.status)}<div class="sm mu">${esc(v.reason||'')}</div></div>`).join(''):'<div class="mu">—</div>'}</div></div></div>`}
 function pins(p,pk){const L=((p.pv||{}).pins||[]).filter(x=>x.pkg===pk);return [L.filter(x=>x.st==='done').length,L.length]}
 function tWork(p){const PV=(p.pv||{}).pins||[],ch=chosen(p.household_id).filter(i=>/簡易施工|改造工程/.test(i.t)),O=ST.pkOpen||(ST.pkOpen={});
@@ -254,6 +254,7 @@ function tWork(p){const PV=(p.pv||{}).pins||[],ch=chosen(p.household_id).filter(
   ['A','關懷設備','全國電子技師',an?`${ad}／${an} 完成`:'—',pinRows('A')],
   ['V','長輩逐區驗收','技師陪同',acc?'已驗收':'等待',['臥室','走道','浴室','玄關'].map(r=>(acc?'<span class="ok">✓ ':'<span class="no">○ ')+r+'</span>').join('<br>')+'<br><span class="no">長輩說有問題就退回相關項目</span>']];
  return `<div class="panel"><div class="ph">工作包與施工順序 <small>需要動工的項目由協力工班先完成，全國電子技師再安裝設備</small></div><div class="pb">
+ <div class="item" style="border:1px dashed #C42D5A;border-radius:6px;padding:6px 8px;margin-bottom:8px"><span class="t"><b>AI 推薦人力</b><div class="s">依時段與地區，推薦這週有空的協力工班「示範地坪 C」與全國電子技師「吳技師」，同一天先施工、後安裝，一次到府</div></span><span class="sm mu">示範資料</span></div>
  <div class="jh">${st.map(x=>`<div class="s ${x}"><i></i></div>`).join('')}</div>
  <div class="wk">${C.map(([k,n,team,tg,body],i)=>`<div class="pk${O[k]?' open':''}"><b>${n}</b><button class="tg" data-pk="${k}" aria-expanded="${!!O[k]}">${O[k]?'收合 ▴':'明細 ▾'}</button><div class="sm">${team}</div><span class="${T[st[i]]}" style="margin-top:6px;display:inline-block">${tg}</span>${O[k]?`<div class="acc">${body}</div>`:''}</div>`).join('')}</div>
  <p class="mu sm" style="margin-top:10px">前置工作未完成時，後續工單顯示等待；支援待料、延期、客戶改期與異常。技師現場差異回報後由顧問核准，顧問不能覆蓋技師的原始核對紀錄。</p></div></div>`}
@@ -265,7 +266,7 @@ function tAfter(p){const hid=p.household_id,s=SUB[hid]||{};const rq=(ST.todos.re
  <p class="mu sm">生活顧問協助轉介，不代辦、不保證核准；需事前核准的工程，核准前不派工。</p></div></div>
  <div class="panel"><div class="ph">驗收、保固與後續需求</div><div class="pb">${rq.map(r=>`<div class="item"><span class="t"><b>${esc(r.kind)}</b><div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')||'<div class="mu">目前沒有售後需求。</div>'}
  <div class="item"><span class="t">設備保固</span><span class="tag gray">依商品保固</span></div><div class="item"><span class="t">協力工班施工保固</span><span class="tag gray">協力工班書面保固</span></div></div></div></div>`}
-function vProd(){ST.hid=ST.hid||3;return `<div class="note" style="margin-bottom:12px">以林女士家為例；實際操作請從「案件管理」進入個案。</div>${tProd()}<div style="height:12px"></div>${tOpt(ST.plans[3])}`}
+function vProd(){ST.hid=ST.hid||3;return `<div class="note" style="margin-bottom:12px">以林媽媽家為例；實際操作請從「案件管理」進入個案。</div>${tProd()}<div style="height:12px"></div>${tOpt(ST.plans[3])}`}
 function vQuoteList(){return `<div class="panel"><div class="ph">報價總覽</div><div class="pb">${cases().map(p=>{const L=quotes(p.household_id);return `<button class="item" data-case="${p.household_id}" data-tabgo="5"><span class="t"><b>${esc(p.household)}</b><div class="s">${L.length?`最新 v${L[0].v}｜NT$${L[0].total.toLocaleString()}`:'尚未送出報價'}</div></span><span class="tag ${L.length?'ok':'gray'}">${L.length?L.length+' 個版本':'待報價'}</span></button>`}).join('')}</div></div>`}
 function vSched(){return cases().filter(p=>p.phase>=3).map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tWork(p)}</div>`).join('')}
 function vAfter(){return cases().map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tAfter(p)}</div>`).join('')}

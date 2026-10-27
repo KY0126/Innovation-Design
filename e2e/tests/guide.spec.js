@@ -77,14 +77,14 @@ test('導覽全部步驟跨 App 與企業管理端走完：每步編號框都找
   expect(seen.size, '導覽每一步都有走到').toBe(require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8').match(/^\s+[A-Z]\(\{ ch:/gm).length);
   // ---- 資料串接 ----
   // 工單編號含日期（W-年月日-序號），改用家庭＋類型找，避免跨日或時區不同對不到
-  const W = s => s.wo.orders.find(o => o.household === '林女士家' && o.kind === '到府安裝' && /^W-\d{8}-06$/.test(o.code));
+  const W = s => s.wo.orders.find(o => o.household === '林媽媽家' && o.kind === '到府安裝' && /^W-\d{8}-06$/.test(o.code));
   // ① 消費者端送出 → 生活顧問端「待整合報價」收到
   expect(S.handoff.length, '消費者端送出的改善選擇有存下來').toBeGreaterThan(0);
   expect(S.handoff[0].items.map(i => i.space).join('、'), '交付內容含走道與浴室').toMatch(/走道.*浴室|浴室.*走道/);
   expect(ui.kpiQuote, '生活顧問端「今天」看得到待整合報價').toMatch(/待整合報價\s*[1-9]/);
   expect(ui.handoffNote, '生活顧問端報價頁顯示家庭交付內容').toBeGreaterThan(0);
   // ② 企業管理端派的工單 → 技師端今日工單
-  expect(ui.techCard, '吳技師今日工單是林女士家').toContain('林女士');
+  expect(ui.techCard, '吳技師今日工單是林媽媽家').toContain('林媽媽');
   // ③ 技師回報差異 → 生活顧問端待審差異 +1、工單多一筆差異
   expect(S.diff.adv.kpi.review - S.start.adv.kpi.review, '生活顧問待審差異 +1').toBe(1);
   expect((W(S.diff).diffs || []).length - (W(S.start).diffs || []).length, '工單差異紀錄 +1').toBe(1);

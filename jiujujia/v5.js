@@ -33,7 +33,7 @@
       ] }
   };
   const LC = { r: ['紅燈', '#C42D5A'], y: ['黃燈', '#E0A030'], g: ['綠燈', '#138F3B'] };
-  const ST = Object.assign({ sp: 'hall', sel: {}, ok: {}, style: {}, combo: 'fast', more: false, pct: 50, view: 'ar', door: {} }, LSX.get('jjj_v5_opt2') || {});
+  const ST = Object.assign({ sp: 'hall', sel: {}, ok: {}, style: {}, combo: 'fast', more: false, pct: 50, view: 'ar', door: {}, mount: 'tape' }, LSX.get('jjj_v5_opt2') || {});
   const save = () => LSX.set('jjj_v5_opt2', ST);
   const optOf = (sp, id) => SP[sp].opts.find(o => o.id === id);
   const cur = sp => optOf(sp, ST.sel[sp] || SP[sp].combo.fast);
@@ -85,14 +85,19 @@
       ${o.note ? `<div class="muted" style="font-size:.82em;margin:2px 0 0 26px">${e(o.note)}</div>` : ''}${fl}</div>`;
   }
 
+  // 安裝方式：AI 依門框材質推薦，由家人選定（技師照著做）
+  const MOUNT = { tape: { n: '背膠固定，不鑽孔', d: '門框為鋁框，AI 推薦；可完整撕除、不留孔', rec: 1 }, drill: { n: '鑽孔固定', d: '較牢固，但會在門框留下孔洞' } };
+  const mountCard = () => `<div class="card"><b>安裝方式</b><span class="muted" style="font-size:.82em">　AI 依門框材質推薦，你來決定</span>
+    ${Object.keys(MOUNT).map(k => { const m = MOUNT[k], on = ST.mount === k; return `<div class="v5o ${on ? 'on' : ''}" role="radio" tabindex="0" aria-checked="${on}" data-v5mount="${k}" style="width:100%;margin:8px 0 0;border:1px solid var(--line);border-radius:10px;padding:8px 10px${on ? ';border:2px solid var(--brand)' : ''}"><span class="rd"></span><b>${e(m.n)}</b>${m.rec ? '<span class="v5rec">AI 推薦</span>' : ''}<div class="muted" style="font-size:.84em;margin:2px 0 0 26px">${e(m.d)}</div></div>`; }).join('')}</div>`;
+
   // ---------- 1 看結果 ----------
   J.V.optA = function () {
     const L = lights(), red = L.filter(x => x[1] === 'r').length, yel = L.filter(x => x[1] === 'y').length, grn = L.length - red - yel;
     const need = Object.keys(SP), done = need.filter(k => ST.ok[k]);
-    return `${CSS}${J.hdr('林女士家｜居家安全檢核')}<div class="scroll" style="padding-top:10px">
+    return `${CSS}${J.hdr('林媽媽家｜居家安全檢核')}<div class="scroll" style="padding-top:10px">
       <div class="card"><div class="muted" style="font-size:.88em">全國電子 AI 顧問阿國評估</div><div style="font-size:1.45em;font-weight:900;margin:2px 0"><span style="color:var(--brand)">${red + yel}</span> 個地方建議處理</div>
         <div class="muted" style="font-size:.88em"><span style="color:${LC.r[1]}">●</span> 紅燈 ${red}　<span style="color:${LC.y[1]}">●</span> 黃燈 ${yel}　<span style="color:${LC.g[1]}">●</span> 綠燈 ${grn}</div></div>
-      ${J.cmpPlan ? J.cmpPlan('v5a', { L, pins: J.DPINS({ night: 1 }, 2), path: true, title: '居家安全地圖' }) : ''}
+      ${J.cmpPlan ? J.cmpPlan('v5a', { L, pins: J.DPINS({ night: 1 }, 2), path: true, title: '2D 平面圖｜居家安全地圖' }) : ''}
       <div class="card" style="padding:4px 14px">
         ${need.map(k => { const s = SP[k], o = ST.ok[k] ? cur(k) : null; return `<button class="v5sp" data-v5go="${k}"><span class="v5dot" style="background:${LC[s.l][1]}"></span><span style="flex:1"><b>${s.n}</b><div class="muted" style="font-size:.86em">${o ? '已選：' + e(o.n) + ' → <span style="color:' + LC[o.r][1] + '">' + LC[o.r][0] + '</span>' : e(s.why) + (s.more ? '、' + e(s.more) : '')}</div></span><span class="muted">›</span></button>`; }).join('')}
         <div class="v5sp" style="cursor:default"><span class="v5dot" style="background:${LC.g[1]}"></span><span style="flex:1"><b>其他 ${grn} 個空間</b><div class="muted" style="font-size:.86em">沒有明顯風險</div></span></div></div>
@@ -107,13 +112,14 @@
     const main = S0.opts.filter(x => !x.more), more = S0.opts.filter(x => x.more);
     const pins = J.DPINS({ night: 1 }, sp === 'bath' && o.ramp ? 0 : 2);
     return `${CSS}${J.hdr(S0.n)}<div class="scroll" style="padding-top:0">
-      <div class="card" style="padding:0;overflow:hidden;margin-top:10px"><div style="display:flex;justify-content:center;padding:8px"><span class="seg" style="width:170px"><button data-v5view="ar" aria-pressed="${ST.view === 'ar'}">實景</button><button data-v5view="3d" aria-pressed="${ST.view === '3d'}">3D 夜間</button></span></div>
+      <div class="card" style="padding:0;overflow:hidden;margin-top:10px"><div style="display:flex;justify-content:center;padding:8px"><span class="seg" style="width:200px"><button data-v5view="ar" aria-pressed="${ST.view === 'ar'}">實景</button><button data-v5view="3d" aria-pressed="${ST.view === '3d'}">3D 居家模型</button></span></div>
         ${ST.view === 'ar' ? scene(sp, o, ST.pct) : ''}</div>
-      ${ST.view === '3d' && J.cmpPlan ? J.cmpPlan('v5b', { L: lights(), pins, path: true, title: '3D 夜間：夜燈亮起的範圍' }) : ''}
+      ${ST.view === '3d' && J.cmpPlan ? J.cmpPlan('v5b', { L: lights(), pins, path: true, title: '3D 居家模型：夜燈亮起的範圍' }) : ''}
       <div class="pad"><b style="color:${LC[S0.l][1]}">● ${LC[S0.l][0]}</b>・<b>${e(S0.why)}</b><div class="muted" style="font-size:.88em">${e(S0.risk)}</div></div>
       <div class="pad" style="padding-top:0;padding-bottom:0"><span class="seg">${[['fast', '最快轉綠'], ['cheap', '最省錢'], ['nodrill', '不鑽孔']].map(([k, n]) => `<button data-v5combo="${k}" aria-pressed="${ST.combo === k}">${n}</button>`).join('')}</span></div>
       ${main.map(x => optRow(sp, x)).join('')}
       ${ST.more ? more.map(x => optRow(sp, x)).join('') : `<div class="pad" style="padding-top:0;text-align:center"><button class="muted" data-v5more style="text-decoration:underline">更多選擇：免費調整${sp === 'bath' ? '、浴室門' : ''}、不處理</button></div>`}
+      ${sp === 'hall' && /全國|簡易/.test(o.t) ? mountCard() : ''}
       <div class="muted" style="font-size:.8em;padding:0 16px">價格與工期為示範資料；改造工程需到府估價，正式以生活顧問報價為準。</div>
       <div class="v5bar"><div class="r"><span>${e(S0.n)} <span style="color:${LC[S0.l][1]}">${LC[S0.l][0]}</span> → <b style="color:${LC[o.r][1]}">${LC[o.r][0]}</b></span><b>${o.lv ? PR[o.lv] : '免費'}</b></div>
         <button class="btn" data-v5ok>確定這個方式</button></div></div>`;
@@ -126,11 +132,13 @@
     const all = picks.concat(extra), lv = Math.max(...all.map(([, o]) => o.lv)), est = all.some(([, o]) => o.est);
     const allGreen = picks.every(([, o]) => o.r === 'g');
     const sel = J.S.hh && J.S.hh.plan ? J.S.hh.plan.sel : { night: 1 };
-    return `${CSS}${J.hdr('改善方案｜林女士家')}<div class="scroll" style="padding-top:10px">
+    return `${CSS}${J.hdr('改善方案｜林媽媽家')}<div class="scroll" style="padding-top:10px">
       ${J.cmpPlan ? J.cmpPlan('v5c', { L: lights(), pins: J.DPINS(sel && sel.night ? sel : { night: 1 }, picks.find(([k]) => k === 'bath')[1].ramp ? 0 : 2), path: true, title: '全屋改善前後（示意）' }) : ''}
       <div class="card"><b>已選的改善方式</b>${all.map(([k, o]) => `<div class="row"><span><span class="v5chip">${/簡易施工|改造工程/.test(o.t) ? '協力工班' : /全國/.test(o.t) ? '全國電子' : o.t === '免費調整' ? '自行調整' : '—'}</span>${e(SP[k].n)}｜${e(o.n)}</span><span class="muted" style="font-size:.85em">${e(o.d)}</span></div>`).join('')}
+        <div class="row"><span><span class="v5chip">安裝方式</span>${e(MOUNT[ST.mount].n)}</span><span class="muted" style="font-size:.85em">家人選定</span></div>
         <div class="row"><span>六個空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
-        <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由協力工班先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div></div>
+        <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由協力工班先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div>
+        <div class="muted" style="font-size:.8em;margin-top:4px">計價方式：設備與長輩關懷月費以場域計價；地板、門檻等工程依 AR 量出的尺寸計價（地板按坪、燈條按公尺），由協力工班報價、生活顧問整合。</div></div>
       <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '協力工班先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
         <div class="muted" style="font-size:.82em;margin-top:6px">長輩本人同意才成交；先施工、再安裝設備。協力工班施工附書面保固；符合資格者可申請長照居家無障礙改善補助，生活顧問協助轉介 1966，不保證核准。</div></div>
       <div class="muted" style="font-size:.8em;padding:0 16px">燈號只協助排序、不取代專業評估；對比為示意、不是施工圖。</div>
@@ -149,7 +157,8 @@
   // ---------- 互動 ----------
   const keepScroll = fn => { const sc = document.querySelector('.scroll'), y = sc ? sc.scrollTop : 0; fn(); const s2 = document.querySelector('.scroll'); if (s2) s2.scrollTop = y; };
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-v5go],[data-v5opt],[data-v5style],[data-v5combo],[data-v5more],[data-v5view],[data-v5ok],[data-v5toC],[data-v5handoff]'); if (!t) return;
+    const t = ev.target.closest('[data-v5go],[data-v5opt],[data-v5style],[data-v5combo],[data-v5more],[data-v5view],[data-v5ok],[data-v5toC],[data-v5handoff],[data-v5mount]'); if (!t) return;
+    if (t.dataset.v5mount) { ST.mount = t.dataset.v5mount; save(); keepScroll(J.render); return; }
     if (t.dataset.v5go) { ST.sp = t.dataset.v5go; ST.more = false; ST.pct = 50; save(); go('opt'); return; }
     if (t.dataset.v5style) { const [id, n] = t.dataset.v5style.split('|'); ST.style[id] = n; ev.stopPropagation(); save(); keepScroll(J.render); return; }
     if (t.dataset.v5opt) { const [sp, id] = t.dataset.v5opt.split('|'); const o = optOf(sp, id); if (o.door) { ST.door = ST.door.on && ST.door.id === id ? { on: false } : { on: true, id }; } else ST.sel[sp] = id; save(); keepScroll(J.render); return; }
@@ -162,7 +171,8 @@
       const items = Object.keys(SP).map(k => { const o = cur(k); return { space: SP[k].n, type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: SP[k].l, to: o.r, style: o.floor ? (ST.style[o.id] || FLOORS[o.floor].s[0][0]) : null }; });
       if (ST.door.on) { const o = optOf('bath', ST.door.id); items.push({ space: '浴室門', type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: 'y', to: o.r, style: null }); }
       const all = LSX.get('jjj_v5_handoff') || []; const d = new Date(), pad = n => String(n).padStart(2, '0');
-      all.unshift({ household: '林女士家', from: '陳小姐', at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`, items });
+      items.push({ space: '安裝方式', type: '全國電子安裝', name: MOUNT[ST.mount].n, price: '—', days: '—', by: '家人選定', est: false, from: 'g', to: 'g', style: null });
+      all.unshift({ household: '林媽媽家', from: '陳小姐', at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`, items });
       LSX.set('jjj_v5_handoff', all.slice(0, 5));
       J.toast('已交給生活顧問王小明，報價完成後通知你');
       const st = J.S.stack, i = st.indexOf('optA'); if (i >= 0) { J.S.stack = st.slice(0, i); J.render(); }

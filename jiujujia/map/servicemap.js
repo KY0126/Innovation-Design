@@ -291,7 +291,7 @@ export function mountServiceMap(root, opt = {}) {
         ${s.code === '04129' ? '<button class="smgo" data-sm="enter">進入逢甲店街區 ›</button>' : ''}</div></div>`; }
     if (k === '04129') return `<div class="smcard"><div class="smph">Digital City 逢甲店${x}<small>大型門市・Digital City｜試點</small></div><div class="smpb"><div class="mu">街區內白色房子是示範系統裡的真實家庭，號碼對應右側清單；米色房子是背景。</div></div></div>`;
     const r = allRows().find(r => r.key === k); if (!r) return ''; const real = r.real, L = S.live, rem = (L.rem || []).filter(y => y.household_id === real.id), wo = (L.wo || []).filter(o => o.household_id === real.id && o.status !== '已完成');
-    return `<div class="smcard"><div class="smph"><span class="nb" style="--c:${HSC[r.st][0]}">${r.no}</span>${esc(real.name)}${x}<small>${HSC[r.st][1]}｜${esc(r.sub)}</small></div><div class="smpb"><div class="kv"><span>長輩</span><b>${esc(real.elder_note || '—')}</b></div><div class="kv"><span>子女帳號</span><b>${esc(real.owner)}</b></div>
+    return `<div class="smcard"><div class="smph"><span class="nb" style="--c:${HSC[r.st][0]}">${r.no}</span>${esc(real.name)}${x}<small>${HSC[r.st][1]}｜${esc(r.sub)}</small></div><div class="smpb"><div class="kv"><span>長輩</span><b>${esc(real.elder_note || '—')}</b></div><div class="kv"><span>家人帳號</span><b>${esc(real.owner)}</b></div>
       ${wo.map(o => `<div class="kv"><span>${esc(o.kind)}</span><b>${esc(o.status)}${o.label && o.label !== '待排程' ? '｜' + esc(o.label) : ''}</b></div>`).join('')}
       ${rem.map(y => `<div class="kv"><span>${esc(y.device)}｜${esc(y.kind)}</span><b>${esc(y.status)}</b></div>`).join('')}
       <button class="smgo" data-sm="draft" data-id="${real.id}">建立維護工單草稿</button><div class="mu">草稿送到生活顧問，確認時段後派工；地址只有負責顧問與技師看得到</div></div></div>`;

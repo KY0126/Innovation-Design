@@ -1,13 +1,13 @@
 # 創新思考與設計
 
-團隊「五子登科」的課程提案、「設計思考流程與九大工具」與可操作原型。
+團隊「五子登科」的課程提案、「設計思考流程與十大工具」與可操作原型。
 
 ## 全國電子．揪居家（2026 InnoConnect+）
 
 | 項目 | 連結 |
 |---|---|
 | Demo 影片 | https://ky0126.github.io/Innovation-Design/demo |
-| 設計思考流程與九大工具 | `/dt`（`jiujujia/design-thinking/`） |
+| 設計思考流程與十大工具 | `/dt`（`jiujujia/design-thinking/`） |
 | 揪居家 App（手機） | `/app`（`jiujujia/app.html`）：家庭、生活顧問、技師同一個登入頁，依帳號身分分流；手機掃碼開啟後可「加入主畫面」 |
 | 企業管理端（電腦版） | `/admin`（`jiujujia/admin.html`）：總部與門市主管；生活顧問在門市電腦用 `/consultant`（`jiujujia/consultant.html`） |
 | 舊網址 | `/consumer`、`/technician` 導向揪居家 App；`/consultant` 仍為生活顧問電腦版 |
