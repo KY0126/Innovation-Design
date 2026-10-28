@@ -50,7 +50,7 @@ Innovation-Design/
 │   ├── home/                 App 首頁仿全國電子 App 的畫面素材
 │   ├── map/                  服務地圖（geo.js 行政區、stores.js 門市、servicemap.js 繪製）
 │   ├── vendor/               three.js（3D 居家模型）與授權
-│   └── design-thinking/      揪居家設計思考流程與十大工具（index.html、10 頁 JPG、PDF）
+│   └── design-thinking/      揪居家設計思考流程與十大工具（index.html、13 頁 JPG、PDF；一個工具一頁）
 ├── e2e/                      Playwright 端到端測試（見 e2e/README.md）
 └── .github/workflows/e2e.yml 推送到 main 時自動跑 e2e 測試
 ```
