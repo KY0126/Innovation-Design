@@ -6,7 +6,7 @@
 
 | 項目 | 連結 |
 |---|---|
-| Demo 影片 | `/demo`（`demo.html`）：v13（台灣口音配音），3:40，含字幕（SRT 可下載） |
+| Demo 影片 | `/demo`（`demo.html`）：v13（台灣口音配音、精簡版），2:40，含字幕（SRT 可下載） |
 | 設計思考流程與十大工具 | `/dt`（`jiujujia/design-thinking/`） |
 | 揪居家 App（手機） | `/app`（`jiujujia/app.html`）：家庭、生活顧問、技師同一個登入頁，依帳號身分分流；手機掃碼開啟後可「加入主畫面」 |
 | 企業管理端（電腦版） | `/admin`（`jiujujia/admin.html`）：總部與門市主管；生活顧問在門市電腦用 `/consultant`（`jiujujia/consultant.html`） |
@@ -35,7 +35,7 @@ Innovation-Design/
 ├── .nojekyll                 讓 GitHub Pages 原樣發布（不經 Jekyll）
 ├── demo/
 │   ├── index.html            /demo/ 轉址回 demo.html
-│   ├── jiujujia_demo_v13.mp4 Demo 影片 v13（3:40，台灣口音配音）
+│   ├── jiujujia_demo_v13.mp4 Demo 影片 v13（2:40，台灣口音配音）
 │   ├── jiujujia_demo_v13.srt 字幕
 │   └── poster.jpg            影片封面
 ├── jiujujia/                 原型本體
