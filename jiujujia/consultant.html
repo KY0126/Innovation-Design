@@ -79,6 +79,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
 @media (max-width:860px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;overflow-x:auto;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:52px;z-index:4}
  .mtabs button{white-space:nowrap;border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:13px}.mtabs button[aria-current="page"]{background:var(--brand);color:#fff;border-color:var(--brand)}
  main{padding:12px}.proto{margin-left:0}}
+.certs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.cert{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line,#E7E2E4);border-radius:10px;padding:10px 12px}.cert b{font-size:14px}.cert .mu{font-size:12px}.cert.adv{background:#FBEFF3}@media (max-width:1100px){.certs{grid-template-columns:repeat(2,minmax(0,1fr))}}.tips{margin:0;padding-left:18px;display:grid;gap:8px}.tips b{margin-right:8px;color:var(--brand,#C42D5A)}
 </style>
 <style>
 #cGate{position:fixed;inset:0;z-index:9000;background:#ECE7E3;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -172,10 +173,18 @@ function render(){nav();const T={wb:'顧問工作台',cases:'案件管理',prod:
  document.getElementById('title').textContent=T[ST.view]||'';const v=document.getElementById('view');
  v.innerHTML=ST.view==='case'?vCase():ST.view==='wb'?vWb():ST.view==='cases'?vCases():ST.view==='prod'?vProd():ST.view==='quote'?vQuoteList():ST.view==='sched'?vSched():vAfter()}
 function row(p,sub,tag){return `<button class="item" data-case="${p.household_id}"><span class="t"><b>${esc(p.household)}</b>｜${esc(p.elder_name)}　<span class="s">${esc(sub||'')}</span></span>${tag||''}<span class="mu">›</span></button>`}
+
+// 生活顧問的居安規劃認證（取自教育訓練系統，示意）與接案說明提示
+function certCard(){const C=[['情境模板與相容性','依場域選設備、檢查相容與安裝限制'],['長輩溝通與陪同模式','用長輩聽得懂的話說明，尊重本人決定'],['隱私與同意','預設不裝鏡頭；長輩本人同意才成交'],['異常處理流程','先問長輩、再依序通知家人']];
+ return `<div class="panel" style="margin-bottom:14px"><div class="ph">我的居安規劃認證 <small>取自既有教育訓練系統（示意）｜四門基礎課通過後才能接案</small></div><div class="pb"><div class="certs">${C.map(([n,d])=>`<div class="cert"><span class="tag ok">已完成</span><b>${n}</b><span class="mu">${d}</span></div>`).join('')}<div class="cert adv"><span class="tag">進階課</span><b>跌倒風險辨識、評估表與量測</b><span class="mu">已完成｜可帶家人看 AR 量測結果</span></div></div></div></div>`}
+const TIPS={'鞋櫃移出走廊':'走道先清空，夜裡起身就不會撞到東西，這項家人自己就能做。','感應夜燈':'走道偏暗，媽媽夜裡起床看不清楚，所以先裝感應夜燈，人一走過就亮。','止滑卡扣地板（淺橡木）':'卡扣地板不用拆舊地板，止滑又能復原，工班半天就做完。','斜坡墊＋止滑地墊':'浴室門檻 2 公分，加斜坡墊就不容易踢到，磁磚地也比較不滑。','木製斜坡＋地面止滑':'木製斜坡比較穩，地面另做止滑，由協力工班施工並提供書面保固。','移除門檻、更換止滑磁磚':'這項會動到防水層，要先到府估價，費用會另出新版本報價。','防夾門擋':'門擋可避免門突然關上夾到手。','可從外側解鎖的把手':'萬一媽媽在浴室跌倒擋住門，家人也能從外面打開。','改為外開門或橫拉門':'改門要先到府估價；如果是租屋，需要房東同意。'};
+function tips(p){const items=chosen(p.household_id);
+ return `<div class="panel" style="margin-top:12px"><div class="ph">向家人說明提示 <small>情境模板自動帶出；顧問確認後照著說即可</small></div><div class="pb"><ul class="tips">${items.map(i=>`<li><b>${esc(i.sp)}｜${esc(i.n)}</b>${esc(TIPS[i.n]||'')}</li>`).join('')}
+ <li><b>鏡頭</b>揪夜安預設不裝鏡頭，要不要加裝由林媽媽本人決定。</li><li><b>費用</b>設備與設定費一次付清，月費 299 元起，兄弟姊妹可以分攤。</li><li><b>成交</b>報價要林媽媽本人在 App 大字確認，才算成交。</li></ul></div></div>`}
 function vWb(){const h=ST.home,k=h.kpi,ho=handoffs(),P=cases();
  const by=s=>P.filter(p=>stage(p)[0].startsWith(s));
  return `<div class="kpis">${[['今日預約',(h.consults||[]).length],['待查看 AI 分析',by('新進').length],['待整合報價',ho.length],['待長輩確認',by('待長輩').length],['待施工排程',by('待施工').length+by('施工中').length],['售後待處理',(ST.todos.requests||[]).length+(ST.todos.care||[]).length]].map(([l,n])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${n}</div></div>`).join('')}</div>
- <div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量即時串接各端資料，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
+ ${certCard()}<div class="note" style="margin-bottom:14px">依期限與優先順序排序；數量即時串接各端資料，家庭交付的改善選擇與報價版本暫存在這台瀏覽器（原型）。</div>
  <div class="grid">
   <div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
   <div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map((x,i)=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。可在消費者端「選改善方式」後按「交給生活顧問整合報價」。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林媽媽家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>
@@ -224,7 +233,8 @@ function tProd(){const st=LS.get('jjj_v5_opt',{style:{}}).style||{};return `<div
  ${[['止滑卡扣地板（簡易施工）',[['淺橡木','#D8B888'],['深胡桃','#6B4A33'],['灰木紋','#A39E95']],'h_part'],['止滑磁磚（改造工程）',[['霧面灰','#A9ABAE'],['木紋','#C08A55'],['米白','#E8E1D2']],'b_eng']].map(([n,L,id])=>`<div style="margin-bottom:10px"><b>${n}</b><div style="display:flex;gap:12px;margin-top:6px">${L.map(([s,c])=>`<span style="text-align:center;font-size:12px"><span style="display:block;width:38px;height:38px;border-radius:50%;background:${c};margin:0 auto 3px;${(st[id]||L[0][0])===s?'outline:3px solid var(--brand);outline-offset:2px':''}"></span>${s}</span>`).join('')}</div></div>`).join('')}
  <p class="mu sm">家庭在 App 選的款式會帶到這裡；實際色差以門市樣品為準。</p></div></div></div>`}
 function quotes(hid){return QUO[hid]||(QUO[hid]=[])}
-function tQuote(p){const hid=p.household_id,items=chosen(hid),L=quotes(hid),pl=p.plan||{};
+function tQuote(p){return tQuote0(p)+tips(p)}
+function tQuote0(p){const hid=p.household_id,items=chosen(hid),L=quotes(hid),pl=p.plan||{};
  const dev=pl.one_time||5900,known=items.filter(i=>!i.est).reduce((a,b)=>a+(b.p||0),0),pend=items.filter(i=>i.est);
  const ho=handoffs()[0];
  return `${ho&&hid===3?`<div class="note" style="margin-bottom:12px">家庭交付（${esc(ho.at)}）：${ho.items.map(i=>esc(i.space+'｜'+i.type+'：'+i.name+(i.style?'（'+i.style+'）':''))).join('、')}</div>`:''}
