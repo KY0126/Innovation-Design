@@ -30,6 +30,38 @@
         { id: 'b_door2', t: '簡易施工', n: '浴室門｜可從外側解鎖的把手', p: '一到三千元', lv: 2, d: '半天', by: '協力工班', r: 'y', note: '長輩若在浴室跌倒擋住門，家人可從外側開門', more: 1, door: 1 },
         { id: 'b_door3', t: '改造工程', n: '浴室門｜改外開門或橫拉門', p: '三千元以上', lv: 3, d: '約 1–3 天', by: '需到府估價', r: 'y', est: 1, more: 1, door: 1 },
         { id: 'b_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留黃燈與風險說明', more: 1 }
+      ] },
+    kit: { n: '廚房', opt: 1, zone: '揪食光', l: 'g', why: '', risk: '忘記關火容易釀成火災；沒開伙也可能代表長輩身體不舒服。',
+      combo: { fast: 'k_ih', cheap: 'k_free', nodrill: 'k_ih' },
+      opts: [
+        { id: 'k_ih', t: '全國電子安裝', n: '定時電磁爐（1～240 分鐘定時）', p: '一到三千元', lv: 2, d: '當天', by: '全國電子配送', r: 'g', rec: 1, note: '不用明火，時間到自動關' },
+        { id: 'k_gas', t: '全國電子安裝', n: '換防乾燒瓦斯爐', p: '約 3 千元以上', lv: 3, d: '當天', by: '原廠安裝', r: 'g', note: '鍋子燒乾會自動熄火' },
+        { id: 'k_free', t: '免費調整', n: '常用鍋具、調味料移到腰到肩之間', p: '免費', lv: 0, d: '當天', by: '家人自行調整', r: 'y', note: '不必墊腳，但忘記關火的問題還在', more: 1 },
+        { id: 'k_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留燈號與風險說明', more: 1 }
+      ] },
+    ldy: { n: '陽台', opt: 1, zone: '揪清爽', l: 'g', why: '', risk: '屋外式熱水器裝在加窗陽台，通風不良時可能一氧化碳中毒。',
+      combo: { fast: 'l_eng', cheap: 'l_free', nodrill: 'l_free' },
+      opts: [
+        { id: 'l_eng', t: '改造工程', n: '熱水器遷移或換強制排氣型', p: '約 3 千元以上', lv: 3, d: '約 1 天', by: '需消防局評估、合格技術士', r: 'g', est: 1, sub: 1, rec: 1, note: '部分縣市有熱水器遷移補助' },
+        { id: 'l_dry', t: '全國電子安裝', n: '電動曬衣機（附 LED 燈）', p: '約 3 千元以上', lv: 3, d: '當天', by: '全國電子技師', r: 'y', note: '不用踮腳曬衣，但熱水器問題還在', more: 1 },
+        { id: 'l_free', t: '免費調整', n: '熱水器使用時開窗', p: '免費', lv: 0, d: '當天', by: '家人自行調整', r: 'y', note: '靠記得開窗，仍建議加購一氧化碳警報器', more: 1 },
+        { id: 'l_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'r', note: '保留燈號與風險說明', more: 1 }
+      ] },
+    liv: { n: '客廳', opt: 1, zone: '揪團聚', l: 'g', why: '', risk: '夏天不開冷氣容易熱傷害；白天在客廳跌倒也可能沒人發現。',
+      combo: { fast: 'v_ac', cheap: 'v_ac', nodrill: 'v_ac' },
+      opts: [
+        { id: 'v_ac', t: '全國電子安裝', n: '冷氣定時與溫度設定＋室溫提醒', p: '免費', lv: 0, d: '當天', by: '全國電子技師', r: 'g', rec: 1, note: '搭配揪團聚溫濕度感測，太熱先語音提醒' },
+        { id: 'v_rail', t: '簡易施工', n: '沙發旁扶手', p: '一到三千元', lv: 2, d: '半天', by: '協力工班', r: 'g', sub: 1, note: '起身有地方扶' },
+        { id: 'v_free', t: '免費調整', n: '延長線沿牆收好、雜物移走', p: '免費', lv: 0, d: '當天', by: '家人自行調整', r: 'y', more: 1 },
+        { id: 'v_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留燈號與風險說明', more: 1 }
+      ] },
+    door: { n: '門口', opt: 1, zone: '揪回家', l: 'g', why: '', risk: '站著彎腰穿鞋容易跌倒；夜間出門或緊急時救援進不了門。',
+      combo: { fast: 'd_rail', cheap: 'd_ramp', nodrill: 'd_ramp' },
+      opts: [
+        { id: 'd_rail', t: '簡易施工', n: '玄關扶手＋壁掛穿鞋椅', p: '約 3 千元以上', lv: 3, d: '半天', by: '協力工班', r: 'g', sub: 1, rec: 1, note: '坐著穿鞋、起身有扶手' },
+        { id: 'd_ramp', t: '簡易施工', n: '非固定式斜坡板', p: '約 3 千元以上', lv: 3, d: '當天', by: '全國電子安裝', r: 'g', sub: 1 },
+        { id: 'd_lock', t: '全國電子安裝', n: 'Wi-Fi 電子鎖（臨時密碼給就近聯絡人）', p: '約 3 千元以上', lv: 3, d: '當天', by: '全國電子安裝', r: 'y', note: '救援不用找鑰匙，但高低差還在', more: 1 },
+        { id: 'd_none', t: '不處理', n: '維持現況', p: '—', lv: 0, d: '—', by: '—', r: 'y', note: '保留燈號與風險說明', more: 1 }
       ] }
   };
   const LC = { r: ['紅燈', '#C42D5A'], y: ['黃燈', '#E0A030'], g: ['綠燈', '#138F3B'] };
@@ -39,6 +71,8 @@
   const cur = sp => optOf(sp, ST.sel[sp] || SP[sp].combo.fast);
   const PR = ['免費', '千元內', '一到三千元', '約 3 千元以上'];
   const lights = () => { const a = J.S.hh && J.S.hh.assessment; return (a && a.lights) || [['臥室', 'g', '無明顯風險'], ['走道', 'r', '夜間偏暗、路上有門檻'], ['浴室', 'y', '門檻約 2 cm，建議斜角處理'], ['廚房', 'g', '無明顯風險'], ['客廳', 'g', '無明顯風險'], ['門口', 'g', '無明顯風險']]; };
+  const NEED = () => Object.keys(SP).filter(k => { const s0 = SP[k]; if (!s0.opt) return true; const x = lights().find(y => y[0] === s0.n); if (!x || !/^[ry]$/.test(x[1])) return false; s0.l = x[1]; s0.why = x[2]; return true; });
+  const zoneCard = (S0, o) => `<div style="padding:16px 14px;background:#FBF4F6"><div class="muted" style="font-size:.85em">加購場域｜${e(S0.zone)}</div><b style="font-size:1.1em">${e(S0.n)}：${e(o.n)}</b><div class="muted" style="font-size:.86em;margin-top:4px">${e(o.note || S0.risk)}</div><div class="muted" style="font-size:.8em;margin-top:6px">${e(S0.zone)}關懷設備另由生活顧問報價，月費每加購一場域 +150。</div></div>`;
   const go = v => { const st = J.S.stack; const i = st.indexOf('optA'); J.S.stack = (i >= 0 ? st.slice(0, i + 1) : st.concat('optA')).concat(v === 'optA' ? [] : [v]); J.render(); };
 
   const CSS = `<style>.v5bar{position:sticky;bottom:-16px;margin-bottom:-16px;padding-bottom:28px!important;background:var(--card);border-top:1px solid var(--line);padding:10px 12px 12px;margin-top:8px}
@@ -93,7 +127,7 @@
   // ---------- 1 看結果 ----------
   J.V.optA = function () {
     const L = lights(), red = L.filter(x => x[1] === 'r').length, yel = L.filter(x => x[1] === 'y').length, grn = L.length - red - yel;
-    const need = Object.keys(SP), done = need.filter(k => ST.ok[k]);
+    const need = NEED(), done = need.filter(k => ST.ok[k]);
     return `${CSS}${J.hdr('林媽媽家｜居家安全檢核')}<div class="scroll" style="padding-top:10px">
       <div class="card"><div class="muted" style="font-size:.88em">全國電子 AI 顧問阿國評估</div><div style="font-size:1.45em;font-weight:900;margin:2px 0"><span style="color:var(--brand)">${red + yel}</span> 個地方建議處理</div>
         <div class="muted" style="font-size:.88em"><span style="color:${LC.r[1]}">●</span> 紅燈 ${red}　<span style="color:${LC.y[1]}">●</span> 黃燈 ${yel}　<span style="color:${LC.g[1]}">●</span> 綠燈 ${grn}</div></div>
@@ -108,12 +142,12 @@
 
   // ---------- 2 選方式：一次只看一個空間 ----------
   J.V.opt = function () {
-    const sp = ST.sp, S0 = SP[sp], o = cur(sp);
+    NEED(); const sp = ST.sp, S0 = SP[sp], o = cur(sp);
     const main = S0.opts.filter(x => !x.more), more = S0.opts.filter(x => x.more);
     const pins = J.DPINS({ night: 1 }, sp === 'bath' && o.ramp ? 0 : 2);
     return `${CSS}${J.hdr(S0.n)}<div class="scroll" style="padding-top:0">
       <div class="card" style="padding:0;overflow:hidden;margin-top:10px"><div style="display:flex;justify-content:center;padding:8px"><span class="seg" style="width:200px"><button data-v5view="ar" aria-pressed="${ST.view === 'ar'}">實景</button><button data-v5view="3d" aria-pressed="${ST.view === '3d'}">3D 居家模型</button></span></div>
-        ${ST.view === 'ar' ? scene(sp, o, ST.pct) : ''}</div>
+        ${ST.view === 'ar' ? (S0.opt ? zoneCard(S0, o) : scene(sp, o, ST.pct)) : ''}</div>
       ${ST.view === '3d' && J.cmpPlan ? J.cmpPlan('v5b', { L: lights(), pins, path: true, title: '3D 居家模型：夜燈亮起的範圍' }) : ''}
       <div class="pad"><b style="color:${LC[S0.l][1]}">● ${LC[S0.l][0]}</b>・<b>${e(S0.why)}</b><div class="muted" style="font-size:.88em">${e(S0.risk)}</div></div>
       <div class="pad" style="padding-top:0;padding-bottom:0"><span class="seg">${[['fast', '最快轉綠'], ['cheap', '最省錢'], ['nodrill', '不鑽孔']].map(([k, n]) => `<button data-v5combo="${k}" aria-pressed="${ST.combo === k}">${n}</button>`).join('')}</span></div>
@@ -127,7 +161,7 @@
 
   // ---------- 3 交給顧問：一張報價、看得到進度 ----------
   J.V.optC = function () {
-    const picks = Object.keys(SP).map(k => [k, cur(k)]);
+    const picks = NEED().map(k => [k, cur(k)]);
     const extra = (ST.door.on ? [['bath', optOf('bath', ST.door.id || 'b_door2')]] : []);
     const all = picks.concat(extra), lv = Math.max(...all.map(([, o]) => o.lv)), est = all.some(([, o]) => o.est);
     const allGreen = picks.every(([, o]) => o.r === 'g');
@@ -136,7 +170,7 @@
       ${J.cmpPlan ? J.cmpPlan('v5c', { L: lights(), pins: J.DPINS(sel && sel.night ? sel : { night: 1 }, picks.find(([k]) => k === 'bath')[1].ramp ? 0 : 2), path: true, title: '全屋改善前後（示意）' }) : ''}
       <div class="card"><b>已選的改善方式</b>${all.map(([k, o]) => `<div class="row"><span><span class="v5chip">${/簡易施工|改造工程/.test(o.t) ? '協力工班' : /全國/.test(o.t) ? '全國電子' : o.t === '免費調整' ? '自行調整' : '—'}</span>${e(SP[k].n)}｜${e(o.n)}</span><span class="muted" style="font-size:.85em">${e(o.d)}</span></div>`).join('')}
         <div class="row"><span><span class="v5chip">安裝方式</span>${e(MOUNT[ST.mount].n)}</span><span class="muted" style="font-size:.85em">家人選定</span></div>
-        <div class="row"><span>六個空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
+        <div class="row"><span>全屋空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
         <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由協力工班先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div>
         <div class="muted" style="font-size:.8em;margin-top:4px">計價方式：設備與長輩關懷月費以場域計價；地板、門檻等工程依 AR 量出的尺寸計價（地板按坪、燈條按公尺），由協力工班報價、生活顧問整合。</div></div>
       <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '協力工班先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
@@ -165,10 +199,10 @@
     if (t.dataset.v5combo) { ST.combo = t.dataset.v5combo; ST.sel[ST.sp] = SP[ST.sp].combo[ST.combo]; save(); keepScroll(J.render); return; }
     if (t.hasAttribute('data-v5more')) { ST.more = true; save(); keepScroll(J.render); return; }
     if (t.dataset.v5view) { ST.view = t.dataset.v5view; save(); keepScroll(J.render); return; }
-    if (t.hasAttribute('data-v5ok')) { ST.sel[ST.sp] = cur(ST.sp).id; ST.ok[ST.sp] = true; save(); const next = Object.keys(SP).find(k => !ST.ok[k]); if (next) { ST.sp = next; ST.more = false; save(); go('opt'); J.toast('已選好，接著看' + SP[next].n); } else go('optA'); return; }
+    if (t.hasAttribute('data-v5ok')) { ST.sel[ST.sp] = cur(ST.sp).id; ST.ok[ST.sp] = true; save(); const next = NEED().find(k => !ST.ok[k]); if (next) { ST.sp = next; ST.more = false; save(); go('opt'); J.toast('已選好，接著看' + SP[next].n); } else go('optA'); return; }
     if (t.hasAttribute('data-v5toC')) { if (!Object.keys(ST.ok).length) { J.toast('先點走道或浴室，選一種改善方式'); return; } go('optC'); return; }
     if (t.hasAttribute('data-v5handoff')) {
-      const items = Object.keys(SP).map(k => { const o = cur(k); return { space: SP[k].n, type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: SP[k].l, to: o.r, style: o.floor ? (ST.style[o.id] || FLOORS[o.floor].s[0][0]) : null }; });
+      const items = NEED().map(k => { const o = cur(k); return { space: SP[k].n, type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: SP[k].l, to: o.r, style: o.floor ? (ST.style[o.id] || FLOORS[o.floor].s[0][0]) : null }; });
       if (ST.door.on) { const o = optOf('bath', ST.door.id); items.push({ space: '浴室門', type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: 'y', to: o.r, style: null }); }
       const all = LSX.get('jjj_v5_handoff') || []; const d = new Date(), pad = n => String(n).padStart(2, '0');
       items.push({ space: '安裝方式', type: '全國電子安裝', name: MOUNT[ST.mount].n, price: '—', days: '—', by: '家人選定', est: false, from: 'g', to: 'g', style: null });
