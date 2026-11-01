@@ -1,8 +1,32 @@
-export default function HomePage() {
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { AppHeader, LoadingState, PageBody } from "@/components/common/app-header";
+import { Notice } from "@/components/ui/card";
+import { useAuth } from "@/lib/shared/auth-context";
+
+/** Entry: route people to login, role selection, or their home page. */
+export default function EntryPage() {
+  const { status } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "signed-out") router.replace("/login");
+    if (status === "needs-profile") router.replace("/onboarding");
+    if (status === "ready") router.replace("/home");
+  }, [status, router]);
+
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-3 px-5 py-16 text-center">
-      <h1 className="text-3xl font-bold text-primary">揪居家</h1>
-      <p className="text-muted-foreground">專案環境已建立，登入與長輩家功能開發中。</p>
-    </main>
+    <>
+      <AppHeader />
+      <PageBody>
+        {status === "error" ? (
+          <Notice tone="error">讀取帳號資料失敗，請重新整理頁面。</Notice>
+        ) : (
+          <LoadingState />
+        )}
+      </PageBody>
+    </>
   );
 }
