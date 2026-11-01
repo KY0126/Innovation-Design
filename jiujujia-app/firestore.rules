@@ -6,6 +6,11 @@ service cloud.firestore {
 
     function signedIn() { return request.auth != null; }
     function uid() { return request.auth.uid; }
+    function userPath() { return /databases/$(database)/documents/users/$(uid()); }
+    function hasProfile() { return exists(userPath()); }
+    function role() { return get(userPath()).data.role; }
+    function validStore(s) { return s in ['dc-fengjia', 'dc-gongyi', 'dc-beitun']; }
+    function validCode(c) { return c is string && c.matches('^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{6}$'); }
     function validText(s, max) { return s is string && s.size() > 0 && s.size() <= max; }
 
     // #1 — own profile; self sign-up may only pick family or elder; role is immutable.
@@ -20,6 +25,69 @@ service cloud.firestore {
       allow update: if signedIn() && uid() == userId
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName'])
         && validText(request.resource.data.displayName, 20);
+      allow delete: if false;
+    }
+
+    // #2 — households: readable only by its family members and its elder.
+    match /households/{hid} {
+      function isFamily() { return uid() in resource.data.familyUids; }
+      function isElder() { return resource.data.elderUid == uid(); }
+
+      allow read: if signedIn() && (isFamily() || isElder());
+
+      allow create: if signedIn() && hasProfile() && role() == 'family'
+        && request.resource.data.keys().hasOnly(['elderName', 'address', 'storeId', 'familyUids', 'elderUid', 'inviteCode', 'createdBy', 'createdAt'])
+        && request.resource.data.createdBy == uid()
+        && request.resource.data.familyUids == [uid()]
+        && request.resource.data.elderUid == null
+        && validText(request.resource.data.elderName, 20)
+        && validText(request.resource.data.address, 100)
+        && validStore(request.resource.data.storeId)
+        && validCode(request.resource.data.inviteCode)
+        && request.resource.data.createdAt == request.time;
+
+      // Elder joins once, proving the invite code; only the elder's own account can become the elder.
+      allow update: if signedIn() && hasProfile() && role() == 'elder'
+        && resource.data.elderUid == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['elderUid', 'elderJoinedAt', 'joinCode'])
+        && request.resource.data.elderUid == uid()
+        && request.resource.data.joinCode == resource.data.inviteCode
+        && request.resource.data.elderJoinedAt == request.time;
+
+      // Family may edit the basic info only.
+      allow update: if signedIn() && isFamily()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['elderName', 'address'])
+        && validText(request.resource.data.elderName, 20)
+        && validText(request.resource.data.address, 100);
+
+      allow delete: if false;
+    }
+
+    // #2 — invite codes: get by exact code only (never list); claimed once by an elder.
+    // Readable by its creator and by elders; anyone signed in may probe a code that does not exist yet (uniqueness check).
+    match /inviteCodes/{code} {
+      function householdAfter(hid) { return getAfter(/databases/$(database)/documents/households/$(hid)).data; }
+
+      allow get: if signedIn()
+        && (resource == null || resource.data.createdBy == uid() || (hasProfile() && role() == 'elder'));
+      allow list: if false;
+
+      allow create: if signedIn() && hasProfile() && role() == 'family'
+        && validCode(code)
+        && request.resource.data.keys().hasOnly(['householdId', 'createdBy', 'claimedBy', 'createdAt'])
+        && request.resource.data.householdId is string && request.resource.data.householdId.size() <= 128
+        && request.resource.data.createdBy == uid()
+        && request.resource.data.claimedBy == null
+        && request.resource.data.createdAt == request.time
+        && householdAfter(request.resource.data.householdId).createdBy == uid()
+        && householdAfter(request.resource.data.householdId).inviteCode == code;
+
+      allow update: if signedIn() && hasProfile() && role() == 'elder'
+        && resource.data.claimedBy == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimedBy'])
+        && request.resource.data.claimedBy == uid()
+        && householdAfter(resource.data.householdId).elderUid == uid();
+
       allow delete: if false;
     }
 
