@@ -196,8 +196,9 @@ describe("households and invite codes (#2)", () => {
   it("denies an elder setting someone else as the elder", async () => {
     await seedHousehold();
     await seedUser("lin", "elder");
-    const batch = writeBatch(db("lin"));
-    batch.update(doc(db("lin"), "households", "h1"), { elderUid: "someone", elderJoinedAt: serverTimestamp(), joinCode: CODE });
+    const linDb = db("lin");
+    const batch = writeBatch(linDb);
+    batch.update(doc(linDb, "households", "h1"), { elderUid: "someone", elderJoinedAt: serverTimestamp(), joinCode: CODE });
     await assertFails(batch.commit());
   });
 
