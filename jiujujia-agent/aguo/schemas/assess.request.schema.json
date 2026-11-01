@@ -1,0 +1,279 @@
+{
+ "$defs": {
+  "Answers": {
+   "additionalProperties": false,
+   "properties": {
+    "live": {
+     "enum": [
+      "剛開始一個人住",
+      "一個人住超過一年",
+      "和家人同住"
+     ],
+     "title": "Live",
+     "type": "string"
+    },
+    "night": {
+     "enum": [
+      "不會",
+      "一晚一次",
+      "一晚兩次以上",
+      "不清楚"
+     ],
+     "title": "Night",
+     "type": "string"
+    },
+    "light": {
+     "enum": [
+      "夠亮",
+      "偏暗",
+      "不清楚"
+     ],
+     "title": "Light",
+     "type": "string"
+    },
+    "phone": {
+     "enum": [
+      "會用 LINE",
+      "只會接電話",
+      "幾乎不用"
+     ],
+     "title": "Phone",
+     "type": "string"
+    },
+    "worry": {
+     "enum": [
+      "夜間跌倒沒人知道",
+      "忘記關火或用電安全",
+      "身體不舒服沒人發現",
+      "接到詐騙電話"
+     ],
+     "title": "Worry",
+     "type": "string"
+    }
+   },
+   "required": [
+    "live",
+    "night",
+    "light",
+    "phone",
+    "worry"
+   ],
+   "title": "Answers",
+   "type": "object"
+  },
+  "Material": {
+   "additionalProperties": false,
+   "properties": {
+    "part": {
+     "enum": [
+      "浴室地板",
+      "走廊牆面",
+      "大門門框"
+     ],
+     "title": "Part",
+     "type": "string"
+    },
+    "material": {
+     "maxLength": 10,
+     "title": "Material",
+     "type": "string"
+    },
+    "ai_confidence_pct": {
+     "anyOf": [
+      {
+       "maximum": 100,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Ai Confidence Pct"
+    },
+    "second_check": {
+     "anyOf": [
+      {
+       "maxLength": 10,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Second Check"
+    },
+    "family_confirmed": {
+     "default": false,
+     "title": "Family Confirmed",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "part",
+    "material"
+   ],
+   "title": "Material",
+   "type": "object"
+  },
+  "Measurements": {
+   "additionalProperties": false,
+   "properties": {
+    "corridor_cm": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Corridor Cm"
+    },
+    "threshold_cm": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Threshold Cm"
+    },
+    "bed_bath_m": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Bed Bath M"
+    },
+    "outlets": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Outlets"
+    }
+   },
+   "title": "Measurements",
+   "type": "object"
+  },
+  "Source": {
+   "additionalProperties": false,
+   "properties": {
+    "source": {
+     "enum": [
+      "AR 掃描",
+      "參考卡照片",
+      "家人手動輸入",
+      "技師實測"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "confidence_pct": {
+     "anyOf": [
+      {
+       "maximum": 100,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Confidence Pct"
+    }
+   },
+   "required": [
+    "source"
+   ],
+   "title": "Source",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "areas": {
+   "items": {
+    "enum": [
+     "臥室",
+     "走道",
+     "浴室",
+     "浴室門",
+     "廚房",
+     "客廳",
+     "門口"
+    ],
+    "type": "string"
+   },
+   "minItems": 1,
+   "title": "Areas",
+   "type": "array"
+  },
+  "answers": {
+   "$ref": "#/$defs/Answers"
+  },
+  "measurements": {
+   "$ref": "#/$defs/Measurements"
+  },
+  "measurement_sources": {
+   "additionalProperties": {
+    "$ref": "#/$defs/Source"
+   },
+   "propertyNames": {
+    "enum": [
+     "corridor_cm",
+     "threshold_cm",
+     "bed_bath_m",
+     "outlets"
+    ]
+   },
+   "title": "Measurement Sources",
+   "type": "object"
+  },
+  "materials": {
+   "items": {
+    "$ref": "#/$defs/Material"
+   },
+   "maxItems": 10,
+   "title": "Materials",
+   "type": "array"
+  },
+  "note": {
+   "anyOf": [
+    {
+     "maxLength": 200,
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Note"
+  }
+ },
+ "required": [
+  "answers",
+  "measurements"
+ ],
+ "title": "AssessInput",
+ "type": "object"
+}

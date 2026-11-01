@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+logs/
+exports/
+data/*.db
+tests/*.db
+data/entities_*.json
+tests/entities_*.json
+docs/verification_log_2*
