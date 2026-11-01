@@ -14,7 +14,7 @@ test("註冊後選擇家人身分，重新登入不會再詢問身分", async ({
   await expect(page.getByRole("heading", { name: "選擇你的身分" })).toBeVisible();
   // 只開放家人、長輩自行註冊
   await expect(page.getByRole("radio")).toHaveCount(2);
-  await expect(page.getByText("生活顧問")).toHaveCount(0);
+  await expect(page.getByRole("radio", { name: /生活顧問|技師|協力工班|管理者/ })).toHaveCount(0);
 
   await page.getByRole("button", { name: "確認身分" }).click();
   await expect(page.getByText("請選擇你的身分")).toBeVisible();
