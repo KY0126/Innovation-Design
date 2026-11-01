@@ -1,6 +1,6 @@
 # 揪居家 Copilot 工具包｜使用說明
 
-這包是給「人工智慧增強軟體工程」學期專案用的 GitHub Copilot App 設定：一份專案憲法、架構與用語文件、4 個共用 skill、5 個對應組員角色的自訂 agent，再加上一支用語檢查腳本和 CI 設定。
+這包是給「人工智慧增強軟體工程」學期專案用的 GitHub Copilot App 設定：一份專案憲法、架構與用語文件、4 個共用 skill、7 個角色 agent（5 個對應組員分工，2 個負責阿國），再加上一支用語檢查腳本和 CI 設定。
 
 ## 檔案結構
 
@@ -9,12 +9,14 @@
 ```
 .github/                         （repo 根目錄）
   copilot-instructions.md        專案憲法，每次對話都會送出，所以只有 9 條規則
-  agents/                        5 個角色 agent（每位組員一個）
+  agents/                        7 個角色 agent（5 個組員分工＋2 個阿國）
     spec-owner.agent.md            產品與規格設計師
     contract-architect.agent.md    脈絡架構與合約守門員
     customer-builder.agent.md      領域全端協作者 A（顧客端）
     store-builder.agent.md         領域全端協作者 B（門市端）
     integration-reviewer.agent.md  系統整合與體驗防禦者
+    aguo-builder.agent.md          阿國開發者（jiujujia-agent/）
+    aguo-reviewer.agent.md         阿國安全審查
   skills/                        4 個共用 skill（所有 agent 都能用）
     scaffold-feature/SKILL.md      依架構建立功能模組與測試骨架
     firestore-rules/SKILL.md       寫安全規則並用模擬器測試
@@ -50,7 +52,7 @@ jiujujia-app/                    Next.js + Firebase MVP
    npm install -g firebase-tools
    firebase login
    ```
-4. 在 GitHub Copilot App 用「Add GitHub repository」或「Clone repository」接上 `Innovation-Design`，**開一個新 session**，輸入 `/agent` 就能看到 5 個角色。agent 跟 session 綁定，加了新 agent 要開新 session 才看得到。
+4. 在 GitHub Copilot App 用「Add GitHub repository」或「Clone repository」接上 `Innovation-Design`，**開一個新 session**，輸入 `/agent` 就能看到 7 個角色。agent 跟 session 綁定，加了新 agent 要開新 session 才看得到。
 
 ## 怎麼使用
 
@@ -58,7 +60,7 @@ jiujujia-app/                    Next.js + Firebase MVP
 
 **agent**：開 session 時，先用 `/agent` 切換角色，再下 prompt。
 
-這門課只有凱一人修，所以採「一人＋5 個 agent」模式：5 個 agent 當虛擬組員，凱負責下指令和做最後決定。建議每個 issue 照這個順序換角色：spec-owner 檢查 issue → builder 開發 → integration-reviewer 審查 PR。這樣即使只有一個人，規格、開發、審查也是由不同角色把關，不會「自己寫、自己改」。
+這門課只有凱一人修，所以採「一人＋7 個 agent」模式：agent 當虛擬組員，凱負責下指令和做最後決定。建議每個 issue 照這個順序換角色：spec-owner 檢查 issue → builder 開發 → integration-reviewer 審查 PR；阿國的 issue 改成 aguo-builder 開發 → aguo-reviewer 審查。這樣即使只有一個人，規格、開發、審查也是由不同角色把關，不會「自己寫、自己改」。
 
 | 角色 | 選這個 agent | 主要工作 |
 |---|---|---|
@@ -67,6 +69,8 @@ jiujujia-app/                    Next.js + Firebase MVP
 | 顧客端負責人 | customer-builder | 建立長輩家、評估、紅黃綠燈、送顧問、長輩同意、驗收 |
 | 門市端負責人 | store-builder | 看評估、整合報價、長輩同意後派工、技師排程 |
 | 整合與體驗防禦者 | integration-reviewer | 審查 PR、維護兩條 E2E 主流程 |
+| 阿國開發者 | aguo-builder | 在 `jiujujia-agent/` 實作阿國的能力、MCP server、評估題組 |
+| 阿國安全審查 | aguo-reviewer | 審查阿國的 PR：個資、prompt injection、參數型別、備援 |
 
 ## 範例 prompt（已照課程規則寫好，可直接貼）
 

@@ -14,7 +14,7 @@ Read-only: `lib/shared/**`, `firestore.rules` (ask contract-architect for change
 2. Propose a short plan (files to touch, tests to write) and wait for approval.
 3. Use the scaffold-feature skill; implement UI → logic → Firestore.
 4. Domain specifics:
-   - Risk lights come from data rules in `lib/customer/risk-rules.ts`; never hard-code colors per screen.
+   - Risk lights come from `lib/shared/data/risk-rules.json` via `lib/customer/risk-rules.ts`; never hard-code colors per screen.
    - Consent: only the elder's own account can approve; family members see the quote but get a 「需由長輩本人同意」 notice instead of the button. Show the quote summary in large text before the consent button.
    - Photos: upload only when the user ticks photo consent; never keep raw scan images.
    - Elder-facing screens: large touch targets, plain zh-TW, no jargon.
