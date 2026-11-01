@@ -1,0 +1,57 @@
+{
+  "$comment": "AI顧問阿國的紅黃綠燈與量測規則（二階 v1.3，與 GitHub 原型 v6 一致）。程式只讀這份，不把數值寫死在程式裡。jiujujia-app/lib/shared/data/risk-rules.json 建好後（#4），由 contract-architect 合併成同一份，阿國會優先讀那一份（見 servers/rules.py 的 RULES_PATH）。門檻是團隊設定，改數值要同步改測試。",
+  "version": "v1.3-2026-11-01",
+  "lights": {
+    "r": {"name": "紅燈", "meaning": "要優先處理"},
+    "y": {"name": "黃燈", "meaning": "建議改善"},
+    "g": {"name": "綠燈", "meaning": "沒有明顯風險"},
+    "n": {"name": "尚未判斷", "meaning": "資料不足，需要補量測"}
+  },
+  "measures": {
+    "corridor_cm": {"label": "床邊到浴室走道寬", "unit": "cm", "min": 40, "max": 300},
+    "threshold_cm": {"label": "浴室門檻高度", "unit": "cm", "min": 0, "max": 30},
+    "bed_bath_m": {"label": "床邊到浴室門口距離", "unit": "m", "min": 0.5, "max": 30},
+    "outlets": {"label": "沿路可用插座", "unit": "個", "min": 0, "max": 10}
+  },
+  "zones": {
+    "bathroom": {"threshold_red_above_cm": 3, "threshold_yellow_above_cm": 0.5},
+    "corridor": {"narrow_below_cm": 80, "path_threshold_above_cm": 0.5,
+                 "rule": "夜間偏暗，且走道窄於 80 cm 或路上有門檻 → 紅燈；只有偏暗或只有偏窄 → 黃燈；其他綠燈"},
+    "bedroom": {"rule": "床邊沒有插座（0 個）或一晚起身兩次以上 → 黃燈"}
+  },
+  "measurement_checks": {
+    "min_confidence_pct": 70,
+    "near_cutoff": {
+      "threshold_cm": {"cutoffs": [0.5, 3], "tolerance": 0.5},
+      "corridor_cm": {"cutoffs": [80], "tolerance": 3}
+    },
+    "material_min_pct": 80,
+    "safe_install": "材質還沒確認前，一律用背膠、不鑽孔"
+  },
+  "materials": {
+    "options": {
+      "浴室地板": ["磁磚", "塑膠地板", "石材", "木地板"],
+      "走廊牆面": ["水泥牆", "磚牆", "輕隔間", "木板牆"],
+      "大門門框": ["鋁框", "鐵框", "木框"]
+    },
+    "install": [
+      {"part": "浴室地板", "material": "磁磚", "install": "止滑條貼在門檻內側"},
+      {"part": "走廊牆面", "material": "水泥牆", "install": "夜燈可用螺絲固定"},
+      {"part": "走廊牆面", "material": "磚牆", "install": "夜燈可用螺絲固定"},
+      {"part": "大門門框", "material": "鋁框", "install": "門窗感測器改用背膠，不鑽孔"}
+    ]
+  },
+  "care": {
+    "bath_stay_min": 30,
+    "elder_no_response_min": 5,
+    "family_no_response_min": 5,
+    "sensor_offline_min": 30,
+    "morning_check": "10:00",
+    "asks_before_notify_family": 2
+  },
+  "stage2_rules": {
+    "notify_family_after_two_asks": true,
+    "multi_select_per_zone": true,
+    "ltc_referral_min_level": 2
+  }
+}
