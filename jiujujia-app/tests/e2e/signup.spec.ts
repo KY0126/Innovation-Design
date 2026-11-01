@@ -19,7 +19,7 @@ test("註冊後選擇家人身分，重新登入不會再詢問身分", async ({
   await page.getByRole("button", { name: "確認身分" }).click();
   await expect(page.getByText("請選擇你的身分")).toBeVisible();
 
-  await page.getByRole("radio", { name: /家人/ }).check();
+  await page.getByRole("radio", { name: "家人", exact: true }).check();
   await page.getByLabel("怎麼稱呼你").fill("陳小姐");
   await page.getByRole("button", { name: "確認身分" }).click();
   await expect(page.getByRole("heading", { name: "陳小姐，你好" })).toBeVisible();

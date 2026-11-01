@@ -57,11 +57,17 @@ export function RolePicker({
                 value={o.role}
                 checked={role === o.role}
                 onChange={() => setRole(o.role)}
+                aria-labelledby={`role-${o.role}-title`}
+                aria-describedby={`role-${o.role}-desc`}
                 className="mt-1 h-5 w-5 accent-primary"
               />
               <span>
-                <span className="block text-lg font-bold">{o.title}</span>
-                <span className="text-muted-foreground">{o.description}</span>
+                <span id={`role-${o.role}-title`} className="block text-lg font-bold">
+                  {o.title}
+                </span>
+                <span id={`role-${o.role}-desc`} className="text-muted-foreground">
+                  {o.description}
+                </span>
               </span>
             </label>
           ))}
