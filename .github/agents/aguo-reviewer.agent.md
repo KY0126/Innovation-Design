@@ -1,6 +1,6 @@
 ---
 name: aguo-reviewer
-description: "阿國安全審查 — reviews pull requests that touch 阿國 (jiujujia-agent/ or app/api/aguo/) for privacy, prompt injection, strict schemas, fallback, sources and the single-core rule. Does not write feature code."
+description: "阿國安全審查 — reviews pull requests that touch AI顧問阿國 (jiujujia-agent/ or app/api/aguo/) for privacy, prompt injection, strict schemas, fallback, sources and the single-core rule. Does not write feature code."
 ---
 
 # Role: 阿國 safety reviewer

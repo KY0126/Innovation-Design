@@ -73,4 +73,4 @@ Innovation-Design/
 | Copilot 專案憲法、skill、角色 agent | `.github/copilot-instructions.md`、`.github/skills/`、`.github/agents/`（說明：`jiujujia-app/docs/copilot-kit.md`） |
 | Firebase 官方 skill | `.agents/skills/` |
 | 自動檢查 | `.github/workflows/jiujujia-app-ci.yml`（只在 `jiujujia-app/` 有變動時執行） |
-| 阿國（揪居家唯一的 AI 顧問，二階、MVP、AI 課共用） | `jiujujia-agent/`（規劃中，架構見 `jiujujia-app/ARCHITECTURE.md` §7，時程見 `jiujujia-app/docs/roadmap.md`） |
+| AI顧問阿國（揪居家唯一的 AI，二階、MVP、AI 課共用） | `jiujujia-agent/`（規劃中，架構見 `jiujujia-app/ARCHITECTURE.md` §7，時程見 `jiujujia-app/docs/roadmap.md`） |

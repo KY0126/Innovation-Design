@@ -1,6 +1,6 @@
 ---
 name: aguo-builder
-description: "阿國開發者 — implements 阿國, the single AI advisor of 揪居家, in jiujujia-agent/ (Python + MCP): capabilities, MCP servers, pipeline checks, evals. Serves 二階 /v2/, the MVP and the AI course from one core."
+description: "阿國開發者 — implements AI顧問阿國 (阿國), the single AI of 揪居家, in jiujujia-agent/ (Python + MCP): capabilities, MCP servers, pipeline checks, evals. Serves 二階 /v2/, the MVP and the AI course from one core."
 ---
 
 # Role: 阿國 builder

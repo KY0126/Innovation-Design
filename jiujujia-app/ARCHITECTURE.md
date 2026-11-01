@@ -9,7 +9,7 @@ one tap sends it to a 生活顧問 → advisor builds ONE quote → elder consen
 
 Substitutes (MVP): AR 量測 is replaced by manual measurement input + optional photo. Night care (後關心) uses simulated events only.
 Out of scope: 3D home model, campus ambassador (校園大使), 揪心願, real sensors, payments.
-Phase 2 — 阿國, the single AI advisor (issues #14–#21): see §7 and `docs/roadmap.md`.
+Phase 2 — AI顧問阿國, the single AI advisor (issues #14–#21): see §7 and `docs/roadmap.md`.
 
 ## 2. Tech stack & folders
 - Next.js App Router (React Server Components by default; `'use client'` only for hooks/browser events), TypeScript strict (no `any`).
@@ -89,9 +89,9 @@ careEvents/{eid}:   { householdId; type: 'simulated_night_alert'; createdAt; han
 - `allow read, write: if true;` is banned in `firestore.rules`.
 
 
-## 7. 阿國 — the single AI advisor (`jiujujia-agent/`)
+## 7. AI顧問阿國 (阿國) — the single AI advisor (`jiujujia-agent/`)
 
-Everything AI / LLM / MCP / agent in this repo **is 阿國**: one core, one API, many consumers. No other module may call an LLM directly.
+Everything AI / LLM / MCP / agent in this repo **is AI顧問阿國** (short: 阿國; first mention in UI and docs uses the full name): one core, one API, many consumers. No other module may call an LLM directly.
 Base: the 二階 v1.3 MCP Agent (program checks → verifier agent → reject and retry). Python 3.13 + MCP; LLM behind one adapter (default: Cloudflare Workers AI, Llama 3.3).
 
 ### 7.1 Capabilities (one endpoint each, same pipeline)
@@ -109,7 +109,7 @@ Pipeline for every capability: validate input schema → MCP tools / LLM → pro
 
 ### 7.2 Consumers (all call the same 阿國)
 1. **二階 `/v2/`** (stage2 branch, static prototype): connection C — results precomputed by `python -m aguo export --demo` into JSON the prototype reads; live mode switched on for enterprise demos.
-2. **jiujujia-app (MVP)**: server Route Handlers `app/api/aguo/*` verify the Firebase ID token, load only the needed fields, POST to 阿國, store the reply in `aiSuggestions` (UI label 「阿國建議」). From 12/17.
+2. **jiujujia-app (MVP)**: server Route Handlers `app/api/aguo/*` verify the Firebase ID token, load only the needed fields, POST to 阿國, store the reply in `aiSuggestions` (UI label 「AI顧問阿國建議」). From 12/17.
 3. **AI 語言模型系統整合 course**: CLI / host demo and evaluation sets in `jiujujia-agent/evals/`.
 
 ### 7.3 Layout and shared data
