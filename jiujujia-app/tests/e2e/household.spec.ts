@@ -15,7 +15,7 @@ async function register(page: Page, user: { email: string; password: string }) {
 }
 
 async function chooseRole(page: Page, role: "家人" | "長輩", name: string) {
-  await page.getByRole("radio", { name: new RegExp(role) }).check();
+  await page.getByRole("radio", { name: role, exact: true }).check();
   await page.getByLabel("怎麼稱呼你").fill(name);
   await page.getByRole("button", { name: "確認身分" }).click();
   await expect(page.getByRole("heading", { name: `${name}，你好` })).toBeVisible();
