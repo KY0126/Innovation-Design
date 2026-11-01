@@ -1,0 +1,42 @@
+{
+  "name": "jiujujia-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "emulators": "firebase emulators:start --project demo-jiujujia",
+    "test:unit": "vitest run --passWithNoTests",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-jiujujia \"vitest run --config vitest.rules.config.ts --passWithNoTests\"",
+    "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-jiujujia \"playwright test --pass-with-no-tests\"",
+    "check:glossary": "node scripts/check-glossary.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "firebase": "^13.1.0",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "firebase-tools": "^15.34.2",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

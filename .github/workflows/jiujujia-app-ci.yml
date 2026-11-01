@@ -1,0 +1,60 @@
+# 揪居家 MVP（jiujujia-app/）：檢查、單元測試、安全規則測試、端對端測試
+name: jiujujia-app CI
+
+on:
+  pull_request:
+    paths:
+      - "jiujujia-app/**"
+      - ".github/workflows/jiujujia-app-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "jiujujia-app/**"
+      - ".github/workflows/jiujujia-app-ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: jiujujia-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    # 固定版本：ubuntu-latest 自 2026/10 起逐步切換到 Ubuntu 26（與原型 e2e.yml 相同理由）
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: jiujujia-app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: jiujujia-app/package-lock.json
+      # Firebase 模擬器需要 Java 21 以上
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run check:glossary
+      - run: npm run build
+      - name: 安全規則測試（Firestore 模擬器）
+        run: npm run test:rules
+      - name: 安裝 Playwright 瀏覽器與中文字型
+        run: npx playwright install --with-deps chromium
+      - name: 端對端測試（Auth + Firestore 模擬器）
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: jiujujia-app-playwright-report
+          path: |
+            jiujujia-app/playwright-report/
+            jiujujia-app/test-results/
+          retention-days: 14
+          if-no-files-found: ignore

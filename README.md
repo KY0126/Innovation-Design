@@ -60,3 +60,16 @@ Innovation-Design/
 ## 端到端測試
 
 `e2e/` 資料夾是 Playwright 端到端測試，涵蓋 App 與企業管理端入口、登入分流、31 步導覽與資料串接。執行方式見 [e2e/README.md](e2e/README.md)。
+
+## 人工智慧增強軟體工程：揪居家 MVP（`jiujujia-app/`）
+
+把上面的原型做成能登入、能存資料的 Next.js + Firebase 版本，用 GitHub Copilot App 依課程進度開發。原型與它的網址都沒有改動。
+
+| 項目 | 位置 |
+|---|---|
+| 程式與本機啟動方式 | `jiujujia-app/README.md` |
+| 需求（User Story #1～#10） | `jiujujia-app/docs/issues/`，並已開成 GitHub issue |
+| 架構與領域鐵律、用語表 | `jiujujia-app/ARCHITECTURE.md`、`jiujujia-app/GLOSSARY.md` |
+| Copilot 專案憲法、skill、角色 agent | `.github/copilot-instructions.md`、`.github/skills/`、`.github/agents/`（說明：`jiujujia-app/docs/copilot-kit.md`） |
+| Firebase 官方 skill | `.agents/skills/` |
+| 自動檢查 | `.github/workflows/jiujujia-app-ci.yml`（只在 `jiujujia-app/` 有變動時執行） |
