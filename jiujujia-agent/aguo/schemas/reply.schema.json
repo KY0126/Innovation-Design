@@ -1,0 +1,134 @@
+{
+ "$defs": {
+  "Checks": {
+   "properties": {
+    "program": {
+     "title": "Program",
+     "type": "boolean"
+    },
+    "verifier": {
+     "title": "Verifier",
+     "type": "boolean"
+    },
+    "retries": {
+     "title": "Retries",
+     "type": "integer"
+    },
+    "issues": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Issues",
+     "type": "array"
+    }
+   },
+   "required": [
+    "program",
+    "verifier",
+    "retries",
+    "issues"
+   ],
+   "title": "Checks",
+   "type": "object"
+  }
+ },
+ "description": "每項能力的回應格式（輸出也驗證，§7.4 第 3 條）。",
+ "properties": {
+  "capability": {
+   "title": "Capability",
+   "type": "string"
+  },
+  "label": {
+   "const": "AI顧問阿國建議",
+   "title": "Label",
+   "type": "string"
+  },
+  "version": {
+   "title": "Version",
+   "type": "string"
+  },
+  "rules_version": {
+   "title": "Rules Version",
+   "type": "string"
+  },
+  "items": {
+   "items": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "title": "Items",
+   "type": "array"
+  },
+  "explanation": {
+   "title": "Explanation",
+   "type": "string"
+  },
+  "sources": {
+   "items": {
+    "additionalProperties": {
+     "type": "string"
+    },
+    "type": "object"
+   },
+   "title": "Sources",
+   "type": "array"
+  },
+  "fallback": {
+   "title": "Fallback",
+   "type": "boolean"
+  },
+  "fallback_reason": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "title": "Fallback Reason"
+  },
+  "checks": {
+   "$ref": "#/$defs/Checks"
+  },
+  "model": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "title": "Model"
+  },
+  "input_flags": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Input Flags",
+   "type": "array"
+  },
+  "elapsed_ms": {
+   "title": "Elapsed Ms",
+   "type": "integer"
+  }
+ },
+ "required": [
+  "capability",
+  "label",
+  "version",
+  "rules_version",
+  "items",
+  "explanation",
+  "sources",
+  "fallback",
+  "fallback_reason",
+  "checks",
+  "model",
+  "input_flags",
+  "elapsed_ms"
+ ],
+ "title": "AguoReply",
+ "type": "object"
+}

@@ -1,0 +1,3 @@
+# 測試用（CI 與本機）；一律用模擬 LLM，不呼叫付費模型
+-r requirements.txt
+pytest==9.2.0

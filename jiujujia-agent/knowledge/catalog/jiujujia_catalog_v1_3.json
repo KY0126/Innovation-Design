@@ -1,0 +1,561 @@
+{
+ "version": "v1.3",
+ "query_date": "2026-10-31",
+ "aligned_with": "二階／五場域方案總表（2026-10-31）",
+ "note": "價格來源分官網、市售、原廠建議、推估；售價以門市為準。只有「已開放」的場域會給 AI 使用",
+ "scenes": [
+  {
+   "id": "J1",
+   "name": "揪夜安｜臥室＋走道＋浴室（試點，必選）",
+   "basis": "提案書 3.2、圖 2 ①；五場域方案總表 ①",
+   "phase": "已開放",
+   "items": [
+    {
+     "category": "夜間照明",
+     "for_item": "感應小夜燈（替代）",
+     "sku": "2092127",
+     "name": "明家LED光控感應小夜燈白光 GN010",
+     "brand": "MIG",
+     "price_twd": 169,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "光控：天暗自動亮、天亮自動熄，不是人體感應；可當走道夜間常亮的輔助照明",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2092127"
+    },
+    {
+     "category": "夜間照明",
+     "for_item": "感應小夜燈（替代）",
+     "sku": "2092126",
+     "name": "明家LED光控感應夜燈附插座 GN110",
+     "brand": "MIG",
+     "price_twd": 199,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "光控、附插座：夜燈和插座可同時使用，適合床邊插座不多的長輩家",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2092126"
+    },
+    {
+     "category": "夜間照明",
+     "for_item": "感應小夜燈",
+     "sku": "2096290",
+     "name": "米家感應夜燈",
+     "brand": "小米",
+     "price_twd": 265,
+     "price_source": "官網",
+     "price_note": "小米品牌活動頁標價",
+     "fit": "品牌活動頁寫「舉步之間，光明立現」，屬走過就亮的感應夜燈",
+     "warranty": "不適用全國電子 3C 家電延長保固（排除小米品牌）",
+     "status": "待確認：商品頁無法開啟，可能已停售",
+     "url": "https://www.elifemall.com.tw/mi/"
+    },
+    {
+     "category": "感測與連網",
+     "for_item": "閘道器",
+     "sku": "2160769",
+     "name": "TP-LINK Tapo H110(US) 智慧紅外線與 IoT 網關",
+     "brand": "TP-LINK",
+     "price_twd": 699,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "Matter 認證的連結中心；商品頁沒有列出相容的門窗或動作感測器型號，能否當揪夜安閘道器待確認",
+     "warranty": "",
+     "status": "官網查得（相容性待確認）",
+     "url": "https://www.elifemall.com.tw/product/2160769"
+    },
+    {
+     "category": "浴室防滑",
+     "for_item": "止滑地墊",
+     "sku": "2145605",
+     "name": "帕斯特-超吸水浴室防滑地墊-40*60cm-大山",
+     "brand": "帕斯特",
+     "price_twd": null,
+     "price_source": "未查得",
+     "price_note": "售價未查得",
+     "fit": "浴室門口吸水防滑地墊，可搭配「斜坡墊＋止滑地墊」做法；同系列另有多種花色",
+     "warranty": "",
+     "status": "官網分類頁查得",
+     "url": "https://www.elifemall.com.tw/autopage/%E6%B5%B4%E5%AE%A4%E5%9C%B0%E5%A2%8A"
+    },
+    {
+     "category": "浴室防滑",
+     "for_item": "止滑地墊",
+     "sku": "2131727",
+     "name": "帕斯特毛絨絨吸水防滑地墊40*60cm米黃",
+     "brand": "帕斯特",
+     "price_twd": null,
+     "price_source": "未查得",
+     "price_note": "售價未查得",
+     "fit": "吸水防滑地墊；同系列另有 50*80cm",
+     "warranty": "",
+     "status": "官網分類頁查得",
+     "url": "https://www.elifemall.com.tw/autopage/%E6%B5%B4%E5%AE%A4%E5%9C%B0%E5%A2%8A"
+    },
+    {
+     "category": "影像確認（選配）",
+     "for_item": "走廊攝影機（選配）",
+     "sku": "2136368",
+     "name": "TP-LINK Tapo C210(EU) 旋轉式家庭安全防護",
+     "brand": "TP-LINK",
+     "price_twd": 1199,
+     "price_source": "官網",
+     "price_note": "組合商品頁標示單價；另一頁顯示特價 939 元，以門市為準",
+     "fit": "揪夜安預設不裝鏡頭；長輩書面同意才加裝，只裝走廊或門口，臥室與浴室不裝",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/A000618"
+    }
+   ],
+   "not_found_on_site": [
+    {
+     "item": "門窗感測器",
+     "category": "感測與連網",
+     "used_in": "揪夜安（臥室門、浴室門各 1）",
+     "note": "全國電子官網站內搜尋查不到；市售參考 Tapo T110 原廠建議售價 499 元（2023）"
+    },
+    {
+     "item": "人體感測器",
+     "category": "感測與連網",
+     "used_in": "晨起平安確認、揪夜安動線判斷",
+     "note": "全國電子官網站內搜尋查不到；市售參考 Tapo T100 原廠建議售價 699 元（2023）"
+    },
+    {
+     "item": "浴室緊急按鈕",
+     "category": "感測與連網",
+     "used_in": "揪夜安",
+     "note": "全國電子官網站內搜尋查不到；市售參考 Tapo S200B 原廠建議售價 499 元（2023）"
+    },
+    {
+     "item": "人體感應夜燈",
+     "category": "夜間照明",
+     "used_in": "揪夜安、走道改善（感應夜燈）",
+     "note": "官網只確認到光控夜燈；米家感應夜燈商品頁無法開啟"
+    },
+    {
+     "item": "門檻提示燈條",
+     "category": "夜間照明",
+     "used_in": "揪夜安（門檻高於 0.5 cm）",
+     "note": "全國電子官網站內搜尋查不到"
+    },
+    {
+     "item": "斜坡墊",
+     "category": "浴室防滑",
+     "used_in": "浴室改善（斜坡墊＋止滑地墊）",
+     "note": "全國電子官網站內搜尋查不到"
+    },
+    {
+     "item": "智慧插座",
+     "category": "感測與連網",
+     "used_in": "揪食光（加購，取得內部資料後開放）",
+     "note": "全國電子官網站內搜尋查不到"
+    }
+   ]
+  },
+  {
+   "id": "J2",
+   "name": "揪食光｜廚房（加購）",
+   "basis": "提案書圖 2 ②；五場域方案總表 ②",
+   "phase": "取得內部資料後開放",
+   "items": [
+    {
+     "category": "忘記關火",
+     "for_item": "定時電磁爐",
+     "sku": "2142657",
+     "name": "Panasonic IH電磁爐 KY-T31",
+     "brand": "Panasonic",
+     "price_twd": 2590,
+     "price_source": "官網",
+     "price_note": "官網商品頁特價（另標 2,690 元）",
+     "fit": "1～240 分鐘定時；十項安全保護",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2142657"
+    },
+    {
+     "category": "忘記關火",
+     "for_item": "定時電磁爐（替代）",
+     "sku": "2143618",
+     "name": "聲寶薄型IH變頻電磁爐 KM-AA12Q",
+     "brand": "聲寶",
+     "price_twd": 1590,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價（原價 1,990）",
+     "fit": "連續 2 小時未操作自動關閉電源；過熱自動斷電",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2143618"
+    },
+    {
+     "category": "用火與用餐關懷",
+     "for_item": "偵煙型住宅用火災警報器",
+     "sku": "",
+     "name": "偵煙型住宅用火災警報器（消防署認證、10 年電池）",
+     "brand": "",
+     "price_twd": 612,
+     "price_source": "市售",
+     "price_note": "Yahoo 購物中心售價（總表）",
+     "fit": "住警器響：不等長輩回覆，立刻通知家人與就近聯絡人",
+     "warranty": "10 年更換",
+     "status": "官網查不到，市售參考",
+     "url": "https://tw.buy.yahoo.com/category/4413538"
+    },
+    {
+     "category": "用火與用餐關懷",
+     "for_item": "人體感測器",
+     "sku": "",
+     "name": "TP-LINK Tapo T100 人體感測器",
+     "brand": "TP-LINK",
+     "price_twd": 699,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "判斷 13:00 前廚房有沒有活動",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "用火與用餐關懷",
+     "for_item": "智慧插座",
+     "sku": "",
+     "name": "智慧插座（接電鍋或電熱水壺）",
+     "brand": "",
+     "price_twd": 500,
+     "price_source": "推估",
+     "price_note": "團隊推估（總表）",
+     "fit": "判斷有沒有開伙；連續用電超過 2 小時先語音提醒，15 分鐘沒回應自動斷電",
+     "warranty": "",
+     "status": "官網查不到",
+     "url": ""
+    },
+    {
+     "category": "用火與用餐關懷",
+     "for_item": "可接智慧插座的電器（例）",
+     "sku": "2134253",
+     "name": "小米電水壺 2",
+     "brand": "小米",
+     "price_twd": 699,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "本身不連網，接智慧插座後可判斷早上有沒有用水壺",
+     "warranty": "不適用全國電子 3C 家電延長保固（排除小米品牌）",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2134253"
+    },
+    {
+     "category": "忘記關火",
+     "for_item": "防乾燒瓦斯爐",
+     "sku": "",
+     "name": "櫻花二口節能安全爐 G5201S（原廠安裝）",
+     "brand": "櫻花",
+     "price_twd": 5940,
+     "price_source": "市售",
+     "price_note": "Yahoo 購物中心售價（總表）；防乾燒規格待門市確認",
+     "fit": "換防乾燒瓦斯爐",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://tw.buy.yahoo.com/brands/41166791?cid=4387518"
+    }
+   ],
+   "not_found_on_site": []
+  },
+  {
+   "id": "J3",
+   "name": "揪清爽｜洗衣陽台（加購）",
+   "basis": "提案書圖 2 ③；五場域方案總表 ③",
+   "phase": "取得內部資料後開放",
+   "items": [
+    {
+     "category": "陽台安全",
+     "for_item": "一氧化碳警報器",
+     "sku": "",
+     "name": "Kidde KN-COB-LP2 一氧化碳警報器",
+     "brand": "Kidde",
+     "price_twd": 2860,
+     "price_source": "市售",
+     "price_note": "市售價（總表）；此款不連網",
+     "fit": "熱水器裝在加了窗戶的陽台時偵測一氧化碳；連網款待選品",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://tw.buy.yahoo.com/category/4413538"
+    },
+    {
+     "category": "陽台安全",
+     "for_item": "門窗感測器（陽台門）",
+     "sku": "",
+     "name": "TP-LINK Tapo T110 門窗感測器",
+     "brand": "TP-LINK",
+     "price_twd": 499,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "22:00 後陽台門開著超過 30 分鐘先語音詢問",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "曬衣",
+     "for_item": "電動曬衣機",
+     "sku": "2122936",
+     "name": "歐蘭特電動曬衣機 OT-09-CL（附 LED 燈）",
+     "brand": "歐蘭特",
+     "price_twd": 11800,
+     "price_source": "官網",
+     "price_note": "依五場域方案總表；本次未能重新開啟商品頁，參訪前再查證",
+     "fit": "不用踮腳或踩椅子曬衣",
+     "warranty": "",
+     "status": "待重新查證（是否含安裝待確認）",
+     "url": "https://www.elifemall.com.tw/product/2122936"
+    },
+    {
+     "category": "家電檔案",
+     "for_item": "除濕機（家電檔案登錄例）",
+     "sku": "2163121",
+     "name": "NWT威技 WiFi智能雙變頻一級能效20L除濕機 WDH-20VX",
+     "brand": "威技",
+     "price_twd": 12888,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價（原價 18,900）",
+     "fit": "乾衣功能；登錄家電檔案後提醒清濾網",
+     "warranty": "全機三年，壓縮機十年",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2163121"
+    }
+   ],
+   "not_found_on_site": []
+  },
+  {
+   "id": "J4",
+   "name": "揪團聚｜客廳（加購）",
+   "basis": "提案書圖 2 ④；五場域方案總表 ④",
+   "phase": "取得內部資料後開放",
+   "items": [
+    {
+     "category": "作息與室溫",
+     "for_item": "溫濕度感測器",
+     "sku": "",
+     "name": "TP-LINK Tapo T315 溫濕度感測器",
+     "brand": "TP-LINK",
+     "price_twd": 899,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "室溫 ≥ 30°C 持續 1 小時語音提醒開冷氣、喝水",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "作息與室溫",
+     "for_item": "溫濕度計（官網替代）",
+     "sku": "2132246",
+     "name": "Xiaomi 電子溫濕度計 Pro",
+     "brand": "小米",
+     "price_twd": 579,
+     "price_source": "官網",
+     "price_note": "官網推薦欄標價",
+     "fit": "官網有賣的溫濕度計；能不能主動發出通知待確認",
+     "warranty": "不適用全國電子 3C 家電延長保固（排除小米品牌）",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2132246"
+    },
+    {
+     "category": "作息與室溫",
+     "for_item": "人體感測器",
+     "sku": "",
+     "name": "TP-LINK Tapo T100 人體感測器",
+     "brand": "TP-LINK",
+     "price_twd": 699,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "白天 8:00～20:00 全屋超過 4 小時沒有活動先語音詢問",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "作息與室溫",
+     "for_item": "一鍵按鈕",
+     "sku": "",
+     "name": "TP-LINK Tapo S200B 智慧按鈕",
+     "brand": "TP-LINK",
+     "price_twd": 499,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "按一下回覆「我很好」，按兩下撥給主要聯絡人",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "照明改善",
+     "for_item": "高亮度 LED 燈具（照明改善候選）",
+     "sku": "2146975",
+     "name": "舞光-30W星鑽遙控吸頂燈R3 LED-CES30DMR3",
+     "brand": "舞光",
+     "price_twd": 2150,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "對應總表改造工程「照明改善」；遙控細節頁面沒寫",
+     "warranty": "",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/2146975"
+    }
+   ],
+   "not_found_on_site": []
+  },
+  {
+   "id": "J5",
+   "name": "揪回家（暫定名）｜門口／玄關（加購，新增）",
+   "basis": "五場域方案總表 ⑤；名稱待全國電子確認",
+   "phase": "取得內部資料後開放",
+   "items": [
+    {
+     "category": "出入平安",
+     "for_item": "大門門窗感測器",
+     "sku": "",
+     "name": "TP-LINK Tapo T110 門窗感測器",
+     "brand": "TP-LINK",
+     "price_twd": 499,
+     "price_source": "原廠建議",
+     "price_note": "原廠建議售價（2023）",
+     "fit": "22:00～6:00 大門打開先語音詢問；長輩與家人都同意才啟用",
+     "warranty": "",
+     "status": "官網查不到，市售參考",
+     "url": "https://www.sogi.com.tw/articles/tp_link_tapo_smart_home/6260237"
+    },
+    {
+     "category": "出入平安",
+     "for_item": "玄關人體感應燈",
+     "sku": "",
+     "name": "玄關人體感應燈",
+     "brand": "",
+     "price_twd": 300,
+     "price_source": "推估",
+     "price_note": "團隊推估（總表）",
+     "fit": "玄關夜間照明",
+     "warranty": "",
+     "status": "官網查不到",
+     "url": ""
+    },
+    {
+     "category": "出入平安（選配）",
+     "for_item": "Wi-Fi 電子鎖",
+     "sku": "2144133",
+     "name": "FAMMIX Wi-Fi 電子鎖 NEWSAFER-2",
+     "brand": "FAMMIX",
+     "price_twd": 7999,
+     "price_source": "官網",
+     "price_note": "依五場域方案總表；本次未能重新開啟商品頁，參訪前再查證",
+     "fit": "可用 App 發臨時密碼給就近聯絡人，取代把備用鑰匙放在鄰居家",
+     "warranty": "",
+     "status": "待重新查證（安裝方式待確認）",
+     "url": "https://www.elifemall.com.tw/product/2144133"
+    },
+    {
+     "category": "出入平安（選配）",
+     "for_item": "電子鎖（高價替代）",
+     "sku": "2163146",
+     "name": "STANLEY S70 掌靜脈人臉辨識貓眼電子鎖",
+     "brand": "STANLEY",
+     "price_twd": 25800,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價",
+     "fit": "商品頁寫「特別適合長輩、小孩」；總表選用 FAMMIX，這款列為高價替代",
+     "warranty": "",
+     "status": "官網查得（是否含安裝頁面未寫）",
+     "url": "https://www.elifemall.com.tw/product/2163146"
+    }
+   ],
+   "not_found_on_site": []
+  },
+  {
+   "id": "K1",
+   "name": "再改善｜安裝與施工服務",
+   "basis": "提案書 3.1：協力工班先施工、全國電子技師再安裝",
+   "phase": "已開放",
+   "items": [
+    {
+     "category": "安裝服務",
+     "for_item": "全國電子技師安裝",
+     "sku": "P1773286650164",
+     "name": "全國修繕工坊",
+     "brand": "全國電子",
+     "price_twd": null,
+     "price_source": "未查得",
+     "price_note": "收費頁面未寫",
+     "fit": "居家修繕到府：水電維修、電力工程、家用設備安裝、大家電移機；居家五金到府安裝：衛浴五金、水五金、照明燈具、電子鎖。頁面沒有提到泥作、木作、門窗、地板、防水或無障礙工程，所以門檻、地板改善仍需要協力工班",
+     "warranty": "",
+     "status": "官網查得（收費與服務地區頁面未寫）",
+     "url": "https://www.elifemall.com.tw/page/P1773286650164"
+    }
+   ],
+   "not_found_on_site": [
+    {
+     "item": "泥作、木作、門窗、地坪止滑工程",
+     "category": "安裝服務",
+     "used_in": "門檻、地板、浴室門改善",
+     "note": "全國修繕工坊頁面沒有列出，仍需協力工班"
+    }
+   ]
+  },
+  {
+   "id": "K2",
+   "name": "後關心｜家電檔案、保養與保固",
+   "basis": "提案書 3.1、圖 2：家電檔案免費、家電保養按次計費",
+   "phase": "已開放",
+   "items": [
+    {
+     "category": "家電保養",
+     "for_item": "冷氣清洗（按次計費）",
+     "sku": "A000835",
+     "name": "全國空調清洗-室內機+室外機",
+     "brand": "全國電子",
+     "price_twd": 2399,
+     "price_source": "官網",
+     "price_note": "官網商品頁標價（原價 3,000；室內機 1,899、室外機 500）",
+     "fit": "專業技師、SOP 清洗流程；家電檔案每年提醒",
+     "warranty": "清洗後保固 30 天",
+     "status": "官網查得",
+     "url": "https://www.elifemall.com.tw/product/A000835"
+    },
+    {
+     "category": "延長保固",
+     "for_item": "延長保固",
+     "sku": "P1779156482384",
+     "name": "3C家電延長保固",
+     "brand": "全國電子",
+     "price_twd": null,
+     "price_source": "未查得",
+     "price_note": "年限與價格頁面未寫",
+     "fit": "適用電視、小家電、筆電、平板、手機、遊戲機。電視與小家電不含小米品牌，手機與筆電不含 Apple",
+     "warranty": "維修金額上限依延長保固合約",
+     "status": "官網查得（年限與價格頁面未寫）",
+     "url": "https://www.elifemall.com.tw/page/P1779156482384"
+    },
+    {
+     "category": "延長保固",
+     "for_item": "延長保固",
+     "sku": "P1762418001114",
+     "name": "空調8年免費延長保固",
+     "brand": "全國電子",
+     "price_twd": null,
+     "price_source": "未查得",
+     "price_note": "活動條件未讀到",
+     "fit": "活動頁標題為「空調 8 年免費延長保固」",
+     "warranty": "空調 8 年（活動條件待確認）",
+     "status": "官網查得（只讀到標題）",
+     "url": "https://www.elifemall.com.tw/page/P1762418001114"
+    }
+   ],
+   "not_found_on_site": []
+  }
+ ],
+ "todo": [
+  "揪食光、揪清爽、揪團聚、揪回家：燈號、關懷規則、報價等全國電子提供進貨價與門市品項後實作（servers/scenes.py 打開開關）",
+  "歐蘭特 OT-09-CL、FAMMIX NEWSAFER-2 的官網售價沿用總表，參訪前重新查證",
+  "官網查不到的感測器、按鈕、燈條、斜坡墊、智慧插座：參訪時確認門市是否販售或由 TP-LINK、小米等品牌供貨",
+  "延長保固的年限與價格頁面沒有寫，參訪時確認"
+ ]
+}

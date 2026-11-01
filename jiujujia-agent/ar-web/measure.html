@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>揪居家量測（v1.3 試作）</title>
+<style>
+  :root { --ink:#1f2a2e; --muted:#5d6b70; --line:#d9e1e3; --brand:#0f6e6a; --brand-soft:#e3f2f1; --warn:#a15c00; --warn-soft:#fff3e0; --bad:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; color:var(--ink); background:#f7f9f9; font-size:17px; line-height:1.6; }
+  header { background:var(--brand); color:#fff; padding:16px 18px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:4px 0 0; font-size:14px; opacity:.9; }
+  main { max-width:720px; margin:0 auto; padding:14px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px; }
+  h2 { font-size:17px; margin:0 0 8px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; }
+  button, .btn { font:inherit; border:1px solid var(--brand); color:var(--brand); background:#fff; border-radius:10px; padding:10px 14px; min-height:44px; cursor:pointer; }
+  button.on, button.primary { background:var(--brand); color:#fff; }
+  button:disabled { border-color:var(--line); color:#9aa7ab; cursor:not-allowed; background:#f2f4f4; }
+  .hint { color:var(--muted); font-size:14px; }
+  .warn { background:var(--warn-soft); color:var(--warn); border-radius:8px; padding:8px 10px; font-size:14px; }
+  .bad { color:var(--bad); }
+  #stage { position:relative; overflow:auto; max-height:70vh; border:1px solid var(--line); border-radius:8px; margin-top:8px; display:none; touch-action: pan-x pan-y; }
+  #photo { display:block; width:100%; cursor:crosshair; }
+  #step { font-weight:600; margin-top:8px; }
+  .result { border-left:4px solid var(--brand); background:var(--brand-soft); padding:10px 12px; border-radius:6px; }
+  .result .big { font-size:26px; font-weight:700; }
+  textarea { width:100%; font:inherit; font-size:14px; min-height:64px; border:1px solid var(--line); border-radius:8px; padding:8px; }
+  input[type=number] { font:inherit; width:130px; padding:8px; border:1px solid var(--line); border-radius:8px; min-height:44px; }
+  #arOverlay { display:none; position:fixed; inset:0; pointer-events:none; }
+  #arOverlay .cross { position:absolute; left:50%; top:50%; width:36px; height:36px; margin:-18px 0 0 -18px; border:3px solid #fff; border-radius:50%; box-shadow:0 0 0 2px rgba(0,0,0,.4); }
+  #arOverlay .msg { position:absolute; left:12px; right:12px; bottom:28px; background:rgba(0,0,0,.6); color:#fff; padding:10px 12px; border-radius:10px; font-size:16px; }
+  #arOverlay button { pointer-events:auto; position:absolute; top:16px; right:16px; background:#fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>揪居家量測（v1.3 試作）</h1>
+  <p>示範用；照片只在這支手機上計算，算完立刻清除，不會上傳。</p>
+</header>
+<main>
+  <section>
+    <h2>1. 要量哪裡？</h2>
+    <div class="row" id="fields">
+      <button data-field="threshold_cm">浴室門檻高度</button>
+      <button data-field="corridor_cm">床邊到浴室走道寬</button>
+      <button data-field="bed_bath_m">床邊到浴室門口距離</button>
+      <button data-field="outlets">沿路可用插座</button>
+    </div>
+  </section>
+
+  <section id="methodBox" hidden>
+    <h2>2. 怎麼量？</h2>
+    <div class="row" id="methods"></div>
+    <p class="hint" id="methodHint"></p>
+  </section>
+
+  <section id="photoBox" hidden>
+    <h2>3. 拍照並點選</h2>
+    <p class="hint" id="photoHint"></p>
+    <div class="row">
+      <label class="btn">拍照或選照片<input id="file" type="file" accept="image/*" capture="environment" hidden></label>
+      <button id="zoomBtn" disabled>放大 2 倍</button>
+      <button id="undoBtn" disabled>復原上一點</button>
+    </div>
+    <div id="step"></div>
+    <div id="stage"><canvas id="photo"></canvas></div>
+  </section>
+
+  <section id="manualBox" hidden>
+    <h2>3. 輸入數值</h2>
+    <div class="row">
+      <input id="manualVal" type="number" inputmode="decimal" step="0.1">
+      <span id="manualUnit" style="align-self:center"></span>
+      <button class="primary" id="manualOk">確定</button>
+    </div>
+    <p class="hint" id="manualHint"></p>
+  </section>
+
+  <section id="arBox" hidden>
+    <h2>3. AR 掃描</h2>
+    <p class="hint">手機對準地面，把中間的圓圈移到起點按一下、移到終點再按一下；同一段量兩次，系統會比對兩次是否一致。</p>
+    <button class="primary" id="arStart">開始 AR 掃描</button>
+    <p class="warn">AR 掃描需要 Android Chrome 與支援 ARCore 的手機；團隊尚未在實機驗證，請以實機測試結果為準。</p>
+  </section>
+
+  <section id="resultBox" hidden>
+    <h2>4. 量測結果</h2>
+    <div class="result" id="result"></div>
+    <p class="hint">複製下面這段貼給 AI顧問阿國，就會存成新的量測紀錄（存之前阿國會再請你確認一次）。</p>
+    <textarea id="copyText" readonly></textarea>
+    <div class="row"><button id="copyBtn">複製</button><button id="againBtn">重新量</button></div>
+  </section>
+
+  <section>
+    <h2>判斷方式</h2>
+    <p class="hint">信心度 70% 以上才拿來判斷燈號；量到的值離燈號分界太近（門檻 0.5 cm、3 cm 前後 0.5 cm，走道 80 cm 前後 3 cm），會標成「需技師到府確認」。這些門檻是團隊設定，POC 實測後修正。</p>
+  </section>
+</main>
+
+<div id="arOverlay"><div class="cross"></div><div class="msg" id="arMsg"></div><button id="arEnd">結束</button></div>
+
+<script src="geometry.js"></script>
+<script>
+"use strict";
+const G = window.JiujuGeometry;
+const FIELDS = {
+  threshold_cm: { label: "浴室門檻高度", unit: "cm", range: [0, 30], methods: ["card", "manual"] },
+  corridor_cm: { label: "床邊到浴室走道寬", unit: "cm", range: [40, 300], methods: ["ar", "a4", "manual"] },
+  bed_bath_m: { label: "床邊到浴室門口距離", unit: "m", range: [0.5, 30], methods: ["ar", "manual"] },
+  outlets: { label: "沿路可用插座", unit: "個", range: [0, 10], methods: ["count"] },
+};
+const METHOD = {
+  card: ["卡片近拍", "iPhone、Android 都可以：把悠遊卡或信用卡立靠在門檻正面，在 25 cm 內近拍。卡片和門檻要在同一個面上。"],
+  a4: ["A4 紙照片", "iPhone、Android 都可以：把一張 A4 紙平放在走道中間，蹲低約 1.2 m 拍，照片要拍到兩邊牆腳。"],
+  ar: ["AR 掃描", "Android Chrome：用手機鏡頭在地面上點起點和終點。"],
+  manual: ["捲尺手動輸入", "用捲尺量，四捨五入到小數一位。"],
+  count: ["點數輸入", "從床邊走到浴室，數一數路上可以用的插座。"],
+};
+const $ = (id) => document.getElementById(id);
+let field = null, method = null, img = null, pts = [], zoom = 1, arResults = [];
+
+function setButtons(box, attr, val) {
+  [...box.querySelectorAll("button")].forEach((b) => b.classList.toggle("on", b.dataset[attr] === val));
+}
+function show(id, on) { $(id).hidden = !on; }
+
+$("fields").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  field = b.dataset.field; setButtons($("fields"), "field", field);
+  const box = $("methods"); box.innerHTML = "";
+  for (const m of FIELDS[field].methods) {
+    const btn = document.createElement("button"); btn.dataset.method = m; btn.textContent = METHOD[m][0];
+    if (m === "ar") btn.disabled = true;
+    box.appendChild(btn);
+  }
+  checkAR();
+  show("methodBox", true); ["photoBox", "manualBox", "arBox", "resultBox"].forEach((x) => show(x, false));
+  $("methodHint").textContent = "";
+});
+
+async function checkAR() {
+  const btn = $("methods").querySelector('[data-method="ar"]'); if (!btn) return;
+  let ok = false;
+  try { ok = !!(navigator.xr && await navigator.xr.isSessionSupported("immersive-ar")); } catch (e) { ok = false; }
+  btn.disabled = !ok;
+  if (!ok) btn.title = "這支手機的瀏覽器不支援 AR 掃描（iPhone Safari 目前不支援），請改用其他方式";
+}
+
+$("methods").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  method = b.dataset.method; setButtons($("methods"), "method", method);
+  $("methodHint").textContent = METHOD[method][1];
+  show("photoBox", method === "card" || method === "a4");
+  show("manualBox", method === "manual" || method === "count");
+  show("arBox", method === "ar"); show("resultBox", false);
+  if (method === "manual" || method === "count") {
+    const f = FIELDS[field];
+    $("manualUnit").textContent = f.unit; $("manualVal").step = method === "count" ? "1" : "0.1"; $("manualVal").value = "";
+    $("manualHint").textContent = `合理範圍 ${f.range[0]}–${f.range[1]} ${f.unit}；超出範圍可能是單位填錯。`;
+  }
+  if (method === "card" || method === "a4") resetPhoto();
+});
+
+// ---------- 照片量測 ----------
+function resetPhoto() {
+  img = null; pts = []; zoom = 1;
+  const cv = $("photo"); cv.width = 1; cv.height = 1; cv.style.width = "100%"; $("stage").style.display = "none";
+  $("zoomBtn").textContent = "放大 2 倍";
+  $("zoomBtn").disabled = true; $("undoBtn").disabled = true; $("file").value = "";
+  $("photoHint").textContent = method === "card"
+    ? "卡片立靠在門檻正面、和門檻同一個面，手機在 25 cm 內近拍。"
+    : "A4 紙平放在走道中間，照片要拍到兩邊牆腳。";
+  $("step").textContent = "";
+}
+$("file").addEventListener("change", (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f); const im = new Image();
+  im.onload = () => {
+    img = im; const cv = $("photo"); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+    URL.revokeObjectURL(url); $("stage").style.display = "block"; $("zoomBtn").disabled = false; draw(); stepText();
+  };
+  im.src = url;
+});
+$("zoomBtn").addEventListener("click", () => {
+  zoom = zoom === 1 ? 2 : 1; $("photo").style.width = (100 * zoom) + "%";
+  $("zoomBtn").textContent = zoom === 1 ? "放大 2 倍" : "縮回原尺寸";
+});
+$("undoBtn").addEventListener("click", () => { pts.pop(); draw(); stepText(); });
+$("photo").addEventListener("click", (e) => {
+  if (!img || pts.length >= 6) return;
+  const cv = $("photo"), r = cv.getBoundingClientRect();
+  pts.push([(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]);
+  draw(); stepText();
+  if (pts.length === 6) finishPhoto();
+});
+function stepText() {
+  const ref = method === "card" ? "卡片" : "A4 紙";
+  const n = pts.length;
+  const what = field === "threshold_cm" ? ["門檻底部（地面線）", "門檻頂端（正上方）"] : ["左邊牆腳", "右邊牆腳"];
+  $("step").textContent = n < 4
+    ? `點${ref}的第 ${n + 1} 個角（從左上角開始，順時針，第一段先沿長邊）`
+    : n < 6 ? `點${what[n - 4]}` : "計算完成";
+  $("undoBtn").disabled = n === 0;
+}
+function draw() {
+  const cv = $("photo"), ctx = cv.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  const s = Math.max(cv.width, cv.height) / 300;
+  ctx.lineWidth = s;
+  pts.forEach((p, i) => {
+    ctx.strokeStyle = i < 4 ? "#00e5ff" : "#ffea00"; ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath(); ctx.arc(p[0], p[1], 3 * s, 0, 2 * Math.PI); ctx.stroke();
+    ctx.font = `${8 * s}px sans-serif`; ctx.fillText(String(i < 4 ? i + 1 : "AB"[i - 4]), p[0] + 4 * s, p[1] - 4 * s);
+  });
+  if (pts.length >= 4) {
+    ctx.strokeStyle = "#00e5ff"; ctx.beginPath(); pts.slice(0, 4).forEach((p, i) => (i ? ctx.lineTo(...p) : ctx.moveTo(...p)));
+    ctx.closePath(); ctx.stroke();
+  }
+  if (pts.length === 6) { ctx.strokeStyle = "#ffea00"; ctx.beginPath(); ctx.moveTo(...pts[4]); ctx.lineTo(...pts[5]); ctx.stroke(); }
+}
+function finishPhoto() {
+  const cv = $("photo");
+  const tapPx = 4 * cv.width / cv.getBoundingClientRect().width;   // 手指點擊約 4 個螢幕像素的誤差，換算成照片像素
+  let r;
+  try { r = G.cardMeasure(field, pts.slice(0, 4), pts[4], pts[5], tapPx, 7, method === "card" ? "card" : "a4"); }
+  catch (err) { $("step").innerHTML = `<span class="bad">${err.message}</span>`; pts = []; draw(); return; }
+  // 隱私：算完立刻清除照片
+  const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, cv.width, cv.height); cv.width = 1; cv.height = 1; img = null;
+  $("stage").style.display = "none"; $("zoomBtn").disabled = true; $("file").value = "";
+  zoom = 1; cv.style.width = "100%"; $("zoomBtn").textContent = "放大 2 倍"; $("undoBtn").disabled = true;
+  $("step").textContent = "照片已清除，只留下量測結果。";
+  showResult(r);
+}
+
+// ---------- 手動輸入 ----------
+$("manualOk").addEventListener("click", () => {
+  const v = Number($("manualVal").value); const f = FIELDS[field];
+  if ($("manualVal").value === "" || Number.isNaN(v)) { $("manualHint").innerHTML = '<span class="bad">請輸入數字</span>'; return; }
+  const value = method === "count" ? Math.round(v) : G.round1(v);
+  showResult({ field, label: f.label, value, unit: f.unit, source: "家人手動輸入", confidence_pct: null, notes: [] });
+});
+
+// ---------- AR 掃描（WebXR hit-test，Android Chrome；尚未實機驗證） ----------
+$("arStart").addEventListener("click", startAR);
+async function startAR() {
+  arResults = [];
+  const overlay = $("arOverlay");
+  let session;
+  try {
+    session = await navigator.xr.requestSession("immersive-ar", {
+      requiredFeatures: ["hit-test", "local"], optionalFeatures: ["dom-overlay"], domOverlay: { root: overlay } });
+  } catch (err) { alertBox("無法啟動 AR 掃描：" + err.message + "。請改用其他方式。"); return; }
+  overlay.style.display = "block";
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl", { xrCompatible: true });
+  session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+  const local = await session.requestReferenceSpace("local");
+  const viewer = await session.requestReferenceSpace("viewer");
+  const hts = await session.requestHitTestSource({ space: viewer });
+  let hit = null, pts3 = [];
+  const say = () => {
+    $("arMsg").textContent = (hit ? "" : "請慢慢移動手機，讓系統找到地面。") +
+      `第 ${arResults.length + 1} 次量測：` + (pts3.length === 0 ? "把圓圈移到起點，點一下螢幕" : "移到終點，再點一下");
+  };
+  session.addEventListener("select", () => {
+    if (!hit) return;
+    pts3.push(hit);
+    if (pts3.length === 2) {
+      const [a, b] = pts3; const m = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+      arResults.push(field === "bed_bath_m" ? m : m * 100); pts3 = [];
+      if (arResults.length === 2) { session.end(); return; }
+    }
+    say();
+  });
+  session.addEventListener("end", () => {
+    overlay.style.display = "none";
+    if (arResults.length === 2) {
+      const r = G.repeatCheck(field, arResults[0], arResults[1]);
+      showResult({ ...r, label: FIELDS[field].label, notes: [r.note] });
+    }
+  });
+  $("arEnd").onclick = () => session.end();
+  session.requestAnimationFrame(function frame(t, f) {
+    session.requestAnimationFrame(frame);
+    const layer = session.renderState.baseLayer;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    const hs = f.getHitTestResults(hts);
+    const p = hs.length ? hs[0].getPose(local) : null;
+    hit = p ? [p.transform.position.x, p.transform.position.y, p.transform.position.z] : null;
+    say();
+  });
+}
+function alertBox(msg) { $("methodHint").innerHTML = `<span class="bad">${msg}</span>`; }
+
+// ---------- 結果 ----------
+function showResult(r) {
+  const f = FIELDS[r.field];
+  const bad = r.value < f.range[0] || r.value > f.range[1];
+  const low = r.confidence_pct !== null && r.confidence_pct < 70;
+  const notes = [...(r.notes || [])];
+  if (bad) notes.push(`超出合理範圍 ${f.range[0]}–${f.range[1]} ${f.unit}，可能點錯或單位錯，請重新量測`);
+  if (low) notes.push("信心度低於 70%，這筆不會拿來判斷燈號，請重新量測或改用捲尺");
+  const conf = r.confidence_pct === null ? "" : `｜信心度 ${r.confidence_pct}%` + (r.spread_cm !== undefined ? `（約 ±${r.spread_cm} cm）` : "");
+  $("result").innerHTML = `<div>${r.label}</div><div class="big">${r.value} ${r.unit}</div>` +
+    `<div class="hint">${r.source}${r.reference ? "｜參考物：" + r.reference : ""}${conf}</div>` +
+    notes.map((n) => `<div class="warn" style="margin-top:6px">${n}</div>`).join("");
+  const conft = r.confidence_pct === null ? "" : `，信心度 ${r.confidence_pct}%`;
+  $("copyText").value = bad ? "" :
+    `請幫我記錄量測：${r.label} ${r.value} ${r.unit}（${r.source}${conft}）\n` +
+    JSON.stringify({ field: r.field, value: r.value, source: r.source, confidence_pct: r.confidence_pct });
+  $("copyBtn").disabled = bad;
+  show("resultBox", true);
+  $("result").dataset.value = String(r.value); $("result").dataset.conf = String(r.confidence_pct);
+  $("resultBox").scrollIntoView({ behavior: "smooth" });
+}
+$("copyBtn").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("copyText").value); $("copyBtn").textContent = "已複製"; }
+  catch (e) { $("copyText").select(); }
+});
+$("againBtn").addEventListener("click", () => {
+  show("resultBox", false);
+  if (method === "card" || method === "a4") resetPhoto();
+});
+</script>
+</body>
+</html>

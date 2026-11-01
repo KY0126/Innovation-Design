@@ -1,0 +1,43 @@
+# AI顧問阿國（jiujujia-agent/）：只要動到阿國就跑 pytest。一律用模擬 LLM，不需要也不讀任何金鑰。
+name: aguo-ci
+
+on:
+  pull_request:
+    paths:
+      - "jiujujia-agent/**"
+      - ".github/workflows/aguo-ci.yml"
+  push:
+    branches: [stage2, "feat/*-aguo-*"]
+    paths:
+      - "jiujujia-agent/**"
+      - ".github/workflows/aguo-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Taipei
+    defaults:
+      run:
+        working-directory: jiujujia-agent
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: jiujujia-agent/requirements*.txt
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python make_data.py && python make_data.py --dataset test
+      - name: pytest（模擬 LLM）
+        run: pytest
+        env:
+          LLM_API_KEY: ""
+          CF_ACCOUNT_ID: ""
