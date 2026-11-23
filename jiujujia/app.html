@@ -723,7 +723,7 @@ a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scro
  ${hasGuard()?`<div class="ly"><h3>關懷方案</h3>
   <button class="plan" data-plan="basic" aria-pressed="${a.plan==='basic'}"><b>揪夜安｜基本方案　每月 NT$ 299</b><div class="rs">臥室到浴室：夜間照明、異常先問再通知、每週語音電話、家電檔案</div></button>
   <button class="plan" data-plan="two" aria-pressed="${a.plan==='two'}"><b>揪夜安｜安心方案（主推）　每月 NT$ 449</b><div class="rs">基本內容＋生活顧問每月關心、年度健檢、免檢測費、冷氣清洗優惠</div></button>
-  <button class="plan" data-plan="adv" disabled style="opacity:.55"><b>揪全家｜全屋套餐　每月 NT$ 699</b> <span class="rtag">擴展期</span><div class="rs">全部場域一起顧，含安心等級服務、年度健檢、首年設定費減免；其他場域擴展期加價：揪食光 +200、揪團聚 +150、揪清爽 +100</div></button>
+  <button class="plan" data-plan="adv" ${(window.JJJPHASE&&JJJPHASE()>=1)?`aria-pressed="${a.plan==='adv'}"`:'disabled style="opacity:.55"'}><b>揪全家｜全屋套餐　每月 NT$ 699</b> <span class="rtag">${(window.JJJPHASE&&JJJPHASE()>=1)?'擴展期已開放':'擴展期'}</span><div class="rs">全部場域一起顧，含安心等級服務、年度健檢、首年設定費減免；其他場域擴展期加價：揪食光 +200、揪團聚 +150、揪清爽 +100</div></button>
   <div class="seg" role="group" aria-label="付款方式"><button data-pay="m" aria-pressed="${a.pay==='m'}">月付不綁約</button><button data-pay="y" aria-pressed="${a.pay==='y'}">年繳 ${fmt(t.y)}（10 付 12）</button></div>
   <p class="rs" style="margin:6px 0 0">付款人可以是家人或長輩本人，也可由兄弟姊妹分攤月費；不論誰付款，都須長輩本人同意才成交。家電換新與以租代買於擴展期開放</p></div>
  <div class="ly"><h3>第二聯絡人（必填）</h3><label class="rs">姓名<input class="fld" id="c2n" value="${a.c2n}" placeholder="例如：${CN('第二聯絡人','第二聯絡人')}"></label><label class="rs" style="display:block;margin-top:8px">電話<input class="fld" id="c2p" inputmode="tel" value="${a.c2p}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">依序通知：長輩本人 → 主要聯絡人 → 第二聯絡人 → 就近聯絡人。</div></div>`:'<div class="ly"><h3>關懷方案</h3><div class="rs">本次未選長輩關懷項目，無月費。</div></div>'}
@@ -830,7 +830,7 @@ plan:()=>{const H=S.hh,p=H&&H.plan;return `${hdr('關懷方案')}<div class="scr
  <div class="card" style="padding:4px 14px"><button class="row" data-a="ntStart" style="width:100%"><span>異常時會怎麼通知？看演練</span><span class="chev">›</span></button></div>
  <div class="card"><b>揪居家怎麼一步步長大</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">試點先做揪夜安，其他方案達標後依序開放；先登記，開放時優先通知</div>
  ${[['試點期','第 1–6 月','now','揪夜安（臥室到浴室）基本 299／安心 449；高雄三民區 民族店、澄清店、三民中華店'],['擴展期','約第 7–15 月','','揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699；保養、換新與以租代買；產險、居家清潔、租賃夥伴；長輩關懷 2.0'],['延伸期','單店約 194 戶以上','','育兒與寵物家庭；揪夥伴商用版（日照、住宿機構、租屋代管、民宿，不含長輩關懷通知）；新家與老宅翻修 AR 配置']].map(([n,t,c,d])=>`<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee)"><div style="flex:none;width:74px"><b style="color:${c?'#C42D5A':'inherit'}">${n}</b><div class="muted" style="font-size:.78em">${t}</div></div><div style="font-size:.88em;line-height:1.6">${c?'<span class="tag ok">目前</span> ':''}${d}</div></div>`).join('')}
- <button class="row" data-req="擴展期方案登記" style="width:100%;margin-top:4px"><span>登記擴展期方案</span><span class="chev">›</span></button></div></div>`}
+ <button class="row" data-go="x0" style="width:100%;margin-top:4px"><span>看擴展期與延伸期會開放什麼</span><span class="chev">›</span></button><button class="row" data-req="擴展期方案登記" style="width:100%;margin-top:4px"><span>登記擴展期方案</span><span class="chev">›</span></button></div></div>`}
 });
 
 Object.assign(V,{
@@ -1453,5 +1453,6 @@ window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApp
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
+<script src="stage2.js?v=20261123a"></script>
 <script src="guide.js?v=20261027i"></script></body>
 </html>

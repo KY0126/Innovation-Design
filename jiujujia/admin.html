@@ -487,6 +487,8 @@ function tickVans(dt,hour){vans.forEach(vn=>{vn.t+=dt;const working=hour>=9&&hou
  else if(vn.phase==='go'){const p=ptOn(vn.route,Math.min(1,vn.t/3.2));vn.g.setAttribute('transform',`translate(${p[0]},${p[1]})`);if(vn.t>=3.2){vn.phase='work';vn.t=0;vn.tx.textContent=vn.name+'｜'+vn.job;vn.tag.setAttribute('opacity',1)}}
  else if(vn.phase==='work'){if(vn.t>=3.5){vn.phase='back';vn.t=0;vn.tag.setAttribute('opacity',0)}}
  else if(vn.phase==='back'){const p=ptOn([...vn.route].reverse(),Math.min(1,vn.t/3.2));vn.g.setAttribute('transform',`translate(${p[0]},${p[1]})`);if(vn.t>=3.2){vn.phase='idle';vn.t=0}}})}
+// ---------- 營運階段（示範用，存在瀏覽器） ----------
+const PH=()=>{try{return Math.max(0,['試點期','擴展期','延伸期'].indexOf(localStorage.getItem('jjj_phase')||'試點期'))}catch(e){return 0}};
 // ---------- 單店財務模型（同決選構想計畫書） ----------
 const FM0={n:20,mix:60,churn:15};let FM={...FM0};
 const fmC=mix=>255+(mix-60)*0.915; // 安心占比→每戶每月貢獻：40%≈237、60%≈255、80%≈273
@@ -601,8 +603,8 @@ function storeRows(){return STORES.map(([code,m,sm])=>{const vv={...v};if(m.diag
 const nt=n=>(n<0?'−':'')+'NT$ '+Math.abs(Math.round(n)).toLocaleString('en-US');
 function hqRefresh(){try{alerts();if(['dispatch','kpi','wish','content','amb','vc','sys','kb'].includes(cur)){document.getElementById('view').innerHTML=V[cur]();notesToInfo()}}catch(e){}}
 
-const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','長輩關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0]];
-const GROUPS=[['今日工作',['live','bk','wo']],['服務家庭',['hh','care']],['揪心願',['wl','wish']],['門市與人員',['ops','partner','content','acct']],['試點與分析',['kpi','optstat','vc']],['系統',['sys']]];
+const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','長輩關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0],['phase','營運階段',0],['biz','異業夥伴',0]];
+const GROUPS=[['今日工作',['live','bk','wo']],['服務家庭',['hh','care']],['揪心願',['wl','wish']],['門市與人員',['ops','partner','biz','content','acct']],['試點與分析',['kpi','optstat','vc']],['系統',['sys','phase']]];
 const SUB={wo:['dispatch'],wish:['kb'],content:['amb'],vc:['vendor'],sys:['about']};
 const PARENT={};Object.entries(SUB).forEach(([p,L])=>L.forEach(c=>PARENT[c]=p));
 let cur=(location.hash||'').slice(1)||DEFAULT_TAB,selW=0,cls={};
@@ -618,6 +620,20 @@ const AIC={'WS-1103':['新增情境模板',86,'與 12 件「浴室門口濕滑�
 const CAT=[['exist','既有商品可滿足'],['tpl','新增情境模板'],['sku','新選品'],['svc','新服務或夥伴']];
 const toast=t=>{const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)};
 const V={
+phase:()=>{const P=PH(),N=['試點期','擴展期','延伸期'];
+ const F=[['家庭端方案','揪夜安（基本 299／安心 449）','＋揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699','＋育兒與寵物模式'],['家電服務','家電檔案（免費）','＋家電保養、換新建議、以租代買','＋新家與老宅翻修 AR 配置'],['長輩關懷','先問長輩本人、依序通知','＋長輩關懷 2.0（既有家電接入）、進階影像版（長輩同意）','—'],['異業合作','長照轉介 1966、社區集客','＋產險、居家清潔、主廚與營養師、租賃公司','＋建商；學校規劃洽談'],['內容與集客','Digital City 社區健檢日','＋節氣食譜、節氣共煮、校園大使短影音','—'],['新客群','—','新婚與搬家家庭','育兒與寵物家庭；揪夥伴商用版（日照據點、住宿機構、租屋代管、民宿、小店）']];
+ return `<div class="panel pb" style="border-left:4px solid #C42D5A"><b>營運階段開關</b><div class="c-mu" style="font-size:13.5px;margin-top:6px;line-height:1.7">同一套系統依階段開放功能；家庭端與顧問端會依目前階段顯示「可訂」或「擴展期開放」。此開關為示範用，正式版依決策點由總部切換。</div>
+ <div class="seg" role="group" aria-label="營運階段" style="margin-top:12px">${N.map((n,i)=>`<button data-ph="${n}" aria-pressed="${P===i}">${n}</button>`).join('')}</div></div>
+ <div class="panel"><div class="ph">各階段開放的功能 <small>目前：${N[P]}</small></div><div style="overflow-x:auto"><table class="wide"><thead><tr><th>項目</th>${N.map((n,i)=>`<th${i===P?' style="color:#C42D5A"':''}>${n}${i===P?'（目前）':''}</th>`).join('')}</tr></thead><tbody>${F.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((c,i)=>`<td${i>P?' class="c-mu"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
+ <div class="grid2"><div class="panel pb"><b>◆二 試點期 → 擴展期（約第 6 月）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 8px">四項同時達標才切換</div><div class="kv"><span>三個月續訂率</span><b>≥ 85%</b></div><div class="kv"><span>診斷轉訂閱率</span><b>≥ 18%</b></div><div class="kv"><span>技師負荷</span><b>≤ 80%</b></div><div class="kv"><span>誤報率</span><b>≤ 10%</b></div></div>
+ <div class="panel pb"><b>◆三 擴展期 → 延伸期（約第 15 月）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 8px">單店訂閱達損益兩平才切換</div><div class="kv"><span>單店訂閱戶數</span><b>≥ 約 194 戶</b></div><div class="kv"><span>超過 260 戶</span><b>加 0.5 位生活顧問</b></div>
+ <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a class="b" href="app.html" target="_blank" rel="noopener">開啟揪居家 App</a><a class="b" href="business.html" target="_blank" rel="noopener">開啟揪夥伴商用版</a></div></div></div>`},
+biz:()=>{const P=PH(),N=['試點期','擴展期','延伸期'];
+ const L=[['長照轉介 1966','公部門','轉介扶手與無障礙補助','臥室到浴室',0],['Digital City 社區健檢日','社區','健檢日集客、居家安全講座','全部',0],['產險公司','產險','延保搭居家意外險','全部',1],['居家清潔業者','清潔','冷氣清洗搭居家打掃','客廳、臥室',1],['主廚與營養師','內容','節氣食譜、節氣共煮示範','廚房',1],['租賃公司','租賃','以租代買、舊機回收','全部',1],['建商','建商','新成屋交屋即配好全屋家電','全屋',2],['輔英科大、樹德科大','學校','規劃洽談','—',2]];
+ const st=i=>i<=P?'<span class="badge c-ok">合作中</span>':i===P+1?'<span class="badge c-am">洽談中</span>':'<span class="badge">未開放</span>';
+ return `<div class="c-mu" style="margin:0 0 10px">目前營運階段：<b>${N[P]}</b>（可在「營運階段」分頁切換）｜夥伴名稱為類別示意</div>
+ <div class="panel"><div class="ph">異業夥伴清單</div><div style="overflow-x:auto"><table class="wide"><thead><tr><th>夥伴</th><th>類型</th><th>合作方式</th><th>對應場域</th><th>開放階段</th><th>狀態</th></tr></thead><tbody>${L.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${N[r[4]]}</td><td>${r[0].includes('輔英')&&P>=2?'<span class="badge c-am">規劃洽談</span>':st(r[4])}</td></tr>`).join('')}</tbody></table></div></div>
+ <div class="panel pb"><b>合作規則</b><div class="kv"><span>資料界線</span><span>夥伴看不到長輩關懷資料；關懷資料不作保費依據</span></div><div class="kv"><span>回饋方式</span><span>全國電子點數或購物金，不做現金分潤</span></div><div class="kv"><span>排程</span><span>清洗、打掃與安裝由生活顧問統一排程、合併到府</span></div></div>`},
 wish:()=>{const w=W[selW];const rows=storeRows();const sum=k=>rows.reduce((a,r)=>a+r.o[k],0);const o=rows[0].o;const wishes=Math.round(sum('wishes')),res=Math.round(sum('res'));const live=o.live;
  const fam=R.out.map((x,i)=>STORES.reduce((a,_,j)=>a,0)||x.subs),sup=R.out.map(x=>x.suppliers);
  const mxF=Math.max(...R.out.map(x=>x.subs)),mxS=Math.max(...sup);const sx=i=>30+i*(250/17),syF=y=>110-90*y/(mxF||1),syS=y=>110-90*y/(mxS||1);
@@ -1034,6 +1050,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 
 
 document.addEventListener('input',e=>{const k=e.target&&e.target.dataset&&e.target.dataset.fm;if(!k)return;FM[k]=+e.target.value;const y=scrollY;document.getElementById('view').innerHTML=V.vc();scrollTo(0,y);const n=document.getElementById('fm-'+k);if(n)n.focus()});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ph]');if(!b)return;try{localStorage.setItem('jjj_phase',b.dataset.ph)}catch(x){}toast('已切換為'+b.dataset.ph+'（示範）');document.getElementById('view').innerHTML=V.phase()});
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="fmReset"]');if(!b)return;FM={...FM0};document.getElementById('view').innerHTML=V.vc()});
 window.JJJA={api,toast,go:t=>{cur=t;location.hash=t;liveRender()}};
 authStart();
