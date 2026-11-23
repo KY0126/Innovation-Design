@@ -931,6 +931,7 @@ obsR:()=>{const o=S.obs,r=obsRisks(o).slice(0,3);return `${hdr('居家安全檢�
  ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" style="border-left:4px solid #8E1E42"><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#F7E9EE;color:#8E1E42">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；原始影像分析完即清除，存入的成果保存六個月。</div></div>`})()}
  <div class="sec">推薦的生活顧問</div>${advCard('Digital City 高雄民族店',true)}
  <div class="pad"><button class="btn" data-go="b4">帶著檢核結果預約門市</button><button class="btn ghost" data-a="obsWish">把觀察到的需求送出為揪心願</button><button class="btn ghost" data-a="obsShare">分享檢核結果給家人（示意）</button>
+ ${window.JJJS2?JJJS2.entry('obsR'):''}
  <p class="muted" style="font-size:.85em">觀察結果以去識別化方式彙整，用於改善情境模板與服務；不包含任何個人資料。</p></div></div>`},
 acard:()=>{const my=S.mySkills||ADVS['Digital City 高雄民族店'].skills;const ALL=['夜間動線照明規劃','長輩陪同說明','關懷設備相容性','門檻與動線量測','晨起平安確認','異常通知設定'];
  return `${stf('我的角色卡')}<div class="scroll">

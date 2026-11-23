@@ -108,3 +108,44 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   await expect(con.locator('#phaseChip')).toContainText('試點期');
   expect([...errs, ...cerr, ...aerr]).toEqual([]);
 });
+
+test('U3 校園大使短影音：試點期不可上傳；擴展期勾滿四項才可送審；企業管理端有審核清單', async ({ page, context }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page);
+  await page.goto('/jiujujia/app.html?phase=pilot');
+  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await page.evaluate(() => window.JJJ.go('u3')); await page.waitForTimeout(300);
+  await expect(page.locator('#view')).toContainText('擴展期開放後即可上傳');
+  await page.goto('/jiujujia/app.html?phase=exp'); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.JJJ.go('u3')); await page.waitForTimeout(300);
+  await page.click('[data-u3t="t1"]');
+  for (const k of ['a', 'b', 'c']) await page.click(`[data-u3="${k}"]`);
+  await expect(page.locator('[data-u3send]')).toHaveCount(0);
+  await page.click('[data-u3="d"]');
+  await page.click('[data-u3send]');
+  await expect(page.locator('#view')).toContainText('已送審');
+  const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
+  await adm.goto('/jiujujia/admin.html');
+  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await adm.evaluate(() => window.JJJA.go('amb')); await adm.waitForTimeout(400);
+  await expect(adm.locator('#view')).toContainText('短影音審核');
+  expect([...errs, ...aerr]).toEqual([]);
+});
+
+test('右下角浮動元件不蓋住主要按鈕（捲到底後）', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const errs = await fresh(page);
+  await page.goto('/jiujujia/app.html');
+  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  for (const v of ['b4', 'm2', 'pl', 'x24', 'u3']) {
+    await page.evaluate(v => { window.JJJ.S.stack = ['home']; window.JJJ.go(v); }, v); await page.waitForTimeout(300);
+    const hit = await page.evaluate(() => {
+      document.querySelectorAll('.scroll').forEach(s => s.scrollTop = 1e6);
+      const fl = ['#jgOpen', '#webDemo'].map(s => document.querySelector(s)).filter(e => e && e.getClientRects().length).map(e => e.getBoundingClientRect());
+      return [...document.querySelectorAll('#view .btn')].filter(b => { const r = b.getBoundingClientRect(); return r.height && fl.some(f => r.left < f.right && f.left < r.right && r.top < f.bottom && f.top < r.bottom); }).map(b => b.textContent.trim());
+    });
+    expect(hit, v).toEqual([]);
+  }
+  expect(errs).toEqual([]);
+});

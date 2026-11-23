@@ -197,6 +197,13 @@ body.jgSheet{padding-bottom:48vh!important}body.jgSheet #view .scroll{padding-bo
 #jg .grab{display:none}
 .jgb{position:fixed;z-index:9994;border:3px solid #C42D5A;border-radius:10px;box-shadow:0 0 0 3px rgba(255,255,255,.8);pointer-events:none;display:none}
 .jgb i{position:absolute;left:-15px;top:-15px;width:26px;height:26px;border-radius:50%;background:#C42D5A;color:#fff;font:900 14px/26px "Noto Sans TC",sans-serif;text-align:center;font-style:normal;box-shadow:0 0 0 3px #fff}
+/* 右下角浮動元件（開啟導覽、瀏覽器展示版）約 110px 高：各頁捲動區底部留白，最後的按鈕才不會被蓋住 */
+.scroll{padding-bottom:120px!important}
+body>.ft,#app .ft,.ft{padding-bottom:110px!important}
+/* 底部有固定操作列（技師完工列）時，浮動元件改放到上方；AR 掃描為全螢幕畫面，掃描時先隱藏 */
+body:has(.sum) #jgOpen{bottom:auto;top:66px}
+body:has(.sum) #webDemo{bottom:auto;top:112px}
+body:has(.arsheet) #jgOpen,body:has(.arsheet) #webDemo{display:none!important}
 #jgOpen{position:fixed;right:16px;bottom:16px;z-index:9993;background:#C42D5A;color:#fff;border:0;border-radius:22px;padding:10px 16px;font:700 14px "Noto Sans TC",system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer}
 body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDock #gate{right:var(--jgm,420px)}
 #jg .jgn{border:2px solid #C42D5A;background:#F7E9EE;border-radius:12px;padding:8px 12px;margin:2px 0 10px;color:#8E1E42;font-weight:700;line-height:1.5}

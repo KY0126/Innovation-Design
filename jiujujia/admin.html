@@ -756,7 +756,7 @@ amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
   <tr><td>北部大學團隊（示意）</td><td>${Math.round(n*0.45)}</td><td>${Math.round(n*0.5)}</td><td>${Math.round(n*0.13)}</td><td>三民中華店</td></tr>
   <tr><td>文藻外語大學（示意）</td><td>${Math.round(n*0.33)}</td><td>${Math.round(n*0.36)}</td><td>${Math.round(n*0.09)}</td><td>民族店</td></tr>
   <tr><td>○○科大（示意）</td><td>${Math.round(n*0.22)}</td><td>${Math.round(n*0.21)}</td><td>${Math.round(n*0.05)}</td><td>澄清店</td></tr></tbody></table></div>
-  <div class="pb c-mu" style="font-size:13px">誘因為購物金、證書與服務學習證明，不給銷售佣金；校園大使看不到任何關懷資料。</div></div></div>`},
+  <div class="pb c-mu" style="font-size:13px">誘因為購物金、證書與服務學習證明，不給銷售佣金；校園大使看不到任何關懷資料。</div></div></div>${PH()>=1?`<div class="panel"><div class="ph">短影音審核 <small>擴展期｜審核通過才由官方社群發布</small></div><div style="overflow-x:auto"><table><thead><tr><th>主題</th><th>團隊</th><th>拍攝前確認</th><th>狀態</th></tr></thead><tbody><tr><td>夜裡起床的那 5 步</td><td>文藻外語大學（示意）</td><td>四項皆勾選</td><td><span class="badge c-am">待審核</span></td></tr><tr><td>門檻 2 公分也會絆倒</td><td>○○科大（示意）</td><td>四項皆勾選</td><td><span class="badge c-ok">已發布</span></td></tr><tr><td>節氣共煮花絮</td><td>文藻外語大學（示意）</td><td>畫面出現門牌</td><td><span class="badge">退回修改</span></td></tr></tbody></table></div><div class="pb c-mu" style="font-size:13px">審核重點：長輩本人同意、不露臉、不拍地址與臥室浴室；獎勵為任務津貼與團隊點數，不抽成。</div></div>`:`<div class="panel pb c-mu" style="font-size:13px">短影音任務於擴展期開放（可在「營運階段」切換示範）。</div>`}`},
 vc:()=>{const f=FM,r=fmRun(f),c=fmC(f.mix),be=Math.round(49400/c),be2=Math.round(79100/c);
  const sens=[10,15,20,30].map(n=>[n,fmRun({...f,n})]);
  const W=560,H=200,x0=40,arr=r.cum.slice(0,36).map(x=>x/1e4),mn=Math.min(-30,...arr),mx=Math.max(60,...arr);
