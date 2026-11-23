@@ -869,6 +869,7 @@ pre:()=>{const PO=(S.topics&&S.topics.preorder)||{count:0,me:false},done=!!PO.me
   ${PRE.items.map(x=>`<div class="row"><span>${x}</span></div>`).join('')}
   <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px"><b style="font-size:1.4em;color:var(--brand)">早鳥 NT$ ${PRE.early.toLocaleString()}</b><s class="muted">NT$ ${PRE.price.toLocaleString()}</s></div></div>
  <div class="card"><b>成團進度</b><div class="rs">成團戶數由總部依供應商最低訂購量與售價訂定</div><div class="pbar" style="margin:8px 0 4px"><i style="width:${Math.min(pct,100)}%"></i></div><div class="muted">${now}／${PRE.goal} 組｜達到成團戶數才會正式下單與安裝</div></div>
+ ${window.JJJS2&&JJJS2.pack?JJJS2.pack():''}
  <div class="card"><b>預購保障</b>
   <div class="row"><span>未達成團數</span><span>全額退款</span></div>
   <div class="row"><span>交付與保固</span><span>由全國電子負責</span></div>
@@ -1443,7 +1444,7 @@ async function tourFinish(){await tourOrder();let T=taskList(S.order);await tech
  S.order=await api('/tech/orders/'+S.order.id+'/complete',{method:'POST',body:{steps:all}});S.stack=['t1','tc'];S.ttab='work';S.topen='收尾';render()}
 async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach(t=>{if(t.group!=='開工')S.acc[t.group]=1});S.stack=['t1','tc','tacc'];render();await new Promise(r=>setTimeout(r,900));
  S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});S.stack=['t1','t4'];render();toast(EN()+'驗收完成，摘要已同步給家人')}
-window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
+window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
 <div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027i"></script>

@@ -193,3 +193,68 @@ test('揪心願（參考 LEGO Ideas）：寫作模板＋標籤、阿國比對相
   await expect(adm.locator('#view')).toContainText('標籤統計');
   expect([...errs, ...aerr]).toEqual([]);
 });
+
+test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→新心願；企業出題線；闖關點數與提示音；包裝與標語；企業管理端出題與點數檢核', async ({ page, context }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page);
+  await page.goto('/jiujujia/app.html?phase=pilot');
+  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  const v = page.locator('#view');
+  // 標語
+  await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
+  await expect(v).toContainText('揪居家，讓家更有電');
+  // 拼出預覽圖
+  await page.evaluate(() => window.JJJ.go('wish')); await page.waitForTimeout(300);
+  await page.click('#view button[data-go="wbuild"]'); await page.waitForTimeout(300);
+  await expect(v).toContainText('先擺一個零件');
+  await page.click('[data-bitem="light"]');
+  await page.click('[data-bslot="0"]'); await page.click('[data-bslot="2"]');
+  await page.click('[data-bitem="rail"]'); await page.click('[data-bslot="5"]');
+  await page.click('[data-bnight="1"]');
+  await page.click('#view button[data-go="wcard"]'); await page.waitForTimeout(300);
+  // 做法卡：零件清單、步驟、需技師、分享 QR
+  await expect(v).toContainText('感應夜燈 ×2');
+  await expect(v).toContainText('含需技師步驟');
+  await expect(v).toContainText('請生活顧問安排技師照這份做法施工');
+  await expect(v.locator('svg[aria-label*="QR"]')).toHaveCount(1);
+  await page.click('[data-wdo="2"]');
+  // 改版：必填、換角度、轉成新心願
+  await page.click('#view button[data-go="wremix"]'); await page.waitForTimeout(300);
+  await page.click('[data-wdo="3"]');
+  await expect(v).toContainText('我改了這樣做');
+  await page.fill('[data-rm="what"]', '把床邊夜燈換成床底燈條');
+  await page.fill('[data-rm="why"]', '光從下面來比較不刺眼');
+  await page.click('[data-rang]');
+  await expect(v).toContainText('💡');
+  await page.click('[data-wdo="3"]');
+  await page.fill('[data-rm="q3"]', '可以貼在床底的長條感應燈');
+  await page.click('[data-wnew="1"]'); await page.waitForTimeout(300);
+  await expect(page.locator('[data-wf="hope"]')).toHaveValue('可以貼在床底的長條感應燈');
+  await expect(v).toContainText('已附 3 個零件的做法卡');
+  // 闖關：點數 150，提示音可按
+  await page.evaluate(() => window.JJJ.go('wquest')); await page.waitForTimeout(300);
+  await expect(v).toContainText('150');
+  await expect(v).toContainText('擴展期開放');
+  await page.click('[data-chime]');
+  // 企業出題線
+  await page.evaluate(() => window.JJJ.go('wall')); await page.waitForTimeout(1200);
+  await expect(v).toContainText('做過 62 戶');
+  await page.click('[data-wline="hq"]');
+  await expect(v).toContainText('好鄰居題');
+  await expect(v).not.toContainText('床邊大按鍵開關');
+  await page.click('[data-wtheme="nb"]'); await page.waitForTimeout(300);
+  await expect(v).toContainText('企業出題線｜全國電子｜揪感心');
+  // 預購頁包裝示意
+  await page.evaluate(() => window.JJJ.go('pre')); await page.waitForTimeout(1200);
+  await expect(v).toContainText('揪心願｜由陳小姐家庭提案');
+  // 企業管理端
+  const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
+  await adm.goto('/jiujujia/admin.html');
+  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await adm.evaluate(() => window.JJJA.go('wish')); await adm.waitForTimeout(500);
+  await expect(adm.locator('#view')).toContainText('企業出題線');
+  await expect(adm.locator('#view')).toContainText('做過／改版');
+  await adm.locator('[data-a="ptOk"]').first().click();
+  await expect(adm.locator('#view')).toContainText('已入帳');
+  expect([...errs, ...aerr]).toEqual([]);
+});
