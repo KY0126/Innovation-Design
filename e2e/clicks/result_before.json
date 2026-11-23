@@ -1,0 +1,104 @@
+{
+ "label": "before",
+ "date": "2026-11-23T15:41:17.180Z",
+ "tasks": [
+  {
+   "id": "T1",
+   "name": "幫林媽媽家開始居家診斷",
+   "who": "家庭（陳小姐）",
+   "clicks": 1,
+   "ok": true,
+   "errs": []
+  },
+  {
+   "id": "T2",
+   "name": "找到林媽媽家的通知設定",
+   "who": "家庭（陳小姐）",
+   "clicks": 2,
+   "ok": true,
+   "errs": []
+  },
+  {
+   "id": "T3",
+   "name": "看長輩家昨晚有沒有異常",
+   "who": "家庭（李家）",
+   "clicks": 2,
+   "ok": true,
+   "errs": []
+  },
+  {
+   "id": "T4",
+   "name": "找到黃先生家的報價草稿並送出",
+   "who": "生活顧問（電腦）",
+   "clicks": 3,
+   "ok": true,
+   "errs": []
+  },
+  {
+   "id": "T5",
+   "name": "回報「浴室門是推拉門」現場差異",
+   "who": "技師",
+   "clicks": 5,
+   "ok": true,
+   "errs": []
+  },
+  {
+   "id": "T6",
+   "name": "找到待回覆的揪心願",
+   "who": "總部",
+   "clicks": 1,
+   "ok": true,
+   "errs": []
+  }
+ ],
+ "landing": [
+  {
+   "id": "L1",
+   "name": "家庭端首頁",
+   "clickable": 11,
+   "screens": 2.4
+  },
+  {
+   "id": "L2",
+   "name": "揪居家主頁（先評估）",
+   "clickable": 21,
+   "screens": 3.1
+  },
+  {
+   "id": "L3",
+   "name": "揪居家主頁（後關心）",
+   "clickable": 32,
+   "screens": 3.7
+  },
+  {
+   "id": "L4",
+   "name": "會員中心",
+   "clickable": 16,
+   "screens": 1.5
+  },
+  {
+   "id": "L5",
+   "name": "生活顧問手機版首頁",
+   "clickable": 16,
+   "screens": 2
+  },
+  {
+   "id": "L6",
+   "name": "生活顧問電腦版首頁",
+   "clickable": 15,
+   "screens": 1.1
+  },
+  {
+   "id": "L7",
+   "name": "技師施工頁",
+   "clickable": 16,
+   "screens": 2
+  },
+  {
+   "id": "L8",
+   "name": "企業管理端首頁",
+   "clickable": 35,
+   "screens": 1.3
+  }
+ ]
+}
