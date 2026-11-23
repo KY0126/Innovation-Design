@@ -183,7 +183,7 @@
     entry(where, ctx) {
       if (where === 'm2') {
         const mine = !ctx; // ctx = 是否在「長輩家」分頁
-        return `<div class="card" style="text-align:center;background:linear-gradient(135deg,#FBF3F3,#fff)"><b style="color:#8E1E42">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，最後揪大家一起想</div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
+        return `<div class="card" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FBF3F3,#fff)">${window.JJJS2.logo(52)}<div><b style="color:#8E1E42">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，<br>最後揪大家一起想</div></div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
           ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
           ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
           ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
@@ -381,8 +381,12 @@
       const D = { dim: [62, 14, '已量產'], switch: [23, 6, '樣品試用中（5 戶）'], voice: [9, 4, ''], mat: [5, 1, ''] }[t.id] || [0, 0, ''];
       return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="muted" style="font-size:.85em">做過 ${D[0]} 戶・改版 ${D[1]} 版</span>${D[2] ? `<span class="tag ok">${D[2]}</span>` : ''}<button class="btn ghost" data-go="wcard" style="width:auto;margin:0 0 0 auto;padding:6px 12px">看做法卡</button></div>`;
     },
+    // 揪居家標誌：房子＋紅黃綠三色燈號（呼應居家安全地圖的燈號）
+    logo(sz) {
+      return `<svg width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="揪居家標誌" style="flex:none"><path d="M8 30 L32 9 L56 30" fill="none" stroke="#C42D5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 27 V54 H50 V27" fill="#fff" stroke="#8E1E42" stroke-width="4" stroke-linejoin="round"/><circle cx="23" cy="42" r="5" fill="#C42D5A"/><circle cx="32" cy="42" r="5" fill="#E0A030"/><circle cx="41" cy="42" r="5" fill="#3E9B6B"/></svg>`;
+    },
     pack() {
-      return `<div class="card"><b>包裝示意</b><div style="margin-top:8px;border:2px solid #C42D5A;border-radius:12px;padding:12px;background:linear-gradient(135deg,#fff,#FBF3F3)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:.8em;color:#C42D5A;font-weight:700">揪心願｜由陳小姐家庭提案</div><div class="big" style="margin:4px 0">可調光感應夜燈組</div><div class="muted" style="font-size:.8em">共同設計：林家、王家、高雄民族店生活顧問</div></div>${qr(123)}</div><div style="margin-top:8px;font-weight:700;color:#8E1E42">揪居家，讓家更有電</div><div class="muted" style="font-size:.78em">掃 QR Code 看做法卡｜全國電子</div></div></div>`;
+      return `<div class="card"><b>包裝示意</b><div style="margin-top:8px;border:2px solid #C42D5A;border-radius:12px;padding:12px;background:linear-gradient(135deg,#fff,#FBF3F3)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:.8em;color:#C42D5A;font-weight:700">揪心願｜由陳小姐家庭提案</div><div class="big" style="margin:4px 0">可調光感應夜燈組</div><div class="muted" style="font-size:.8em">共同設計：林家、王家、高雄民族店生活顧問</div></div>${qr(123)}</div><div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-weight:700;color:#8E1E42">${this.logo(28)}揪居家，讓家更有電</div><div class="muted" style="font-size:.78em">掃 QR Code 看做法卡｜全國電子</div></div></div>`;
     },
   });
 
