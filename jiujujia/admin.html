@@ -671,7 +671,16 @@ wish:()=>{const w=W[selW];const rows=storeRows();const sum=k=>rows.reduce((a,r)=
   <div class="cls">${CAT.map(([k,n])=>`<button data-c="${k}" aria-pressed="${cls[w.id]===k}">${n}</button>`).join('')}</div>
   <div class="f"><label>回覆家庭（經由綁定門市）</label><textarea class="fld" rows="3">您好，我們已收到您的心願。綁定門市將與您聯繫，評估更換為可調光感應夜燈。</textarea></div>
   <div style="display:flex;gap:6px"><button class="b pri" data-a="reply">送出回覆</button><button class="b" data-a="toTpl">轉為情境模板草案</button></div>
-  <p class="c-mu" style="font-size:13px;margin:10px 0 0">相似心願累積達門檻時，會進入「共鳴」，作為新服務與選品的依據。</p></div></div></div>`},
+  <p class="c-mu" style="font-size:13px;margin:10px 0 0">相似心願累積達門檻時，會進入「共鳴」，作為新服務與選品的依據。</p></div></div></div>
+ <div class="grid2"><div class="panel"><div class="ph">每季審查 <small>參考 LEGO Ideas 一年三次審查｜下一次：2027/1/15（示意）</small></div><div style="overflow-x:auto"><table><thead><tr><th>主題</th><th>標籤</th><th>門檻</th><th>市場性</th><th>長輩安全</th><th>成本</th><th>結果</th></tr></thead><tbody>
+  <tr><td>可調光感應夜燈</td><td>#臥室到浴室 #防跌照明</td><td>127／100 ✓</td><td>✓</td><td>✓</td><td>✓ 2 家報價</td><td><span class="badge c-ok">通過・預購中</span></td></tr>
+  <tr><td>床邊大按鍵開關</td><td>#臥室到浴室 #省力家事</td><td>86／100</td><td>—</td><td>—</td><td>—</td><td><span class="badge c-am">第 3 關（剩 45 天）</span></td></tr>
+  <tr><td>睡前語音報平安</td><td>#全屋 #聯絡與陪伴</td><td>47／50</td><td>—</td><td>—</td><td>—</td><td><span class="badge c-am">第 2 關（剩 21 天）</span></td></tr>
+  <tr><td>浴室門口止滑地墊</td><td>#臥室到浴室 #無障礙改善</td><td>31／50</td><td>—</td><td>—</td><td>—</td><td><span class="badge">評估為既有選品</span></td></tr></tbody></table></div>
+  <div class="pb c-mu" style="font-size:13px">審查由總部、供應商與生活顧問三方進行；長輩安全不過就不量產。提案人回饋：淨銷售額 1% 購物金、首批商品、商品頁列名，不做現金分潤。</div></div>
+ <div class="panel"><div class="ph">標籤統計 <small>寫作模板＋推薦標籤｜三家試點門市累計（示意）</small></div><div class="pb">
+  ${[['臥室到浴室',128,1],['全屋',47,1],['廚房',23,0],['客廳',12,0],['洗衣陽台',8,0]].map(([n,v,on])=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0"><span style="width:84px">#${n}</span><div style="flex:1;height:10px;background:#F2E6EA;border-radius:5px"><div style="width:${Math.round(v/128*100)}%;height:10px;border-radius:5px;background:${on?'#C42D5A':'#E58AA5'}"></div></div><b style="width:40px;text-align:right">${v}</b><span class="badge ${on?'c-ok':''}" style="width:72px;text-align:center">${on?'試點量產':'擴展期證據'}</span></div>`).join('')}
+  <div class="c-mu" style="font-size:13px;margin-top:8px">試點期只量產「臥室到浴室」；其他場域的心願累積為擴展期開放揪食光、揪團聚、揪清爽的需求證據。需求類型最多：防跌照明、聯絡與陪伴。</div></div></div></div>`},
 kb:()=>{const m=month,base=[48,22,18,12];const T=[['夜間動線照明','v1.4',0,3,'11/02'],['晨起平安確認','v1.2',1,1,'10/25'],['夏季室溫提醒','v1.0',2,0,'10/18'],['浴室門口止滑（由心願新增）','v0.1',3,0,'11/03']];
  const cert=[['民族店',2,2],['三民中華店',2,2],['澄清店',1,2]];
  return `${fbar()}<div class="grid4">

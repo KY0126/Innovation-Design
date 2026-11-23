@@ -149,3 +149,47 @@ test('右下角浮動元件不蓋住主要按鈕（捲到底後）', async ({ pa
   }
   expect(errs).toEqual([]);
 });
+
+test('揪心願（參考 LEGO Ideas）：寫作模板＋標籤、阿國比對相似心願與四不提醒、三段門檻、企業管理端每季審查與標籤統計', async ({ page, context }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page);
+  await page.goto('/jiujujia/app.html?phase=pilot');
+  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await page.evaluate(() => window.JJJ.go('wish')); await page.waitForTimeout(300);
+  const v = page.locator('#view');
+  await expect(v).toContainText('官方寫作模板');
+  // 未填希望不能送出
+  await page.click('[data-a="wishSend"]');
+  await expect(page.locator('#view')).toContainText('官方寫作模板');
+  // 相似心願：寫到夜燈 → 阿國建議去共鳴
+  await page.fill('[data-wf="stuck"]', '感應夜燈太亮，很刺眼'); await page.waitForTimeout(900);
+  await expect(v).toContainText('找到相似心願');
+  // 四不：寫品牌 → 提醒並停用送出
+  await page.fill('[data-wf="hope"]', '想要飛利浦的夜燈'); await page.waitForTimeout(900);
+  await expect(v).toContainText('不指名品牌');
+  await expect(page.locator('[data-a="wishSend"]')).toBeDisabled();
+  await page.fill('[data-wf="hope"]', '亮度可以調低的感應夜燈'); await page.waitForTimeout(900);
+  await page.click('[data-wneed="防跌照明"]');
+  // 試點期選廚房 → 說明會累積為擴展期證據
+  await page.click('[data-wfield="廚房"]');
+  await expect(v).toContainText('擴展期開放新場域的需求證據');
+  await page.click('[data-wfield="臥室到浴室"]');
+  await page.click('[data-a="wishSend"]'); await page.waitForTimeout(1200);
+  await expect(page.locator('#view')).not.toContainText('官方寫作模板');
+  // 心願牆：標籤、三段門檻、擴展期證據卡、標籤篩選
+  await page.evaluate(() => window.JJJ.go('wall')); await page.waitForTimeout(1200);
+  await expect(v).toContainText('#防跌照明');
+  await expect(v).toContainText('第 2 關：90 天內 50 戶');
+  await expect(v).toContainText('擴展期證據');
+  await page.click('[data-wtag="聯絡與陪伴"]');
+  await expect(v).toContainText('睡前語音報平安');
+  await expect(v).not.toContainText('浴室門口止滑地墊');
+  // 企業管理端
+  const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
+  await adm.goto('/jiujujia/admin.html');
+  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await adm.evaluate(() => window.JJJA.go('wish')); await adm.waitForTimeout(500);
+  await expect(adm.locator('#view')).toContainText('每季審查');
+  await expect(adm.locator('#view')).toContainText('標籤統計');
+  expect([...errs, ...aerr]).toEqual([]);
+});

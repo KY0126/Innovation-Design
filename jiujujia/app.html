@@ -854,14 +854,16 @@ const WT=[
 const PRE={name:'可調光感應夜燈組',price:1990,early:1690,goal:60,now:41,items:['可調光感應小夜燈 ×3（三段亮度）','與現有閘道器連線，夜間亮度可在 App 調整','技師到府更換與長輩教學'],ship:'預計 12 月中出貨，由綁定門市安排更換'};
 Object.assign(V,{
 wall:()=>{const T=S.topics;if(!T)return `${hdr('大家的心願')}<div class="ld">載入中…</div>`;return `${hdr('大家的心願')}<div class="scroll" style="padding-top:12px">
- <div class="pad muted" style="margin-bottom:4px">只顯示整理過的主題，不公開任何家庭的內容。只有訂閱同一場域方案的家庭可以按「我也需要」；共鳴達門檻（擴展期 100 戶，試點期依訂閱戶數調整）後由總部評估，再依供應商最低訂購量與售價訂出每項商品的成團戶數，開放預購。</div>
- ${T.topics.map(t=>{const c=t.c,pct=Math.min(100,Math.round(c/t.th*100));return `<div class="card">
+ <div class="pad muted" style="margin-bottom:4px">只顯示整理過的主題，不公開任何家庭的內容。訂閱同場域方案的家庭可按「我也需要」：30 天內 20 戶、90 天內 50 戶、最終 100 戶進入每季審查（市場性、長輩安全、成本），通過才開放預購；逾期封存，相似心願可合併重來。</div>
+ ${window.JJJS2&&JJJS2.wallHead?JJJS2.wallHead():''}
+ ${T.topics.filter(t=>!(window.JJJS2&&JJJS2.wallShow)||JJJS2.wallShow(t)).map(t=>{const c=t.c,pct=Math.min(100,Math.round(c/t.th*100));return `<div class="card">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><b>${esc(t.n)}</b><div class="muted" style="font-size:.9em">${esc(t.d)}</div></div>${t.st==='pre'?'<span class="tag ok">預購中</span>':`<span class="tag">共鳴中</span>`}</div>
-  <div class="pbar" style="margin:10px 0 4px"><i style="width:${pct}%"></i></div>
-  <div class="muted" style="font-size:.88em">${c} 個家庭也需要${t.st==='pre'?'｜已達評估門檻':`｜還差 ${Math.max(0,t.th-c)} 個家庭進入評估`}</div>
+  ${window.JJJS2&&JJJS2.wallCard?JJJS2.wallCard(t):`<div class="pbar" style="margin:10px 0 4px"><i style="width:${pct}%"></i></div>
+  <div class="muted" style="font-size:.88em">${c} 個家庭也需要${t.st==='pre'?'｜已達評估門檻':`｜還差 ${Math.max(0,t.th-c)} 個家庭進入評估`}</div>`}
   ${t.st==='pre'?`<button class="btn" data-go="pre" style="margin-top:10px">前往預購：${PRE.name}</button>`:(J()?`<button class="btn ghost" data-me="${t.id}" aria-pressed="${!!t.me}" style="margin-top:10px">${t.me?'已表示需要 ✓':'我也需要'}</button>`:`<button class="btn ghost" disabled style="margin-top:10px;opacity:.6">訂閱同場域方案後即可參與</button>`)}
  </div>`}).join('')}
- <p class="pad muted" style="font-size:.85em">心願來源：家人提出、門市代長輩記錄、技師健檢回報。</p></div>`},
+ ${window.JJJS2&&JJJS2.wallTail?JJJS2.wallTail():''}
+ <p class="pad muted" style="font-size:.85em">心願來源：家人提出、門市代長輩記錄、技師健檢回報。提案人：商品淨銷售額 1% 以購物金回饋、首批商品與商品頁列名（不做現金分潤）。</p></div>`},
 pre:()=>{const PO=(S.topics&&S.topics.preorder)||{count:0,me:false},done=!!PO.me,now=PRE.now+PO.count,pct=Math.round(now/PRE.goal*100);return `${hdr('預購｜'+PRE.name)}<div class="scroll" style="padding-top:12px">
  <div class="card"><div class="rs">由揪居家家庭提案｜可調光感應夜燈</div><div class="big" style="margin:6px 0">${PRE.name}</div>
   ${PRE.items.map(x=>`<div class="row"><span>${x}</span></div>`).join('')}
