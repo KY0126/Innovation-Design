@@ -45,9 +45,10 @@ footer{color:var(--mu);font-size:12.5px;padding:0 20px 20px}
 </main>
 <footer>揪居家｜團隊 五子登科｜InnoConnect+ 2026 全國電子提案。延伸期示範畫面；客戶、據點、設備與日期皆為虛構示意。</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="phase.js?v=20261123b"></script>
 <script>
 (function(){
-const PH=()=>{try{return Math.max(0,['試點期','擴展期','延伸期'].indexOf(localStorage.getItem('jjj_phase')||'試點期'))}catch(e){return 0}};
+const PH=()=>window.JJJPHASE?JJJPHASE():0;
 const T={
  day:{n:'日照據點',c:'高雄○○日照中心（虛構）',sp:[['活動室','冷氣 ×2','保養到期 12/05','am'],['活動室','空氣清淨機','正常','ok'],['用餐區','冰箱','正常','ok'],['用餐區','電鍋與飲水機','濾心到期 12/10','am'],['浴室','電熱水器','待修：溫度不穩','rd'],['午休室','除濕機','正常','ok']]},
  care:{n:'住宿機構／養老院',c:'高雄○○護理之家（虛構）',sp:[['101 房','冷氣','保養到期 12/03','am'],['102 房','冷氣','正常','ok'],['交誼廳','電視','正常','ok'],['洗衣間','洗衣機 ×3','待修：1 台脫水異常','rd'],['廚房','冰箱 ×2','正常','ok']]},

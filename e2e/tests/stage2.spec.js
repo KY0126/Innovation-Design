@@ -71,3 +71,41 @@ test('營運階段開關：企業管理端切到擴展期後，App 揪全家可�
   await page.click('[data-ph="試點期"]');
   expect([...errs, ...aerr, ...berr]).toEqual([]);
 });
+
+test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依階段顯示', async ({ page, context }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page);
+  // 企業管理端營運階段頁有分享連結
+  const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
+  await adm.goto('/jiujujia/admin.html');
+  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await adm.evaluate(() => window.JJJA.go('phase')); await adm.waitForTimeout(300);
+  await expect(adm.locator('[data-plink="business.html"]')).toHaveAttribute('href', /phase=pilot/);
+  await adm.close();
+  // 網址參數帶入擴展期
+  await page.goto('/jiujujia/app.html?phase=exp');
+  expect(await page.evaluate(() => window.JJJPHASE())).toBe(1);
+  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  // F01／F02 → 揪居家主頁（長輩家）有其他場域入口；切到我家有育兒與寵物
+  await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
+  await expect(page.locator('#view')).toContainText('揪居家接下來會開放');
+  await expect(page.locator('#view [data-go="x24"]')).toBeVisible();
+  await page.click('[data-home="mine"]'); await page.waitForTimeout(300);
+  await expect(page.locator('#view [data-go="x34"]')).toBeVisible();
+  // F15 家電健康卡 → F27
+  const id = await page.evaluate(() => (window.JJJ.S.hh.devices[0] || {}).id);
+  if (id !== undefined) {
+    await page.evaluate(i => { window.JJJ.S.hc = i; window.JJJ.go('hc'); }, id); await page.waitForTimeout(300);
+    await page.click('#view [data-go="x27"]');
+    await expect(page.locator('#view')).toContainText('先保養延壽');
+  }
+  // 生活顧問（電腦版）顯示目前階段與擴展期加購提示
+  const con = await context.newPage(); const cerr = []; con.on('pageerror', e => cerr.push(e.message));
+  await con.goto('/jiujujia/consultant.html');
+  await con.click('#cLogin [data-demo]'); await con.waitForTimeout(2500);
+  await expect(con.locator('#phaseChip')).toContainText('擴展期');
+  // 網址參數切回試點期
+  await con.goto('/jiujujia/consultant.html?phase=pilot'); await con.waitForTimeout(2000);
+  await expect(con.locator('#phaseChip')).toContainText('試點期');
+  expect([...errs, ...cerr, ...aerr]).toEqual([]);
+});

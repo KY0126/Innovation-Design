@@ -3,10 +3,8 @@
 (function () {
   const J = window.JJJ; if (!J) return;
   const { V, hdr, toast, render, go } = J;
-  const PH_KEY = 'jjj_phase';
   const PHASES = ['試點期', '擴展期', '延伸期'];
-  const ph = () => { try { return Math.max(0, PHASES.indexOf(localStorage.getItem(PH_KEY) || '試點期')); } catch (e) { return 0; } };
-  window.JJJPHASE = ph;
+  const ph = () => window.JJJPHASE ? window.JJJPHASE() : 0;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const L = { s: {} }; // 本模組自己的畫面狀態
   const need = n => n === 2 ? '延伸期' : '擴展期';
@@ -161,6 +159,29 @@
            <div class="card"><div class="rs">預設不裝鏡頭。</div></div>`}`);
     },
   });
+
+  // 既有畫面的入口（介面藍圖：F01 揪居家 → F33、F02 家庭模式 → F34、F15 家電健康卡 → F27）
+  window.JJJS2 = {
+    entry(where, ctx) {
+      if (where === 'm2') {
+        const mine = !ctx; // ctx = 是否在「長輩家」分頁
+        return `<div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
+          ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
+          ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
+          ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
+      }
+      if (where === 'hc') {
+        const h = ctx || {}, old = h.years != null && h.years >= 8;
+        return `<div class="card" style="padding:4px 14px">${row('x27', old ? `已用 ${h.years} 年：看換新建議` : '家電換新建議', '先保養延壽，效能不足才換新；可選以租代買', 1)}</div>`;
+      }
+      if (where === 'a1') { // 生活顧問手機版：依目前階段提醒可提案的方案
+        const p = ph();
+        const t = ['試點期｜只提案揪夜安（基本 299／安心 449）；其他場域可幫家人登記', '擴展期｜可加購揪食光 +200、揪團聚 +150、揪清爽 +100，四場域改揪全家 699；可提以租代買', '延伸期｜另可接新家與老宅翻修、育兒與寵物家庭'][p];
+        return `<div class="card" style="background:var(--note);padding:8px 14px"><span class="${p ? 'tag ok' : 'rtag'}">營運階段</span> <span style="font-size:.88em">${t}</span></div>`;
+      }
+      return '';
+    },
+  };
 
   // 本模組的點擊事件（在原 App 的事件處理之前攔截自己的屬性）
   document.addEventListener('click', e => {
