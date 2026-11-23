@@ -100,7 +100,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
 <body>
 <div id="cGate" hidden><div class="box"><div class="sd"><span class="tg">企業管理端（電腦版）｜生活顧問</span><h2>今天的家庭，一次看完</h2><p>在門市電腦整合報價、排工作包；外出與到府請用揪居家 App</p><ul><li>新進案件與 AI 分析</li><li>整合報價、版本紀錄</li><li>工作包與施工順序、差異核准</li></ul></div>
 <form id="cLogin" novalidate><h3>生活顧問登入</h3><div class="sub">請用門市配發的帳號；需已取得居安規劃認證</div><label>Email<input name="email" type="email" autocomplete="username"></label><label>密碼<input name="password" type="password" autocomplete="current-password"></label><div class="er" role="alert"></div><button class="go" type="submit">登入生活顧問端</button>
-<div class="dm"><b>示範帳號</b><button type="button" data-demo="advisor@example.com">▶ 一鍵登入｜王小明（台中逢甲店）</button></div>
+<div class="dm"><b>示範帳號</b><button type="button" data-demo="advisor@example.com">▶ 一鍵登入｜王小明（高雄民族店）</button></div>
 <div class="oth">家庭與技師 → <a href="app.html">揪居家 App（手機）</a>　總部 → <a href="admin.html">企業管理端（電腦版）</a></div></form></div></div>
 <div class="app">
  <aside class="side" aria-label="生活顧問端選單">
@@ -180,7 +180,7 @@ function certCard(){const C=[['情境模板與相容性','依場域選設備、�
 const TIPS={'鞋櫃移出走廊':'走道先清空，夜裡起身就不會撞到東西，這項家人自己就能做。','感應夜燈':'走道偏暗，媽媽夜裡起床看不清楚，所以先裝感應夜燈，人一走過就亮。','止滑卡扣地板（淺橡木）':'卡扣地板不用拆舊地板，止滑又能復原，工班半天就做完。','斜坡墊＋止滑地墊':'浴室門檻 2 公分，加斜坡墊就不容易踢到，磁磚地也比較不滑。','木製斜坡＋地面止滑':'木製斜坡比較穩，地面另做止滑，由協力工班施工並提供書面保固。','移除門檻、更換止滑磁磚':'這項會動到防水層，要先到府估價，費用會另出新版本報價。','防夾門擋':'門擋可避免門突然關上夾到手。','可從外側解鎖的把手':'萬一媽媽在浴室跌倒擋住門，家人也能從外面打開。','改為外開門或橫拉門':'改門要先到府估價；如果是租屋，需要房東同意。'};
 function tips(p){const items=chosen(p.household_id);
  return `<div class="panel" style="margin-top:12px"><div class="ph">向家人說明提示 <small>情境模板自動帶出；顧問確認後照著說即可</small></div><div class="pb"><ul class="tips">${items.map(i=>`<li><b>${esc(i.sp)}｜${esc(i.n)}</b>${esc(TIPS[i.n]||'')}</li>`).join('')}
- <li><b>鏡頭</b>揪夜安預設不裝鏡頭，要不要加裝由林媽媽本人決定。</li><li><b>費用</b>設備與設定費一次付清，月費 299 元起，兄弟姊妹可以分攤。</li><li><b>成交</b>報價要林媽媽本人在 App 大字確認，才算成交。</li></ul></div></div>`}
+ <li><b>鏡頭</b>揪夜安預設不裝鏡頭，要不要加裝由林媽媽本人決定。</li><li><b>費用</b>設備與設定費一次付清，月費基本 299 元、安心 449 元，兄弟姊妹可以分攤。</li><li><b>成交</b>報價要林媽媽本人在 App 大字確認，才算成交。</li></ul></div></div>`}
 function vWb(){const h=ST.home,k=h.kpi,ho=handoffs(),P=cases();
  const by=s=>P.filter(p=>stage(p)[0].startsWith(s));
  return `<div class="kpis">${[['今日預約',(h.consults||[]).length],['待查看 AI 分析',by('新進').length],['待整合報價',ho.length],['待長輩確認',by('待長輩').length],['待施工排程',by('待施工').length+by('施工中').length],['售後待處理',(ST.todos.requests||[]).length+(ST.todos.care||[]).length]].map(([l,n])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${n}</div></div>`).join('')}</div>

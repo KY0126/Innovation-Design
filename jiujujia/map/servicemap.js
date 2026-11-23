@@ -5,7 +5,7 @@ import * as THREE from '../vendor/three.module.min.js';
 const G = window.SMGEO, ST = window.SMSTORES, AGE = window.SMAGE65, PILOT = window.SMPILOT;
 const TYN = { g: '一般門市', l: '大型門市', e: '體驗館門市', d: '百貨門市' };
 const TYC = { g: '#F6A5B9', l: '#C42D5A', e: '#8E1E42', d: '#E8577A' };
-const STAGES = { pilot: ['台中市'], expand: ['台北市', '新北市', '桃園市', '台中市', '台南市', '高雄市'], extend: null };
+const STAGES = { pilot: ['高雄市'], expand: ['台北市', '新北市', '桃園市', '台中市', '台南市', '高雄市'], extend: null };
 const STN = { pilot: '試點', expand: '擴展', extend: '延伸' };
 const BRAND = '#C42D5A', GRAY = '#C9C9CE';
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -140,7 +140,7 @@ export function mountServiceMap(root, opt = {}) {
   const stageOf = cn => STAGES.pilot.includes(cn) ? 'pilot' : STAGES.expand.includes(cn) ? 'expand' : 'extend';
   const inStage = cn => { const L = STAGES[S.stage]; return !L || L.includes(cn); };
   async function loadLive() {
-    const st = encodeURIComponent('Digital City 台中逢甲店');
+    const st = encodeURIComponent('Digital City 高雄民族店');
     try { const [hh, wo, care, rem] = await Promise.all([api('/admin/households?store=' + st), api('/admin/workorders?store=' + st), api('/admin/care?store=' + st), api('/admin/reminders?store=' + st)]);
       S.live = { hh: hh.households || [], wo: wo.orders || [], care: care.events || [], rem: rem.reminders || [] };
     } catch (e) { S.live = { hh: [], wo: [], care: [], rem: [], err: e.message }; }
@@ -164,7 +164,7 @@ export function mountServiceMap(root, opt = {}) {
     let no = 0; return Object.entries(HSC).map(([k, [, n]]) => ({ id: n, st: k, title: n, rows: rows.filter(r => r.st === k).map(r => ({ ...r, no: ++no })) })).filter(g => g.rows.length); }
   const groups = () => S.level === 1 ? groupsL1() : S.level === 2 ? groupsL2() : groupsL3();
   const allRows = () => groups().flatMap(g => g.rows);
-  function defaultOpen() { const G2 = groups(); if (S.level === 1) return (G2.find(g => g.id === STN[S.stage]) || G2[0] || {}).id; if (S.level === 2) return (G2.find(g => g.rows.some(r => r.key === '04129')) || G2.find(g => g.rows.some(r => r.s.pilot)) || G2[0] || {}).id; return (G2[0] || {}).id; }
+  function defaultOpen() { const G2 = groups(); if (S.level === 1) return (G2.find(g => g.id === STN[S.stage]) || G2[0] || {}).id; if (S.level === 2) return (G2.find(g => g.rows.some(r => r.key === '07078')) || G2.find(g => g.rows.some(r => r.s.pilot)) || G2[0] || {}).id; return (G2[0] || {}).id; }
   function openGroup(id, dim = true) { S.open = id; const g = groups().find(x => x.id === id); S.selGroup = g && dim ? g.rows.map(r => r.key) : null; if (S.sel && S.selGroup && !S.selGroup.includes(S.sel)) S.sel = null; }
 
   // ----- 第一層：全台縣市立體色塊 -----
@@ -190,12 +190,12 @@ export function mountServiceMap(root, opt = {}) {
       if (has) label([t.c[0], .3 * sc, t.c[1]], esc(t.n), 'twn', null, () => S.layers.town || S.open === t.n); }
     for (const r of rows) { const s = r.s, b = storeBuilding(s); b.scale.setScalar(sc * 1.15); b.position.set(s.x, .25 * sc, s.y); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
       label([s.x, (s.type === 'd' ? 3.2 : 2.4) * sc * 1.15 + .3 * sc, s.y], String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.open === s.town || S.hover === s.code).el.style.setProperty('--c', TYC[s.type]); }
-    if (cn === '台中市') { const home = STORES.find(s => s.code === '04129'), dst = [[home.x + 2.2, home.y - 1.6], [home.x - 1.8, home.y + 2.4]];
+    if (cn === '高雄市') { const home = STORES.find(s => s.code === '07078'), dst = [[home.x + 2.2, home.y - 1.6], [home.x - 1.8, home.y + 2.4]];
       dst.forEach((d, i) => { const v = van(i ? '#8E1E42' : BRAND); v.scale.setScalar(sc * 1.1); v.position.set(home.x, .3 * sc, home.y); v.visible = S.layers.van; v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([home.x, 1, home.y], i ? '陳技師（模擬）' : '吳技師（模擬）', 'van', null, () => S.layers.van);
         movers.push(t => { v.visible = S.layers.van; const k = (Math.sin(t * .35 + i * 2) + 1) / 2, x = home.x + (d[0] - home.x) * k, z = home.y + (d[1] - home.y) * k; v.position.x = x; v.position.z = z; v.rotation.y = Math.atan2(-(d[1] - home.y), d[0] - home.x) + (Math.cos(t * .35 + i * 2) < 0 ? Math.PI : 0); L.p.set(x, sc * 1.1, z); }); }); }
     target.set(cx, 0, cy); setShadow(span * 1.2); fly([cx, cy + span * .06], span * 1.35, -0.22, 0.78);
   }
-  // ----- 第三層：逢甲店街區（真實示範家庭標號碼，其餘房子為背景） -----
+  // ----- 第三層：民族店街區（真實示範家庭標號碼，其餘房子為背景） -----
   const HOUSES = (() => { const H = [], rng = (i, k) => hash('h' + i + k); let i = 0;
     for (let gx = -3; gx <= 3; gx++) for (let gz = -3; gz <= 3; gz++) { if (Math.abs(gx) < 1 && Math.abs(gz) < 1) continue; if (rng(i, 'skip') < .28) { i++; continue; }
       H.push({ id: 'H' + i, x: gx * 4.2 + (rng(i, 'x') - .5) * 1.2, z: gz * 4.2 + (rng(i, 'z') - .5) * 1.2, sub: rng(i, 's') < .38, heat: rng(i, 'h') }); i++; }
@@ -208,7 +208,7 @@ export function mountServiceMap(root, opt = {}) {
     for (let k = -3; k <= 3; k++) { const a = bx(34, .04, .9, '#D9D2D5', 0, 0, k * 4.2 + 2.1); a.userData.base = 1; scene.add(a); const b = bx(.9, .04, 34, '#D9D2D5', k * 4.2 + 2.1, 0, 0); b.userData.base = 1; scene.add(b); }
     const heat = []; for (const h of HOUSES) if (h.sub) { const d = new THREE.Mesh(new THREE.CircleGeometry(1.6 + h.heat, 24), new THREE.MeshBasicMaterial({ color: '#F6C6D3', transparent: true, opacity: .35 + h.heat * .25 })); d.rotation.x = -Math.PI / 2; d.position.set(h.x, .03, h.z); d.userData.base = 1; d.visible = S.layers.heat; heat.push(d); scene.add(d); }
     movers.push(() => heat.forEach(d => d.visible = S.layers.heat));
-    const st = STORES.find(s => s.code === '04129'), sb = storeBuilding(st); sb.scale.setScalar(1.15); keyed(sb, '04129'); scene.add(sb); label([0, 3.4, 0], '逢甲店', 'st pil', '04129');
+    const st = STORES.find(s => s.code === '07078'), sb = storeBuilding(st); sb.scale.setScalar(1.15); keyed(sb, '07078'); scene.add(sb); label([0, 3.4, 0], '民族店', 'st pil', '07078');
     const used = {};
     for (const r of rows) { const h = houseOf(r.real.id); if (!h) continue; used[h.id] = 1; const c = HSC[r.st][0], g = house('#FFFFFF', '#B9776B', c); g.position.set(h.x, 0, h.z); g.rotation.y = hash(h.id) > .5 ? 0 : Math.PI / 2; keyed(g, r.key); scene.add(g);
       label([h.x, 1.9, h.z], String(r.no), 'num', r.key).el.style.setProperty('--c', c);
@@ -231,7 +231,7 @@ export function mountServiceMap(root, opt = {}) {
     else if (S.level === 2) { const cty = G.counties.find(c => c.n === S.county), bb = bboxOf(cty.p), pad = 3; vb = [bb[0] - pad, bb[1] - pad, bb[2] - bb[0] + pad * 2, bb[3] - bb[1] + pad * 2]; const f = (vb[2] / 100);
       for (const t of G.towns[S.county] || []) body += `<path d="${P(t.p)}" fill="#F7EEEA" stroke="#E2D2D6" stroke-width="${.3 * f}"/>`;
       for (const r of groupsL2().flatMap(g => g.rows)) body += dot(r.s.x, r.s.y, (r.s.pilot ? 2.2 : 1.6) * f, focused(r.key) ? TYC[r.s.type] : GRAY, r.key, r.no); }
-    else { vb = [-17, -17, 34, 34]; body += `<rect x="-17" y="-17" width="34" height="34" fill="#F7EEF1"/><rect x="-1.6" y="-1.2" width="3.2" height="2.4" fill="${BRAND}" data-k="04129"/>`;
+    else { vb = [-17, -17, 34, 34]; body += `<rect x="-17" y="-17" width="34" height="34" fill="#F7EEF1"/><rect x="-1.6" y="-1.2" width="3.2" height="2.4" fill="${BRAND}" data-k="07078"/>`;
       for (const h of HOUSES) body += `<rect x="${h.x - .5}" y="${h.z - .5}" width="1" height="1" rx=".2" fill="#F4F1EC" stroke="#ddd" stroke-width=".05"/>`;
       for (const r of groupsL3().flatMap(g => g.rows)) { const h = houseOf(r.real.id); if (h) body += dot(h.x, h.z, .9, focused(r.key) ? HSC[r.st][0] : GRAY, r.key, r.no); } }
     svg.setAttribute('viewBox', vb.join(' ')); svg.innerHTML = body;
@@ -243,7 +243,7 @@ export function mountServiceMap(root, opt = {}) {
   function select(k) { hideHint(); S.sel = k || null; if (k) { const g = groups().find(x => x.rows.some(r => r.key === k)); if (g && S.open !== g.id) openGroup(g.id); } S.tab = 'ops'; applyDim(); panel(); }
   function enter() {
     if (S.level === 1 && S.sel) { S.county = S.sel; S.level = 2; S.sel = null; S.open = undefined; build(); }
-    else if (S.level === 2 && S.sel) { if (S.sel !== '04129') { toast('第三層街區先開放試點的逢甲店；其他門市於第二階段由企業提供資料後開放'); return; } S.store = S.sel; S.level = 3; S.sel = null; S.open = undefined; build(); }
+    else if (S.level === 2 && S.sel) { if (S.sel !== '07078') { toast('第三層街區先開放試點的民族店；其他門市於第二階段由企業提供資料後開放'); return; } S.store = S.sel; S.level = 3; S.sel = null; S.open = undefined; build(); }
   }
   function up() { if (S.level === 3) { S.level = 2; S.sel = S.store; } else if (S.level === 2) { S.level = 1; S.sel = S.county; } S.open = undefined; build(); }
   async function build() {
@@ -256,7 +256,7 @@ export function mountServiceMap(root, opt = {}) {
 
   // ----- 介面 -----
   function top() {
-    const bc = [['全台', 1]]; if (S.level >= 2) bc.push([S.county, 2]); if (S.level >= 3) bc.push(['逢甲店街區', 3]);
+    const bc = [['全台', 1]]; if (S.level >= 2) bc.push([S.county, 2]); if (S.level >= 3) bc.push(['民族店街區', 3]);
     $('.smbc').innerHTML = bc.map(([n, l], i) => i < bc.length - 1 ? `<button data-sm="bc" data-l="${l}">${esc(n)}</button><span>›</span>` : `<b>${esc(n)}</b>`).join('');
     $('.smup').hidden = S.level === 1; $('.smmode').textContent = S.flat ? '3D' : '平面'; $('.smmode').hidden = !webgl;
     root.querySelector('[data-k="flt"]').parentElement.hidden = S.level === 3;
@@ -265,10 +265,10 @@ export function mountServiceMap(root, opt = {}) {
     let K = [], ins = '';
     if (S.level === 1) { const v = visibleStores(STORES), dc = v.filter(s => s.dc).length, cs = new Set(v.map(s => s.county)).size;
       K = [['門市', v.length, '公開'], ['Digital City', dc, '公開', 'dc'], ['涵蓋縣市', cs, '公開'], [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
-      ins = S.stage === 'pilot' ? '試點選台中市：逢甲、公益、北屯總站 3 家 Digital City 大型門市都在市區，同一組技師可以統一排程、合併到府。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋 21 縣市 316 家門市；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
+      ins = S.stage === 'pilot' ? '試點選高雄市三民區：民族、澄清、三民中華 3 家 Digital City 都在三民區，同一組技師可以統一排程、合併到府；三民區 65 歲以上約 7.2 萬人。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋 21 縣市 316 家門市；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
     else if (S.level === 2) { const v = visibleStores(STORES.filter(s => s.county === S.county)), pil = v.filter(s => s.pilot);
       K = [['門市', v.length, '公開'], ['Digital City', v.filter(s => s.dc).length, '公開', 'dc'], ['65 歲以上占比', (AGE[S.county] || '—') + '%', '公開'], [pil.length ? '試點門市' : '一般門市', pil.length ? pil.length + ' 家' : v.filter(s => s.type === 'g').length + ' 家', pil.length ? '規劃' : '公開', pil.length ? 'pilot' : null]];
-      ins = S.county === '台中市' ? '逢甲店今天有合併到府工單：陳技師先裝夜燈與門檻燈條，吳技師再裝關懷設備。點清單裡的逢甲店，再「進入街區」。' : `${S.county}門市 ${v.length} 家；第二階段由企業提供營運資料後，才看得到揪居家與派工。`; }
+      ins = S.county === '高雄市' ? '民族店今天有合併到府工單：陳技師先裝夜燈與門檻燈條，吳技師再裝關懷設備。點清單裡的民族店，再「進入街區」。' : `${S.county}門市 ${v.length} 家；第二階段由企業提供營運資料後，才看得到揪居家與派工。`; }
     else { const L = S.live || {}, today = (L.wo || []).filter(o => ['已指派', '進行中', '待驗收'].includes(o.status)), wait = (L.wo || []).filter(o => o.status === '待排程' || o.status === '待確認'), ev = (L.care || []).filter(e => !e.followed_up);
       K = [['服務家庭', (L.hh || []).length + ' 戶', '即時', 'all'], ['今日到府', today.length + ' 張', '即時', 'doing'], ['待排程／待確認', wait.length + ' 張', '即時', 'need'], ['待關心事件', ev.length + ' 件', '即時', 'need']];
       const r = (L.rem || []).filter(x => x.status === '待處理'); ins = wait.length ? `${wait[0].household}的${wait[0].kind}等門市確認時段${r.length ? '；另有 ' + r.length + ' 則主動提醒可轉成維護工單' : ''}。` : r.length ? `${r[0].household}的${r[0].device}${r[0].kind}快到了，點那一戶即可建立維護工單草稿。` : '街區目前沒有待處理工單。'; }
@@ -285,11 +285,11 @@ export function mountServiceMap(root, opt = {}) {
         <button class="smgo" data-sm="enter">進入${esc(k)} ›</button></div></div>`; }
     if (S.level === 2) { const r = allRows().find(r => r.key === k); if (!r) return ''; const s = r.s, T = [['ops', '營運'], ['jjj', '揪居家'], ['eva', '評估']], tb = S.tab; let b = '';
       if (tb === 'ops') b = `<div class="kv"><span>官網類型</span><b>${TYN[s.type]}</b></div><div class="kv"><span>Digital City</span><b>${s.dc ? '是' : '否'}</b></div><div class="kv"><span>行政區</span><b>${esc(s.town)}</b></div><div class="mu">${esc(s.addr)}</div><div class="mu">門市代號 ${esc(s.code)}｜公開資料</div>`;
-      else if (tb === 'jjj') b = s.code === '04129' ? `<div class="kv"><span>揪居家情境角</span><b>有</b></div><div class="mu">今日合併到府：陳技師夜間照明（B）→ 吳技師關懷設備（A）。進入街區看每一戶的即時狀態。</div>` : s.pilot ? '<div class="mu">試點門市｜示範資料先建立逢甲店</div>' : '<div class="mu">第二階段由企業提供營運資料後開放</div>';
+      else if (tb === 'jjj') b = s.code === '07078' ? `<div class="kv"><span>揪居家情境角</span><b>有</b></div><div class="mu">今日合併到府：陳技師夜間照明（B）→ 吳技師關懷設備（A）。進入街區看每一戶的即時狀態。</div>` : s.pilot ? '<div class="mu">試點門市｜示範資料先建立民族店</div>' : '<div class="mu">第二階段由企業提供營運資料後開放</div>';
       else b = `<div class="kv"><span>縣市 65 歲以上占比</span><b>${AGE[s.county]}%</b></div><div class="kv"><span>同行政區門市</span><b>${STORES.filter(y => y.county === s.county && y.town === s.town).length} 家</b></div><div class="kv"><span>店型空間</span><b>${s.type === 'l' || s.type === 'e' ? '可設揪居家情境角' : '空間較小'}</b></div><div class="mu">公開資料＋規則試算</div>`;
       return `<div class="smcard"><div class="smph"><span class="nb" style="--c:${TYC[s.type]}">${r.no}</span>${esc(s.short)}${x}<small>${TYN[s.type]}${s.dc ? '・Digital City' : ''}${s.pilot ? '｜試點門市' : ''}</small></div><div class="smtb">${T.map(([kk, n]) => `<button data-sm="tab" data-k="${kk}" class="${tb === kk ? 'on' : ''}">${n}</button>`).join('')}</div><div class="smpb">${b}
-        ${s.code === '04129' ? '<button class="smgo" data-sm="enter">進入逢甲店街區 ›</button>' : ''}</div></div>`; }
-    if (k === '04129') return `<div class="smcard"><div class="smph">Digital City 逢甲店${x}<small>大型門市・Digital City｜試點</small></div><div class="smpb"><div class="mu">街區內白色房子是示範系統裡的真實家庭，號碼對應右側清單；米色房子是背景。</div></div></div>`;
+        ${s.code === '07078' ? '<button class="smgo" data-sm="enter">進入民族店街區 ›</button>' : ''}</div></div>`; }
+    if (k === '07078') return `<div class="smcard"><div class="smph">Digital City 民族店${x}<small>大型門市・Digital City｜試點</small></div><div class="smpb"><div class="mu">街區內白色房子是示範系統裡的真實家庭，號碼對應右側清單；米色房子是背景。</div></div></div>`;
     const r = allRows().find(r => r.key === k); if (!r) return ''; const real = r.real, L = S.live, rem = (L.rem || []).filter(y => y.household_id === real.id), wo = (L.wo || []).filter(o => o.household_id === real.id && o.status !== '已完成');
     return `<div class="smcard"><div class="smph"><span class="nb" style="--c:${HSC[r.st][0]}">${r.no}</span>${esc(real.name)}${x}<small>${HSC[r.st][1]}｜${esc(r.sub)}</small></div><div class="smpb"><div class="kv"><span>長輩</span><b>${esc(real.elder_note || '—')}</b></div><div class="kv"><span>家人帳號</span><b>${esc(real.owner)}</b></div>
       ${wo.map(o => `<div class="kv"><span>${esc(o.kind)}</span><b>${esc(o.status)}${o.label && o.label !== '待排程' ? '｜' + esc(o.label) : ''}</b></div>`).join('')}
@@ -331,7 +331,7 @@ export function mountServiceMap(root, opt = {}) {
     else if (a === 'grp') { const id = b.dataset.k; if (S.open === id) { S.open = null; S.selGroup = null; } else openGroup(id); applyDim(); panel(); }
     else if (a === 'kpi') { const k = b.dataset.k;
       if (k === 'dc') { S.dcOnly = !S.dcOnly; S.open = undefined; build(); }
-      else if (k === 'stage') { S.stage = 'pilot'; S.sel = '台中市'; S.open = undefined; build(); }
+      else if (k === 'stage') { S.stage = 'pilot'; S.sel = '高雄市'; S.open = undefined; build(); }
       else if (k === 'pilot') { const g = groups().find(x => x.rows.some(r => r.s.pilot)); if (g) openGroup(g.id); S.selGroup = allRows().filter(r => r.s.pilot).map(r => r.key); S.sel = null; applyDim(); panel(); }
       else if (k === 'all') { S.open = null; S.selGroup = null; S.sel = null; applyDim(); panel(); }
       else { const g = groups().find(x => x.st === k); if (g) { openGroup(g.id); S.sel = null; applyDim(); panel(); } else toast('目前沒有符合的家庭'); } }

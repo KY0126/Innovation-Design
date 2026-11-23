@@ -319,7 +319,7 @@ td.nw{white-space:nowrap}
  <div>
   <div class="top"><h1 id="title">即時總覽</h1><div class="meta"><span>使用者 <b id="who">—</b></span><span id="scope">門市 <b>—</b></span></div><span class="pv live" id="pv">即時資料</span><button class="b" id="logoutBtn">登出</button></div>
   <div class="mtabs" id="mtabs"></div>
-  <main class="body"><div id="alerts" class="alerts" role="status"></div><div id="view"></div><div id="mapView" hidden></div><div id="opsView" hidden><div class="tb"><div class="meta"><span>門市 <b>Digital City 台中逢甲店</b>（示範）</span><span>資料區間 <b id="mLabel">第 1 個月</b></span><span>最後更新 <b id="upd">—</b></span><span class="sync">與試點指標、派工排程同步</span></div>
+  <main class="body"><div id="alerts" class="alerts" role="status"></div><div id="view"></div><div id="mapView" hidden></div><div id="opsView" hidden><div class="tb"><div class="meta"><span>門市 <b>Digital City 高雄民族店</b>（示範）</span><span>資料區間 <b id="mLabel">第 1 個月</b></span><span>最後更新 <b id="upd">—</b></span><span class="sync">與試點指標、派工排程同步</span></div>
  <button class="b pri" id="play" aria-pressed="false">播放</button><button class="b" id="step">下一個月</button><button class="b" id="reset">重設</button>
  <div class="seg" role="group" aria-label="情境"><button data-sc="low">保守</button><button data-sc="base" aria-pressed="true">基準</button><button data-sc="high">樂觀</button></div>
  <button class="b" id="openP">參數設定</button></div>
@@ -358,7 +358,7 @@ td.nw{white-space:nowrap}
    <div class="ph" style="border-top:1px solid var(--line);border-radius:0">服務進度｜林媽媽家（示範） <small id="stTag" class="cur-h">先評估中</small></div>
    <div class="pb"><div class="jh3" id="steps"></div><div class="c-mu" style="margin-top:6px" id="stDesc"></div></div></div>
  </section>
- <section class="panel" style="margin-top:10px"><div class="ph">門市待辦｜台中逢甲店 <small>門市只負責事前設定與事後關心，不參與緊急處理</small></div><div style="overflow-x:auto"><table><thead><tr><th>類型</th><th>家庭</th><th>內容</th><th>狀態</th></tr></thead><tbody>
+ <section class="panel" style="margin-top:10px"><div class="ph">門市待辦｜民族店 <small>門市只負責事前設定與事後關心，不參與緊急處理</small></div><div style="overflow-x:auto"><table><thead><tr><th>類型</th><th>家庭</th><th>內容</th><th>狀態</th></tr></thead><tbody>
   <tr><td><span class="badge c-ok">事後關心</span></td><td>林媽媽家</td><td>11/20 凌晨 02:44 長輩按「我很好」；確認判斷時間是否合適</td><td><span class="badge c-am">今日待撥</span></td></tr>
   <tr><td><span class="badge c-ok">事後關心</span></td><td>黃先生家</td><td>昨晚通知家人、就近聯絡人到場；建議檢查浴室門口夜燈亮度</td><td><span class="badge c-am">今日待撥</span></td></tr>
   <tr><td><span class="badge c-am">設備問題</span></td><td>林媽媽家</td><td>浴室門感測器電量 12%，下次到府更換</td><td><span class="badge c-bl">已排程</span></td></tr>
@@ -366,7 +366,7 @@ td.nw{white-space:nowrap}
   <tr><td><span class="badge c-bl">居安規劃</span></td><td>林媽媽家</td><td>居家安全檢核：走道紅燈（夜間偏暗）、浴室黃燈（門檻約 2 cm），AR 掃描（場勘）量得走道約 92 cm；建議夜間動線照明＋門檻提示燈條</td><td><span class="badge c-am">等待補助核定</span></td></tr>
   <tr><td><span class="badge c-ok">語音電話</span></td><td>本週 42 戶</td><td>每週語音電話，長輩接聽按鍵即可；40 戶已回覆，2 戶重撥未接已通知家人</td><td><span class="badge c-ok">已回報家人</span></td></tr></tbody></table></div></section>
 </div></main>
-  <p class="ft">揪居家｜團隊 五子登科｜InnoConnect+ 2026 全國電子提案。「即時營運」為系統中的真實資料；「模擬與分析」為依假設參數的試算與示意畫面，非門市實際營運資料。示範門市「Digital City 台中逢甲店」取自公開資訊；其餘門市代號、人名、地址皆為示意，家庭資料以去識別化摘要呈現。</p>
+  <p class="ft">揪居家｜團隊 五子登科｜InnoConnect+ 2026 全國電子提案。「即時營運」為系統中的真實資料；「模擬與分析」為依假設參數的試算與示意畫面，非門市實際營運資料。示範門市「Digital City 高雄民族店」取自公開資訊；其餘門市代號、人名、地址皆為示意，家庭資料以去識別化摘要呈現。</p>
  </div>
 </div>
 <aside class="drawer" id="drawer" aria-label="參數設定" aria-hidden="true">
@@ -381,7 +381,7 @@ const DEFAULT_TAB='live';
 
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const P=[
- {k:'fee',n:'單一場域關懷月費',u:'元',min:149,max:599,st:10,src:'待問卷'},
+ {k:'fee',n:'平均關懷月費（基本 299／安心 449）',u:'元',min:249,max:449,st:10,src:'我方定價'},
  {k:'conv',n:'診斷轉為訂閱',u:'%',min:5,max:60,st:1,src:'待問卷'},
  {k:'ret',n:'三個月續訂率',u:'%',min:50,max:98,st:1,src:'待問卷'},
  {k:'diag',n:'每月診斷需求',u:'戶',min:20,max:200,st:5,src:'待企業資料'},
@@ -393,14 +393,14 @@ const P=[
  {k:'coItems',n:'每季上架的揪心願商品',u:'項',min:0,max:3,st:0.5,src:'假設'},
  {k:'coBuy',n:'每項每月購買家庭比例',u:'%',min:0,max:8,st:0.5,src:'待問卷'},
  {k:'coLift',n:'心願實現帶動的續訂提升',u:'個百分點',min:0,max:8,st:1,src:'假設'}];
-const SC={low:{fee:249,conv:12,ret:75,diag:90,instH:2,alert:0.6,fine:60,fixed:3.5,init:30,coItems:0.5,coBuy:1,coLift:1},
- base:{fee:299,conv:20,ret:85,diag:120,instH:1.5,alert:0.4,fine:70,fixed:2.5,init:20,coItems:1,coBuy:2,coLift:3},
- high:{fee:349,conv:28,ret:92,diag:150,instH:1,alert:0.3,fine:80,fixed:2,init:20,coItems:2,coBuy:3,coLift:4}};
+const SC={low:{fee:329,conv:12,ret:75,diag:90,instH:2,alert:0.6,fine:60,fixed:3.5,init:30,coItems:0.5,coBuy:1,coLift:1},
+ base:{fee:389,conv:20,ret:85,diag:120,instH:1.5,alert:0.4,fine:70,fixed:2.5,init:20,coItems:1,coBuy:2,coLift:3},
+ high:{fee:419,conv:28,ret:92,diag:150,instH:1,alert:0.3,fine:80,fixed:2,init:20,coItems:2,coBuy:3,coLift:4}};
 let v={...SC.base},staff={adv:2,tech:2};
 document.getElementById('params').innerHTML=P.map(p=>`<div class="p"><div class="t"><label for="r-${p.k}">${p.n}<span class="src">${p.src}</span></label><b id="o-${p.k}"></b></div><input type="range" id="r-${p.k}" min="${p.min}" max="${p.max}" step="${p.st}"></div>`).join('');
 const SEAS=[1.00,0.94,1.03,0.98,1.12,1.06,0.97,1.02,0.95,1.08,0.99,1.15,1.01,0.96,1.05,1.0,1.1,1.04]; // 月份波動：母親節、父親節、春節檔期等【示意】
 function run(vv=v,st=staff){
- const M=18,avgFee=vv.fee,addon=35,varC=45,devM=600,setup=1500;
+ const M=18,avgFee=vv.fee,addon=35,varC=45,devM=600,setup=1200;
  const techCapH=st.tech*160*0.6,advCapDiag=st.adv*160*0.45/0.75;
  let subs=0,wait=0,cum=-vv.init*1e4,bep=null;const out=[];
  for(let t=1;t<=M;t++){
@@ -421,15 +421,15 @@ let sd=11;const rnd=()=>{sd=(sd*9301+49297)%233280;return sd/233280};
 const base=el('g',{});
 const MAINX=470,MAINY=372;
 el('rect',{x:0,y:0,width:900,height:540,fill:'var(--g-land)'},base);
-// named roads (示意，依逢甲商圈大致路網，非實際比例)
+// named roads (示意，依民族店周邊大致路網，非實際比例)
 const ROADS=[
- {p:[[110,0],[110,540]],w:12,k:'sec',n:'黎明路',lx:114,ly:470,rot:90},
- {p:[[300,0],[300,540]],w:10,k:'sec',n:'逢甲路',lx:304,ly:470,rot:90},
- {p:[[470,0],[470,540]],w:18,k:'maj',n:'福星路',lx:476,ly:100,rot:90},
- {p:[[760,0],[760,540]],w:18,k:'maj',n:'河南路',lx:766,ly:470,rot:90},
- {p:[[0,200],[900,200]],w:12,k:'sec',n:'文華路',lx:560,ly:195},
- {p:[[0,420],[900,420]],w:18,k:'maj',n:'青海路',lx:560,ly:414},
- {p:[[0,40],[900,290]],w:18,k:'maj',n:'西屯路',lx:620,ly:205,rot:15.5}];
+ {p:[[110,0],[110,540]],w:12,k:'sec',n:'大順二路',lx:114,ly:470,rot:90},
+ {p:[[300,0],[300,540]],w:10,k:'sec',n:'民族一路',lx:304,ly:470,rot:90},
+ {p:[[470,0],[470,540]],w:18,k:'maj',n:'明誠一路',lx:476,ly:100,rot:90},
+ {p:[[760,0],[760,540]],w:18,k:'maj',n:'大昌二路',lx:766,ly:470,rot:90},
+ {p:[[0,200],[900,200]],w:12,k:'sec',n:'天祥一路',lx:560,ly:195},
+ {p:[[0,420],[900,420]],w:18,k:'maj',n:'九如一路',lx:560,ly:414},
+ {p:[[0,40],[900,290]],w:18,k:'maj',n:'澄清路',lx:620,ly:205,rot:15.5}];
 const LANES_V=[200,385,615,860],LANES_H=[110,330,495];
 const dseg=(x,y,[[x1,y1],[x2,y2]])=>{const dx=x2-x1,dy=y2-y1,t=Math.max(0,Math.min(1,((x-x1)*dx+(y-y1)*dy)/(dx*dx+dy*dy)));return Math.hypot(x-x1-t*dx,y-y1-t*dy)};
 const CAMPUS=[312,212,148,148],PARK=[630,436,110,84],MARKET=[318,120,140,70];
@@ -450,8 +450,8 @@ LANES_H.forEach(y=>el('line',{x1:0,y1:y,x2:900,y2:y,stroke:'var(--g-road)','stro
 ROADS.forEach(r=>{const d='M'+r.p.map(q=>q.join(',')).join('L');el('path',{d,stroke:r.k==='maj'?'var(--g-maj-s)':'var(--g-road-s)','stroke-width':r.w+2,fill:'none'},base);el('path',{d,stroke:r.k==='maj'?'var(--g-maj)':'var(--g-road)','stroke-width':r.w,fill:'none'},base)});
 ROADS.forEach(r=>{const t=el('text',{x:r.lx,y:r.ly,'font-size':11,fill:'var(--g-label)','font-weight':500,'paint-order':'stroke',stroke:'var(--g-land)','stroke-width':3},base);t.textContent=r.n;if(r.rot)t.setAttribute('transform',`rotate(${r.rot} ${r.lx} ${r.ly})`)});
 const lbl=(x,y,t,c,s)=>{const e=el('text',{x,y,'font-size':s||11,'text-anchor':'middle',fill:c||'var(--g-label)','font-weight':600,'paint-order':'stroke',stroke:'var(--g-land)','stroke-width':3},base);e.textContent=t};
-lbl(CAMPUS[0]+CAMPUS[2]/2,CAMPUS[1]+CAMPUS[3]/2,'逢甲大學','#8A5A1E',12);
-lbl(MARKET[0]+MARKET[2]/2,MARKET[1]+MARKET[3]/2+4,'逢甲夜市','#B4532A',11.5);
+lbl(CAMPUS[0]+CAMPUS[2]/2,CAMPUS[1]+CAMPUS[3]/2,'文藻外語大學','#8A5A1E',12);
+lbl(MARKET[0]+MARKET[2]/2,MARKET[1]+MARKET[3]/2+4,'明誠商圈','#B4532A',11.5);
 lbl(PARK[0]+PARK[2]/2,PARK[1]+PARK[3]/2+4,'○○公園','#8E1E42',11);
 const POI=[[255,262,'便利商店','#8E1E42'],[560,148,'便利商店','#8E1E42'],[700,360,'公車站','#8E1E42'],[180,380,'○○宮','#B4532A'],[540,480,'○○國小','#8A5A1E']];
 POI.forEach(([x,y,n,c])=>{el('circle',{cx:x,cy:y,r:6.5,fill:c,stroke:'#fff','stroke-width':2},base);el('text',{x:x+10,y:y+4,'font-size':10.5,fill:c,'font-weight':500,'paint-order':'stroke',stroke:'var(--g-land)','stroke-width':3},base).textContent=n});
@@ -470,7 +470,7 @@ const store=el('g',{});
 el('path',{d:`M${MAINX},${MAINY-6} l-11,-18 a13,13 0 1,1 22,0 z`,fill:'#C42D5A',stroke:'#fff','stroke-width':1.5},store);
 el('circle',{cx:MAINX,cy:MAINY-30,r:4.5,fill:'#fff'},store);
 el('rect',{x:MAINX+14,y:MAINY-52,width:228,height:36,rx:4,fill:'var(--card)',stroke:'var(--line)'},store);
-el('text',{x:MAINX+22,y:MAINY-37,'font-size':11.5,'font-weight':700,fill:'var(--ink)'},store).textContent='全國電子 Digital City 台中逢甲店';
+el('text',{x:MAINX+22,y:MAINY-37,'font-size':11.5,'font-weight':700,fill:'var(--ink)'},store).textContent='全國電子 Digital City 高雄民族店';
 el('text',{x:MAINX+22,y:MAINY-22,'font-size':10.5,fill:'var(--muted)'},store).textContent='示範門市｜揪居家情境角';
 el('text',{x:892,y:534,'font-size':9.5,'text-anchor':'end',fill:'var(--g-label)'},store).textContent='示意地圖｜非實際比例與住戶位置';
 const VG=el('g',{}),EG=el('g',{});
@@ -493,14 +493,14 @@ const money=n=>'NT$ '+Math.round(n).toLocaleString('en-US');
 const wan=n=>(n<0?'−':'')+Math.abs(n/1e4).toFixed(1)+' 萬';
 const pad=n=>String(n).padStart(2,'0');
 const STEPS=[['線上評估','家人經全國電子 AI 顧問阿國進入居家診斷，完成 AR 掃描與安全檢核，預約門市諮詢','① 先評估'],['門市體驗','林媽媽於情境角確認設備不含鏡頭','① 先評估'],['確認方案','生活顧問把夜間動線照明與關懷設備整合成一張報價，設定聯絡人','② 再改善'],['到府安裝','技師先裝夜燈與門檻燈條、再裝關懷設備，同一天合併到府','② 再改善'],['教學啟用','技師一對一教學，測試「我很好」按鈕','③ 後關心'],['售後追蹤','平常安靜關懷，每週語音電話、每月一則整合摘要','③ 後關心']];
-const AREAS=['西屯區○○路','西屯區○○街','南屯區○○路','北屯區○○街','西區○○路'];
+const AREAS=['三民區○○路','三民區○○街','鼓山區○○路','左營區○○街','苓雅區○○路'];
 function wos(o){const list=[];const n1=Math.max(1,Math.round(o.inst/22)),n2=Math.max(1,Math.round(o.subs/12/22));const tech=['吳技師','陳技師','林技師','黃技師'];
  let s=9;for(let i=0;i<Math.min(n1,3);i++){list.push([`${pad(s)}:00–${pad(s+2)}:00`,'安裝｜夜間動線照明',i]);s+=2}
  for(let i=0;i<Math.min(n2,2);i++){list.push([`${pad(s)}:30–${pad(s+1)}:30`,'年度健檢｜檢查與記錄',i+3]);s+=2}
  if(o.subs>40)list.push(['16:00–16:30','更換電池｜浴室門感測器',5]);
  const nowH=Math.floor(clock/60);
  return list.slice(0,6).map(([tm,type,i],k)=>{const end=+tm.slice(6,8);const st=nowH>=end?['已完成','c-ok']:nowH>=+tm.slice(0,2)?['進行中','c-am']:['已排程','c-bl'];
-  if(k===0){type='安裝｜夜間動線照明＋門檻提示燈條'}return `<tr><td>${tm}</td><td>W-20261108-${pad(k+1)}</td><td>${type}</td><td>${k===0?'林媽媽家｜西屯區○○路＊＊號':AREAS[(i+month)%5]+'＊＊號'}</td><td>${k===0?'陳技師→吳技師':tech[(i+month)%4]}</td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join('')}
+  if(k===0){type='安裝｜夜間動線照明＋門檻提示燈條'}return `<tr><td>${tm}</td><td>W-20261108-${pad(k+1)}</td><td>${type}</td><td>${k===0?'林媽媽家｜三民區○○路＊＊號':AREAS[(i+month)%5]+'＊＊號'}</td><td>${k===0?'陳技師→吳技師':tech[(i+month)%4]}</td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join('')}
 const logs=[];const PIN=['11/20 02:44','林媽媽家｜啟用後夜間浴室停留過久，燈光詢問後長輩按「我很好」，流程結束','fine'];
 function logHTML(){return [PIN,...logs].slice(0,5).map(([a,b,c])=>`<div><b>${a}</b><span><span class="badge ${c==='fine'?'c-ok':'c-am'}">${c==='fine'?'長輩確認':'通知家人'}</span> ${b}</span></div>`).join('')}
 function addLog(type){const h=homes[Math.floor(Math.random()*Math.max(1,shown))];if(!h||shown<1)return;
@@ -584,13 +584,13 @@ function eco(rows){const sw=rows.reduce((a,r)=>a+r.o.subs*0.012,0),mt=rows.reduc
 function storeRowsF(){const r=storeRows();return selStore==='all'?r:r.filter(x=>x.code===selStore)}
 function info(t){return `<span class="ii" tabindex="0" title="${t}" aria-label="${t}">ⓘ</span>`}
 function spark(a,c,t){if(!a||a.length<2)return '';const mn=Math.min(...a,t??Infinity),mx=Math.max(...a,t??-Infinity);const sx=i=>2+i*(116/(a.length-1)),sy=y=>22-18*(y-mn)/((mx-mn)||1);return `<svg viewBox="0 0 120 26" width="120" height="26" style="display:block" aria-hidden="true">${t!=null?`<line x1="2" x2="118" y1="${sy(t)}" y2="${sy(t)}" stroke="var(--muted)" stroke-dasharray="2 2" stroke-width=".8"/>`:''}<polyline points="${a.map((y,i)=>`${sx(i)},${sy(y)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="1.8"/><circle cx="${sx(a.length-1)}" cy="${sy(a[a.length-1])}" r="2.2" fill="${c}"/></svg>`}
-function fbar(){return `<div class="fbar"><label>門市<select data-f="store"><option value="all">全部試點門市</option>${['台中逢甲店','台中公益店','新北○○店'].map(c=>`<option ${selStore===c?'selected':''}>${c}</option>`).join('')}</select></label><label>期間<select data-f="month">${Array.from({length:18},(_,i)=>`<option value="${i+1}" ${month===i+1?'selected':''}>第 ${i+1} 個月</option>`).join('')}</select></label><label>情境<select data-f="sc">${[['low','保守'],['base','基準'],['high','樂觀']].map(([k,n])=>`<option value="${k}" ${JSON.stringify(v)===JSON.stringify(SC[k])?'selected':''}>${n}</option>`).join('')}<option value="" ${['low','base','high'].some(k=>JSON.stringify(v)===JSON.stringify(SC[k]))?'':'selected'}>自訂</option></select></label><span class="c-mu" style="margin-left:auto;font-size:12.5px">模擬資料｜與門市營運同步</span></div>`}
+function fbar(){return `<div class="fbar"><label>門市<select data-f="store"><option value="all">全部試點門市</option>${['民族店','澄清店','三民中華店'].map(c=>`<option ${selStore===c?'selected':''}>${c}</option>`).join('')}</select></label><label>期間<select data-f="month">${Array.from({length:18},(_,i)=>`<option value="${i+1}" ${month===i+1?'selected':''}>第 ${i+1} 個月</option>`).join('')}</select></label><label>情境<select data-f="sc">${[['low','保守'],['base','基準'],['high','樂觀']].map(([k,n])=>`<option value="${k}" ${JSON.stringify(v)===JSON.stringify(SC[k])?'selected':''}>${n}</option>`).join('')}<option value="" ${['low','base','high'].some(k=>JSON.stringify(v)===JSON.stringify(SC[k]))?'':'selected'}>自訂</option></select></label><span class="c-mu" style="margin-left:auto;font-size:12.5px">模擬資料｜與門市營運同步</span></div>`}
 function alerts(){try{const rows=storeRows();const L=[];rows.forEach(r=>{if(r.o.advLoad>0.8)L.push(['am',`${r.code} 生活顧問負荷 ${Math.round(r.o.advLoad*100)}%`]);if(r.o.techLoad>0.8)L.push(['am',`${r.code} 技師負荷 ${Math.round(r.o.techLoad*100)}%`]);});L.push(['bl','床邊大按鍵開關共鳴 86／100（訂閱家庭），接近評估門檻']);L.push(['bl','可調光感應夜燈組成團 41／60']);L.push(['am','廠商作業系統後台同步延遲 42 分鐘']);
  document.getElementById('alerts').innerHTML=`<span class="al-t">待處理 ${L.length}</span>`+L.slice(0,5).map(([c,t])=>`<span class="al al-${c}">${t}</span>`).join('')}catch(e){}}
 function notesToInfo(){document.querySelectorAll('#view .panel').forEach(p=>{const ph=p.querySelector('.ph');if(!ph)return;p.querySelectorAll(':scope > .pb.c-mu, :scope .pb > .c-mu[style*="font-size:13px"], :scope .pb > .c-mu[style*="font-size:12.5px"]').forEach(n=>{const t=n.textContent.trim();if(t.length<18||n.querySelector('table'))return;ph.insertAdjacentHTML('beforeend',info(t.replace(/"/g,'')));n.remove()})})}
 
-const STORES=[['台中逢甲店',{},{}],['台中公益店',{diag:0.75,conv:-2.5},{tech:-1}],['新北○○店',{diag:0.9,conv:-0.5},{}]];
-function storeRows(){return STORES.map(([code,m,sm])=>{const vv={...v};if(m.diag)vv.diag=v.diag*m.diag;if(m.conv)vv.conv=Math.max(5,v.conv+m.conv);const st={adv:staff.adv,tech:Math.max(1,staff.tech+(sm.tech||0))};const rr=code==='台中逢甲店'?R:run(vv,st);const o=rr.out[month-1];return {code,o,vv,st,bep:rr.bep}})}
+const STORES=[['民族店',{},{}],['澄清店',{diag:0.75,conv:-2.5},{tech:-1}],['三民中華店',{diag:0.9,conv:-0.5},{}]];
+function storeRows(){return STORES.map(([code,m,sm])=>{const vv={...v};if(m.diag)vv.diag=v.diag*m.diag;if(m.conv)vv.conv=Math.max(5,v.conv+m.conv);const st={adv:staff.adv,tech:Math.max(1,staff.tech+(sm.tech||0))};const rr=code==='民族店'?R:run(vv,st);const o=rr.out[month-1];return {code,o,vv,st,bep:rr.bep}})}
 const nt=n=>(n<0?'−':'')+'NT$ '+Math.abs(Math.round(n)).toLocaleString('en-US');
 function hqRefresh(){try{alerts();if(['dispatch','kpi','wish','content','amb','vc','sys','kb'].includes(cur)){document.getElementById('view').innerHTML=V[cur]();notesToInfo()}}catch(e){}}
 
@@ -600,10 +600,10 @@ const SUB={wo:['dispatch'],wish:['kb'],content:['amb'],vc:['vendor'],sys:['about
 const PARENT={};Object.entries(SUB).forEach(([p,L])=>L.forEach(c=>PARENT[c]=p));
 let cur=(location.hash||'').slice(1)||DEFAULT_TAB,selW=0,cls={};
 const W=[
- {id:'WS-1103',src:'App｜家人',store:'台中逢甲店',txt:'希望浴室地板不要那麼滑，媽媽洗澡比較安心',d:'11/03',sim:12},
- {id:'WS-1102',src:'門市代記｜長輩',store:'台中逢甲店',txt:'晚上起床找不到電燈開關',d:'11/02',sim:9},
- {id:'WS-1101',src:'技師健檢回報',store:'新北○○店',txt:'長輩想學用手機和孫子視訊',d:'11/01',sim:7},
- {id:'WS-1030',src:'App｜孫輩',store:'台中公益店',txt:'阿公說夜燈太亮睡不著，希望可以調暗',d:'10/30',sim:5}];
+ {id:'WS-1103',src:'App｜家人',store:'民族店',txt:'希望浴室地板不要那麼滑，媽媽洗澡比較安心',d:'11/03',sim:12},
+ {id:'WS-1102',src:'門市代記｜長輩',store:'民族店',txt:'晚上起床找不到電燈開關',d:'11/02',sim:9},
+ {id:'WS-1101',src:'技師健檢回報',store:'三民中華店',txt:'長輩想學用手機和孫子視訊',d:'11/01',sim:7},
+ {id:'WS-1030',src:'App｜孫輩',store:'澄清店',txt:'阿公說夜燈太亮睡不著，希望可以調暗',d:'10/30',sim:5}];
 const AIC={'WS-1103':['新增情境模板',86,'與 12 件「浴室門口濕滑」心願相似，建議在揪夜安模板加入門口止滑地墊','tpl'],
  'WS-1102':['既有商品可滿足',91,'感應夜燈與夜間照明組可滿足；建議由綁定門市推薦既有方案','exist'],
  'WS-1101':['新服務或夥伴',78,'屬教學服務，建議納入門市長輩體驗日或節氣共煮主題','svc'],
@@ -631,7 +631,7 @@ wish:()=>{const w=W[selW];const rows=storeRows();const sum=k=>rows.reduce((a,r)=
    <polyline points="${sup.map((y,i)=>`${sx(i)},${syS(y)}`).join(' ')}" fill="none" stroke="#8E1E42" stroke-width="2.2" stroke-dasharray="5 3"/>
    <line x1="${sx(month-1)}" x2="${sx(month-1)}" y1="18" y2="110" stroke="var(--muted)" stroke-dasharray="2 3"/>
    <text x="30" y="126" font-size="11.5" fill="var(--muted)">1月</text><text x="262" y="126" font-size="11.5" fill="var(--muted)">18月</text></svg>
-  <div class="kv"><span><i class="lg" style="background:#C42D5A"></i>訂閱家庭（台中逢甲店）</span><b>${Math.round(o.subs)} 戶</b></div>
+  <div class="kv"><span><i class="lg" style="background:#C42D5A"></i>訂閱家庭（民族店）</span><b>${Math.round(o.subs)} 戶</b></div>
   <div class="kv"><span><i class="lg" style="background:#8E1E42"></i>合作供應商</span><b>${o.suppliers} 家</b></div>
   <div class="kv"><span>心願實現後的續訂率</span><b>${Math.round(o.retE)}%</b></div>
   <div class="c-mu" style="font-size:12.5px;margin-top:4px">試點期只驗證機制；家庭與供應商互相拉抬的效果需規模累積後才會出現。</div></div></div></div>
@@ -649,7 +649,7 @@ wish:()=>{const w=W[selW];const rows=storeRows();const sum=k=>rows.reduce((a,r)=
   <div style="display:flex;gap:6px"><button class="b pri" data-a="reply">送出回覆</button><button class="b" data-a="toTpl">轉為情境模板草案</button></div>
   <p class="c-mu" style="font-size:13px;margin:10px 0 0">相似心願累積達門檻時，會進入「共鳴」，作為新服務與選品的依據。</p></div></div></div>`},
 kb:()=>{const m=month,base=[48,22,18,12];const T=[['夜間動線照明','v1.4',0,3,'11/02'],['晨起平安確認','v1.2',1,1,'10/25'],['夏季室溫提醒','v1.0',2,0,'10/18'],['浴室門口止滑（由心願新增）','v0.1',3,0,'11/03']];
- const cert=[['台中逢甲店',2,2],['新北○○店',2,2],['台中公益店',1,2]];
+ const cert=[['民族店',2,2],['三民中華店',2,2],['澄清店',1,2]];
  return `${fbar()}<div class="grid4">
  <div class="panel pb kpi"><div class="l">啟用中模板</div><div class="n">3 個</div><div class="d">草案 1 個</div></div>
  <div class="panel pb kpi"><div class="l">本月規則更新</div><div class="n">2 次</div><div class="d">均附修改原因</div></div>
@@ -658,17 +658,17 @@ kb:()=>{const m=month,base=[48,22,18,12];const T=[['夜間動線照明','v1.4',0
  <div class="grid2"><div class="panel"><div class="ph">情境模板 ${info('由總部維護，全門市同步；每次修改需填寫原因並保留版本紀錄。')}</div><div style="overflow-x:auto"><table><thead><tr><th>模板</th><th>版本</th><th>採用率</th><th>走勢</th><th>錯誤回報</th><th>最後更新</th></tr></thead><tbody>
   ${T.map(([n,ver,i,er,d])=>{const ser=Array.from({length:m},(_,k)=>i===3?(k>m-3?2+k%2:0):Math.max(1,base[i]-4+k*0.5+((k*7+i)%3)));return `<tr><td>${n}</td><td>${ver}</td><td>${i===3?'—':Math.round(ser[m-1])+'%'}</td><td>${spark(ser,i===3?'#B04A6A':'#8E1E42')}</td><td>${er?`<span class="badge c-am">${er}</span>`:'0'}</td><td>${d}</td></tr>`}).join('')}</tbody></table></div></div>
  <div class="panel"><div class="ph">第一線回報 <span class="badge c-am">1 待處理</span></div><div style="overflow-x:auto"><table><thead><tr><th>來源</th><th>內容</th><th>狀態</th><th></th></tr></thead><tbody>
-  <tr><td>台中逢甲店｜王小明</td><td>新款插座實測可相容</td><td><span class="badge c-am">待處理</span></td><td><button class="b pri" data-a="upd">更新規則</button></td></tr>
+  <tr><td>民族店｜王小明</td><td>新款插座實測可相容</td><td><span class="badge c-am">待處理</span></td><td><button class="b pri" data-a="upd">更新規則</button></td></tr>
   <tr><td>技師｜吳技師</td><td>插座位置不同，改用電池型夜燈</td><td><span class="badge c-ok">已併入 v1.4</span></td><td></td></tr>
   <tr><td>技師｜林技師</td><td>推拉門需不同固定方式</td><td><span class="badge c-ok">已併入 v1.3</span></td><td></td></tr></tbody></table></div></div></div>
  <div class="panel"><div class="ph">居安規劃認證進度 ${info('四門課：情境模板與相容性、長輩溝通與陪同模式、隱私與同意、異常處理流程；掛在既有教育訓練系統（示意）。')}</div><div class="pb">
   ${cert.map(([st,d,t])=>`<div class="kv"><span>${st}</span><span style="display:flex;align-items:center;gap:10px;width:55%"><span class="bar" style="flex:1;margin:0"><i style="width:${d/t*100}%;background:${d<t?'#E0A030':'#8E1E42'}"></i></span><b style="width:70px;text-align:right">${d}／${t} 人</b></span></div>`).join('')}
   <div class="kv"><span>課程完訓率</span><span>情境模板 100%｜長輩溝通 83%｜隱私與同意 100%｜異常處理 67%</span></div></div></div>`},
-dispatch:()=>{const rows=storeRowsF();const techs=[['吳技師','台中逢甲店',[[9,11,'安裝｜林媽媽家','i'],[11.5,12.5,'到府場勘｜楊先生家（浴室門檻）','s'],[13.5,14.5,'健檢｜林媽媽家','p'],[16,16.5,'設備問題｜陳先生家','d']]],['陳技師','台中逢甲店｜夜間照明',[[9,10,'夜燈＋門檻燈條｜林媽媽家','c']]],['林技師','台中逢甲店',[[9,10.5,'安裝｜李先生家','i'],[11,12,'健檢｜黃女士家','p'],[14,15,'更換電池｜王先生家','d']]],['蔡技師','台中公益店',[[10,12,'安裝｜周女士家','i'],[13,14,'夜燈調整｜何先生家','f'],[15,16,'健檢｜吳先生家','p']]],['黃技師','新北○○店',[[9,11,'安裝｜蔡女士家','i'],[13,14,'設備問題｜許先生家','d'],[14.5,16.5,'安裝｜鄭先生家','i']]]];
+dispatch:()=>{const rows=storeRowsF();const techs=[['吳技師','民族店',[[9,11,'安裝｜林媽媽家','i'],[11.5,12.5,'到府場勘｜楊先生家（浴室門檻）','s'],[13.5,14.5,'健檢｜林媽媽家','p'],[16,16.5,'設備問題｜陳先生家','d']]],['陳技師','民族店｜夜間照明',[[9,10,'夜燈＋門檻燈條｜林媽媽家','c']]],['林技師','民族店',[[9,10.5,'安裝｜李先生家','i'],[11,12,'健檢｜黃女士家','p'],[14,15,'更換電池｜王先生家','d']]],['蔡技師','澄清店',[[10,12,'安裝｜周女士家','i'],[13,14,'夜燈調整｜何先生家','f'],[15,16,'健檢｜吳先生家','p']]],['黃技師','三民中華店',[[9,11,'安裝｜蔡女士家','i'],[13,14,'設備問題｜許先生家','d'],[14.5,16.5,'安裝｜鄭先生家','i']]]];
  const col={i:'#C42D5A',c:'#8E1E42',p:'#8E1E42',d:'#E0A030',r:'#8E1E42',f:'#E8577A',s:'#9A9893'};const X=h=>130+(h-9)*70;
  const gantt=`<svg viewBox="0 0 780 ${30+techs.length*34}" width="100%" role="img" aria-label="技師一日時間軸" class="gantt">${Array.from({length:10},(_,k)=>`<line x1="${X(9+k)}" x2="${X(9+k)}" y1="18" y2="${18+techs.length*34}" stroke="var(--line)"/><text x="${X(9+k)}" y="12" font-size="11.5" text-anchor="middle" fill="var(--muted)">${9+k}:00</text>`).join('')}
   <line x1="${X(10.5)}" x2="${X(10.5)}" y1="46" y2="58" stroke="#8E1E42" stroke-dasharray="2 2"/>${techs.map(([n,st,js],r)=>`<text x="4" y="${38+r*34}" font-size="12.5" fill="var(--ink)">${n}</text><text x="4" y="${50+r*34}" font-size="11" fill="var(--muted)">${st}</text>${js.map(([a,b,t,k])=>`<g class="gb" tabindex="0" data-tip="${t}<br><small>${n}｜${st}｜${String(Math.floor(a)).padStart(2,'0')}:${a%1?'30':'00'}–${String(Math.floor(b)).padStart(2,'0')}:${b%1?'30':'00'}</small>"><rect x="${X(a)}" y="${24+r*34}" width="${(b-a)*70-3}" height="22" rx="3" fill="${col[k]}" opacity=".9"/><text x="${X(a)+4}" y="${39+r*34}" font-size="10" fill="#fff">${(()=>{const w=(b-a)*70-10,f=9.5;return t.length*f>w?t.slice(0,Math.max(2,Math.floor(w/f)-1))+'…':t})()}</text></g>`).join('')}`).join('')}</svg>`;
- const pend=[['林媽媽家（台中逢甲店）','夜間動線照明＋門檻提示燈條','兩位技師同日上午合併到府','m1'],['李先生家（台中逢甲店）','晨起平安確認','可排入林技師週四下午','m2'],['周女士家（台中公益店）','夜間動線照明','台中公益店技師負荷高，建議由台中逢甲店支援','m3'],['王先生家（台中逢甲店）','更換電池｜浴室門感測器','電量 12%，家人已在 App 一鍵預約','m4'],['趙女士家（新北○○店）','設備問題｜閘道器離線','已帶入家電檔案的序號與保固；由原生活顧問接手','m5'],['黃先生家（台中逢甲店）','到府複量｜床邊插座','AR 掃描（場勘）看不到床後插座；複量結果寫回方案圖面','m6']];
+ const pend=[['林媽媽家（民族店）','夜間動線照明＋門檻提示燈條','兩位技師同日上午合併到府','m1'],['李先生家（民族店）','晨起平安確認','可排入林技師週四下午','m2'],['周女士家（澄清店）','夜間動線照明','澄清店技師負荷高，建議由民族店支援','m3'],['王先生家（民族店）','更換電池｜浴室門感測器','電量 12%，家人已在 App 一鍵預約','m4'],['趙女士家（三民中華店）','設備問題｜閘道器離線','已帶入家電檔案的序號與保固；由原生活顧問接手','m5'],['黃先生家（民族店）','到府複量｜床邊插座','AR 掃描（場勘）看不到床後插座；複量結果寫回方案圖面','m6']];
  return `${fbar()}<div class="grid4">
  <div class="panel pb kpi"><div class="l">待派工方案</div><div class="n">${pend.filter(p=>!asg[p[3]]).length} 件</div><div class="d">今日新增 2</div></div>
  <div class="panel pb kpi"><div class="l">本週工單</div><div class="n">${Math.round(rows.reduce((a,r)=>a+r.o.inst+r.o.subs/12+r.o.subs*0.02,0)/4.3)} 張</div><div class="d">合併到府約 20%</div></div>
@@ -695,7 +695,7 @@ vendor:()=>`<div class="panel"><div class="ph">廠商作業系統後台｜揪居
  <div class="panel"><div class="ph">本季媒合紀錄</div><div style="overflow-x:auto"><table><thead><tr><th>需求單</th><th>主題</th><th>參與供應商</th><th>狀態</th></tr></thead><tbody>
   <tr><td>RFQ-2611-01</td><td>可調光感應夜燈組</td><td>2 家已報價</td><td><span class="badge c-am">預購驗證中</span></td></tr>
   <tr><td>RFQ-2609-02</td><td>電池型感應夜燈（床邊沒插座用）</td><td>1 家（既有供應商）</td><td><span class="badge c-ok">已上架</span></td></tr></tbody></table></div></div>`,
-content:()=>{const m=month;const V1=[['節氣共煮｜夜間走廊這樣亮','台中逢甲店｜小明顧問',1860+m*40,96+m*3,31+m],['短影音｜半夜起床怎麼不摸黑','新北○○店｜阿哲顧問',5200+m*120,142+m*4,38+m],['商家檔案貼文｜長輩體驗日','三家試點門市',3100+m*60,64+m*2,22+m]];
+content:()=>{const m=month;const V1=[['節氣共煮｜夜間走廊這樣亮','民族店｜小明顧問',1860+m*40,96+m*3,31+m],['短影音｜半夜起床怎麼不摸黑','三民中華店｜阿哲顧問',5200+m*120,142+m*4,38+m],['商家檔案貼文｜長輩體驗日','三家試點門市',3100+m*60,64+m*2,22+m]];
  const mx=Math.max(...V1.map(x=>x[3]));const bars=`<svg viewBox="0 0 520 ${V1.length*46+10}" width="100%" role="img" aria-label="內容轉換長條圖">${V1.map((x,i)=>`<text x="0" y="${18+i*46}" font-size="11" fill="var(--ink)">${x[0]}</text><rect x="0" y="${24+i*46}" width="${x[3]/mx*360}" height="9" rx="2" fill="#8E1E42"/><text x="${x[3]/mx*360+6}" y="${32+i*46}" font-size="11.5" fill="var(--muted)">診斷 ${x[3]}</text><rect x="0" y="${35+i*46}" width="${x[4]/mx*360}" height="9" rx="2" fill="#C42D5A"/><text x="${x[4]/mx*360+6}" y="${43+i*46}" font-size="11.5" fill="var(--muted)">預約 ${x[4]}</text>`).join('')}</svg>`;
  return `${fbar()}<div class="grid4">
  <div class="panel pb kpi"><div class="l">認證生活顧問</div><div class="n">5 人</div><div class="d">1 人進修中</div></div>
@@ -704,14 +704,14 @@ content:()=>{const m=month;const V1=[['節氣共煮｜夜間走廊這樣亮','�
  <div class="panel pb kpi"><div class="l">內容帶來的預約</div><div class="n">${V1.reduce((a,x)=>a+x[4],0)}</div><div class="d">${spark(Array.from({length:m},(_,k)=>60+k*3+(k%2)*4),'#C42D5A')}</div></div></div>
  <div class="grid2"><div class="panel"><div class="ph">內容成效｜診斷與預約 ${info('內容以教學與答疑為主，導向診斷而非搶購；不展示任何家庭資料。')}</div><div class="pb">${bars}</div></div>
  <div class="panel"><div class="ph">生活顧問人物圖鑑 ${info('延續企業既有門市人物經營，示意角色；只呈現專長與認證，不顯示個人業績或排名。')}</div><div style="overflow-x:auto"><table><thead><tr><th>門市</th><th>生活顧問</th><th>主打技</th><th>認證</th><th>本月內容</th></tr></thead><tbody>
-  <tr><td>台中逢甲店</td><td>小明顧問</td><td>3 項</td><td><span class="badge c-ok">已認證</span></td><td>1</td></tr>
-  <tr><td>台中逢甲店</td><td>阿芳顧問</td><td>2 項</td><td><span class="badge c-ok">已認證</span></td><td>0</td></tr>
-  <tr><td>新北○○店</td><td>阿哲顧問</td><td>2 項</td><td><span class="badge c-ok">已認證</span></td><td>1</td></tr>
-  <tr><td>台中公益店</td><td>小雯顧問</td><td>1 項</td><td><span class="badge c-am">3／4 課</span></td><td>0</td></tr></tbody></table></div></div>
+  <tr><td>民族店</td><td>小明顧問</td><td>3 項</td><td><span class="badge c-ok">已認證</span></td><td>1</td></tr>
+  <tr><td>民族店</td><td>阿芳顧問</td><td>2 項</td><td><span class="badge c-ok">已認證</span></td><td>0</td></tr>
+  <tr><td>三民中華店</td><td>阿哲顧問</td><td>2 項</td><td><span class="badge c-ok">已認證</span></td><td>1</td></tr>
+  <tr><td>澄清店</td><td>小雯顧問</td><td>1 項</td><td><span class="badge c-am">3／4 課</span></td><td>0</td></tr></tbody></table></div></div>
  <div class="panel"><div class="ph">校園大使搭檔卡 ${info('延續「這家電 人物圖鑑」：每位校園大使和一位生活顧問組成搭檔，大使拍居家觀察短影音（經長輩同意、不露臉與地址），帶來的評估預約交給顧問。示意角色。')}</div><div style="overflow-x:auto"><table><thead><tr><th>搭檔</th><th>校園大使</th><th>生活顧問</th><th>主打技</th><th>本月短影音</th></tr></thead><tbody>
-  <tr><td>台中逢甲店</td><td>小安（大學生）</td><td>小明顧問</td><td>陪外婆做居家觀察</td><td>2</td></tr>
-  <tr><td>台中公益店</td><td>示範大使 B</td><td>阿芳顧問</td><td>夜間防跌健檢日</td><td>1</td></tr>
-  <tr><td>北屯總站店</td><td>示範大使 C</td><td>示範顧問 C</td><td>協助完成 AR 掃描</td><td>1</td></tr>
+  <tr><td>民族店</td><td>小安（大學生）</td><td>小明顧問</td><td>陪外婆做居家觀察</td><td>2</td></tr>
+  <tr><td>澄清店</td><td>示範大使 B</td><td>阿芳顧問</td><td>夜間防跌健檢日</td><td>1</td></tr>
+  <tr><td>三民中華店</td><td>示範大使 C</td><td>示範顧問 C</td><td>協助完成 AR 掃描</td><td>1</td></tr>
  </tbody></table></div></div></div>`},
 amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
  const risks=[['夜間走廊偏暗',.58],['浴室門口濕滑或床邊沒有開關',.47],['夜間起床兩次以上',.36],['動線有高低差或樓梯',.31],['家中沒有 Wi-Fi',.22]];
@@ -729,17 +729,17 @@ amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
   <div class="kv"><span>床邊沒有插座</span><b>32%</b></div>
   <button class="b" data-a="importObs" style="margin-top:8px">匯入模擬參數（Wi-Fi 比例、就近聯絡人比例）</button></div></div>
  <div class="panel"><div class="ph">校園大使團隊 <small>以團隊彙總｜不做個人排名</small></div><div style="overflow-x:auto"><table><thead><tr><th>團隊</th><th>觀察</th><th>診斷</th><th>預約</th><th>對應門市</th></tr></thead><tbody>
-  <tr><td>北部大學團隊（示意）</td><td>${Math.round(n*0.45)}</td><td>${Math.round(n*0.5)}</td><td>${Math.round(n*0.13)}</td><td>新北○○店</td></tr>
-  <tr><td>逢甲大學（示意）</td><td>${Math.round(n*0.33)}</td><td>${Math.round(n*0.36)}</td><td>${Math.round(n*0.09)}</td><td>台中逢甲店</td></tr>
-  <tr><td>○○科大（示意）</td><td>${Math.round(n*0.22)}</td><td>${Math.round(n*0.21)}</td><td>${Math.round(n*0.05)}</td><td>台中公益店</td></tr></tbody></table></div>
+  <tr><td>北部大學團隊（示意）</td><td>${Math.round(n*0.45)}</td><td>${Math.round(n*0.5)}</td><td>${Math.round(n*0.13)}</td><td>三民中華店</td></tr>
+  <tr><td>文藻外語大學（示意）</td><td>${Math.round(n*0.33)}</td><td>${Math.round(n*0.36)}</td><td>${Math.round(n*0.09)}</td><td>民族店</td></tr>
+  <tr><td>○○科大（示意）</td><td>${Math.round(n*0.22)}</td><td>${Math.round(n*0.21)}</td><td>${Math.round(n*0.05)}</td><td>澄清店</td></tr></tbody></table></div>
   <div class="pb c-mu" style="font-size:13px">誘因為購物金、證書與服務學習證明，不給銷售佣金；校園大使看不到任何關懷資料。</div></div></div>`},
-vc:()=>{const rows=[['關懷月費','299 元起（揪夜安），每多一場域 +150，揪全家 599','我方定價','已訂定'],['每月診斷需求','西屯區 65 歲以上約 3.7 萬人推估','公開資料＋試點實測','試點驗證'],['診斷轉訂閱率','門檻 ≥18%','試點實測','試點驗證'],['三個月續訂率','門檻 ≥85%','試點實測','試點驗證'],['設備毛利、技師工時成本、門市分攤','—','全國電子','待企業提供'],['顧問工時成本','參考主計總處批發零售業薪資','公開資料＋全國電子','待企業提供']];
+vc:()=>{const rows=[['關懷月費','揪夜安基本 299／安心 449；擴展期場域加價 +100～200，揪全家 699','我方定價','已訂定'],['每月診斷需求','三民區 65 歲以上約 7.2 萬人推估','公開資料＋試點實測','試點驗證'],['診斷轉訂閱率','門檻 ≥18%','試點實測','試點驗證'],['三個月續訂率','門檻 ≥85%','試點實測','試點驗證'],['設備毛利、技師工時成本、門市分攤','—','全國電子','待企業提供'],['顧問工時成本','參考主計總處批發零售業薪資','公開資料＋全國電子','待企業提供']];
  return `<div class="panel pb" style="border-left:4px solid #C42D5A"><b>財務規劃方式</b><div class="c-mu" style="font-size:13.5px;margin-top:6px;line-height:1.7">本平台未取得全國電子內部成本資料，因此不做營收與回收期預估。試點結束後，以實測數字代入下式，算出單店損益兩平戶數，作為是否擴張的依據。</div>
  <div style="margin:12px 0;padding:12px 14px;background:var(--head);border-radius:8px;font-size:15px"><b>損益兩平訂閱戶數</b> ＝ 每月固定成本（顧問與技師工時、門市分攤）÷ 每戶每月貢獻毛利</div></div>
  <div class="panel"><div class="ph">試算所需資料與來源</div><div class="pb"><table><thead><tr><th>項目</th><th>目前數值</th><th>來源</th><th>狀態</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="badge ${r[3]==='已訂定'?'c-ok':r[3]==='待企業提供'?'c-am':''}">${r[3]}</span></td></tr>`).join('')}</tbody></table></div></div>
- <div class="grid2"><div class="panel pb"><b>規模示意（非預估）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">以月費 299 元、月繳計算，若 80 家 Digital City 每店平均有 100 戶訂閱：</div>
-  <div class="kv"><span>訂閱戶數</span><b>8,000 戶</b></div><div class="kv"><span>每月經常性營收</span><b>約 239 萬元</b></div><div class="kv"><span>每年經常性營收</span><b>約 2,870 萬元</b></div></div>
- <div class="panel pb"><b>擴張門檻（試點期）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">四項同時達標才進入擴展期</div>
+ <div class="grid2"><div class="panel pb"><b>規模示意（非預估）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">以平均月費 389 元（基本 299 四成、安心 449 六成）、月繳計算，若 80 家 Digital City 每店平均有 200 戶訂閱（單店約 194 戶打平）：</div>
+  <div class="kv"><span>訂閱戶數</span><b>16,000 戶</b></div><div class="kv"><span>每月經常性營收</span><b>約 622 萬元</b></div><div class="kv"><span>每年經常性營收</span><b>約 7,469 萬元</b></div></div>
+ <div class="panel pb"><b>三個決策點</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">◆一 第 2 月：整合測試、個資檢查、試裝 3 戶一次驗收通過才接案<br>◆二 第 6 月：以下四項同時達標才進入擴展期<br>◆三 約第 15 月：單店約 194 戶以上才進入延伸期</div>
   <div class="kv"><span>三個月續訂率</span><b>≥ 85%</b></div><div class="kv"><span>診斷轉訂閱率</span><b>≥ 18%</b></div><div class="kv"><span>技師負荷</span><b>≤ 80%</b></div><div class="kv"><span>誤報率</span><b>≤ 10%</b></div></div></div>`},
 sys:()=>{const rows=storeRows();const S3=k=>Math.round(rows.reduce((a,r)=>a+r.o[k],0));const ev=S3('ev'),inst=S3('inst'),subs=S3('subs');
  const D=ev*30+inst*7+subs*2+S3('wishes')+ 420,I=ev+12+S3('res'),K=10,Wd=inst+3;
@@ -756,7 +756,7 @@ partner:()=>{const P=[['泥作（含防水）','示範泥作 A','打除門檻、
  const B=[['全國電子安裝',62,'#C42D5A'],['簡易施工',21,'#E0577A'],['改造工程',9,'#E98AA3'],['免費調整',31,'#8A8A8A'],['不處理',8,'#BDBDBD']];
  const R=[['長輩不想鑽孔',4,'推「不鑽孔」組合'],['預算考量',3,'提示補助轉介 1966'],['找不到合適選項',2,'引導許揪心願']];
  const tag=t=>`<span class="badge" style="background:#fff;border:1px solid var(--line);color:var(--muted)">${t}</span>`;
- return `<div class="c-mu" style="margin:0 0 10px">Digital City 台中逢甲店｜試點範圍：揪夜安（臥室到浴室）｜協力工班名稱與數字皆為示範資料</div>
+ return `<div class="c-mu" style="margin:0 0 10px">Digital City 高雄民族店｜試點範圍：揪夜安（臥室到浴室）｜協力工班名稱與數字皆為示範資料</div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:12px">
  <div class="panel"><div class="ph">協力工班名單 <small>每類每店一家</small></div><div class="pb" style="overflow-x:auto"><table><thead><tr><th>類別</th><th>協力工班（示範）</th><th>試點可接</th><th>進行中</th><th>準時率</th><th>投保／保固</th></tr></thead><tbody>${P.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="c-mu">—</td><td><span class="badge ${r[4]==='有效'?'c-ok':'c-am'}">${r[4]}</span></td></tr>`).join('')}</tbody></table>
  <div class="c-mu" style="font-size:12px;margin-top:6px">準時率於試點開始後累積；保單到期前 30 天提醒生活顧問。要求：合法登記、公共意外責任保險、書面保固、防水由合格業者承作；全國電子為客訴單一窗口；介紹費與管理費待全國電子確認。</div></div></div>
@@ -791,9 +791,9 @@ kpi:()=>{const rows=storeRowsF();const m=month;const ser=f=>Array.from({length:m
   ${rows.map((r,i)=>`<tr><td>${r.code}</td><td>${(4.3+0.1*((i+m)%3)+(r.o.subs>150?0.1:0)).toFixed(1)}</td><td>${18+Math.round(r.o.inst*0.6)}</td><td>${[92,84,88][i%3]}%</td><td>${Math.round(r.o.inst*0.25)}</td></tr>`).join('')}</tbody></table></div></div>
  <div class="panel"><div class="ph">搜尋關鍵字趨勢｜近 30 天</div><div class="pb">${[['長輩 夜燈',12],['感應小夜燈',9],['浴室 防滑',6],['門檻 斜坡',4],['智慧插座',3]].map(([k,t])=>`<div class="kv"><span>${k}</span><span style="display:flex;align-items:center;gap:8px;width:50%"><span class="bar" style="flex:1;margin:0"><i style="width:${Math.min(100,t*2.4)}%;background:#8E1E42"></i></span><b class="up" style="width:44px;text-align:right">+${t}%</b></span></div>`).join('')}</div></div></div>
  <div class="panel"><div class="ph">試點門市選擇 ${info('依商家檔案搜尋趨勢、周邊高齡獨居家庭、可投入人力與店型空間評估（示意）。')}</div><div style="overflow-x:auto"><table><thead><tr><th>門市</th><th>搜尋趨勢</th><th>高齡獨居家庭</th><th>人力</th><th>空間</th><th>評估</th></tr></thead><tbody>
-  <tr><td>台中逢甲店</td><td>高</td><td>高</td><td>顧問 2、技師 2</td><td>可設情境角</td><td><span class="badge c-ok">優先試點</span></td></tr>
-  <tr><td>新北○○店</td><td>中高</td><td>高</td><td>顧問 2、技師 2</td><td>可設情境角</td><td><span class="badge c-ok">優先試點</span></td></tr>
-  <tr><td>台中公益店</td><td>中</td><td>中</td><td>顧問 2、技師 1</td><td>空間較小</td><td><span class="badge c-am">第二批</span></td></tr></tbody></table></div></div>`},
+  <tr><td>民族店</td><td>高</td><td>高</td><td>顧問 2、技師 2</td><td>可設情境角</td><td><span class="badge c-ok">優先試點</span></td></tr>
+  <tr><td>三民中華店</td><td>中高</td><td>高</td><td>顧問 2、技師 2</td><td>可設情境角</td><td><span class="badge c-ok">優先試點</span></td></tr>
+  <tr><td>澄清店</td><td>中</td><td>中</td><td>顧問 2、技師 1</td><td>社區健檢日集客</td><td><span class="badge c-ok">試點</span></td></tr></tbody></table></div></div>`},
  about:()=>{const VC=[['主要','進貨物流','依品牌進貨','揪心願預購驗證後才進貨','揪心願、SAP ERP、廠商作業後台'],['主要','營運','依規格銷售單品','情境模板把單品組成家庭方案','提案工具、情境模板'],['主要','出貨物流','各產品團隊各自到府','統一排程、合併到府、共用工單','派工排程、技師工單'],['主要','行銷與銷售','同捆包促銷','生活顧問人物圖鑑、校園大使、節氣共煮；保養到期與心願達標推播','商家檔案平台、App 推播與折價券、官網'],['主要','售後服務','顧客報修才處理','家電檔案主動提醒、長輩關懷、年度健檢；報修自動帶入家電檔案；先保養延壽、能效換機、舊機回收','設備檔案、LINE、線上報修'],['支援','基礎設施','SAP ERP、POS、企服網、門市通、App','企業營運資訊平台串接既有系統，只補缺少的功能','企業營運資訊平台'],['支援','人力資源','教育訓練系統','居安規劃認證（基礎四門課＋進階課）','eHRD'],['支援','技術發展','各系統獨立','設備檔案、規則與 AI 建議、營運模擬','揪居家新增模組'],['支援','採購','SAP ERP、廠商作業後台','揪心願預購達標後開採購單、供應商媒合','SAP ERP、廠商作業後台']];return `<div class="panel"><div class="ph">永續效益的計算方式</div><div class="pb"><div class="kv"><span>節電量</span><span>換機台數 × 年省電度數（約 400 度，依能效標示調整）＋ 保養台數 × 年省電度數（約 60 度）</span></div><div class="kv"><span>家庭電費節省</span><span>節電量 × 每度 3.5 元（假設）</span></div><div class="kv"><span>減碳量</span><span>節電量 × 0.471 公斤 CO2e（能源署 114 年度民生住宅電力排碳係數）</span></div><div class="kv"><span>舊機回收</span><span>延伸既有廢四機逆向回收，換機時由技師搬運並開立回收聯單</span></div><div class="kv"><span>資料界線</span><span>能效與用電資料只用於提供家庭建議，總部僅看彙總數字</span></div></div></div><div class="panel pb c-mu" style="font-size:13.5px">以下為系統架構與分析說明，供簡報與決選構想計畫書引用；儀表板請使用左側其他分頁。</div><div class="panel"><div class="ph">價值鏈：揪居家補強了哪些活動 <small>價值重心由營運與銷售延伸到售後服務</small></div><div style="overflow-x:auto"><table><thead><tr><th>類型</th><th>價值活動</th><th>目前</th><th>揪居家補強</th><th>對應系統或模組</th></tr></thead><tbody>
   ${VC.map(r=>`<tr><td><span class="badge ${r[0]==='主要'?'c-rd':'c-bl'}">${r[0]}</span></td><td><b style="font-weight:500">${r[1]}</b></td><td class="c-mu">${r[2]}</td><td>${r[3]}</td><td class="c-mu">${r[4]}</td></tr>`).join('')}</tbody></table></div></div>
  <div class="panel"><div class="ph">DIKW 流向：從資料到決策 <small>點選各階段可前往對應分頁</small></div><div class="pb">
@@ -818,11 +818,11 @@ kpi:()=>{const rows=storeRowsF();const m=month;const ser=f=>Array.from({length:m
   <tr><td>知識管理系統 KMS</td><td>情境模板與規則版本、第一線回報、認證課程</td><td>情境模板與規則</td></tr>
   <tr><td>知識工作系統 KWS</td><td>生活顧問提案工具、AI 建議與說明話術、居家場景預演</td><td>可點選原型（生活顧問端）</td></tr></tbody></table></div></div>
  <div class="panel"><div class="ph">場域方案、訂閱線與揪夥伴 <small>四層＝服務深度｜場域＝商品範圍</small></div><div style="overflow-x:auto"><table><thead><tr><th>場域方案</th><th>範圍</th><th>階段</th><th>關懷月費</th><th>主要合作夥伴</th></tr></thead><tbody>
-  <tr><td><b style="font-weight:500">揪夜安</b> <span class="badge c-rd">主推</span></td><td>臥室到浴室</td><td>試點期（只做此場域）</td><td>299 元</td><td>防災、保險（延保＋居家意外險）、無障礙改造</td></tr>
-  <tr><td><b style="font-weight:500">揪食光</b></td><td>廚房</td><td>擴展期</td><td>加購 +150 元</td><td>主廚節氣食譜、新開業餐廳開店廚房整包</td></tr>
+  <tr><td><b style="font-weight:500">揪夜安</b> <span class="badge c-rd">主推</span></td><td>臥室到浴室</td><td>試點期（只做此場域）</td><td>基本 299／安心 449 元</td><td>防災、保險（延保＋居家意外險）、無障礙改造</td></tr>
+  <tr><td><b style="font-weight:500">揪食光</b></td><td>廚房</td><td>擴展期</td><td>加購 +200 元</td><td>主廚節氣食譜、新開業餐廳開店廚房整包</td></tr>
   <tr><td><b style="font-weight:500">揪團聚</b></td><td>客廳</td><td>擴展期</td><td>加購 +150 元</td><td>運動教練、日照中心影音整包</td></tr>
-  <tr><td><b style="font-weight:500">揪清爽</b></td><td>洗衣陽台</td><td>擴展期</td><td>加購 +150 元</td><td>收納、清潔業者；自助洗衣店整包；包租代管退租清潔</td></tr>
-  <tr><td><b style="font-weight:500">揪全家</b></td><td>全屋套餐</td><td>擴展期</td><td>599 元（含年度健檢、首年設定費減免）</td><td>依人生事件：新婚、搬家、長輩開始獨居</td></tr></tbody></table></div>
+  <tr><td><b style="font-weight:500">揪清爽</b></td><td>洗衣陽台</td><td>擴展期</td><td>加購 +100 元</td><td>收納、清潔業者；自助洗衣店整包；包租代管退租清潔</td></tr>
+  <tr><td><b style="font-weight:500">揪全家</b></td><td>全屋套餐</td><td>擴展期</td><td>699 元（含安心等級服務、年度健檢、首年設定費減免）</td><td>依人生事件：新婚、搬家、長輩開始獨居</td></tr></tbody></table></div>
  <div class="pb c-mu" style="font-size:13.5px;border-top:1px solid var(--line)"><b style="font-weight:500;color:var(--ink)">兩條訂閱線：</b>服務訂閱為長輩關懷，不綁約、年繳 10 付 12、可由兄弟姊妹分攤；家電訂閱為以租代買，依品項 36／60 期月付，含安裝、保養與延保，到期可換新、買斷或回收，擴展期再開放。<br><b style="font-weight:500;color:var(--ink)">揪夥伴三種專案：</b>內容（夥伴提供內容換曝光，依家庭設備檔案推送）、整包（店家版四層服務）、組合（雙方商品綁售，不使用長輩關懷資料）；夥伴經廠商作業後台加入，節氣共煮只在 Digital City 每季舉辦，由夥伴示範、顧問接待。<br><b style="font-weight:500;color:var(--ink)">校園大使：</b>居家觀察與節氣共煮短影音經官方帳號轉發；每月任務津貼＋團隊獎勵，不做個人排名與銷售抽成；拍攝須長輩同意。</div></div>
  <div class="panel"><div class="ph">揪居家與全國電子既有系統的串接 <small>系統名稱旁標示資料來源｜實際串接方式待企業確認</small></div><div class="pb">
  <div class="feat3"><div><span class="ftg">核</span><b>核心：生活顧問陪一個家，從居家安全開始</b><div class="c-mu">先評估、再改善、後關心；診斷、規劃、安裝到追蹤同一人負責</div></div><div><span class="ftg">購</span><b>延伸一：四層服務，同一個家逐步加購</b><div class="c-mu">一個家一份家電檔案，逐步加購保養、場域與換機</div></div><div><span class="ftg">創</span><b>延伸二：揪心願與揪夥伴，帶來新商品與新客群</b><div class="c-mu">共鳴達門檻才預購，夥伴帶來新需求與客群</div></div></div>

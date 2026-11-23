@@ -477,7 +477,7 @@ function nav(cur){const it=[['home','首頁',icon.home],['news','最新',icon.ne
  return `<nav class="nav" aria-label="主選單">${it.map(([k,l,i])=>`<button data-nav="${k}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`).join('')}</nav>`}
 const V={
 boot:()=>`<div class="ld">載入中…</div>`,
-login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','台中逢甲店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]]];let k=0;
+login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','高雄民族店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]]];let k=0;
  return `<div class="top"><h1 style="color:var(--brand)">全國電子</h1></div><div class="scroll" style="padding-top:16px"><div class="pad">
  <div class="lgh"><span class="eh">♥</span><div><div class="big" style="margin:0">登入揪居家</div><div class="muted">家庭、生活顧問、技師都從這裡登入</div></div></div>
  <form id="loginForm" class="card" style="margin:14px 0 10px" novalidate>
@@ -627,7 +627,7 @@ m2:()=>{const p=S.home==='parents',H=S.hh,h=H.household,fm=S.famMine||{},dv=DEV(
  <div class="sec">揪心願</div><div class="card"><div class="muted" style="margin-bottom:8px">家裡還需要什麼？說給我們聽，總部會整理成新的方案或服務。</div>
   ${(H.wishes||[]).map(w=>`<div class="row" style="align-items:flex-start"><span>${esc(w.text)}${w.reply?`<span class="muted" style="display:block;font-size:.85em">門市回覆：${esc(w.reply)}</span>`:''}</span><span class="tag ${w.status==='已回覆'?'ok':''}">${w.status==='已回覆'?'門市已回覆':'已送出'}</span></div>`).join('')}
   <button class="btn" data-go="wish" style="margin-top:10px">許一個揪心願</button><button class="btn ghost" data-go="wall">看看大家的心願</button></div>
- ${p?`<div class="card"><b>綁定門市｜${esc(h.store)}</b><div class="muted">${J()?'年度健檢：安裝滿一年由門市排程':'年度健檢將於啟用關懷後安排'}</div><div class="row" style="margin-top:6px"><span>你的生活顧問｜${esc(H.plan&&H.plan.advisor?H.plan.advisor:(ADVS[h.store]||ADVS['Digital City 台中逢甲店']).nick)}</span><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div></div>`:''}
+ ${p?`<div class="card"><b>綁定門市｜${esc(h.store)}</b><div class="muted">${J()?'年度健檢：安裝滿一年由門市排程':'年度健檢將於啟用關懷後安排'}</div><div class="row" style="margin-top:6px"><span>你的生活顧問｜${esc(H.plan&&H.plan.advisor?H.plan.advisor:(ADVS[h.store]||ADVS['Digital City 高雄民族店']).nick)}</span><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div></div>`:''}
  </div>${nav('m1')}`},
 wish:()=>{const c=S.wcat||'';return `${hdr('許一個揪心願')}<div class="scroll" style="padding-top:12px"><div class="pad">
  <div class="muted" style="margin-bottom:10px">為${S.home==='parents'?'長輩家':'我家'}許願。內容只有門市與總部看得到，不會公開。</div>
@@ -640,7 +640,7 @@ wish:()=>{const c=S.wcat||'';return `${hdr('許一個揪心願')}<div class="scr
 const CAT=[
  {ring:0,id:'mgr',n:'家電檔案',d:'關懷設備序號、保固與電量提醒自動登錄',p:0,lock:1},
  {ring:1,id:'clean',n:'家電保養',d:'擴展期開放',p:0,exp:1},
- {ring:2,id:'night',n:'夜間動線照明',d:'感應夜燈 3、門窗感測 2、智慧插座 1',p:3600,g:1},
+ {ring:2,id:'night',n:'夜間動線照明',d:'感應夜燈 3、門窗感測 2、智慧插座 1',p:3900,g:1},
  {ring:2,id:'morning',n:'晨起平安確認',d:'門窗感測 1、人體感測 1',p:2400,g:1},
  {ring:2,id:'power',n:'用電異常提醒',d:'智慧插座 3、溫度感測 1',p:1500,g:1},
  {ring:2,id:'alert',n:'異常時依序通知家人',d:'先問長輩，再通知家人與就近聯絡人',p:0,g:1},
@@ -659,7 +659,7 @@ function recommend(){const a=A(),sel={mgr:1},later={};const g=a.goals,c=S.case||
  if(a.budget==='先免費試用'){['night','alert','power','morning','strip'].forEach(k=>delete sel[k]);}
  a.sel=sel;a.later=later;}
 function hasGuard(){const a=A();return CAT.some(c=>c.g&&a.sel[c.id])}
-function totals(){const a=A();let one=0;CAT.forEach(c=>{if(a.sel[c.id])one+=c.p});const setup=hasGuard()?1500:0;const m=hasGuard()?({basic:299,two:449,adv:599}[a.plan]||299):0;return {one:one+setup,setup,m,y:m*10}}
+function totals(){const a=A();let one=0;CAT.forEach(c=>{if(a.sel[c.id])one+=c.p});const setup=hasGuard()?1200:0;const m=hasGuard()?({basic:299,two:449,adv:699}[a.plan]||299):0;return {one:one+setup,setup,m,y:m*10}}
 function planName(p){return {basic:'揪夜安｜單一場域關懷',two:'揪夜安＋揪食光｜兩場域關懷',adv:'揪全家｜全屋套餐'}[p||'basic']}
 function clock(){const a=A();if(!a||!a.t0)return '00:00';const t=Math.floor(((a.t1||Date.now())-a.t0)/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
@@ -721,9 +721,9 @@ a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scro
  <div class="ly"><h3>一次性費用</h3>${CAT.filter(c=>a.sel[c.id]&&c.p).map(c=>`<div class="row"><span>${c.n}</span><span>${fmt(c.p)}</span></div>`).join('')}${t.setup?`<div class="row"><span>規劃與安裝設定費</span><span>${fmt(t.setup)}</span></div>`:''}<div class="row"><b>合計</b><b>${fmt(t.one)}</b></div><div class="rs">試點定價，實際依門市盤點</div><div class="rs" style="margin-top:4px">安裝時段由顧問統一排程、合併到府。</div>${a.remeas?'<div class="rs" style="margin-top:4px;color:var(--brand-ink)">已註記：安裝前先到府複量</div>':''}</div>
  <div class="ly"><h3>到府分工（統一排程、合併到府）</h3><div class="row"><span>夜間照明</span><span class="rs">全國電子技師｜夜燈、門檻提示燈條</span></div><div class="row"><span>關懷設備</span><span class="rs">全國電子技師｜閘道器、感測器、測試通知</span></div><div class="rs">同一天先裝照明、再裝關懷設備，${EN()}只要在家一次。</div></div>
  ${hasGuard()?`<div class="ly"><h3>關懷方案</h3>
-  <button class="plan" data-plan="basic" aria-pressed="${a.plan==='basic'}"><b>揪夜安｜單一場域　每月 NT$ 299</b><div class="rs">臥室到浴室：異常通知、設備離線偵測、每月摘要</div></button>
-  <button class="plan" data-plan="two" disabled style="opacity:.55"><b>加購揪食光｜每月 NT$ 449</b> <span class="rtag">擴展期</span><div class="rs">再加廚房：防乾燒與用電異常提醒（每加一場域 +150）</div></button>
-  <button class="plan" data-plan="adv" disabled style="opacity:.55"><b>揪全家｜全屋套餐　每月 NT$ 599</b> <span class="rtag">擴展期</span><div class="rs">全部場域關懷，含年度健檢、首年設定費減免</div></button>
+  <button class="plan" data-plan="basic" aria-pressed="${a.plan==='basic'}"><b>揪夜安｜基本方案　每月 NT$ 299</b><div class="rs">臥室到浴室：夜間照明、異常先問再通知、每週語音電話、家電檔案</div></button>
+  <button class="plan" data-plan="two" aria-pressed="${a.plan==='two'}"><b>揪夜安｜安心方案（主推）　每月 NT$ 449</b><div class="rs">基本內容＋生活顧問每月關心、年度健檢、免檢測費、冷氣清洗優惠</div></button>
+  <button class="plan" data-plan="adv" disabled style="opacity:.55"><b>揪全家｜全屋套餐　每月 NT$ 699</b> <span class="rtag">擴展期</span><div class="rs">全部場域一起顧，含安心等級服務、年度健檢、首年設定費減免；其他場域擴展期加價：揪食光 +200、揪團聚 +150、揪清爽 +100</div></button>
   <div class="seg" role="group" aria-label="付款方式"><button data-pay="m" aria-pressed="${a.pay==='m'}">月付不綁約</button><button data-pay="y" aria-pressed="${a.pay==='y'}">年繳 ${fmt(t.y)}（10 付 12）</button></div>
   <p class="rs" style="margin:6px 0 0">付款人可以是家人或長輩本人，也可由兄弟姊妹分攤月費；不論誰付款，都須長輩本人同意才成交。家電換新與以租代買於擴展期開放</p></div>
  <div class="ly"><h3>第二聯絡人（必填）</h3><label class="rs">姓名<input class="fld" id="c2n" value="${a.c2n}" placeholder="例如：${CN('第二聯絡人','第二聯絡人')}"></label><label class="rs" style="display:block;margin-top:8px">電話<input class="fld" id="c2p" inputmode="tel" value="${a.c2p}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">依序通知：長輩本人 → 主要聯絡人 → 第二聯絡人 → 就近聯絡人。</div></div>`:'<div class="ly"><h3>關懷方案</h3><div class="rs">本次未選長輩關懷項目，無月費。</div></div>'}
@@ -870,9 +870,9 @@ pre:()=>{const PO=(S.topics&&S.topics.preorder)||{count:0,me:false},done=!!PO.me
  <div class="pad">${done?'<div class="okbox">已登記預購意向。達到成團戶數、正式開放付款時會通知您，再由綁定門市安排安裝。</div>':'<button class="btn" data-a="preBuy">登記預購意向（暫不收款）</button>'}</div></div>`}
 });
 
-const ADVS={'Digital City 台中逢甲店':{nick:'小明顧問',ini:'明',color:'#C42D5A',skills:['夜間動線照明規劃','長輩陪同說明','關懷設備相容性'],stats:[['貼心 CARE',92],['安心 SAFE',88],['規劃 PLAN',85]]},
- 'Digital City 台中公益店':{nick:'阿芳顧問',ini:'芳',color:'#8E1E42',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]}};
-function advCard(store,compact){const a=ADVS[store]||ADVS['Digital City 台中逢甲店'];const sk=(S.mySkills&&store==='Digital City 台中逢甲店')?S.mySkills:a.skills;return `<div class="card acard" style="border-left:5px solid ${a.color}">
+const ADVS={'Digital City 高雄民族店':{nick:'小明顧問',ini:'明',color:'#C42D5A',skills:['夜間動線照明規劃','長輩陪同說明','關懷設備相容性'],stats:[['貼心 CARE',92],['安心 SAFE',88],['規劃 PLAN',85]]},
+ 'Digital City 高雄澄清店':{nick:'阿芳顧問',ini:'芳',color:'#8E1E42',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]}};
+function advCard(store,compact){const a=ADVS[store]||ADVS['Digital City 高雄民族店'];const sk=(S.mySkills&&store==='Digital City 高雄民族店')?S.mySkills:a.skills;return `<div class="card acard" style="border-left:5px solid ${a.color}">
  <div style="display:flex;gap:12px;align-items:center"><div class="avt" style="background:${a.color}">${a.ini}</div><div style="flex:1"><div class="rs">人物圖鑑｜${store}</div><b style="font-size:1.08em">${a.nick}</b> <span class="tag ok">居安規劃認證</span> <span class="tag" style="background:#F7E9EE;color:#8E1E42">含進階課</span></div></div>
  <div style="margin-top:8px">${sk.map(x=>`<span class="tag" style="margin:0 6px 6px 0;display:inline-block">主打技｜${x}</span>`).join('')}</div>
  ${compact?'':a.stats.map(([n,v])=>`<div style="display:flex;align-items:center;gap:8px;font-size:.85em;margin-top:4px"><span style="width:76px" class="muted">${n}</span><span class="pbar" style="flex:1"><i style="width:${v}%;background:${a.color}"></i></span></div>`).join('')}
@@ -922,13 +922,13 @@ obsR:()=>{const o=S.obs,r=obsRisks(o).slice(0,3);return `${hdr('居家安全檢�
   ${r.map(([a,b],i)=>`<div class="row"><span><b>${i+1}. ${a}</b><span class="muted" style="display:block;font-size:.88em">建議：${b}</span></span></div>`).join('')}</div>
  <div class="card"><b>各空間燈號</b><div class="rs" style="margin-bottom:4px">依勾選結果自動標示；紅燈優先處理</div>${obsLights(o).map(([n,c,t])=>`<div class="row"><span><span class="dot" style="width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px;background:${c==='r'?'#C42D5A':c==='y'?'#E0A030':'#138F3B'}"></span>${n}</span><span class="muted" style="font-size:.88em">${t}</span></div>`).join('')}<div class="muted" style="font-size:.85em;margin-top:6px">這是 ① 先評估的結果。預約後，生活顧問依檢核結果與 AR 掃描尺寸，把家電與無障礙改善整合成一張報價；尺寸不足時才安排技師到府複量。</div></div>
  ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" style="border-left:4px solid #8E1E42"><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#F7E9EE;color:#8E1E42">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；原始影像分析完即清除，存入的成果保存六個月。</div></div>`})()}
- <div class="sec">推薦的生活顧問</div>${advCard('Digital City 台中逢甲店',true)}
+ <div class="sec">推薦的生活顧問</div>${advCard('Digital City 高雄民族店',true)}
  <div class="pad"><button class="btn" data-go="b4">帶著檢核結果預約門市</button><button class="btn ghost" data-a="obsWish">把觀察到的需求送出為揪心願</button><button class="btn ghost" data-a="obsShare">分享檢核結果給家人（示意）</button>
  <p class="muted" style="font-size:.85em">觀察結果以去識別化方式彙整，用於改善情境模板與服務；不包含任何個人資料。</p></div></div>`},
-acard:()=>{const my=S.mySkills||ADVS['Digital City 台中逢甲店'].skills;const ALL=['夜間動線照明規劃','長輩陪同說明','關懷設備相容性','門檻與動線量測','晨起平安確認','異常通知設定'];
+acard:()=>{const my=S.mySkills||ADVS['Digital City 高雄民族店'].skills;const ALL=['夜間動線照明規劃','長輩陪同說明','關懷設備相容性','門檻與動線量測','晨起平安確認','異常通知設定'];
  return `${stf('我的角色卡')}<div class="scroll">
  <div class="step">延續門市人物圖鑑｜可選 3 項主打技（來自情境模板）</div>
- ${advCard('Digital City 台中逢甲店')}
+ ${advCard('Digital City 高雄民族店')}
  <div class="ly"><h3>主打技（最多 3 項）</h3>${ALL.map(x=>`<button class="chip" data-sk="${x}" aria-pressed="${my.includes(x)}">${x}</button>`).join('')}</div>
  <div class="ly"><h3>居安規劃認證｜基礎四門課（取自教育訓練系統，示意）</h3>
   ${[['情境模板與相容性',1],['長輩溝通與陪同模式',1],['隱私與同意',1],['異常處理流程',1]].map(([n,d])=>`<div class="row"><span>${n}</span><span class="tag ok">已完成</span></div>`).join('')}</div>
@@ -1027,7 +1027,7 @@ pl:()=>{const H=S.hh,p=H&&H.plan;if(!p)return `${hdr('專屬居家方案')}<div 
  ${H.pv?`<div class="card" style="padding:10px 14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>方案圖面</b>${verTag(H.pv)}</div><div class="muted" style="font-size:.88em;margin-top:2px">${H.pv.status==='長輩已確認'||H.pv.status==='差異已核准'?EN()+'已在門市看過安裝前後對比並同意（'+esc((H.pv.locked_at||'').slice(5,16).replace('-','/'))+'）；施工依這個版本':H.pv.status==='草稿'?'顧問規劃中，長輩確認後鎖定版本':esc(H.pv.reason||'')}</div>${(H.versions||[]).length>1?`<div class="rs" style="margin-top:4px">版本歷程：${H.versions.map(v=>'v'+v.ver+' '+esc(v.status)).join(' → ')}</div>`:''}</div>
  ${cmpPlan('pl',{L:H.assessment?H.assessment.lights:[],pins:H.pv.pins,path:!!a.sel.night})}`:''}
  <div class="card" style="display:flex;gap:10px;align-items:center"><div class="avt" style="background:var(--brand);width:40px;height:40px;font-size:1em">顧</div><div style="flex:1"><b>${esc(p.advisor||'生活顧問')}</b><div class="muted" style="font-size:.88em">${esc(h.store)}｜居安規劃認證</div></div><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div>
- ${pend?`<div class="sec">到府安裝資料</div><div class="card"><label class="muted">到府地址<input class="fld" id="addr" autocomplete="street-address" value="${esc(h.address||'')}" placeholder="例如：台中市西屯區○○路○號"></label><label class="muted" style="display:block;margin-top:8px">聯絡電話<input class="fld" id="tel" inputmode="tel" autocomplete="tel" value="${esc(h.phone||'')}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">只提供給負責到府的技師，出發當天才顯示完整地址。</div></div>`:''}
+ ${pend?`<div class="sec">到府安裝資料</div><div class="card"><label class="muted">到府地址<input class="fld" id="addr" autocomplete="street-address" value="${esc(h.address||'')}" placeholder="例如：高雄市三民區○○路○號"></label><label class="muted" style="display:block;margin-top:8px">聯絡電話<input class="fld" id="tel" inputmode="tel" autocomplete="tel" value="${esc(h.phone||'')}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">只提供給負責到府的技師，出發當天才顯示完整地址。</div></div>`:''}
  <div class="pad">${pend?'<button class="btn" data-a="plPay">確認方案</button>':`<div class="okbox">已確認方案。${ins&&ins.slot?'到府安裝：'+esc(ins.label)+(a.sel.night?'，夜間照明與關懷設備同一天完成':''):'門市會排定到府安裝時間，排定後顯示在「安裝進度」。'}</div>`}</div></div>`},
 ip:()=>{const H=S.hh,o=H&&H.install,p=H&&H.plan,sel=p?p.sel:{},m=(H&&H.assessment&&H.assessment.measures)||{};const d=!o?0:o.status==='已完成'?6:Math.max(0,Math.min(5,o.progress||0));const steps=IPSF(sel);
  return `${hdr('安裝進度')}<div class="scroll" style="padding-top:12px">
@@ -1325,7 +1325,7 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.me){const id=t.dataset.me;busy(t,async()=>{const d=await api('/wish-topics/'+id+'/vote',{method:'POST'});const tp=S.topics.topics.find(x=>x.id===id);if(tp){tp.c+=d.me?1:-1;tp.me=d.me}render()});return}
  if(t.dataset.oc){const o=S.obs;o[t.dataset.oc]=!o[t.dataset.oc];render();return}
  if(t.dataset.ob){const [k,x]=t.dataset.ob.split('|');S.obs[k]=x;render();return}
- if(t.dataset.sk){let m=[...(S.mySkills||ADVS['Digital City 台中逢甲店'].skills)];const x=t.dataset.sk;if(m.includes(x))m=m.filter(y=>y!==x);else if(m.length<3)m.push(x);else{toast('最多選 3 項');return}S.mySkills=m;render();return}
+ if(t.dataset.sk){let m=[...(S.mySkills||ADVS['Digital City 高雄民族店'].skills)];const x=t.dataset.sk;if(m.includes(x))m=m.filter(y=>y!==x);else if(m.length<3)m.push(x);else{toast('最多選 3 項');return}S.mySkills=m;render();return}
  if(t.dataset.ts){const st=TS().st;st[t.dataset.ts]=!st[t.dataset.ts];if(t.dataset.ts==='scan'&&st.scan)toast('已掃描設備序號，登錄到家電檔案');render();saveSteps();return}
  if(t.dataset.td){const x=TS();x.diff=x.diff===t.dataset.td?'':t.dataset.td;render();saveSteps();return}
  if(t.dataset.home){S.home=t.dataset.home;render();return}
