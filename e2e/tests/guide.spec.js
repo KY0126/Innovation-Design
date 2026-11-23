@@ -39,7 +39,7 @@ test('導覽全部步驟跨 App 與企業管理端走完：每步編號框都找
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
   page.on('dialog', d => { errs.push('dialog: ' + d.message()); d.dismiss(); });
   await page.goto('/consumer.html');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('jjj_g_full', '1'); });
   await page.goto('/consumer.html');
   await expect(page.locator('#jg')).toBeVisible({ timeout: 10_000 });
   const seen = new Set(), log = [], S = {}, ui = {};
@@ -74,7 +74,9 @@ test('導覽全部步驟跨 App 與企業管理端走完：每步編號框都找
   }
   await info.attach('walk.txt', { body: log.join('\n'), contentType: 'text/plain' });
   console.log(log.join('\n'));
-  expect(seen.size, '導覽每一步都有走到').toBe(require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8').match(/^\s+[A-Z]\(\{ ch:/gm).length);
+  // 完整故事模式：不含 mode: 'short' 的步驟
+  const src = require('fs').readFileSync(require('path').join(__dirname, '../../jiujujia/guide.js'), 'utf8');
+  expect(seen.size, '導覽每一步都有走到').toBe(src.match(/^\s+[A-Z]\(\{ ch:/gm).length - src.match(/^\s+[A-Z]\(\{ ch: \d+, mode: 'short'/gm).length);
   // ---- 資料串接 ----
   // 工單編號含日期（W-年月日-序號），改用家庭＋類型找，避免跨日或時區不同對不到
   const W = s => s.wo.orders.find(o => o.household === '林媽媽家' && o.kind === '到府安裝' && /^W-\d{8}-06$/.test(o.code));

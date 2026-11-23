@@ -1,6 +1,6 @@
 {
  "label": "before",
- "date": "2026-11-23T15:41:17.180Z",
+ "date": "2026-11-23T16:22:50.132Z",
  "tasks": [
   {
    "id": "T1",
@@ -22,7 +22,7 @@
    "id": "T3",
    "name": "看長輩家昨晚有沒有異常",
    "who": "家庭（李家）",
-   "clicks": 2,
+   "clicks": 1,
    "ok": true,
    "errs": []
   },
@@ -97,7 +97,7 @@
   {
    "id": "L8",
    "name": "企業管理端首頁",
-   "clickable": 35,
+   "clickable": 22,
    "screens": 1.3
   }
  ]

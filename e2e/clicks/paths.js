@@ -24,7 +24,7 @@ module.exports = {
     tasks: mk({
       T1: { steps: ['.agq [data-go="b1"]'], done: ['[data-a="loginChild"]', 'text=開始 AR 掃描'] },
       T2: { steps: ['[data-nav="m1"]', '[data-go="nset"]'], done: 'text=通知設定' },
-      T3: { steps: ['.entry', '[data-go="gl"]'], done: 'text=關懷紀錄' },
+      T3: { steps: ['.entry'], done: '.jhero' },
       T4: { steps: ['[data-case="2"]', '[data-tab="5"]', '[data-q="send"]'], done: ['text=/已送出|已建立|v\\d/'] },
       T5: { steps: ['[data-id="6"]', '[data-tgrp="浴室"]', '[data-tsel="pin:D1"]', '[data-a="tDiffGo"]', TXT, '[data-a="tdfSend"]'], done: 'text=差異' },
       T6: { steps: ['[data-tab="wl"]'], done: 'text=揪心願' },

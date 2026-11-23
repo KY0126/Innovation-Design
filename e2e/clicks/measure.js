@@ -10,7 +10,7 @@ async function login(p, page, who) {
 }
 async function clickable(p) {
   return p.evaluate(() => [...document.querySelectorAll('button,a,[data-go],[data-tab],[data-v],select,input')]
-    .filter(e => e.offsetParent && e.getBoundingClientRect().width > 0 && !e.closest('#webDemo,#jgOpen,.jg,.jdemo') && !e.closest('nav.bnav,.bnav,.homeNav'))
+    .filter(e => { const r = e.getBoundingClientRect(); return e.offsetParent && r.width > 0 && r.right > 0 && r.left < innerWidth; }).filter(e => !e.closest('#webDemo,#jgOpen,.jg,.jdemo') && !e.closest('nav.bnav,.bnav,.homeNav'))
     .length);
 }
 (async () => {

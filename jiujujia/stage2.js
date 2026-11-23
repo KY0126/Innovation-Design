@@ -27,6 +27,43 @@
     ['wash', '揪清爽', '洗衣陽台', 100, '不必爬高曬衣'],
   ];
 
+  // A4 全家場域方案：同一組空間座標畫 3D（plan.jpg 疊範圍）與 2D 俯視平面圖
+  const HPR = { bed: [0, 0, 4, 3.5], bath: [4, 0, 6.2, 3.5], ldy: [6.2, 0, 9, 3.5], hall: [0, 3.5, 9, 4.6], kit: [0, 4.6, 3.8, 8], liv: [3.8, 4.6, 9, 8], door: [7.2, 8, 9, 9] };
+  const ZN = { bed: ['臥室', 'night'], hall: ['走道', 'night'], bath: ['浴室', 'night'], door: ['玄關', 'night'], kit: ['廚房', 'food'], liv: ['客廳', 'tv'], ldy: ['洗衣陽台', 'wash'] };
+  const DEV2 = [['夜', 2.9, 1.6], ['夜', 3.4, 4.05], ['夜', 4.15, 3.2], ['檻', 4.6, 3.5], ['感', 5.2, 3.5], ['鈕', 5.7, 0.9], ['感', 7.55, 8.5]];
+  const LBL2 = { hall: [7.4, 4.2], door: [8.45, 8.65] };
+  const NPATH = [[2.85, 1.4], [3.05, 2.6], [3.45, 3.5], [3.6, 4.05], [4.8, 4.05], [5.0, 3.5], [4.9, 2.3], [4.75, 1.3]];
+  function zoneMap() {
+    const m = L.s.zm || '3d', on = k => ZN[k][1] === 'night', ex = open(1);
+    const tabs = `<div class="tabs" role="tablist" style="margin:8px 0">${[['3d', '3D 居家模型'], ['2d', '2D 平面圖']].map(([k, n]) => `<button role="tab" data-zm="${k}" aria-selected="${m === k}">${n}</button>`).join('')}</div>`;
+    let g = '';
+    if (m === '3d') {
+      const H = J.HPV, FT = J.HPJ.FT;
+      Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
+        const P = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(([x, z]) => J.hpp(x + .05, FT + .02, z + .05).map(v => v.toFixed(0)).join(',')).join(' ');
+        g += `<polygon points="${P}" fill="${on(k) ? 'rgba(196,45,90,.22)' : 'rgba(120,120,120,.12)'}" stroke="${on(k) ? '#C42D5A' : '#8C9096'}" stroke-width="${on(k) ? 5 : 3}" ${on(k) ? '' : 'stroke-dasharray="10 8"'}/>`;
+      });
+      g += J.hpPath();
+      Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
+        const [px, py] = J.hpp((x0 + x1) / 2, FT + .5, (z0 + z1) / 2), f = FIELDS.find(F => F[0] === ZN[k][1]);
+        g += `<text x="${px.toFixed(0)}" y="${py.toFixed(0)}" font-size="30" font-weight="700" text-anchor="middle" fill="${on(k) ? '#8E1E42' : '#5E6168'}" stroke="#fff" stroke-width="8" paint-order="stroke">${ZN[k][0]}${on(k) ? '' : '｜' + f[1]}</text>`;
+      });
+      return `<div class="card zmap">${tabs}<div style="position:relative;border-radius:10px;overflow:hidden;background:#F6F3EE"><img src="home/plan.jpg" alt="林媽媽家 3D 居家模型：四個場域的範圍" style="display:block;width:100%"><svg viewBox="${H.join(' ')}" style="position:absolute;inset:0;width:100%;height:100%">${g}</svg></div>
+        <div class="rs" style="margin-top:6px"><span style="color:#C42D5A">■</span> 揪夜安（試點期可訂）：臥室、走道、浴室、玄關<br><span style="color:#8C9096">▢</span> ${ex ? '擴展期已開放' : '擴展期'}：揪食光、揪團聚、揪清爽</div></div>`;
+    }
+    const S = 30, X = x => (x * S + 10).toFixed(0), Z = z => (z * S + 10).toFixed(0);
+    Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
+      g += `<rect x="${X(x0)}" y="${Z(z0)}" width="${((x1 - x0) * S).toFixed(0)}" height="${((z1 - z0) * S).toFixed(0)}" fill="${on(k) ? '#FBEAF0' : '#F3F3F3'}" stroke="${on(k) ? '#C42D5A' : '#9A9A9A'}" stroke-width="${on(k) ? 2 : 1.2}" ${on(k) ? '' : 'stroke-dasharray="5 4"'}/>`;
+      const [lx, lz] = LBL2[k] || [(x0 + x1) / 2, z0 + .5];
+      g += `<text x="${X(lx)}" y="${Z(lz)}" font-size="11" text-anchor="middle" fill="${on(k) ? '#8E1E42' : '#666'}">${ZN[k][0]}</text>`;
+    });
+    g += `<polyline points="${NPATH.map(([x, z]) => X(x) + ',' + Z(z)).join(' ')}" fill="none" stroke="#C42D5A" stroke-width="2" stroke-dasharray="4 3"/>`;
+    DEV2.forEach(([c, x, z]) => { g += `<g transform="translate(${X(x)},${Z(z)})"><circle r="9" fill="#C42D5A" stroke="#fff" stroke-width="2"/><text y="4" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">${c}</text></g>`; });
+    return `<div class="card zmap">${tabs}<svg viewBox="0 0 290 290" style="width:100%;display:block;background:#fff" role="img" aria-label="林媽媽家 2D 平面圖：揪夜安設備位置與夜間路線">${g}</svg>
+      <div class="rs" style="margin-top:6px">夜＝感應夜燈　檻＝門檻提示燈條　感＝門窗感測器　鈕＝緊急按鈕；虛線是床邊到浴室的夜間路線</div>
+      <div class="muted" style="font-size:.8em;margin-top:4px">依 3D 模型座標推出的示意圖，不是丈量施工圖；正式版由 AR 掃描（場勘）產生，生活顧問用來整合報價、技師當施工圖底圖。</div></div>`;
+  }
+
   Object.assign(V, {
     // 入口：擴展期與延伸期功能總覽
     x0: () => page('揪居家接下來會開放', `
@@ -56,6 +93,7 @@
       const sum = 449 + add.reduce((a, f) => a + f[3], 0);
       const all = add.length === 3;
       return page('全家場域方案', `${bar(1)}
+      ${zoneMap()}
       <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 掃描與家電檔案，只補掃新空間。月費依風險分級。</div></div>
       ${FIELDS.map(([k, n, w, p, d]) => k === 'night'
         ? `<div class="card" style="border-left:5px solid #C42D5A"><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
@@ -402,11 +440,12 @@
       document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}${f.theme ? '｜全國出題：' + (THEMES.find(x => x.id === f.theme) || {}).n : ''}${Object.keys(bld()).length ? '｜附做法卡' : ''}）`;
       J.S.wcat = f.field; L.s.wf = null; return;
     }
-    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
+    const t = e.target.closest && e.target.closest('[data-zm],[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
     if (!t || t.disabled) return;
     e.stopPropagation();
     const d = t.dataset;
-    if (d.x24) { if (!open(1)) return; const s = L.s.f24; s[d.x24] = !s[d.x24]; }
+    if (d.zm) { L.s.zm = d.zm; }
+    else if (d.x24) { if (!open(1)) return; const s = L.s.f24; s[d.x24] = !s[d.x24]; }
     else if (d.x29) { if (!open(1)) return; const s = L.s.f29; s[d.x29] = !s[d.x29]; }
     else if (d.x31) { const s = L.s.f31; s[d.x31] = !s[d.x31]; }
     else if (d.wwho !== undefined || d.wfield !== undefined || d.wneed !== undefined || d.wobj !== undefined || d.wprice !== undefined) {

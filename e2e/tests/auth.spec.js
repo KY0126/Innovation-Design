@@ -44,7 +44,7 @@ test.describe('放錯入口會被擋下', () => {
 });
 // 3. 一鍵登入：同一個 App 依身分進到各自首頁；電腦版兩個入口
 test.describe('一鍵示範登入', () => {
-  for (const [who, email, text] of [['家庭｜陳小姐', 'chen@example.com', 'AI 顧問阿國'], ['生活顧問｜王小明（手機）', 'advisor@example.com', '生活顧問・今天'], ['技師｜吳技師', 'tech@example.com', '我的工單']]) {
+  for (const [who, email, text] of [['家庭｜陳小姐', 'chen@example.com', '居家知識'], ['生活顧問｜王小明（手機）', 'advisor@example.com', '生活顧問・今天'], ['技師｜吳技師', 'tech@example.com', '我的工單']]) {
     test(`揪居家 App：${who}`, async ({ page }) => {
       const errs = await fresh(page); await page.goto('/jiujujia/app.html');
       await page.click(`[data-demo="${email}"]`);
@@ -68,7 +68,7 @@ test.describe('一鍵示範登入', () => {
     const errs = await fresh(page); await page.goto('/jiujujia/admin.html');
     await page.click('#gate [data-demo="advisor@example.com"]');
     await expect(page).toHaveURL(/consultant\.html/);
-    await expect(page.locator('.panel', { hasText: '新進案件與 AI 分析' })).toBeVisible();
+    await expect(page.locator('.panel', { hasText: '目前案件' })).toBeVisible();
     await expect(page.locator('#who')).toHaveText('王小明');
     expect(errs).toEqual([]);
   });
@@ -81,7 +81,7 @@ test.describe('一鍵示範登入', () => {
   test('家庭登入 App 後打開企業管理端，不會沿用家庭登入', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
     await page.click('[data-demo="chen@example.com"]');
-    await expect(page.locator('#view')).toContainText('AI 顧問阿國');
+    await expect(page.locator('#view .hg1')).toContainText('揪居家');
     await page.goto('/jiujujia/admin.html');
     await expect(page.locator('#gate')).toBeVisible();
     await expect(page.locator('#gate .gerr')).toContainText('揪居家 App');
