@@ -37,7 +37,7 @@ footer{color:var(--mu);font-size:12.5px;padding:0 20px 20px}
 </head>
 <body>
 <header><b>揪夥伴商用版</b><span class="t" id="who"></span>
-<div class="types" role="group" aria-label="客戶類型" id="types"></div></header>
+</header>
 <div class="ban" id="ban"></div>
 <main>
  <section id="desk"></section>
@@ -50,7 +50,7 @@ footer{color:var(--mu);font-size:12.5px;padding:0 20px 20px}
 (function(){
 const PH=()=>window.JJJPHASE?JJJPHASE():0;
 const T={
- day:{n:'日照據點',c:'高雄○○日照中心（虛構）',sp:[['活動室','冷氣 ×2','保養到期 12/05','am'],['活動室','空氣清淨機','正常','ok'],['用餐區','冰箱','正常','ok'],['用餐區','電鍋與飲水機','濾心到期 12/10','am'],['浴室','電熱水器','待修：溫度不穩','rd'],['午休室','除濕機','正常','ok']]},
+ day:{n:'日照據點',c:'高雄樂齡日照中心（虛構）',sp:[['活動室','冷氣 ×2','保養到期 12/05','am'],['活動室','空氣清淨機','正常','ok'],['用餐區','冰箱','正常','ok'],['用餐區','電鍋與飲水機','濾心到期 12/10','am'],['浴室','電熱水器','待修：溫度不穩','rd'],['午休室','除濕機','正常','ok']]},
  care:{n:'住宿機構／養老院',c:'高雄○○護理之家（虛構）',sp:[['101 房','冷氣','保養到期 12/03','am'],['102 房','冷氣','正常','ok'],['交誼廳','電視','正常','ok'],['洗衣間','洗衣機 ×3','待修：1 台脫水異常','rd'],['廚房','冰箱 ×2','正常','ok']]},
  rent:{n:'租屋代管與社宅',c:'○○代管（虛構）｜12 戶',sp:[['3F-1','冷氣','保養到期 12/08','am'],['3F-2','洗衣機','正常','ok'],['4F-1','熱水器','待修：點火失敗','rd'],['4F-2','冰箱','正常','ok']]},
  bnb:{n:'民宿',c:'○○民宿（虛構）｜6 間房',sp:[['雙人房 A','冷氣','保養到期 12/12','am'],['雙人房 B','冷氣','正常','ok'],['四人房','除濕機','正常','ok'],['公共區','洗脫烘洗衣機','正常','ok']]},
@@ -61,8 +61,7 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');cle
 const B={ok:['正常','ok'],am:['保養到期','am'],rd:['待修','rd']};
 function render(){
  const d=T[k],p=PH();
- $('types').innerHTML=Object.entries(T).map(([id,v])=>`<button data-k="${id}" aria-pressed="${id===k}">${v.n}</button>`).join('');
- $('who').textContent=`${d.n}｜${d.c}｜只看自己的據點`;
+  $('who').innerHTML=`客戶類型：<b style="font-size:inherit;color:var(--r)">${d.n}</b>｜${d.c}｜只看自己的據點<span style="color:var(--mu)">（同一版型也服務住宿機構、租屋代管與社宅、民宿、小店）</span>`;
  $('ban').innerHTML=p>=2?'<b style="color:var(--r)">延伸期已開放</b>：揪夥伴商用版提供家電檔案、保養、換新三層服務；不含長輩關懷異常通知（機構已有照服員與緊急呼叫系統）。'
   :`<b>延伸期開放｜示範預覽</b>：目前營運階段為${['試點期','擴展期'][p]}；單店約 194 戶以上（決策點三）才開放商用版。可在企業管理端「營運階段」切換示範。`;
  const due=d.sp.filter(x=>x[3]==='am').length,fix=d.sp.filter(x=>x[3]==='rd').length;
@@ -79,7 +78,6 @@ function render(){
  <div class="note"><div class="h">本月帳單</div>所有空間彙整成一張發票（示意）。</div>`;
 }
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
- if(t.dataset.k){k=t.dataset.k;render();return}
  const a=t.dataset.a;if(!a)return;
  if(PH()<2&&a!=='later'){toast('延伸期開放（示範預覽）');return}
  if(a==='csv'){const d=T[k];const rows=[['空間','設備','狀態','說明'],...d.sp.map(r=>[r[0],r[1],B[r[3]][0],r[2]])];

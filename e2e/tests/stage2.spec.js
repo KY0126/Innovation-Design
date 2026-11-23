@@ -61,9 +61,8 @@ test('營運階段開關：企業管理端切到擴展期後，App 揪全家可�
   const biz = await context.newPage(); const berr = []; biz.on('pageerror', e => berr.push(e.message));
   await biz.goto('/jiujujia/business.html');
   await expect(biz.locator('#ban')).toContainText('示範預覽');
-  await biz.click('[data-k="care"]');
-  await expect(biz.locator('#who')).toContainText('護理之家');
-  await expect(biz.locator('#desk')).toContainText('洗衣間');
+  await expect(biz.locator('#who')).toContainText('日照據點');
+  await expect(biz.locator('#desk')).toContainText('午休室');
   await page.evaluate(() => window.JJJA.go('phase')); await page.waitForTimeout(300);
   await page.click('[data-ph="延伸期"]');
   await biz.reload();

@@ -58,10 +58,10 @@
       <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 掃描與家電檔案，只補掃新空間。月費依風險分級。</div></div>
       ${FIELDS.map(([k, n, w, p, d]) => k === 'night'
         ? `<div class="card" style="border-left:5px solid #C42D5A"><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
-        : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div>${k === 'food' ? `<div class="muted" style="font-size:.85em;margin-top:4px">先看廚房診斷 ›</div>` : ''}</button>`).join('')}
+        : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div></button>`).join('')}
       <div class="card"><div style="display:flex;justify-content:space-between"><span>每月合計</span><b>NT$ ${sum.toLocaleString('en-US')}</b></div>
       ${all ? `<div style="margin-top:8px;padding:8px 10px;background:#FBF3F3;border-radius:8px;font-size:.9em">四個場域都要了，改用<b>揪全家 699 元</b>每月可省 ${sum - 699} 元。</div><button class="btn" data-go="x26" style="margin-top:8px">改看揪全家</button>`
-        : `<div style="margin-top:10px">${act(1, '加購並交給生活顧問', 'data-req="加購場域方案"')}</div>`}</div>
+        : `<div style="margin-top:10px">${add.length || !open(1) ? act(1, '加購並交給生活顧問', 'data-req="加購場域方案"') : '<button class="btn ghost" disabled style="opacity:.6">先選要加購的場域</button>'}</div>`}</div>
       <button class="btn ghost" data-go="x25" style="margin:0 12px 12px;width:calc(100% - 24px)">揪食光：先看廚房診斷結果</button>`);
     },
 
