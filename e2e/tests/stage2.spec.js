@@ -194,7 +194,7 @@ test('揪心願（參考 LEGO Ideas）：寫作模板＋標籤、阿國比對相
   expect([...errs, ...aerr]).toEqual([]);
 });
 
-test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→新心願；企業出題線；闖關點數與提示音；包裝與標語；企業管理端出題與點數檢核', async ({ page, context }, info) => {
+test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→新心願；我家出題／全國出題；闖關點數與提示音；包裝與標語；企業管理端出題與點數檢核', async ({ page, context }, info) => {
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html?phase=pilot');
@@ -236,14 +236,16 @@ test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→�
   await expect(v).toContainText('150');
   await expect(v).toContainText('擴展期開放');
   await page.click('[data-chime]');
-  // 企業出題線
+  // 全國出題
   await page.evaluate(() => window.JJJ.go('wall')); await page.waitForTimeout(1200);
   await expect(v).toContainText('做過 62 戶');
+  await expect(v).toContainText('從自己家遇到的問題出發');
   await page.click('[data-wline="hq"]');
+  await expect(v).toContainText('全國電子出題，揪全國的家庭一起想');
   await expect(v).toContainText('好鄰居題');
   await expect(v).not.toContainText('床邊大按鍵開關');
   await page.click('[data-wtheme="nb"]'); await page.waitForTimeout(300);
-  await expect(v).toContainText('企業出題線｜全國電子｜揪感心');
+  await expect(v).toContainText('全國出題｜全國電子｜揪感心');
   // 預購頁包裝示意
   await page.evaluate(() => window.JJJ.go('pre')); await page.waitForTimeout(1200);
   await expect(v).toContainText('揪心願｜由陳小姐家庭提案');
@@ -252,7 +254,7 @@ test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→�
   await adm.goto('/jiujujia/admin.html');
   await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('wish')); await adm.waitForTimeout(500);
-  await expect(adm.locator('#view')).toContainText('企業出題線');
+  await expect(adm.locator('#view')).toContainText('全國出題');
   await expect(adm.locator('#view')).toContainText('做過／改版');
   await adm.locator('[data-a="ptOk"]').first().click();
   await expect(adm.locator('#view')).toContainText('已入帳');

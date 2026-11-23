@@ -232,7 +232,7 @@
       const fld = (k, label, ph2) => `<label class="muted" style="display:block;margin-bottom:8px">${label}<input class="fld" data-wf="${k}" value="${esc(f[k] || '')}" placeholder="${ph2}" style="margin-top:4px"></label>`;
       const th = THEMES.find(x => x.id === f.theme), hasB = Object.keys(bld()).length;
       return page('許一個揪心願', `
-      ${th ? `<div class="card" style="border-left:4px solid #C42D5A"><div class="muted" style="font-size:.85em">企業出題線｜${th.by}</div><b>${th.n}</b><div class="rs">獎勵：${th.rw}</div></div>` : ''}
+      ${th ? `<div class="card" style="border-left:4px solid #C42D5A"><div class="muted" style="font-size:.85em">全國出題｜${th.by}</div><b>${th.n}</b><div class="rs">獎勵：${th.rw}</div></div>` : ''}
       <div class="card" style="background:var(--note)"><b>官方寫作模板</b><div class="rs">照著填，生活顧問與總部就能看懂、比對與審查。內容只有門市與總部看得到，心願牆只顯示整理過的主題。</div></div>
       <div class="card">
         <div class="muted">誰遇到</div><div>${['長輩', '孫輩', '我自己', '其他家人'].map(v => chip('data-wwho', v, f.who === v)).join('')}</div>
@@ -279,7 +279,7 @@
     },
   });
 
-  // ---------- 揪心願：拼出預覽圖、做法卡、改版、闖關、企業出題線、品牌觸點 ----------
+  // ---------- 揪心願：拼出預覽圖、做法卡、改版、闖關、我家出題／全國出題、品牌觸點 ----------
   const SLOTS = [['床邊', 3.08, 1.0], ['床尾', 3.35, 2.6], ['走道', 4.2, 3.66], ['門檻', 4.7, 3.55], ['浴室門口', 5.3, 3.25], ['浴室內', 5.6, 2.0]];
   const ITEMS = {
     light: { n: '感應夜燈', c: '燈', p: 390, tool: 0, min: 5, step: s => `在${s}離地約 30 公分貼一顆感應夜燈（背膠，不鑽孔）` },
@@ -372,10 +372,10 @@
   Object.assign(window.JJJS2, {
     lineTabs() {
       const ln = L.s.wline || 'own';
-      return `<div class="pad" style="padding-top:0"><div class="seg" role="group" aria-label="心願路線" style="margin-bottom:8px"><button data-wline="own" aria-pressed="${ln === 'own'}">平常線｜大家自己做</button><button data-wline="hq" aria-pressed="${ln === 'hq'}">企業出題線</button></div><button class="row" data-go="wquest" style="width:100%"><span>🏅 我的闖關進度與點數：<b>${pts().total}</b> 點</span><span class="chev">›</span></button></div>`;
+      return `<div class="pad" style="padding-top:0"><div class="seg" role="group" aria-label="心願路線" style="margin-bottom:8px"><button data-wline="own" aria-pressed="${ln === 'own'}">我家出題</button><button data-wline="hq" aria-pressed="${ln === 'hq'}">全國出題</button></div><div class="rs" style="margin-bottom:8px">${ln === 'own' ? '從自己家遇到的問題出發' : '全國電子出題，揪全國的家庭一起想'}</div><button class="row" data-go="wquest" style="width:100%"><span>🏅 我的闖關進度與點數：<b>${pts().total}</b> 點</span><span class="chev">›</span></button></div>`;
     },
     themes() {
-      return `<div class="pad" style="padding-top:0"><div class="rs" style="margin-bottom:8px">全國電子依企業方向出題，大家依自己家的需求投稿；投稿同樣用寫作模板、標籤與做法卡，獎勵點數加倍。</div></div>` + THEMES.map(x => { const on = ph() >= x.ph; return `<div class="card" style="border-left:4px solid #C42D5A"><div style="display:flex;justify-content:space-between;gap:8px"><b>${x.n}</b>${on ? `<span class="tag">剩 ${x.left} 天</span>` : '<span class="rtag">擴展期</span>'}</div><div class="muted" style="font-size:.88em;margin-top:2px">出題：${x.by}｜已投稿 ${x.sub} 件</div><div class="rs" style="margin-top:4px">獎勵：${x.rw}</div>${on ? `<button class="btn ghost" data-wtheme="${x.id}" style="margin-top:8px">用這題投稿</button>` : '<button class="btn ghost" disabled style="margin-top:8px;opacity:.6">擴展期開放（異業夥伴共同出題）</button>'}</div>`; }).join('');
+      return `<div class="pad" style="padding-top:0"><div class="rs" style="margin-bottom:8px">依自己家的需求投稿；投稿同樣用寫作模板、標籤與做法卡，獎勵點數加倍。</div></div>` + THEMES.map(x => { const on = ph() >= x.ph; return `<div class="card" style="border-left:4px solid #C42D5A"><div style="display:flex;justify-content:space-between;gap:8px"><b>${x.n}</b>${on ? `<span class="tag">剩 ${x.left} 天</span>` : '<span class="rtag">擴展期</span>'}</div><div class="muted" style="font-size:.88em;margin-top:2px">出題：${x.by}｜已投稿 ${x.sub} 件</div><div class="rs" style="margin-top:4px">獎勵：${x.rw}</div>${on ? `<button class="btn ghost" data-wtheme="${x.id}" style="margin-top:8px">用這題投稿</button>` : '<button class="btn ghost" disabled style="margin-top:8px;opacity:.6">擴展期開放（異業夥伴共同出題）</button>'}</div>`; }).join('');
     },
     topicExtra(t) {
       const D = { dim: [62, 14, '已量產'], switch: [23, 6, '樣品試用中（5 戶）'], voice: [9, 4, ''], mat: [5, 1, ''] }[t.id] || [0, 0, ''];
@@ -399,7 +399,7 @@
       document.querySelectorAll('[data-wf]').forEach(i => { f[i.dataset.wf] = i.value.trim(); });
       if (!f.hope) { e.stopPropagation(); toast('請寫下「希望」：一句話描述理想的樣子'); return; }
       if (!f.need.length) { e.stopPropagation(); toast('請選一到兩個需求類型'); return; }
-      document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}${f.theme ? '｜企業出題：' + (THEMES.find(x => x.id === f.theme) || {}).n : ''}${Object.keys(bld()).length ? '｜附做法卡' : ''}）`;
+      document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}${f.theme ? '｜全國出題：' + (THEMES.find(x => x.id === f.theme) || {}).n : ''}${Object.keys(bld()).length ? '｜附做法卡' : ''}）`;
       J.S.wcat = f.field; L.s.wf = null; return;
     }
     const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
