@@ -660,7 +660,7 @@ function recommend(){const a=A(),sel={mgr:1},later={};const g=a.goals,c=S.case||
  a.sel=sel;a.later=later;}
 function hasGuard(){const a=A();return CAT.some(c=>c.g&&a.sel[c.id])}
 function totals(){const a=A();let one=0;CAT.forEach(c=>{if(a.sel[c.id])one+=c.p});const setup=hasGuard()?1200:0;const m=hasGuard()?({basic:299,two:449,adv:699}[a.plan]||299):0;return {one:one+setup,setup,m,y:m*10}}
-function planName(p){return {basic:'揪夜安｜單一場域關懷',two:'揪夜安＋揪食光｜兩場域關懷',adv:'揪全家｜全屋套餐'}[p||'basic']}
+function planName(p){return {basic:'揪夜安｜基本方案',two:'揪夜安｜安心方案',adv:'揪全家｜全屋套餐'}[p||'basic']}
 function clock(){const a=A();if(!a||!a.t0)return '00:00';const t=Math.floor(((a.t1||Date.now())-a.t0)/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
 function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar" id="hintbar" style="display:${dis&&hint?'block':'none'}">${hint||''}</div><div class="sum"><div style="font-size:.9em"><div>一次性 ${fmt(t.one)}</div><div class="muted">${t.m?'＋每月 '+fmt(t.m):'無月費'}</div></div><button class="btn" data-a="${act}" ${dis?'disabled':''}>${label}</button></div>`}
@@ -827,7 +827,10 @@ plan:()=>{const H=S.hh,p=H&&H.plan;return `${hdr('關懷方案')}<div class="scr
  <div class="card"><b>取消關懷方案</b><div class="muted" style="margin:4px 0 10px">月付不綁約，當期結束後停止服務；設備歸您所有，家電檔案仍可免費使用。</div><button class="btn ghost" data-req="取消方案" style="margin:0">申請取消</button></div>`
  :S.ph>=2&&p?`<div class="card"><b>方案${p.status==='待確認'?'待確認':'已確認'}</b><div class="muted" style="margin:4px 0 10px">${esc(planName(p.plan))}｜${p.monthly?'每月 '+fmt(p.monthly):'無月費'}；長輩關懷在到府安裝完成後啟用。</div><button class="btn" data-go="pl">查看專屬方案</button></div>`
  :`<div class="card"><b>尚未啟用長輩關懷</b><div class="muted" style="margin:4px 0 10px">家電檔案已免費為您服務。需要關懷長輩的日常時，可以先做 AR 掃描（場勘）與居家診斷，或預約門市諮詢。</div><button class="btn" data-go="b1">開始居家安全評估</button></div>`}
- <div class="card" style="padding:4px 14px"><button class="row" data-a="ntStart" style="width:100%"><span>異常時會怎麼通知？看演練</span><span class="chev">›</span></button></div></div>`}
+ <div class="card" style="padding:4px 14px"><button class="row" data-a="ntStart" style="width:100%"><span>異常時會怎麼通知？看演練</span><span class="chev">›</span></button></div>
+ <div class="card"><b>揪居家怎麼一步步長大</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">試點先做揪夜安，其他方案達標後依序開放；先登記，開放時優先通知</div>
+ ${[['試點期','第 1–6 月','now','揪夜安（臥室到浴室）基本 299／安心 449；高雄三民區 民族店、澄清店、三民中華店'],['擴展期','約第 7–15 月','','揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699；保養、換新與以租代買；產險、居家清潔、租賃夥伴；長輩關懷 2.0'],['延伸期','單店約 194 戶以上','','育兒與寵物家庭；揪夥伴商用版（日照、住宿機構、租屋代管、民宿，不含長輩關懷通知）；新家與老宅翻修 AR 配置']].map(([n,t,c,d])=>`<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee)"><div style="flex:none;width:74px"><b style="color:${c?'#C42D5A':'inherit'}">${n}</b><div class="muted" style="font-size:.78em">${t}</div></div><div style="font-size:.88em;line-height:1.6">${c?'<span class="tag ok">目前</span> ':''}${d}</div></div>`).join('')}
+ <button class="row" data-req="擴展期方案登記" style="width:100%;margin-top:4px"><span>登記擴展期方案</span><span class="chev">›</span></button></div></div>`}
 });
 
 Object.assign(V,{
@@ -871,7 +874,8 @@ pre:()=>{const PO=(S.topics&&S.topics.preorder)||{count:0,me:false},done=!!PO.me
 });
 
 const ADVS={'Digital City 高雄民族店':{nick:'小明顧問',ini:'明',color:'#C42D5A',skills:['夜間動線照明規劃','長輩陪同說明','關懷設備相容性'],stats:[['貼心 CARE',92],['安心 SAFE',88],['規劃 PLAN',85]]},
- 'Digital City 高雄澄清店':{nick:'阿芳顧問',ini:'芳',color:'#8E1E42',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]}};
+ 'Digital City 高雄澄清店':{nick:'阿芳顧問',ini:'芳',color:'#8E1E42',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]},
+ 'Digital City 高雄三民中華店':{nick:'阿哲顧問',ini:'哲',color:'#E0577A',skills:['夜間動線照明規劃','校園大使觀察回饋'],stats:[['貼心 CARE',88],['安心 SAFE',84],['規劃 PLAN',86]]}};
 function advCard(store,compact){const a=ADVS[store]||ADVS['Digital City 高雄民族店'];const sk=(S.mySkills&&store==='Digital City 高雄民族店')?S.mySkills:a.skills;return `<div class="card acard" style="border-left:5px solid ${a.color}">
  <div style="display:flex;gap:12px;align-items:center"><div class="avt" style="background:${a.color}">${a.ini}</div><div style="flex:1"><div class="rs">人物圖鑑｜${store}</div><b style="font-size:1.08em">${a.nick}</b> <span class="tag ok">居安規劃認證</span> <span class="tag" style="background:#F7E9EE;color:#8E1E42">含進階課</span></div></div>
  <div style="margin-top:8px">${sk.map(x=>`<span class="tag" style="margin:0 6px 6px 0;display:inline-block">主打技｜${x}</span>`).join('')}</div>
