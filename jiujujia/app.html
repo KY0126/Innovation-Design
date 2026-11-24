@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261124a"></script>
+<script src="store.js?v=20261125a"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -354,6 +354,11 @@ async function loadCases(){const d=await api('/advisor/bookings');S.today=d.toda
 async function loadTodos(){S.todos=await api('/advisor/todos')}
 async function loadOrders(){const d=await api('/tech/orders');S.today=d.today;S.orders=d.orders}
 async function loadTopics(){S.topics=await api('/wish-topics')}
+// 居家評估中途保存：量測與答案存進資料庫 assessment_drafts，下次開始評估時帶回
+let draftT=null;
+function saveDraft(){if(!S.me||S.me.role!=='family')return;clearTimeout(draftT);draftT=setTimeout(()=>api('/home/assessment-draft',{method:'PUT',body:{draft:{meas:S.meas,ans:S.ans,qi:S.qi||0,self:!!S.self}}}).catch(()=>{}),400)}
+function clearDraft(){clearTimeout(draftT);api('/home/assessment-draft',{method:'DELETE'}).catch(()=>{})}
+async function loadDraft(){try{const r=await api('/home/assessment-draft');const d=r.draft;if(d&&((d.meas&&Object.keys(d.meas).length)||(d.ans&&Object.keys(d.ans).length))){Object.assign(S.meas,d.meas||{});Object.assign(S.ans,d.ans||{});S.qi=Math.min(d.qi||0,Q.length-1);rr();toast('已帶回上次沒做完的量測與回答')}}catch(e){}}
 async function loadDrafts(){S.drafts=(await api('/advisor/drafts')).drafts}
 async function loadQuote(){S.quote=(await api('/home/quote')).quote}
 const LOAD={pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,wall:loadTopics,pre:loadTopics};
@@ -1160,13 +1165,13 @@ share:()=>`${lhead('家人群組（示意）')}<div class="chat"><div class="sys
 apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載入中…</div>`;const pv=B.pv,pins=(S.pmPins||(pv?pv.pins:[])),sel=S.pmSel,sp=pins.find(p=>p.id===sel),locked=pv&&pv.status!=='草稿',ins=B.install;
  return `${stf('方案圖面｜'+esc(B.household))}<div class="scroll">
  <div class="step">${pv?'目前版本 '+verTag(pv):'尚未建立圖面'}${B.versions&&B.versions.length>1?'｜歷程 '+B.versions.map(v=>'v'+v.ver).join(' → '):''}</div>
- <div class="ly"><h3>標記與工作包 <span class="rs" style="font-weight:400">點標記選取，再點圖面移動位置</span></h3>${planMap(pins,{edit:true,sel,letters:true,path:true})}
+ <div class="card" style="margin:10px 12px 0;background:var(--brand-soft)"><b style="color:var(--brand-ink)">圖面編輯與差異核准請到門市電腦</b><div class="rs">手機只看圖面；移動標記、存新版本、核准技師差異，都在生活顧問電腦版的「改善方案」與「驗收與售後」。</div></div>
+ <div class="ly"><h3>標記與工作包 <span class="rs" style="font-weight:400">點標記看說明</span></h3>${planMap(pins,{sel,letters:true,path:true})}
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">${['B','A'].map(k=>`<span class="rs"><span class="dot" style="background:${PKC[k]}"></span> ${k} ${PKN[k]}</span>`).join('')}</div>
-  ${sp?`<div class="card" style="margin:10px 0 0;padding:10px;border:1.5px solid var(--brand)"><b>${esc(sp.label)}</b><div class="rs">${esc(sp.room||'')}｜座標 ${sp.x.toFixed(1)}, ${sp.y.toFixed(1)} 公尺${sp.note?'｜'+esc(sp.note):''}</div><div style="margin-top:6px">${['B','A'].map(k=>`<button class="chip" data-pmpkg="${k}" aria-pressed="${sp.pkg===k}">${k} ${PKN[k]}</button>`).join('')}</div></div>`:''}
-  <div style="display:flex;gap:8px;margin-top:10px"><button class="btn ghost" style="margin:0" data-a="pmAdd">＋ 床邊插座（B）</button><button class="btn" style="margin:0" data-a="pmSave" ${S.pmDirty?'':'disabled'}>${locked?'存成新版本':'儲存圖面'}</button></div>
-  ${locked&&S.pmDirty?'<div class="warn">已鎖定的版本不會被覆蓋；儲存後產生新版本，需請長輩再確認一次。</div>':''}</div>
+  ${sp?`<div class="card" style="margin:10px 0 0;padding:10px;border:1.5px solid var(--brand)"><b>${esc(sp.label)}</b><div class="rs">${esc(sp.room||'')}｜座標 ${sp.x.toFixed(1)}, ${sp.y.toFixed(1)} 公尺${sp.note?'｜'+esc(sp.note):''}</div><div style="margin-top:6px"><span class="tag">${sp.pkg} ${PKN[sp.pkg]||''}</span></div></div>`:''}
+</div>
  ${ins?`<div class="ly"><h3>到府工單 ${esc(ins.code)}｜${esc(ins.label)}</h3>${ins.packages.map(k=>`<div class="row"><span><span class="dot" style="background:${PKC[k.code]}"></span> <b style="font-weight:500">${esc(k.name)}</b><span class="rs" style="display:block">${esc(k.team)}${k.assignee?'｜'+esc(k.assignee):''}${k.prereq?'｜需先完成 '+k.prereq:''}</span></span><span class="tag ${k.status==='已完成'?'ok':''}">${esc(k.status)}</span></div>`).join('')}</div>`:''}
- ${B.diffs.length?`<div class="ly"><h3>技師差異回報</h3>${B.diffs.map(diffRow).join('')}</div>`:''}
+ ${B.diffs.length?`<div class="ly"><h3>技師差異回報 <span class="rs" style="font-weight:400">請到門市電腦核准</span></h3>${B.diffs.map(d=>diffRow(d,true)).join('')}</div>`:''}
  <div class="pad">${pv&&pv.status==='草稿'?'<button class="btn" data-go="aec">請長輩確認（安裝前後對比）</button>':''}<button class="btn ghost" data-a="advAgain">回到今天</button></div></div>`},
 // 顧問：長輩確認（大字、同一張對比圖）
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
@@ -1228,8 +1233,8 @@ tdf:()=>{const o=S.order,f=S.tdf||(S.tdf={level:'輕微',text:'',photo:false});c
   <button class="chip" data-a="tdfPhoto" aria-pressed="${f.photo}" style="margin-top:8px">${f.photo?'✓ 已附照片（不含人像）':'＋ 附現場照片'}</button></div>
  <div class="pad"><button class="btn" data-a="tdfSend">送出給生活顧問</button><button class="btn ghost" data-a="back">取消</button></div></div>`}
 });
-function diffRow(d){return `<div class="it" style="align-items:flex-start"><span style="flex:1"><b style="font-weight:500">${esc(d.household||'')}｜${d.pkg} ${PKN[d.pkg]||''}${d.pin?'｜'+esc(d.pin):''}</b><div class="rs">${esc(d.text)}｜${esc(d.by||'')}｜${esc(d.when)}${d.photo?'｜附照片':''}</div>${d.status!=='待審核'?`<div class="rs" style="color:${d.status==='已核准'?'var(--ok)':'var(--muted)'}">${esc(d.status)}${d.new_ver?'｜圖面 v'+d.new_ver:''}</div>`:''}</span>
- ${d.status==='待審核'?`<span style="display:flex;flex-direction:column;gap:6px;flex:none">${d.level==='暫停'?'<span class="tag" style="background:#FFE3DA;color:#B33A1C">暫停施工中</span>':''}<button class="tag ok" data-dfok="${d.id}" style="border:0">核准</button><button class="tag" data-dfno="${d.id}" style="border:0;background:var(--bg);color:var(--muted)">退回</button></span>`:''}</div>`}
+function diffRow(d,ro){return `<div class="it" style="align-items:flex-start"><span style="flex:1"><b style="font-weight:500">${esc(d.household||'')}｜${d.pkg} ${PKN[d.pkg]||''}${d.pin?'｜'+esc(d.pin):''}</b><div class="rs">${esc(d.text)}｜${esc(d.by||'')}｜${esc(d.when)}${d.photo?'｜附照片':''}</div>${d.status!=='待審核'?`<div class="rs" style="color:${d.status==='已核准'?'var(--ok)':'var(--muted)'}">${esc(d.status)}${d.new_ver?'｜圖面 v'+d.new_ver:''}</div>`:''}</span>
+ ${d.status==='待審核'&&ro?`<span class="tag" style="flex:none">待電腦版核准</span>`:''}${d.status==='待審核'&&!ro?`<span style="display:flex;flex-direction:column;gap:6px;flex:none">${d.level==='暫停'?'<span class="tag" style="background:#FFE3DA;color:#B33A1C">暫停施工中</span>':''}<button class="tag ok" data-dfok="${d.id}" style="border:0">核准</button><button class="tag" data-dfno="${d.id}" style="border:0;background:var(--bg);color:var(--muted)">退回</button></span>`:''}</div>`}
 async function loadAdvHome(){S.ahome=await api('/advisor/home')}
 async function openBoard(hid){const [b,q]=await Promise.all([api('/advisor/plan/'+hid),api('/advisor/quotes/'+hid).catch(()=>({quotes:[]}))]);S.board=b;S.quotes=q.quotes||[];S.pmPins=null;S.pmSel=null;S.pmDirty=false}
 async function refreshOrder(){if(!S.order)return;S.order=await api('/tech/orders/'+S.order.id)}
@@ -1343,8 +1348,8 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.hc!==undefined){S.hc=+t.dataset.hc;go('hc');return}
  if(t.dataset.nav){const n=t.dataset.nav;if(n==='home'||n==='m1'){S.stack=[n];render()}else toast('此分頁維持原 App 功能');return}
  if(t.dataset.req){sendReq(t.dataset.req);return}
- if(t.dataset.ans){S.ans[Q[S.qi||0].k]=t.dataset.ans;render();return}
- if(t.dataset.outlet!==undefined){S.meas.outlets=t.dataset.outlet;render();return}
+ if(t.dataset.ans){S.ans[Q[S.qi||0].k]=t.dataset.ans;saveDraft();render();return}
+ if(t.dataset.outlet!==undefined){S.meas.outlets=t.dataset.outlet;saveDraft();render();return}
  if(t.dataset.store){S.store=t.dataset.store;S.slot=null;S.slots=null;render();loadSlots().then(render).catch(x=>toast(x.message));return}
  if(t.dataset.slot){S.slot=t.dataset.slot;render();return}
  if(t.dataset.fam){const f=S.famMine||(S.famMine={});f[t.dataset.fam]=!f[t.dataset.fam];render();savePrefs({fam:f});return}
@@ -1379,15 +1384,15 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='big'){S.big=!S.big;render();savePrefs({big:S.big})}
  else if(a==='guide'){S.guide=!S.guide;render()}
  else if(a==='reload'){const v=S.stack[S.stack.length-1];if(LOAD[v])busy(t,async()=>{await LOAD[v]();render();toast('已更新')})}
- else if(a==='loginChild'||a==='loginSelf'||a==='redo'){S.armode='ar';S.arT=0;if(a!=='redo')S.self=(a==='loginSelf');if(S.self)S.big=true;S.qi=0;S.d0=Date.now();S.ans={};const as=S.hh&&S.hh.assessment;S.meas=as?{...as.measures}:{};go('ar')}
+ else if(a==='loginChild'||a==='loginSelf'||a==='redo'){S.armode='ar';S.arT=0;if(a!=='redo')S.self=(a==='loginSelf');if(S.self)S.big=true;S.qi=0;S.d0=Date.now();S.ans={};const as=S.hh&&S.hh.assessment;S.meas=as?{...as.measures}:{};go('ar');if(a==='redo')clearDraft();else loadDraft()}
  else if(a==='arScan')arStart();
  else if(a==='arCol'){S.arCol=!S.arCol;const sh=document.getElementById('arSheet');if(sh)sh.innerHTML=arSheetInner()}
- else if(a==='arUse'){S.meas={...S.meas,corridor_cm:AR_RES.corridor_cm,threshold_cm:AR_RES.threshold_cm,bed_bath_m:AR_RES.bed_bath_m,outlets:AR_RES.outlets};S.armode='manual';render();toast('已帶入 AR 掃描結果，可以再修正')}
+ else if(a==='arUse'){S.meas={...S.meas,corridor_cm:AR_RES.corridor_cm,threshold_cm:AR_RES.threshold_cm,bed_bath_m:AR_RES.bed_bath_m,outlets:AR_RES.outlets};S.armode='manual';saveDraft();render();toast('已帶入 AR 掃描結果，可以再修正')}
  else if(a==='arNext'||a==='arSkip'){if(a==='arSkip')S.meas={};else{const R=S.cfg.measure_range;for(const k in S.meas){const v=S.meas[k];if(v===''||v==null){delete S.meas[k];continue}const n=Number(v);if(!isFinite(n)||n<R[k][0]||n>R[k][1]){toast('請確認量測數字是否正確');return}}}go('b2')}
  else if(a==='consent'){S.consent=!S.consent;render()}
  else if(a==='repairList')toast('線上報修維持原 App 功能');
- else if(a==='prev'){S.qi--;render()}
- else if(a==='next'){if(S.qi<Q.length-1){S.qi++;render()}else busy(t,async()=>{const dur=S.d0?Math.round((Date.now()-S.d0)/1000):null;applyHome(await api('/assessments',{method:'POST',body:{answers:S.ans,measures:S.meas,filled_by:S.self?'self':'child',duration_s:dur}}));S.d0=null;const i=S.stack.indexOf('b1');S.stack=(i>=0?S.stack.slice(0,i):S.stack.slice(0,1)).concat('b3');render()})}
+ else if(a==='prev'){S.qi--;saveDraft();render()}
+ else if(a==='next'){if(S.qi<Q.length-1){S.qi++;saveDraft();render()}else busy(t,async()=>{const dur=S.d0?Math.round((Date.now()-S.d0)/1000):null;applyHome(await api('/assessments',{method:'POST',body:{answers:S.ans,measures:S.meas,filled_by:S.self?'self':'child',duration_s:dur}}));clearDraft();S.d0=null;const i=S.stack.indexOf('b1');S.stack=(i>=0?S.stack.slice(0,i):S.stack.slice(0,1)).concat('b3');render()})}
  else if(a==='save'){toast('已存入「長輩家」，成果保存六個月');S.home='parents';S.stack=['home','m2'];render()}  else if(a==='saveMine'){toast('已存入「我家」，成果保存六個月');S.home='mine';S.stack=['home','m2'];render()}  else if(a==='saveNone'){toast('這次先不儲存：不建立家庭紀錄，原始影像已清除')}
  else if(a==='book')busy(t,async()=>{const st=S.store||S.hh.household.store;const d=await api('/bookings',{method:'POST',body:{store:st,slot:S.slot}});applyHome(d.home);S.slot=null;S.slots=null;S.stack=['home','b5'];render()});
  else if(a==='toHome2'){S.home='parents';S.stack=['home','m2'];render()}
@@ -1451,7 +1456,7 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='ipList'){const it=instItems({plan:S.hh.plan});toast(it.length?it.map(([n,q])=>n+' '+q).join('、'):'依工單內容')}
  else if(a==='ntAgain'){const i=S.stack.lastIndexOf('n0');if(i>=0){S.stack=S.stack.slice(0,i+1);render()}else back()}
 });
-document.getElementById('view').addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cmpr){cmpSet(e.target.dataset.cmpr,+e.target.value);return}if(e.target.id==='tdfTxt'&&S.tdf){S.tdf.text=e.target.value;return}if(e.target.id==='accNote'){S.accNote=e.target.value;return}const m=e.target.dataset&&e.target.dataset.meas;if(m){S.meas[m]=e.target.value;return}const a=A();if(!a)return;if(e.target.id==='c2n'){a.c2n=e.target.value;const b=document.querySelector('[data-a="advConfirm"]');if(b)b.disabled=hasGuard()&&!a.c2n.trim();const h=document.getElementById('hintbar');if(h)h.style.display=(hasGuard()&&!a.c2n.trim())?'block':'none'}if(e.target.id==='c2p')a.c2p=e.target.value;if(e.target.id==='ewish')a.ewish=e.target.value});
+document.getElementById('view').addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cmpr){cmpSet(e.target.dataset.cmpr,+e.target.value);return}if(e.target.id==='tdfTxt'&&S.tdf){S.tdf.text=e.target.value;return}if(e.target.id==='accNote'){S.accNote=e.target.value;return}const m=e.target.dataset&&e.target.dataset.meas;if(m){S.meas[m]=e.target.value;saveDraft();return}const a=A();if(!a)return;if(e.target.id==='c2n'){a.c2n=e.target.value;const b=document.querySelector('[data-a="advConfirm"]');if(b)b.disabled=hasGuard()&&!a.c2n.trim();const h=document.getElementById('hintbar');if(h)h.style.display=(hasGuard()&&!a.c2n.trim())?'block':'none'}if(e.target.id==='c2p')a.c2p=e.target.value;if(e.target.id==='ewish')a.ewish=e.target.value});
 boot();
 // 錄製 Demo 影片用：讓自動化腳本能逐格播放 AR 動畫
 async function tourDiag(){if(!S.meas||!Object.keys(S.meas).length)S.meas={corridor_cm:AR_RES.corridor_cm,threshold_cm:AR_RES.threshold_cm,bed_bath_m:AR_RES.bed_bath_m,outlets:AR_RES.outlets};

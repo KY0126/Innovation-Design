@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261124a"></script>
+<script src="store.js?v=20261125a"></script>
+<script src="planmap.js?v=20261125a"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -86,6 +87,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
  .mtabs button{white-space:nowrap;border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:13px}.mtabs button[aria-current="page"]{background:var(--brand);color:#fff;border-color:var(--brand)}
  main{padding:12px}.proto{margin-left:0}}
 .certs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.cert{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line,#E7E2E4);border-radius:10px;padding:10px 12px}.cert b{font-size:14px}.cert .mu{font-size:12px}.cert.adv{background:#FBEFF3}@media (max-width:1100px){.certs{grid-template-columns:repeat(2,minmax(0,1fr))}}.tips{margin:0;padding-left:18px;display:grid;gap:8px}.tips b{margin-right:8px;color:var(--brand,#C42D5A)}
+.b[aria-pressed="true"]{background:#FAE0E8;border-color:#D4003C;color:#A3002E}
 </style>
 <style>
 #cGate{position:fixed;inset:0;z-index:9000;background:#ECE7E3;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -209,7 +211,7 @@ function vWb(){const h=ST.home,ho=handoffs(),P=cases(),stg=ST.stg||'all';
  ${stg!=='all'?'<div style="margin:-6px 0 10px"><button class="b" data-stg="all">顯示全部案件</button></div>':''}
  <div class="wb2"><div>${left}</div>
  <div><div class="panel"><div class="ph">今天 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc((c.label.split('）')[1]||c.label))}</b>｜${esc(c.household)}<div class="s">${esc(c.kind)}</div></span><span class="mu">›</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
- <div class="panel decide"><div class="ph">需要你決定 <small>技師現場差異</small></div><div class="pb">${diffs.length?diffs.map(d=>`<button class="item" data-case="${d.household_id||3}" data-tabgo="7"><span class="t"><b>${esc(d.household||'')}</b>｜${esc(d.text)}<div class="s">${esc(d.by||'技師')}｜${esc(d.level||'')}</div></span><span class="tag am">待核准</span></button>`).join(''):'<span class="mu">目前沒有待核准的差異</span>'}</div></div></div></div>`}
+ <div class="panel decide"><div class="ph">需要你決定 <small>技師現場差異</small></div><div class="pb">${diffs.length?diffs.map(d=>`<button class="item" data-case="${d.household_id||3}" data-tabgo="8"><span class="t"><b>${esc(d.household||'')}</b>｜${esc(d.text)}<div class="s">${esc(d.by||'技師')}｜${esc(d.level||'')}</div></span><span class="tag am">待核准</span></button>`).join(''):'<span class="mu">目前沒有待核准的差異</span>'}</div></div></div></div>`}
 function vCases(){return `<div class="panel"><div class="ph">已授權案件 <small>只顯示消費者授權分享、與本門市服務相關的案件</small></div><div class="pb">${cases().map(p=>row(p,(p.elder_note||'')+'｜'+stage(p)[0])).join('')}</div></div>`}
 function sel(hid){return SEL[hid]||(SEL[hid]={'走道':[1],'浴室':[0],'浴室門':[]})}
 function chosen(hid){const s=sel(hid);return Object.keys(OPTS).flatMap(sp=>(s[sp]||[]).map(i=>Object.assign({sp},OPTS[sp].items[i])))}
@@ -240,7 +242,7 @@ function tSpace(p){const created=(p.assessment||{}).created_at||'2026-10-17 21:1
  <tr><td>影像確認版錄影與異常紀錄</td><td>${(p.plan&&p.plan.sel&&p.plan.sel.cam)?'<span class="tag">保存六個月</span>':'<span class="tag gray">未加裝（無鏡頭版）</span>'}</td></tr>
  <tr><td>2D／3D 模型、尺寸、風險紀錄</td><td><span class="tag gray">依住宅履歷規則管理</span></td></tr></table>
  <p class="mu sm">顧問只能查看已授權的成果。原型未接正式後端，自動清理與到期覆蓋標示為待實作。</p></div></div></div>`}
-function tOpt(p){const s=sel(p.household_id);return `<div class="note" style="margin-bottom:12px">四類改善方式：免費調整、全國電子安裝、簡易施工、改造工程（需到府估價）。勾選後同步到報價；價格與工期為示範資料。</div>
+function tOpt(p){const s=sel(p.household_id);return `${planPanel(p)}<div class="note" style="margin-bottom:12px">四類改善方式：免費調整、全國電子安裝、簡易施工、改造工程（需到府估價）。勾選後同步到報價；價格與工期為示範資料。</div>
  ${Object.entries(OPTS).map(([sp,o])=>`<div class="panel" style="margin-bottom:12px"><div class="ph">${esc(sp)} <span class="dot" style="background:${LC[o.l][1]};margin-left:4px"></span><small>${LC[o.l][0]}｜${esc(o.why)}</small></div><div class="pb" style="overflow-x:auto"><table><tr><th></th><th>方式</th><th>內容</th><th>價格</th><th>工期</th><th>執行單位</th><th>前置／依賴</th><th>驗收與保固</th><th>需現場核對</th></tr>
  ${o.items.map((it,i)=>`<tr><td><input type="checkbox" data-opt="${esc(sp)}|${i}" ${(s[sp]||[]).includes(i)?'checked':''} aria-label="選擇${esc(it.n)}"></td><td><span class="tag ${it.t==='改造工程'?'am':it.t==='免費調整'?'gray':''}">${esc(it.t)}</span></td><td>${esc(it.n)}</td><td>${fmt(it.p)}</td><td>${esc(it.d)}</td><td>${esc(it.by)}</td><td>${esc(it.dep)}</td><td>${esc(it.acc)}</td><td>${esc(it.chk)}</td></tr>`).join('')}</table></div></div>`).join('')}`}
 function tProd(){const st=(CH[ST.hid]||{}).style||{};return `<div class="grid"><div class="panel"><div class="ph">揪夜安設備 <small>商品規格與供貨（示範資料）</small></div><div class="pb"><table><tr><th>商品</th><th>規格</th><th>安裝限制</th><th>供貨</th></tr>
@@ -287,8 +289,32 @@ function tWork(p){const PV=(p.pv||{}).pins||[],ch=chosen(p.household_id).filter(
  <div class="jh">${st.map(x=>`<div class="s ${x}"><i></i></div>`).join('')}</div>
  <div class="wk">${C.map(([k,n,team,tg,body],i)=>`<div class="pk${O[k]?' open':''}"><b>${n}</b><button class="tg" data-pk="${k}" aria-expanded="${!!O[k]}">${O[k]?'收合 ▴':'明細 ▾'}</button><div class="sm">${team}</div><span class="${T[st[i]]}" style="margin-top:6px;display:inline-block">${tg}</span>${O[k]?`<div class="acc">${body}</div>`:''}</div>`).join('')}</div>
  <p class="mu sm" style="margin-top:10px">前置工作未完成時，後續工單顯示等待；支援待料、延期、客戶改期與異常。技師現場差異回報後由顧問核准，顧問不能覆蓋技師的原始核對紀錄。</p></div></div>`}
+// ---------- 方案圖面（P4，從手機移到電腦版） ----------
+function pmState(p){if(!ST.pm||ST.pm.hid!==p.household_id)ST.pm={hid:p.household_id,pins:null,sel:null,dirty:false};return ST.pm}
+function planPanel(p){const pv=p.pv,M=pmState(p),pins=M.pins||(pv?pv.pins:[]),sp=pins.find(x=>x.id===M.sel),locked=pv&&pv.status!=='草稿',K=JJJPM.PKC,N=JJJPM.PKN;
+ return `<div class="panel" style="margin-bottom:12px"><div class="ph">方案圖面 <small>${pv?'目前版本 v'+pv.ver+'｜'+esc(pv.status):'尚未建立圖面'}${p.versions&&p.versions.length>1?'｜歷程 '+p.versions.map(v=>'v'+v.ver).join('、'):''}</small></div><div class="pb">
+ <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start">
+ <div>${JJJPM.render(pins,{edit:true,sel:M.sel,letters:true,path:true,alt:esc(p.household)+'方案圖面'})}<div class="s mu" style="margin-top:6px">點標記選取，再點圖面移動位置</div></div>
+ <div>${['B','A'].map(k=>`<div class="s"><span class="dot" style="background:${K[k]}"></span> ${k} ${N[k]}</div>`).join('')}
+  ${sp?`<div class="item" style="display:block;margin-top:10px;border:1.5px solid var(--brand,#D4003C);border-radius:8px;padding:10px"><b>${esc(sp.label)}</b><div class="s">${esc(sp.room||'')}｜座標 ${(+sp.x).toFixed(1)}, ${(+sp.y).toFixed(1)} 公尺</div><div style="margin-top:6px;display:flex;gap:6px">${['B','A'].map(k=>`<button class="b" data-cpkg="${k}" aria-pressed="${sp.pkg===k}">${k} ${N[k]}</button>`).join('')}</div></div>`:'<div class="s mu" style="margin-top:10px">尚未選取標記</div>'}
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="b" data-cpadd="1">＋ 床邊插座（B）</button><button class="b pri" data-cpsave="1" ${M.dirty?'':'disabled'}>${locked?'存成新版本':'儲存圖面'}</button></div>
+  ${locked&&M.dirty?'<div class="note" style="margin-top:8px">已鎖定的版本不會被覆蓋；儲存後產生新版本，需請長輩再確認一次。</div>':''}
+ </div></div></div></div>`}
+function diffPanel(list){const L=(list||[]).filter(d=>d.status==='待審核');return `<div class="panel" style="margin-bottom:12px"><div class="ph">技師現場差異 <small>差異核准只在電腦版｜待核准 ${L.length} 件</small></div><div class="pb">${L.length?L.map(d=>`<div class="item"><span class="t"><b>${esc(d.household||'')}</b>｜${esc(d.pkg||'')} ${esc((JJJPM.PKN||{})[d.pkg]||'')}${d.pin?'｜'+esc(d.pin):''}<div class="s">${esc(d.text)}｜${esc(d.by||'')}｜${esc(d.when||'')}${d.level==='暫停'?'｜暫停施工中':''}</div></span><span style="display:flex;gap:6px;flex:none"><button class="b pri" data-cdfok="${d.id}" data-hid="${d.household_id||ST.hid}">核准</button><button class="b" data-cdfno="${d.id}" data-hid="${d.household_id||ST.hid}">退回</button></span></div>`).join(''):'<span class="mu">目前沒有待核准的差異</span>'}</div></div>`}
+document.addEventListener('click',e=>{
+ if(ST.view!=='case')return;const p=ST.plans[ST.hid];if(!p)return;const M=pmState(p);
+ const pg=e.target.closest('[data-pin]');if(pg&&e.target.closest('[data-pmap]')){M.sel=M.sel===pg.dataset.pin?null:pg.dataset.pin;render();return}
+ const pm=e.target.closest('[data-pmap]');if(pm&&M.sel){const [x,y]=JJJPM.toPlan(e,pm);if(!M.pins)M.pins=JSON.parse(JSON.stringify(p.pv?p.pv.pins:[]));const q=M.pins.find(z=>z.id===M.sel);if(q){q.x=x;q.y=y;M.dirty=true}render();return}
+ const b=e.target.closest('[data-cpkg],[data-cpadd],[data-cpsave]');if(!b||b.disabled)return;
+ if(!M.pins)M.pins=JSON.parse(JSON.stringify(p.pv?p.pv.pins:[]));
+ if(b.dataset.cpkg){const q=M.pins.find(z=>z.id===M.sel);if(q){q.pkg=b.dataset.cpkg;M.dirty=true}render()}
+ else if(b.dataset.cpadd){if(M.pins.some(z=>z.id==='O1'))return;M.pins.push({id:'O1',pkg:'B',k:'outlet',label:'床邊加裝插座（夜燈用）',x:2.7,y:0.7,room:'臥室',st:'plan'});M.sel='O1';M.dirty=true;render()}
+ else if(b.dataset.cpsave){b.disabled=true;api('/advisor/plan/'+p.household_id+'/pins',{method:'PUT',body:{pins:M.pins}}).then(d=>{ST.plans[p.household_id]=d;ST.pm=null;render()}).catch(x=>{b.disabled=false;console.warn(x)})}
+});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cdfok],[data-cdfno]');if(!b||b.disabled)return;const id=b.dataset.cdfok||b.dataset.cdfno,ok=!!b.dataset.cdfok,hid=+b.dataset.hid;b.disabled=true;
+ api('/advisor/diffs/'+id,{method:'POST',body:{action:ok?'approve':'reject'}}).then(async d=>{if(d&&d.household_id)ST.plans[d.household_id]=d;else if(hid)ST.plans[hid]=await api('/advisor/plan/'+hid);try{ST.home=await api('/advisor/home')}catch(x){}render()}).catch(x=>{b.disabled=false;console.warn(x)})});
 function tAfter(p){const hid=p.household_id,s=SUB[hid]||{};const rq=(ST.todos.requests||[]).filter(r=>r.household===p.household);
- return `<div class="grid"><div class="panel"><div class="ph">補助轉介 <small>長照居家無障礙改善補助</small></div><div class="pb">
+ return `${diffPanel(p.diffs)}<div class="grid"><div class="panel"><div class="ph">補助轉介 <small>長照居家無障礙改善補助</small></div><div class="pb">
  <div class="item"><span class="t">長輩是否已有長照服務</span><select data-sub="has" aria-label="是否已有長照服務"><option ${s.has==='未確認'||!s.has?'selected':''}>未確認</option><option ${s.has==='有'?'selected':''}>有</option><option ${s.has==='沒有'?'selected':''}>沒有</option></select></div>
  <div class="item"><span class="t">已轉介 1966</span><input type="checkbox" data-sub="ref" ${s.ref?'checked':''} aria-label="已轉介 1966"></div>
  <div class="item"><span class="t">核准狀態</span><select data-sub="ok" aria-label="核准狀態"><option ${!s.ok||s.ok==='待評估'?'selected':''}>待評估</option><option ${s.ok==='已核准'?'selected':''}>已核准</option><option ${s.ok==='不符資格'?'selected':''}>不符資格</option></select></div>
