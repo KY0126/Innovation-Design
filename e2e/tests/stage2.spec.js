@@ -79,11 +79,13 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   await adm.goto('/jiujujia/admin.html');
   await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('phase')); await adm.waitForTimeout(300);
-  await expect(adm.locator('[data-plink="business.html"]')).toHaveAttribute('href', /phase=pilot/);
+  // 營運階段存在資料庫，預設全部開放（延伸期）
+  await expect(adm.locator('[data-plink="business.html"]')).toHaveAttribute('href', /phase=ext/);
+  expect(await adm.evaluate(() => Object.keys(localStorage).filter(k => k === 'jjj_phase'))).toEqual([]);
   await adm.close();
   // 網址參數帶入擴展期
   await page.goto('/jiujujia/app.html?phase=exp');
-  expect(await page.evaluate(() => window.JJJPHASE())).toBe(1);
+  expect(await page.evaluate(async () => { await window.JJJPHASE_READY; return window.JJJPHASE(); })).toBe(1);
   await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   // F01／F02 → 揪居家主頁（長輩家）有其他場域入口；切到我家有育兒與寵物
   await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
