@@ -113,18 +113,29 @@ function draw() {
   const { r, cam, target } = R, w = R.host.clientWidth || 320, h = R.host.clientHeight || 240;
   r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
   cam.position.set(target.x + R.dist * Math.cos(R.el) * Math.sin(R.az), target.y + R.dist * Math.sin(R.el), target.z + R.dist * Math.cos(R.el) * Math.cos(R.az)); cam.lookAt(target);
-  r.render(R.built.scene, cam);
-  if (R.lab) R.lab.innerHTML = R.built.tags.map(([t, v, nw]) => { const p = v.clone().project(cam); if (p.z > 1) return ''; return `<span class="w3tag${nw ? ' nw' : ''}" style="left:${((p.x + 1) / 2 * w).toFixed(0)}px;top:${((1 - p.y) / 2 * h).toFixed(0)}px">${t}</span>`; }).join('');
+  const sx = R.before ? Math.round(w * R.pos / 100) : 0;
+  if (R.before) { r.setScissorTest(true); r.setScissor(0, 0, sx, h); r.render(R.before.scene, cam); r.setScissor(sx, 0, w - sx, h); r.render(R.built.scene, cam); r.setScissorTest(false); if (R.hd) R.hd.style.left = R.pos + '%'; }
+  else r.render(R.built.scene, cam);
+  if (R.lab) R.lab.innerHTML = R.built.tags.map(([t, v, nw]) => { const p = v.clone().project(cam); if (p.z > 1 || (p.x + 1) / 2 * w < sx) return ''; return `<span class="w3tag${nw ? ' nw' : ''}" style="left:${((p.x + 1) / 2 * w).toFixed(0)}px;top:${((1 - p.y) / 2 * h).toFixed(0)}px">${t}</span>`; }).join('');
 }
 // 掛到容器上：o = { field, items:[{tag,part,x,y,spec?}], night }
+// o.compare = true：關燈看看，左邊裝之前、右邊裝之後，中間的軸可左右拖
 export function mount(host, o) {
-  const S = ensure(), key = JSON.stringify([o.field, o.night, (o.items || []).map(i => [i.tag, i.part, i.x, i.y])]);
+  const S = ensure(), key = JSON.stringify([o.field, o.night, !!o.compare, (o.items || []).map(i => [i.tag, i.part, i.x, i.y])]);
   if (S.key !== key) {
-    S.built = build(o); S.key = key; S.r.toneMappingExposure = o.night ? .95 : 1.05;
+    S.built = build(o); S.key = key; S.before = o.compare ? build(Object.assign({}, o, { items: [] })) : null; S.r.toneMappingExposure = o.night ? .95 : 1.05;
     const B = S.built.B, span = Math.max(B[2] - B[0], (B[3] - B[1]) * 1.3) / 1000; S.target.set(m((B[0] + B[2]) / 2), 0, m((B[1] + B[3]) / 2) + .2); if (S.field !== o.field) { S.dist = span * 1.85 + 2; S.field = o.field; }
   }
   host.innerHTML = ''; host.appendChild(S.r.domElement); const lab = document.createElement('div'); lab.className = 'w3lab'; host.appendChild(lab);
-  S.host = host; S.lab = lab; draw();
+  S.host = host; S.lab = lab; S.hd = null;
+  if (o.compare) {
+    S.pos = o.pos == null ? 50 : o.pos;
+    host.insertAdjacentHTML('beforeend', '<div class="wcmp-l">裝之前</div><div class="wcmp-r">裝之後</div><div class="wcmp-h" role="slider" tabindex="0" aria-label="左右拖曳比較裝之前與裝之後" aria-valuemin="0" aria-valuemax="100"><i>‹ ›</i></div>');
+    const hd = S.hd = host.querySelector('.wcmp-h'), set = x => { S.pos = Math.max(2, Math.min(98, x)); hd.setAttribute('aria-valuenow', Math.round(S.pos)); if (o.onPos) o.onPos(S.pos); draw(); };
+    hd.addEventListener('pointerdown', e => { e.stopPropagation(); hd.setPointerCapture(e.pointerId); const mv = ev => { const r = host.getBoundingClientRect(); set((ev.clientX - r.left) / r.width * 100); }, upx = () => { hd.removeEventListener('pointermove', mv); hd.removeEventListener('pointerup', upx); }; hd.addEventListener('pointermove', mv); hd.addEventListener('pointerup', upx); });
+    hd.addEventListener('keydown', e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); set(S.pos + (e.key === 'ArrowLeft' ? -5 : 5)); } });
+  }
+  draw();
   return S;
 }
 window.JJJ3D = { mount };

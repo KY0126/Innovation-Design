@@ -150,8 +150,25 @@
     if (o.sheet) add(`<text x="${f(B[0])}" y="${f(B[3] + 46 * k)}" font-size="${f(11 * k)}" font-weight="700" fill="${INK}" style="${F}">${o.sheet === 'E' ? '設備施工圖' : '平面配置圖'}<tspan font-weight="400" font-size="${f(7.5 * k)}" fill="${MID}">　${o.sheet === 'E' ? 'E-01' : 'A-01'}｜SCALE 1:50｜單位 mm</tspan></text><path d="M${f(B[0])} ${f(B[3] + 51 * k)}H${f(B[2])}" stroke="${INK}" stroke-width="${(1.4 * k).toFixed(1)}"/>`);
     return `<svg class="cad" viewBox="${f(vx)} ${f(vy)} ${f(vw)} ${f(vh)}" role="img" aria-label="${esc(o.alt || field + '平面圖')}" style="display:block;width:100%;height:auto;background:#fff;touch-action:${o.edit ? 'none' : 'auto'}">${g.join('')}</svg>`;
   }
+  // ---------- 關燈看看：半夜關燈後的照亮範圍（示意，非實測照度） ----------
+  // 每個場域一條要走的路（起點到終點）
+  const ROUTE = { '臥室到浴室': [[2950, 1300], [3400, 3100], [3400, 3950], [4975, 3950], [4975, 3000], [4800, 1250], [5700, 950]], '廚房': [[3200, 4100], [3200, 5200], [1200, 5600], [1000, 6800]],
+    '客廳': [[6000, 6900], [6000, 5600], [4800, 5300], [4800, 4100]], '洗衣陽台': [[6000, 4100], [7000, 4100], [7000, 2800], [6700, 1000]], '全屋': [[2950, 1300], [3400, 3100], [3400, 4050], [8050, 4050], [8050, 8700]] };
+  const isLight = it => it.part === 'light' || it.part === 'strip' || (!it.part && /燈/.test(it.name || ''));
+  function glows(items) { return (items || []).filter(isLight).map(it => it.part === 'strip' ? { x: it.x, y: it.y, rx: 1100, ry: 520 } : { x: it.x, y: it.y, rx: 1300, ry: 1300 }); }
+  function routePts(field) { const R = ROUTE[field] || ROUTE['全屋'], P = []; for (let i = 0; i < R.length - 1; i++) { const a = R[i], b = R[i + 1], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 120); for (let k = 0; k < n; k++) P.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]); } P.push(R[R.length - 1]); return P; }
+  function coverage(field, items) { const G = glows(items), P = routePts(field), lit = P.filter(p => G.some(g => ((p[0] - g.x) / (g.rx * .85)) ** 2 + ((p[1] - g.y) / (g.ry * .85)) ** 2 <= 1)); return Math.round(lit.length / P.length * 100); }
+  // 平面圖加上夜間遮罩；items 空陣列 = 裝之前
+  function night(field, items, id, o = {}) {
+    const G = glows(items), P = routePts(field), R = ROUTE[field] || ROUTE['全屋'], lit = p => G.some(g => ((p[0] - g.x) / (g.rx * .85)) ** 2 + ((p[1] - g.y) / (g.ry * .85)) ** 2 <= 1);
+    const ov = `<defs><radialGradient id="${id}g"><stop offset="0" stop-color="#000"/><stop offset=".55" stop-color="#000" stop-opacity=".75"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><radialGradient id="${id}w"><stop offset="0" stop-color="#FFC97A" stop-opacity=".5"/><stop offset="1" stop-color="#FFC97A" stop-opacity="0"/></radialGradient><mask id="${id}m"><rect x="-5000" y="-5000" width="20000" height="20000" fill="#fff"/>${G.map(g => `<ellipse cx="${g.x}" cy="${g.y}" rx="${g.rx}" ry="${g.ry}" fill="url(#${id}g)"/>`).join('')}</mask></defs>`
+      + `<rect x="-5000" y="-5000" width="20000" height="20000" fill="#12131A" fill-opacity=".8" mask="url(#${id}m)"/>${G.map(g => `<ellipse cx="${g.x}" cy="${g.y}" rx="${g.rx}" ry="${g.ry}" fill="url(#${id}w)"/>`).join('')}`
+      + P.map(p => `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="38" fill="${lit(p) ? '#FFB547' : '#6E6E78'}"/>`).join('')
+      + [R[0], R[R.length - 1]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="90" fill="#fff" stroke="${RED}" stroke-width="30"/>`).join('');
+    return plan(field, items, Object.assign({ full: 1, alt: o.alt || '關燈後平面圖' }, o)).replace(/<\/svg>$/, ov + '</svg>');
+  }
   // 螢幕座標轉成 mm
   function toMM(e, svg) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round(q.x), Math.round(q.y)]; }
   function clampTo(field, x, y) { const B = bbox(field); return [Math.max(B[0] + 60, Math.min(B[2] - 60, x)), Math.max(B[1] + 60, Math.min(B[3] - 60, y))]; }
-  window.JJJCAD = { ROOMS, WALLS, WINS, DOORS, FURN, ELEC, FR, SPEC, spec, FIN, plan, toMM, nearWall, bbox, clampTo, inBox };
+  window.JJJCAD = { night, coverage, isLight, ROOMS, WALLS, WINS, DOORS, FURN, ELEC, FR, SPEC, spec, FIN, plan, toMM, nearWall, bbox, clampTo, inBox };
 })();

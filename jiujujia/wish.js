@@ -27,7 +27,19 @@
     return CAD().plan(field, items(field, build, cps), { edit: opt.edit, sel: opt.sel, full: opt.full, lights: lights(opt), alt: field + '平面配置圖' });
   }
   // 3D 容器：畫面重繪後由 hook 掛上 WebGL
-  function v3d(field, build, cps, night, key) { S.w3cfg = { key, field, night: !!night, items: items(field, build, cps).map(({ tag, part, x, y, spec }) => ({ tag, part, x, y, spec })) }; return `<div class="w3d" data-w3d="${key}" role="img" aria-label="${esc(field)} 3D 鳥瞰，可拖曳旋轉"><div class="muted" style="padding:12px">3D 載入中…</div></div>`; }
+  function v3d(field, build, cps, key, compare) { S.w3cfg = { key, field, night: !!compare, compare: !!compare, pos: S.wcmpPos, onPos: p => { S.wcmpPos = p; }, items: items(field, build, cps).map(({ tag, part, x, y, spec, name }) => ({ tag, part, x, y, spec, name })) }; return `<div class="w3d" data-w3d="${key}" role="img" aria-label="${esc(field)} 3D 鳥瞰，可拖曳旋轉"><div class="muted" style="padding:12px">3D 載入中…</div></div>`; }
+  // 關燈看看：作品裡有會發光的零件才有對照
+  const hasLight = (field, build, cps) => items(field, build, cps).some(it => CAD().isLight(it));
+  const ROUTE_N = { '臥室到浴室': '床邊到馬桶的路' };
+  const MOON = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+  function cmp2d(field, build, cps) { const p = S.wcmpPos == null ? 50 : S.wcmpPos; return `<div class="wcmp" data-wcmp="1" style="--p:${p}%"><div class="wcmp-a">${CAD().night(field, [], 'nb', { alt: '裝之前，關燈後' })}</div><div class="wcmp-b">${CAD().night(field, items(field, build, cps), 'na', { alt: '裝之後，關燈後' })}</div><div class="wcmp-l">裝之前</div><div class="wcmp-r">裝之後</div><div class="wcmp-h" role="slider" tabindex="0" aria-label="左右拖曳比較裝之前與裝之後" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p)}"><i>‹ ›</i></div></div>`; }
+  function nightBlock(field, build, cps, v, key, tail) {
+    const its = items(field, build, cps);
+    return `${v === '2d' ? cmp2d(field, build, cps) : v3d(field, build, cps, key, true)}
+      <div class="muted" style="display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:.8em"><span>拖曳中間的軸比較${v === '2d' ? '｜虛線是' + (ROUTE_N[field] || '常走的路') : ''}</span>${tail || ''}</div>
+      <div class="wnst"><span>裝之前<br><b>${CAD().coverage(field, [])}%</b> <small>的路照得到</small></span><span class="on">裝之後<br><b>${CAD().coverage(field, its)}%</b> <small>的路照得到</small></span></div>
+      <div class="muted" style="font-size:.75em;margin-top:6px">照亮範圍為示意，非實測照度；以燈具規格與安裝位置估算</div>`;
+  }
   // 設備表
   function sched(field, build, cps) { return items(field, build, cps).map(it => { const sp = it.spec || CAD().spec(it.part), tool = it.p && it.p.tool; return `<div class="wsr"><b>${it.tag}</b><span><span style="color:var(--ink)">${esc(it.name)}</span><span class="muted" style="display:block;font-size:.85em">${esc(sp[4])}｜X ${it.x.toLocaleString('en-US')}、Y ${it.y.toLocaleString('en-US')} mm</span></span><span class="${tool ? 'wtech' : 'muted'}">${it.cp ? '待評估' : tool ? '技師安裝' : '自行安裝'}</span></div>`; }).join(''); }
   const bar = c => `<div class="wbar"><i style="width:${Math.min(100, c)}%"></i>${[20, 50, 100].map(n => `<b style="left:${n}%"></b>`).join('')}</div>`;
@@ -66,9 +78,9 @@
     const w = S.wkd; if (!w) return `${hdr('作品')}<div class="scroll"><div class="card muted" style="margin-top:12px">載入中…</div></div>`;
     const own = w.user_id === S.me.id, sh = S.wsheet;
     return `${hdr('作品')}<div class="scroll" style="padding-top:12px">
-      ${(() => { const cps = w.cparts.map(c => ({ ...c, tmp: c.id })), v = S.wkv || '2d'; return `<div class="card" style="padding:6px 8px 8px"><div class="sxt" role="tablist" style="margin-bottom:6px">${[['2d', '平面圖'], ['3d', '3D'], ['night', '夜間']].map(([k, l]) => `<button role="tab" data-wkv="${k}" aria-selected="${v === k}">${l}</button>`).join('')}</div>
-        ${v === '2d' ? map(w.field, w.build, cps, { full: 1 }) : v3d(w.field, w.build, cps, v === 'night', 'wk')}
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.8em" class="muted"><span>${v === '2d' ? 'A-01 平面配置圖｜1:50｜單位 mm｜紅色為新增' : v === '3d' ? '拖曳旋轉、雙指縮放' : '夜間模擬：夜燈與燈條亮起的樣子'}</span><button class="lnk" data-wsheet="1" style="color:#A3002E">看設備施工圖</button></div></div>`; })()}
+      ${(() => { const cps = w.cparts.map(c => ({ ...c, tmp: c.id })), v = S.wkv === '3d' ? '3d' : '2d', hl = hasLight(w.field, w.build, cps), on = hl && S.wkn, sheetL = '<button class="lnk" data-wsheet="1" style="color:#A3002E">看設備施工圖</button>'; return `<div class="card" style="padding:6px 8px 8px"><div class="wtabs"><div class="sxt" role="tablist">${[['2d', '平面圖'], ['3d', '3D']].map(([k, l]) => `<button role="tab" data-wkv="${k}" aria-selected="${v === k}">${l}</button>`).join('')}</div>${hl ? `<button class="wnbtn" data-wkn="1" aria-pressed="${!!on}">${MOON}關燈看看</button>` : ''}</div>
+        ${on ? nightBlock(w.field, w.build, cps, v, 'wk', sheetL) : `${v === '2d' ? map(w.field, w.build, cps, { full: 1 }) : v3d(w.field, w.build, cps, 'wk', false)}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.8em" class="muted"><span>${v === '2d' ? 'A-01 平面配置圖｜1:50｜單位 mm｜紅色為新增' : '拖曳旋轉、雙指縮放'}</span>${sheetL}</div>`}</div>`; })()}
       <div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:1.12em">${esc(w.title)}</b>${stTag(w.status)}</div>
         <div class="muted" style="font-size:.88em">設計者：${esc(w.designer)}｜${esc(w.field)}${w.theme ? '｜全國出題：' + esc(w.theme.title) : ''}</div>
         ${w.parent ? `<button class="lnk" data-wk="${w.parent.id}">改自「${esc(w.parent.title)}」（${esc(w.parent.designer)}）</button>` : ''}
@@ -90,7 +102,7 @@
         <div class="rs" style="margin-top:6px">只有訂閱「${esc(w.plan)}」的家庭能支持；其他人可先追蹤</div></div></div>` : ''}
       </div>`;
   };
-  async function openWk(id) { S.wkd = null; S.wsheet = null; S.wkE = false; S.wkv = '2d'; go('wk'); await meta(); try { S.wkd = (await api('/wish/works/' + id)).work; } catch (e) { toast(e.message); } if (J.S.stack[J.S.stack.length - 1] === 'wk') render(); }
+  async function openWk(id) { S.wkd = null; S.wsheet = null; S.wkE = false; S.wkv = '2d'; S.wkn = false; S.wcmpPos = 50; go('wk'); await meta(); try { S.wkd = (await api('/wish/works/' + id)).work; } catch (e) { toast(e.message); } if (J.S.stack[J.S.stack.length - 1] === 'wk') render(); }
 
   // ---------- 創作 4 步：寫下心願、拼出來、做法卡、確認送出 ----------
   const WSTEP = ['寫下心願', '拼出來', '做法卡', '確認送出'];
@@ -115,12 +127,12 @@
         ${sim.length ? `<div class="card" style="background:#FAE0E8"><b style="color:#A3002E">找到相似作品</b><div class="rs" style="margin-bottom:6px">去按「我也需要」比重新提案更快達到門檻。</div>${sim.map(w => `<button class="row" data-wk="${w.id}" style="width:100%"><span>${esc(w.title)}｜${w.count} 戶</span><span class="chev">›</span></button>`).join('')}</div>` : ''}`;
       foot = `<button class="btn" data-wnext="1" ${s.hope.trim() ? '' : 'disabled'}>下一步：拼出來</button>`;
     } else if (n.step === 1) {
-      const m = (S.hh && S.hh.assessment && S.hh.assessment.measures) || {}, v = n.view || '2d', its = items(n.field, n.build, n.cparts), pk = its.find(x => x.idx === n.pick);
+      const m = (S.hh && S.hh.assessment && S.hh.assessment.measures) || {}, v = n.view === '3d' ? '3d' : '2d', its = items(n.field, n.build, n.cparts), hl = its.some(it => CAD().isLight(it)); if (!hl) n.night = false; const pk = n.night ? null : its.find(x => x.idx === n.pick);
       body = `<div class="card" style="padding:8px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px"><b style="font-size:.95em">${esc(n.field)}</b><span class="seg" role="group" aria-label="底圖">${S.hh && S.hh.assessment ? `<button data-whome="mine" aria-pressed="${n.home === 'mine'}">我家</button>` : ''}<button data-whome="tpl" aria-pressed="${n.home === 'tpl'}">場域模板</button></span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="sxt" role="tablist" style="padding:0">${[['2d', '2D'], ['3d', '3D'], ['night', '夜間']].map(([k, l]) => `<button role="tab" data-wview="${k}" aria-selected="${v === k}">${l}</button>`).join('')}</div><button class="lnk" data-wundo="1" ${n.hist && n.hist.length ? '' : 'disabled'}>復原</button></div>
+        <div class="wtabs"><div class="sxt" role="tablist">${[['2d', '2D'], ['3d', '3D']].map(([k, l]) => `<button role="tab" data-wview="${k}" aria-selected="${v === k}">${l}</button>`).join('')}</div><button class="wnbtn${hl ? '' : ' off'}" data-wnight="1" aria-pressed="${!!n.night}">${MOON}關燈看看</button><button class="wnbtn" data-wundo="1" ${n.hist && n.hist.length && !n.night ? '' : 'disabled'}>復原</button></div>
         ${n.home === 'mine' ? `<div class="rs">依 AR 量測：${m.corridor_cm ? '走道 ' + m.corridor_cm + ' cm' : '尚未量走道'}${m.threshold_cm != null ? '、門檻 ' + m.threshold_cm + ' cm' : ''}；房名旁的點是居家安全燈號</div>` : ''}
-        ${v === '2d' ? `<div class="wcad" data-wcad="1">${map(n.field, n.build, n.cparts, { edit: 1, mine: n.home === 'mine', sel: n.pick })}</div>` : v3d(n.field, n.build, n.cparts, v === 'night', 'wnew')}
-        <div class="rs">${v !== '2d' ? '3D 只看不改；要擺零件請切回 2D' : n.sel ? '點平面圖放上「' + esc(n.sel[0] === 'c' ? ((n.cparts.find(c => 'c' + c.tmp === n.sel) || {}).name || '') : (part(n.sel) || {}).n || '') + '」，或直接從下面拖上來' : '按住下面的零件拖到平面圖；放好的零件可以再拖動，點一下看細節'}</div></div>
+        ${n.night ? nightBlock(n.field, n.build, n.cparts, v, 'wnew') : v === '2d' ? `<div class="wcad" data-wcad="1">${map(n.field, n.build, n.cparts, { edit: 1, mine: n.home === 'mine', sel: n.pick })}</div>` : v3d(n.field, n.build, n.cparts, 'wnew', false)}
+        <div class="rs">${n.night ? '關燈看看時只能看；關掉才能擺零件' : v !== '2d' ? '3D 只看不改；要擺零件請切回 2D' : n.sel ? '點平面圖放上「' + esc(n.sel[0] === 'c' ? ((n.cparts.find(c => 'c' + c.tmp === n.sel) || {}).name || '') : (part(n.sel) || {}).n || '') + '」，或直接從下面拖上來' : '按住下面的零件拖到平面圖；放好的零件可以再拖動，點一下看細節'}</div></div>
         ${pk ? (() => { const sp = pk.spec || CAD().spec(pk.part), nw = CAD().nearWall(pk.x, pk.y), far = sp[3] === 'wall' && nw[0] > 300, tool = pk.p && pk.p.tool; return `<div class="card wpk"><div style="display:flex;justify-content:space-between;align-items:center"><b><span style="color:#D4003C">${pk.tag}</span> ${esc(pk.name)}</b><button class="lnk" data-wpickx="1">完成</button></div>
           <div class="rs" style="line-height:1.75">${pk.p ? '約 NT$ ' + pk.p.p.toLocaleString('en-US') : '自訂零件，還沒有商品'}｜${pk.cp ? '待評估' : tool ? '技師安裝' : '自行安裝'}｜安裝高度 ${esc(sp[4])}<br>位置：X ${pk.x.toLocaleString('en-US')} mm、Y ${pk.y.toLocaleString('en-US')} mm（離牆 ${Math.round(nw[0]).toLocaleString('en-US')} mm）</div>
           ${far ? '<div class="wwarn">這個零件要裝在牆上，請拖到牆邊。</div>' : ''}<button class="btn ghost" data-wdel="${pk.idx}" style="margin-top:8px">移除這個零件</button></div>`; })() : ''}
@@ -128,7 +140,7 @@
       const P = W.parts.filter(p => p.f.includes(n.field)), cats = WCAT.filter(([, ids]) => P.some(p => ids.includes(p.id))).concat([['自訂', null]]), cat = cats.some(c => c[0] === n.cat) ? n.cat : cats[0][0];
       const tiles = cat === '自訂' ? n.cparts.map(c => `<button class="wtile nw" data-wsel="c${c.tmp}" aria-pressed="${n.sel === 'c' + c.tmp}">${ico('new')}<span>${esc(c.name)}</span><small>自訂</small></button>`).join('') + (n.cparts.length < 5 ? '<button class="wtile nw" data-wcnew="1">' + ico('plus') + '<span>自訂零件</span><small>我想要但還沒有</small></button>' : '')
         : P.filter(p => (WCAT.find(c => c[0] === cat) || [, []])[1].includes(p.id)).map(p => `<button class="wtile" data-wsel="${p.id}" aria-pressed="${n.sel === p.id}">${ico(p.id)}<span>${esc(p.n)}</span><small>${p.tool ? '需技師' : 'NT$' + p.p.toLocaleString('en-US')}</small></button>`).join('');
-      foot = `<div class="wpal" aria-label="全國電子零件盤"><div class="sxt" role="tablist" style="padding:0 2px">${cats.map(([c]) => `<button role="tab" data-wcat="${c}" aria-selected="${cat === c}">${c}</button>`).join('')}</div><div class="wtiles">${tiles}</div></div><button class="btn" data-wnext="2" ${n.build.length ? '' : 'disabled'}>下一步：做法卡｜已放 ${n.build.length} 個</button>`;
+      foot = `<div class="wpal${n.night ? ' dim' : ''}" aria-label="全國電子零件盤" ${n.night ? 'aria-disabled="true"' : ''}><div class="sxt" role="tablist" style="padding:0 2px">${cats.map(([c]) => `<button role="tab" data-wcat="${c}" aria-selected="${cat === c}">${c}</button>`).join('')}</div><div class="wtiles">${tiles}</div></div><button class="btn" data-wnext="2" ${n.build.length ? '' : 'disabled'}>下一步：做法卡｜已放 ${n.build.length} 個</button>`;
     } else if (n.step === 2) {
       body = `<div class="card" style="padding:8px"><b style="font-size:.95em">平面配置圖</b>${map(n.field, n.build, n.cparts, { mine: n.home === 'mine', full: 1 })}<div class="sec" style="padding-left:0">設備表</div>${sched(n.field, n.build, n.cparts)}</div>${card(n.build, n.cparts, n.field)}`;
       foot = `<button class="btn" data-wnext="3">下一步：確認送出</button>`;
@@ -159,7 +171,7 @@
   // 拖曳：零件盤往上拖到平面圖新增；平面圖上的零件拖動換位置
   let drag = null, dragEnd = 0, skipClick = false;
   view.addEventListener('pointerdown', e => {
-    const n = S.wn; if (!n || n.step !== 1 || (n.view || '2d') !== '2d') return;
+    const n = S.wn; if (!n || n.step !== 1 || n.view === '3d' || n.night) return;
     const pin = e.target.closest('[data-wpin]'), tile = e.target.closest('.wtile[data-wsel]');
     if (!pin && !tile) return;
     drag = { pin: pin ? +pin.dataset.wpin : null, sel: tile ? tile.dataset.wsel : null, x0: e.clientX, y0: e.clientY, on: false, el: pin || tile, id: e.pointerId };
@@ -179,9 +191,13 @@
     if (d.to) { snap(n); const b = n.build[d.pin]; b.x = d.to[0]; b.y = d.to[1]; b.slot = nearSlot(n.field, b.x, b.y); n.pick = d.pin; } rr();
   };
   view.addEventListener('pointerup', dragStop, true); view.addEventListener('pointercancel', dragStop, true);
+  // 關燈看看（2D）：在圖上左右拖或用鍵盤左右鍵移動中間的軸
+  const cmpSet = (box, p) => { S.wcmpPos = Math.max(2, Math.min(98, p)); box.style.setProperty('--p', S.wcmpPos + '%'); const h = box.querySelector('.wcmp-h'); if (h) h.setAttribute('aria-valuenow', Math.round(S.wcmpPos)); };
+  view.addEventListener('pointerdown', e => { const box = e.target.closest('[data-wcmp]'); if (!box) return; e.preventDefault(); const r = box.getBoundingClientRect(), at = ev => cmpSet(box, (ev.clientX - r.left) / r.width * 100); at(e); try { box.setPointerCapture(e.pointerId); } catch (er) { } const up = () => { box.removeEventListener('pointermove', at); box.removeEventListener('pointerup', up); box.removeEventListener('pointercancel', up); }; box.addEventListener('pointermove', at); box.addEventListener('pointerup', up); box.addEventListener('pointercancel', up); });
+  view.addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('[data-wcmp] .wcmp-h'); if (!h || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return; e.preventDefault(); cmpSet(h.parentNode, (S.wcmpPos == null ? 50 : S.wcmpPos) + (e.key === 'ArrowLeft' ? -5 : 5)); });
   // 3D：畫面重繪後掛上 WebGL
   let m3d = null;
-  (window.JJJHOOKS = window.JJJHOOKS || []).push((v, el) => { const h = el.querySelector('[data-w3d]'); if (!h || !S.w3cfg) return; const cfg = S.w3cfg; (m3d = m3d || import('./cad3d.js?v=20261125a')).then(M => { if (h.isConnected) M.mount(h, cfg); }).catch(er => { h.innerHTML = '<div class="muted" style="padding:12px">這台裝置無法顯示 3D：' + esc(er.message) + '</div>'; }); });
+  (window.JJJHOOKS = window.JJJHOOKS || []).push((v, el) => { const h = el.querySelector('[data-w3d]'); if (!h || !S.w3cfg) return; const cfg = S.w3cfg; (m3d = m3d || import('./cad3d.js?v=20261125b')).then(M => { if (h.isConnected) M.mount(h, cfg); }).catch(er => { h.innerHTML = '<div class="muted" style="padding:12px">這台裝置無法顯示 3D：' + esc(er.message) + '</div>'; }); });
   if (!document.getElementById('wcadcss')) document.head.insertAdjacentHTML('beforeend', `<style id="wcadcss">
 .wcad{border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-top:6px}.wcad svg [data-wpin]{touch-action:none}
 .w3d{position:relative;height:270px;border-radius:8px;overflow:hidden;background:#F4F2EF;margin-top:6px}.w3lab{position:absolute;inset:0;pointer-events:none}
@@ -191,14 +207,22 @@
 .wtile small{color:var(--muted);font-size:11px}.wtile[aria-pressed=true]{border:2px solid #D4003C;padding:7px 3px}.wtile.nw{border-style:dashed}
 .wghost{position:fixed;z-index:9999;transform:translate(-50%,-120%);pointer-events:none;background:#D4003C;color:#fff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;opacity:.9;white-space:nowrap}
 .wwarn{margin-top:6px;font-size:.9em;color:#A3002E;background:#FAE0E8;border-radius:8px;padding:6px 10px}
+.wtabs{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);margin-bottom:6px}.wtabs .sxt{border:0;margin:0;padding:0;flex:1}
+.wnbtn{display:inline-flex;align-items:center;gap:4px;height:32px;min-height:0;width:auto;padding:0 10px;border-radius:8px;border:1px solid #DAD6D3;background:#fff;color:var(--ink);font-size:13px;flex:none}.wnbtn[aria-pressed=true]{background:#2B2B2E;border-color:#2B2B2E;color:#fff}.wnbtn.off,.wnbtn:disabled{color:#B5AEB2}
+.wcmp{position:relative;margin-top:6px;border-radius:8px;overflow:hidden;touch-action:none;cursor:ew-resize;user-select:none;border:1px solid var(--line)}.wcmp-b{position:absolute;inset:0;clip-path:inset(0 0 0 var(--p))}
+.wcmp-h{position:absolute;top:0;bottom:0;left:var(--p,50%);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);z-index:2;cursor:ew-resize;touch-action:none}.wcmp-h i{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:16px;background:#fff;border:2px solid #D4003C;color:#D4003C;font-style:normal;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.wcmp-l,.wcmp-r{position:absolute;top:8px;z-index:2;background:rgba(18,19,26,.85);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;pointer-events:none}.wcmp-l{left:8px}.wcmp-r{right:8px;color:#FFC97A}
+.wnst{display:flex;gap:10px;margin-top:8px;font-size:.85em}.wnst span{flex:1;background:#F3F1EE;border-radius:8px;padding:6px 10px}.wnst span.on{background:#FFF4E3}.wnst b{font-size:1.3em}.wnst span.on b{color:#A35A00}.wnst small{color:var(--muted)}
+.wpal.dim{opacity:.4;pointer-events:none}
 .wsr{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:.92em}.wsr>b{color:#D4003C;width:24px;flex:none}.wsr>span:nth-child(2){flex:1}.wtech{color:#A3002E}
 </style>`);
   view.addEventListener('click', async e => {
-    const t = e.target.closest('[data-wtab],[data-wfld],[data-wsort],[data-wk],[data-wcreate],[data-wnewt],[data-wsup],[data-wbuy],[data-wprice2],[data-wsupgo],[data-wsupx],[data-wshare],[data-wremix],[data-wcmt],[data-wback],[data-wleave],[data-wnext],[data-wwho2],[data-wfield2],[data-wthm],[data-whome],[data-wsel],[data-wpin],[data-wcad],[data-wcnew],[data-wkv],[data-wsheet],[data-wsheetx],[data-wview],[data-wundo],[data-wcat],[data-wpickx],[data-wdel],[data-wcsave],[data-wcx],[data-wterm],[data-wsend]');
+    const t = e.target.closest('[data-wtab],[data-wfld],[data-wsort],[data-wk],[data-wcreate],[data-wnewt],[data-wsup],[data-wbuy],[data-wprice2],[data-wsupgo],[data-wsupx],[data-wshare],[data-wremix],[data-wcmt],[data-wback],[data-wleave],[data-wnext],[data-wwho2],[data-wfield2],[data-wthm],[data-whome],[data-wsel],[data-wpin],[data-wcad],[data-wcnew],[data-wkv],[data-wkn],[data-wnight],[data-wsheet],[data-wsheetx],[data-wview],[data-wundo],[data-wcat],[data-wpickx],[data-wdel],[data-wcsave],[data-wcx],[data-wterm],[data-wsend]');
     if (!t || t.disabled) return; e.stopPropagation();
     const d = t.dataset, n = S.wn;
     if (skipClick) { skipClick = false; if (Date.now() - dragEnd < 400 && (d.wsel || d.wpin != null || d.wcad)) return; }
     if (d.wkv) { S.wkv = d.wkv; rr(); return; }
+    if (d.wkn) { S.wkn = !S.wkn; rr(); return; }
     if (d.wsheet) { S.wkE = true; rr(); return; }
     if (d.wsheetx) { S.wkE = false; rr(); return; }
     if (d.wtab) { S.wtab = d.wtab; S.wl2d = null; render(); J.LOAD.wl2().then(render); return; }
@@ -225,6 +249,7 @@
     if (d.whome) { n.home = d.whome; render(); return; }
     if (d.wsel) { n.sel = n.sel === d.wsel ? null : d.wsel; render(); return; }
     if (d.wview) { n.view = d.wview; n.pick = null; rr(); return; }
+    if (d.wnight) { if (!hasLight(n.field, n.build, n.cparts)) { toast('先放一個夜燈或燈條'); return; } n.night = !n.night; n.pick = null; n.sel = null; rr(); return; }
     if (d.wcat) { n.cat = d.wcat; rr(); return; }
     if (d.wundo) { if (n.hist.length) { n.build = n.hist.pop(); n.pick = null; } rr(); return; }
     if (d.wpickx) { n.pick = null; rr(); return; }
