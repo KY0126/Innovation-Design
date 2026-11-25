@@ -58,3 +58,20 @@
   J.LOAD.bks = async () => { S.bks = (await api('/home/bookings')).bookings; };
   J.LOAD.reqs = async () => { S.reqs = (await api('/home/requests')).requests; };
 })();
+
+// ---------- 會員中心「保固清單」：我的購買、揪居家｜長輩家（與揪居家家電檔案同一份資料） ----------
+(function () {
+  const J = window.JJJ; if (!J) return;
+  const { V, S, api, esc, toast, render } = J;
+  const row = d => `<div class="gi" style="cursor:default"><span><b>${esc(d.name)}</b><span class="muted" style="display:block;font-size:.85em">保固：${esc(d.warranty || '—')}${d.years != null ? '｜使用 ' + d.years + ' 年' : ''}</span></span>${d.repairing ? '<span class="tag">報修中</span>' : `<button class="tag" data-repair="${d.id}">線上報修</button>`}</div>`;
+  V.wty = () => { const W = S.wty; return `${J.hdr('保固清單')}<div class="scroll" style="padding-top:12px">${!W ? '<div class="card muted">載入中…</div>' : `
+    <div class="sec">我的購買｜${W.mine.length}</div><div class="glist">${W.mine.length ? W.mine.map(row).join('') : '<div class="gi muted" style="cursor:default">沒有資料</div>'}</div>
+    <div class="sec">揪居家｜長輩家（家人共用）｜${W.parents.length}</div><div class="glist">${W.parents.length ? W.parents.map(row).join('') : '<div class="gi muted" style="cursor:default">沒有資料</div>'}</div>
+    ${W.care.length ? `<div class="sec">揪夜安方案設備｜${W.care.length}</div><button class="card" data-go="hf" style="display:flex;justify-content:space-between;align-items:center;width:calc(100% - 24px)"><span><b>由綁定門市負責</b><span class="muted" style="display:block;font-size:.85em">${esc(W.care.map(d => d.name).join('、'))}；故障請找生活顧問</span></span><span class="chev">›</span></button>` : ''}`}
+    <div class="glist" style="margin-top:12px"><button class="gi" data-go="reqs"><span><b>線上報修清單</b></span><span class="chev">›</span></button></div></div>`; };
+  J.LOAD.wty = async () => { S.wty = await api('/home/warranty'); };
+  document.getElementById('view').addEventListener('click', async e => {
+    const t = e.target.closest('[data-repair]'); if (!t) return; e.stopPropagation();
+    try { const d = await api('/home/repair', { method: 'POST', body: { device_id: +t.dataset.repair } }); toast(d.duplicate ? '這台已在報修中' : '已送出線上報修，進度在「線上報修清單」'); if (J.S.stack[J.S.stack.length - 1] === 'wty') await J.LOAD.wty(); render(); } catch (er) { toast(er.message); }
+  }, true);
+})();

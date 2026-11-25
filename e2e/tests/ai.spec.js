@@ -14,10 +14,10 @@ test('家庭：揪居家主頁有浮動按鈕；問長輩狀況、價格，回�
   await page.click('[data-aigo]');
   await page.click('[data-aiq="媽媽昨晚還好嗎？"]');
   await expect(page.locator('.aim').last()).toContainText('長輩確認');
-  await page.click('[data-aiq="揪全家多少錢？"]');
+  await page.fill('#aiQ', '揪全家多少錢？'); await page.press('#aiQ', 'Enter');
   await expect(page.locator('.aim').last()).toContainText('699');
   await page.fill('#aiQ', '可以幫我修水管嗎'); await page.press('#aiQ', 'Enter');
-  await expect(page.locator('.aim').last().locator('[data-aireq]')).toBeVisible();
+  await expect(page.locator('.aim').last().locator('[data-aihand]')).toBeVisible();
   // 流程頁不顯示
   await app(page, "A=>{A.go('b1')}");
   await expect(page.locator('.aifab')).toHaveCount(0);

@@ -84,7 +84,7 @@
       why: '生活顧問登入後只看自己的工作：數字卡同時是導覽，認證縮成名字旁的徽章，側欄收成 4 項。',
       flow: ['App｜家庭', '生活顧問（電腦版）'] }),
     A({ ch: 0, t: '讀懂 AI 分析', nav: { view: 'case', hid: 3, tab: 1 },
-      items: [['~林媽媽家@h2', '案件：<b>林媽媽家</b>（74 歲，一個人住）'], ['[data-tab="1"]', '先讀懂<b>燈號與理由</b>'], ['#view .panel', 'AI 判定不了的項目，列為<b>待現場確認</b>']],
+      items: [['~林媽媽家@h2', '案件：<b>林媽媽家</b>（74 歲，一個人住）'], ['[data-tab="1"]', '先讀懂<b>燈號與理由</b>'], ['~待現場確認@.panel', 'AI 判定不了的項目，列為<b>待現場確認</b>']],
       why: 'AI 分析是參考，不是正式鑑定。生活顧問先讀懂理由，才能向家人說清楚。',
       flow: ['App｜家庭・AR 量測', '生活顧問（電腦版）'] }),
     A({ ch: 0, t: '整合成一張報價', nav: { view: 'case', hid: 3, tab: 5 },
@@ -128,7 +128,7 @@
       why: '全部沒問題才驗收完成，摘要同步到家人的 App；有問題就退回，相關項目改回待施工。',
       flow: ['App｜技師', 'App｜家庭・服務進度'], act: { fn: 'accept', label: '幫長輩驗收' }, last: '接下來換成李小姐（App｜家庭），看已經在用揪夜安的家庭。' }),
     L({ ch: 1, mode: 'short', t: '安裝進度與驗收紀錄', nav: ['home', 'm2', 'ch', 'ip'], home: 'parents',
-      items: [['#view', '協力工班、技師安裝、長輩逐區驗收，<b>每一步都有時間與人</b>']],
+      items: [['.jt', '協力工班、技師安裝、長輩逐區驗收，<b>每一步都有時間與人</b>']],
       why: '家人不在現場也知道裝到哪裡；驗收由長輩本人確認，紀錄同步給生活顧問。',
       flow: ['App｜技師', 'App｜家庭', '生活顧問（電腦版）'] }),
     L({ ch: 2, t: '後關心｜揪居家', nav: ['home', 'm2'], home: 'parents',
@@ -144,7 +144,7 @@
       why: '達到門檻後由總部評估、再開放預購，先有訂單才進貨，門市不必壓庫存。',
       flow: ['App｜家庭', '企業管理端｜揪心願彙整'], last: '最後到企業管理端（電腦版），看總部怎麼看這些資料。' }),
     M({ ch: 3, t: '企業管理端｜即時總覽', nav: { tab: 'live' },
-      items: [['#nav', '側欄 7 項：即時總覽、派工與工單、服務地圖、家庭、揪心願、人員與夥伴、試點分析'], ['#view', '總部與門市主管看到的是<b>同一份即時資料</b>']],
+      items: [['#nav', '側欄 7 項：即時總覽、派工與工單、服務地圖、家庭、揪心願、人員與夥伴、試點分析'], ['.today3', '總部與門市主管看到的是<b>同一份即時資料</b>']],
       why: '揪居家 App 與企業管理端資料即時串接；總部不用等月報，就能看到每一戶走到哪一步。',
       flow: ['App｜家庭', '生活顧問（電腦版）', 'App｜技師', '企業管理端'] }),
     M({ ch: 3, t: '預約與派工', nav: { tab: 'bk' },
@@ -152,11 +152,11 @@
       why: '一次到府就把夜燈與關懷設備裝好，減少技師來回。',
       flow: ['App｜家庭', '企業管理端', 'App｜技師'], act: { click: '#nav [data-tab="bk"]', label: '打開預約與派工' } }),
     M({ ch: 3, t: '工單', nav: { tab: 'wo' },
-      items: [['#view', '每張工單都有<b>工作包、檢核清單、照片與狀態紀錄</b>']],
+      items: [['details.job[open]', '每張工單都有<b>工作包、檢核清單、照片與狀態紀錄</b>']],
       why: '技師的差異回報、生活顧問的核准都留在工單裡，事後查得到。',
       flow: ['App｜技師', '企業管理端'] }),
     M({ ch: 3, t: '揪心願', nav: { tab: 'wl' },
-      items: [['#nav [data-tab="wl"]', '家庭的心願集中在<b>揪心願</b>，彙整與規則在分頁'], ['#view', '待回覆的心願先處理；同類心願累積到門檻再評估']],
+      items: [['#nav [data-tab="wl"]', '家庭設計的作品與心願集中在<b>揪心願</b>，上方分頁依工作順序排，紅字是待辦數'], ['~共鳴中@.panel', '共鳴中的作品看離 100 戶還差多少；達門檻才進審查看板，舊的文字心願在待審查，回覆後邀請拼成作品']],
       why: '先看需求再下單：心願達到門檻才開預購，門市不必壓庫存。',
       flow: ['App｜家庭', '企業管理端'] }),
     M({ ch: 3, mode: 'full', t: '協力工班', nav: { tab: 'partner' },
@@ -164,11 +164,11 @@
       why: '會動到房子的工程交給簽約的協力工班，全國電子技師專心安裝設備。',
       flow: ['生活顧問（電腦版）', '企業管理端'] }),
     M({ ch: 3, t: '服務地圖', nav: { tab: 'ops' },
-      items: [['#mapView', '全台 → 縣市 → 門市街區，三層往下看']],
+      items: [['#mapView', '全台、縣市、門市街區，三層往下看']],
       why: '總部依導入階段決定擴張順序，每一戶的狀態都看得到。',
       flow: ['企業管理端'] }),
     M({ ch: 3, t: '試點分析', nav: { tab: 'kpi' },
-      items: [['#view', '續訂率、轉換率、技師負荷、誤報率、驗收一次通過率，<b>達標才擴展</b>']],
+      items: [['~試點漏斗@.mg', '續訂率、轉換率、技師負荷、誤報率、驗收一次通過率，<b>達標才擴展</b>']],
       why: '試點是為了驗證假設，不是為了衝量；沒達標就回到前面的步驟調整。',
       flow: ['企業管理端'] }),
     M({ ch: 4, t: '營運階段開關', nav: { tab: 'phase' },
@@ -255,6 +255,40 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
 #jg.nc .bd>.who,#jg.nc .bd>h2,#jg.nc .s1,#jg.nc .rest,#jg.nc .ft [data-t=act]{display:none}
 #jg.nc .li,#jg.nd .li{opacity:.45}
 #jg.nd .ft [data-t=prev]{border:2px solid #D4003C;color:#D4003C}
+/* ===== 2026/11/25 版型：純文字分段、細線進度、紅框白底編號、半遮罩 ===== */
+#jg{border-radius:14px;border:1px solid #E7E2E4;box-shadow:0 4px 16px rgba(61,58,64,.08)}
+#jg .hd{font-size:13.5px;color:#6F6670}#jg .hd b{color:#3D3A40;font-weight:700}#jg .hd .tt{display:none}
+#jg .hd button{color:#6F6670;font-size:13px;white-space:nowrap}#jg .hd>span:last-child{display:flex;flex:none}
+#jg .tl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:12px 0 4px}
+#jg .tl div{text-align:left;font-size:12px;font-weight:400;color:#8C8389;padding-top:8px;position:relative}
+#jg .tl div::before{content:"";position:absolute;left:0;right:0;width:auto!important;top:0;height:3px!important;border-radius:2px!important;background:#E7E2E4;margin:0!important}
+#jg .tl div::after,#jg .tl i{display:none!important}
+#jg .tl .dn{color:#3D3A40}#jg .tl .dn::before{background:#3D3A40}
+#jg .tl .cu{color:#D4003C;font-weight:700}#jg .tl .cu::before{background:#D4003C}
+#jg .who{display:block;background:none;color:#6F6670;font-weight:400;font-size:13px;padding:0;margin-top:12px;border-top:1px solid #EFECEA;padding-top:12px;border-radius:0}
+#jg h2{margin:2px 0 8px;font-size:22px;font-weight:700;color:#2B2B2E}
+#jg .sec{font-weight:400;color:#6F6670;margin:12px 0 4px}
+#jg .li i{background:#fff;border:1.5px solid #D4003C;color:#D4003C;font-weight:700;font-size:12px;width:22px;height:22px;box-sizing:border-box}#jg .li b{color:#2B2B2E}
+#jg .why{background:none;border-radius:0;padding:0;font-size:14px;line-height:1.7}
+#jg .flow{display:block;font-size:14px}
+#jg .msg{background:none;padding:0;margin-top:10px;color:#A3002E}
+#jg .jgn{border:0;background:none;border-radius:0;padding:0;margin:8px 0 0;color:#6F6670;font-weight:400;font-size:13px}#jg .jgn small{display:inline;margin-left:4px;font-size:13px}#jg .jgn.big{font-size:13px}
+#jg .ft{border-top:1px solid #EFECEA;padding-bottom:16px!important}
+#jg .ft button{border-radius:8px;border:1px solid #DAD6D3;font-weight:400}#jg .ft button.p{font-weight:700;border-color:#D4003C}
+#jg .jbt{border-radius:8px;border:1px solid #DAD6D3}
+.jgb{border:2px solid #D4003C;border-radius:10px;box-shadow:none}
+.jgb i{left:-12px;top:-12px;width:24px;height:24px;background:#fff;color:#D4003C;border:1.5px solid #D4003C;box-sizing:border-box;font:700 12px/21px "Noto Sans TC",sans-serif;box-shadow:none}
+#jgMask{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;display:none}
+/* 手機：預設收成底部一列（步數、標題、下一步），展開才看說明；收合時不放遮罩 */
+#jg.sheet{border-radius:16px 16px 14px 14px;max-height:60vh}
+#jg.sheet.min{flex-direction:row;align-items:center;gap:8px;padding:8px 10px 8px 14px}
+#jg.sheet.min .grab,#jg.sheet.min .bd{display:none}
+#jg.sheet.min .hd{padding:0;flex:1;min-width:0}
+#jg.sheet.min .hd .hl{min-width:0;display:flex;flex-direction:column}#jg.sheet.min .hd .hm{font-size:11.5px}#jg.sheet.min .hd button{padding:4px 4px}
+#jg.sheet.min .hd .tt{display:block;font-size:15px;font-weight:700;color:#2B2B2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#jg.sheet.min .ft{border:0;padding:0!important}#jg.sheet.min .ft button:not(.p){display:none}#jg.sheet.min .ft button.p{flex:none;padding:0 16px}
+body.jgSheet.jgMin{padding-bottom:90px!important}body.jgSheet.jgMin #view .scroll{padding-bottom:150px!important}
+body.jgSheet #webDemo{display:none!important}
 `;
   document.head.appendChild(css);
   // ---------- 小工具 ----------
@@ -275,7 +309,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   }
   const clipRect = () => { let c = { left: 0, top: 0, right: innerWidth, bottom: innerHeight }; if (PAGE === 'app') { const v = document.getElementById('view'); if (v) { const r = v.getBoundingClientRect(); c = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; } } if (panel && !panel.hidden && panel.classList.contains('sheet')) c.bottom = Math.min(c.bottom, panel.getBoundingClientRect().top); return c; };
   // ---------- 狀態 ----------
-  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760, showTok = 0, moving = false, mode = '', flash = null, lastKey = null, folded = false, followT = 0, autoT = 0, pendingA = false;
+  let panel, boxes = [], cur = -1, busy = false, raf = 0, mini = innerWidth < 760, showTok = 0, moving = false, mode = '', flash = null, lastKey = null, folded = false, maskOff = false, followT = 0, autoT = 0, pendingA = false;
   // 換步驟或執行動作時鎖住面板按鈕，避免連點跳步、兩次更新互相覆蓋
   const lock = on => { moving = on; if (panel) panel.querySelectorAll('.ft button').forEach(b => { b.disabled = on; }); };
   const stepI = () => { const v = LS.get(K); return v == null ? null : +v; };
@@ -286,10 +320,11 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
   function ensure() {
     if (panel) return;
     panel = document.createElement('div'); panel.id = 'jg'; panel.setAttribute('role', 'complementary'); panel.setAttribute('aria-label', '導覽說明'); document.body.appendChild(panel);
+    const mk = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); mk.id = 'jgMask'; mk.setAttribute('aria-hidden', 'true'); mk.innerHTML = '<path fill="rgba(30,28,32,0.42)" fill-rule="evenodd"></path>'; document.body.appendChild(mk);
     for (let k = 0; k < 3; k++) { const b = document.createElement('div'); b.className = 'jgb'; b.innerHTML = `<i>${k + 1}</i>`; document.body.appendChild(b); boxes.push(b); }
     panel.addEventListener('click', onClick);
   }
-  function stop() { LS.del(K); LS.set(OFF, '1'); if (panel) panel.hidden = true; boxes.forEach(b => b.style.display = 'none'); document.body.classList.remove('jgDock', 'jgSheet'); openBtn(true); relayout(); }
+  function stop() { LS.del(K); LS.set(OFF, '1'); if (panel) panel.hidden = true; boxes.forEach(b => b.style.display = 'none'); maskDraw([]); document.body.classList.remove('jgDock', 'jgSheet'); openBtn(true); relayout(); }
   // 「開啟導覽」與「重設資料」合成一顆「導覽與展示」按鈕，點開再選（不蓋住頁面按鈕與底部選單）
   function mergeDemo() { const d = document.getElementById('webDemo'); if (!d || getComputedStyle(d).display === 'none') return null; if (d._m) return d; d._m = 1;
     const box = document.createElement('div'); box.className = 'wdx'; const cap = document.createElement('small'); cap.textContent = '瀏覽器展示版'; box.appendChild(cap);
@@ -312,7 +347,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const tok = ++showTok; ensure(); panel.hidden = false; cur = i; lock(true);
     try { await who(); } catch (e) {}
     if (tok !== showTok) return;
-    const head = `<div class="grab"></div><div class="hd"><span><b>${FULL ? `導覽 ${i + 1}／${STEPS.length}` : `導覽 ${track(i).pos}／${track(i).L.length}`}</b>｜${FULL ? ENDS[s.end].n : GN[GRP(s)] + '｜' + ENDS[s.end].n}</span><span><button data-t="min" aria-label="收合">${mini ? '展開' : '收合'}</button><button data-t="stop" aria-label="關閉導覽">✕</button></span></div>`;
+    const head = ttl => `<div class="grab"></div><div class="hd"><span class="hl"><span class="hm"><b>${FULL ? `導覽 ${i + 1}／${STEPS.length}` : `導覽 ${track(i).pos}／${track(i).L.length}`}</b>　${GN[GRP(s)] === CH[s.ch] ? GN[GRP(s)] : GN[GRP(s)] + '・' + (CH[s.ch] || '')}</span><span class="tt">${ttl}</span></span><span><button data-t="min" aria-label="收合或展開導覽">${mini ? '展開' : '收合'}</button><button data-t="stop" aria-label="關閉導覽">關閉</button></span></div>`;
     let body = '', foot = '';
     const onPage = ENDS[s.end].page === PAGE;
     mode = '';
@@ -337,9 +372,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     } else {
       const items = s.items.map((it, k) => `<div class="li" data-k="${k}"><i>${k + 1}</i><span>${it[1]}</span></div>`).join('');
       const mine = { family: 'App｜家庭', tech: 'App｜技師', advisor: '生活顧問（電腦版）', advisorApp: 'App｜生活顧問', admin: '企業管理端' }[s.end];
-      const flow = s.flow.map((f, k) => `<span class="${s.flow.length === 1 || f.startsWith(mine) ? 'me' : ''}">${f}</span>`).join('<em>→</em>');
+      const flow = s.flow.length === 1 ? `資料存在${s.flow[0]}。` : `從${s.flow[0]}送出，${s.flow.slice(1).join('、')}即時看到。`;
       const fl = flash; flash = null;
-      body = `${tlHtml(s.ch)}${fl ? `<div class="jgn">${fl.t}${fl.sub ? `<small>${fl.sub}</small>` : ''}</div>` : ''}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec s1">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">這筆資料會送到</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
+      body = `${tlHtml(s.ch)}${fl ? `<div class="jgn">${fl.t}${fl.sub ? `<small>${fl.sub}</small>` : ''}</div>` : ''}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${s.t}</h2><div class="sec s1">看畫面上的編號</div>${items}<div class="rest"><div class="sec">為什麼這樣設計</div><div class="why">${s.why}</div><div class="sec">資料去哪裡</div><div class="flow">${flow}</div>${s.last ? `<div class="msg">${s.last}</div>` : ''}${tocHtml(i)}</div>`;
       const nxt = STEPS[nextIdx(i)];
       const nextLabel = !nxt || (!FULL && GRP(nxt) !== GRP(s)) ? `完成${FULL ? '' : GN[GRP(s)]}導覽` : (nxt.end !== s.end || nxt.as !== s.as) ? (ENDS[nxt.end].page === ENDS[s.end].page ? `下一步：換成${WHO[nxt.as].split('（')[0]}` : `下一步：到${ENDS[nxt.end].n}`) : '下一步';
       foot = `${i && (FULL || track(i).pos > 1) ? '<button data-t="prev">上一步</button>' : ''}${s.act && !s._done ? `<button class="p" data-t="act">${s.act.label}</button>` : ''}<button ${s.act && !s._done ? '' : 'class="p"'} data-t="next">${nextLabel}</button>`;
@@ -350,7 +385,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
       mode = 'step'; s._where = where(); lastKey = screenKey();
     }
     panel.classList.remove('nc', 'nd');
-    panel.innerHTML = head + `<div class="bd">${body}</div><div class="ft">${foot}</div>`; moving = false;
+    panel.innerHTML = head((body.match(/<h2>([\s\S]*?)<\/h2>/) || [])[1] || '') + `<div class="bd">${body}</div><div class="ft">${foot}</div>`; moving = false; maskOff = false;
     panel.classList.toggle('min', mini);
     relayout(); setTimeout(() => scrollFirst(), 200);
   }
@@ -363,6 +398,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const want = nv ? Math.max(10, Math.round(innerHeight - nv.getBoundingClientRect().top) + 6) + 'px' : '10px';
     if (d.style.bottom !== want) d.style.bottom = want;
   }
+  function navLift(base) { const v = PAGE === 'app' && document.getElementById('view'); if (!v) return base; const vb = v.getBoundingClientRect().bottom; const nv = [...v.querySelectorAll('nav.nav')].find(n => { const r = n.getBoundingClientRect(); return r.height && Math.abs(r.bottom - vb) < 4; }); return nv ? Math.max(base, Math.round(innerHeight - nv.getBoundingClientRect().top) + 6) : base; }
   function demoLift(base) { placeDemo(); const d = document.getElementById('webDemo'); if (!d) return base; const r = d.getBoundingClientRect(); if (!r.height) return base; return Math.max(base, Math.round(innerHeight - r.top) + 8); }
   function setBoxes(items) { boxes.forEach((b, k) => { b.dataset.sel = items[k] ? items[k][0] : ''; }); place(); }
   function scrollFirst() { const b = boxes[0]; const el = b && b.dataset.sel && find(b.dataset.sel); if (!el) return; const r = el.getBoundingClientRect(), c = clipRect(); if (r.top < c.top || r.bottom > c.bottom) el.scrollIntoView({ block: panel && panel.classList.contains('sheet') ? 'start' : 'center' }); place(); }
@@ -375,8 +411,8 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
         const F = window.JJJFRAME;
         const B = document.body.classList;
         if (PAGE === 'app' && F && F.side) { panel.classList.remove('sheet'); panel.style.removeProperty('bottom'); Object.assign(panel.style, { left: F.gx + 'px', top: F.top + 'px', width: F.gw + 'px', height: F.h + 'px', right: 'auto', bottom: 'auto' }); B.remove('jgDock', 'jgSheet'); }
-        else if (PAGE !== 'app' && innerWidth >= 900) { const w = innerWidth >= 1180 ? 388 : 330; panel.classList.remove('sheet'); Object.assign(panel.style, { left: 'auto', right: '16px', top: '16px', bottom: demoLift(16) + 'px', width: w + 'px', height: 'auto' }); document.body.style.setProperty('--jgm', w + 32 + 'px'); B.add('jgDock'); B.remove('jgSheet'); }
-        else { panel.classList.add('sheet'); Object.assign(panel.style, { height: 'auto' }); panel.style.setProperty('bottom', demoLift(8) + 'px', 'important'); B.remove('jgDock'); B.add('jgSheet'); }
+        else if (PAGE !== 'app' && innerWidth >= 900) { const w = innerWidth >= 1180 ? 388 : 330; panel.classList.remove('sheet'); Object.assign(panel.style, { left: 'auto', right: '16px', top: '16px', bottom: 'auto', maxHeight: (innerHeight - 16 - demoLift(16)) + 'px', width: w + 'px', height: 'auto' }); document.body.style.setProperty('--jgm', w + 32 + 'px'); B.add('jgDock'); B.remove('jgSheet'); }
+        else { panel.classList.add('sheet'); B.toggle('jgMin', mini); Object.assign(panel.style, { height: 'auto' }); panel.style.setProperty('bottom', navLift(8) + 'px', 'important'); B.remove('jgDock'); B.add('jgSheet'); }
       }
       const c = clipRect();
       boxes.forEach((b, k) => {
@@ -387,8 +423,24 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
         if (R - L < 8 || B - T < 8) { b.style.display = 'none'; return; }
         Object.assign(b.style, { display: 'block', left: L - 4 + 'px', top: T - 4 + 'px', width: R - L + 8 + 'px', height: B - T + 8 + 'px' });
       });
+      const holes = boxes.filter(b => b.style.display === 'block').map(b => b.getBoundingClientRect());
+      maskDraw(panel && !panel.hidden && !mini && !maskOff && mode === 'step' && !panel.classList.contains('nc') ? holes : []);
     });
   }
+  // 半遮罩：畫面變暗約 4 成，只亮出這一步的編號區域；遮罩不攔點擊，點暗處就讓遮罩消失（手機同時收成一列）
+  function maskDraw(H) {
+    const m = document.getElementById('jgMask'); if (!m) return;
+    if (!H.length) { m.style.display = 'none'; return; }
+    const W = innerWidth, Hh = innerHeight, rr = (r, k) => { const x = r.left, y = r.top, w = r.width, h = r.height, c = Math.min(k, w / 2, h / 2); return `M${x + c} ${y}H${x + w - c}A${c} ${c} 0 0 1 ${x + w} ${y + c}V${y + h - c}A${c} ${c} 0 0 1 ${x + w - c} ${y + h}H${x + c}A${c} ${c} 0 0 1 ${x} ${y + h - c}V${y + c}A${c} ${c} 0 0 1 ${x + c} ${y}Z`; };
+    m.setAttribute('viewBox', `0 0 ${W} ${Hh}`); m.firstChild.setAttribute('d', `M0 0H${W}V${Hh}H0Z` + H.map(r => rr(r, 10)).join('')); m.style.display = 'block';
+  }
+  function maskAway() { maskOff = true; if (panel && panel.classList.contains('sheet') && !mini) { mini = true; panel.classList.add('min'); const b = panel.querySelector('[data-t=min]'); if (b) b.textContent = '展開'; } place(); }
+  document.addEventListener('pointerdown', e => {
+    const m = document.getElementById('jgMask'); if (!m || m.style.display !== 'block' || e.target.closest('#jg,#jgOpen,#webDemo')) return;
+    const inHole = boxes.some(b => { if (b.style.display !== 'block') return false; const r = b.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; });
+    if (!inHole) maskAway();
+  }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && panel && !panel.hidden) maskAway(); });
   async function doNav(s) {
     try {
       if (PAGE === 'app' && window.JJJ && Array.isArray(s.nav)) { const J = window.JJJ, st = s.nav.slice(); const last = st.pop(); J.tourGo(st.length ? st : [last], s.home); if (st.length && J.go) J.go(last); await wait(700); }
@@ -407,9 +459,9 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     if (b.dataset.go) { const k = +b.dataset.go; STEPS.forEach(x => { x._navved = false; x._done = false; x._pre = false; }); LS.set(K, String(k)); return show(); }
     if (t === 'stop') return stop();
     if (t === 'back') { const w = s && s._where; clearNote(); if (w) await goWhere(w); lastKey = screenKey(); place(); return; }
-    if (t === 'fold') { folded = true; panel.hidden = true; boxes.forEach(x => x.style.display = 'none'); openBtn(true); return; }
+    if (t === 'fold') { folded = true; panel.hidden = true; boxes.forEach(x => x.style.display = 'none'); maskDraw([]); openBtn(true); return; }
     if (moving && t !== 'min') return;
-    if (t === 'min') { mini = !mini; panel.classList.toggle('min', mini); b.textContent = mini ? '展開' : '收合'; return; }
+    if (t === 'min') { mini = !mini; panel.classList.toggle('min', mini); b.textContent = mini ? '展開' : '收合'; if (!mini) maskOff = false; place(); return; }
     if (t === 'mode') { if (FULL) LS.del('jjj_g_full'); else LS.set('jjj_g_full', '1'); LS.del(K); LS.del(OFF); location.reload(); return; }
     if (t === 'prev') { const pi = prevIdx(i), p = STEPS[pi]; if (!p) return; p._navved = false; p._done = false; p._pre = false; LS.set(K, String(pi)); return show(); }
     if (t === 'next') { const ni = nextIdx(i), n = STEPS[ni]; if (!n) return stop(); n._navved = false; n._done = false; n._pre = false; LS.set(K, String(ni)); return show(); }
@@ -497,7 +549,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
     const j = STEPS.findIndex(x => x.end === s.end && x.as === s.as && uniqAt(x) === key);
     if (j > i) { // B
       lastKey = key; const n = STEPS[j]; n._navved = true; n._done = false; n._pre = false;
-      flash = { t: `已跟上你的畫面：第 ${num(i)} 步 → 第 ${num(j)} 步`, sub: j - i > 1 ? '跳過的步驟可從「目錄」回看' : '' };
+      flash = { t: `你從第 ${num(i)} 步跳到第 ${num(j)} 步。`, sub: j - i > 1 ? '跳過的步驟可在目錄回看。' : '' };
       LS.set(K, String(j)); show(); return;
     }
     const sAt = uniqAt(s); const ok = sAt ? key === sAt : anyFound(s);
@@ -517,7 +569,7 @@ body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDo
       pendingA = false; if (stepI() !== i) { lock(false); return; } const n = STEPS[i + 1];
       if (!n || n.end !== s.end || n.as !== s.as) { show(); return; }
       n._navved = !n.nav || allFound(n); n._done = false; n._pre = false;
-      flash = { t: `✓ 已完成第 ${num(i)} 步，自動前往第 ${num(i) + 1} 步`, sub: label ? `偵測到你點了「${label}」` : '' };
+      flash = { t: `已完成第 ${num(i)} 步，自動前往第 ${num(i) + 1} 步`, sub: label ? `偵測到你點了「${label}」` : '' };
       LS.set(K, String(i + 1)); show();
     }, s.act.wait || 800);
   }, true);

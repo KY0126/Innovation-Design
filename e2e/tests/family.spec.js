@@ -14,10 +14,10 @@ test('全家場域方案 → 加購與訂閱 4 步 → 全部訂單；生活顧�
   await page.click('.svc[data-go="x24"]');
   await page.click('[data-x24="food"]'); await page.click('[data-x24="wash"]');
   await page.click('[data-co="fields"]');
-  await expect(page.locator('.stpr li.on')).toContainText('選方案');
+  await expect(page.locator('.stpr li.on')).toContainText('確認方案');
   await page.click('[data-co-next="1"]');
   await expect(page.locator('[data-co-next="2"]')).toBeDisabled();
-  await page.click('[data-co-agree]'); await page.click('[data-co-next="2"]');
+  await page.fill('[data-cov="address"]', '高雄市三民區建工路 1 號'); await page.fill('[data-cov="phone"]', '0912345678'); await page.click('[data-coslot="平日上午"]'); await page.click('[data-co-agree]'); await page.click('[data-co-next="2"]');
   await page.locator('[data-copay]').first().click(); await page.click('[data-co-next="3"]');
   await expect(page.locator('#view')).toContainText('已送出');
   await page.click('[data-co-done="ords"]');
@@ -41,7 +41,7 @@ test('進階影像版：沒有長輩本人同意不能訂；同意紀錄存資�
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
   await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
-  const r = await J(page, '/home/orders', { method: 'POST', body: { items: ['cam'], pay: '門市付款' } });
+  const r = await J(page, '/home/orders', { method: 'POST', body: { items: ['cam'], pay: '信用卡每月扣款' } });
   expect(r._s).toBe(400);
   await app(page, "A=>{A.S.stack=['home','m2'];A.go('x31')}");
   for (const k of ['a', 'b', 'c', 'd']) await page.click(`[data-x31="${k}"]`);
@@ -51,7 +51,7 @@ test('進階影像版：沒有長輩本人同意不能訂；同意紀錄存資�
   await expect(page.locator('#view')).toContainText('您同意');
   const c = (await J(page, '/home/consents')).consents[0];
   expect(c.agreed).toBe(1);
-  expect((await J(page, '/home/orders', { method: 'POST', body: { items: ['cam'], pay: '門市付款' } }))._s).toBe(200);
+  expect((await J(page, '/home/orders', { method: 'POST', body: { items: ['cam'], pay: '信用卡每月扣款' } }))._s).toBe(200);
   expect(errs).toEqual([]);
 });
 
