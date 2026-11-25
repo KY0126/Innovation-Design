@@ -116,6 +116,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .ibx{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border-bottom:1px solid var(--line);min-height:56px}.ibx:last-child{border-bottom:0}.ibd{width:8px;height:8px;border-radius:50%;background:transparent;flex:none}.ibx.new .ibd{background:#D4003C}.ibx.new b{color:var(--ink)}
 .svcg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 12px 6px}.svc{background:var(--card);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:84px}.svc b{font-size:.98em}.svc .muted{font-size:.84em}
 .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;z-index:50}.sheet{background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.aifab{position:absolute;right:12px;width:96px;height:96px;z-index:30}.aib{position:relative;width:96px;height:96px;border-radius:50%;border:3px solid #fff;background:#FAE0E8;padding:0;box-shadow:0 4px 14px rgba(61,58,64,.28);display:block}.aib img{display:block;width:90px;height:90px;border-radius:50%;object-fit:cover}.ail{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:#3D3A40;color:#fff;font-size:13px;font-weight:700;border:2px solid #fff;border-radius:12px;padding:2px 10px;white-space:nowrap}.aix{position:absolute;top:-6px;right:-6px;width:28px;height:28px;border-radius:50%;background:#fff;color:#3D3A40;border:1px solid #D9D4DA;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:0}
+.aichat{padding:12px 12px 16px}.aim{display:flex;gap:8px;margin:0 0 12px;align-items:flex-start}.aim img{width:36px;height:36px;border-radius:50%;flex:none;object-fit:cover}.aim>div{background:var(--card);border-radius:4px 14px 14px 14px;padding:10px 12px;max-width:80%;line-height:1.6}.aim.me{justify-content:flex-end}.aim.me>div{background:#FAE0E8;border-radius:14px 4px 14px 14px}.aia{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ais{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}.aif{display:flex;gap:8px;padding:8px 12px 56px;background:var(--card);border-top:1px solid var(--line)}.aif .fld{flex:1;margin:0}
 .glist{background:var(--card);border-radius:14px;margin:0 12px 4px;overflow:hidden}.glist .gi{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:14px;border-bottom:1px solid var(--line);min-height:52px}.glist .gi:last-child{border-bottom:0}
 .btn.logout{background:#fff;color:#D4003C;border:1.5px solid #D4003C}
 .av{width:48px;height:48px;border-radius:50%;background:#FAE0E8;color:#A3002E;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2em;flex:none}
@@ -1421,6 +1423,7 @@ function render(){
  if(S.fromLog)document.querySelectorAll('#view .sim').forEach(x=>x.remove());
  const sc=document.querySelector('.scroll');if(sc)sc.scrollTop=0;
  if(v==='home')hbWire();
+ if(window.JJJAI)JJJAI.after(v,view);
 }
 // 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
 const NO_NAV=['login','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct'];
@@ -1598,7 +1601,7 @@ async function tourFinish(){await tourOrder();let T=taskList(S.order);await tech
  S.order=await api('/tech/orders/'+S.order.id+'/complete',{method:'POST',body:{steps:all}});S.stack=['t1','tc'];S.ttab='work';S.topen='收尾';render()}
 async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach(t=>{if(t.group!=='開工')S.acc[t.group]=1});S.stack=['t1','tc','tacc'];render();await new Promise(r=>setTimeout(r,900));
  S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});S.stack=['t1','t4'];render();toast(EN()+'驗收完成，摘要已同步給家人')}
-window.JJJ={api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
+window.JJJ={planName,api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
 <div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261124b"></script>
@@ -1615,6 +1618,6 @@ window.JJJ={api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V,TIP,hdr,
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261125e"></script><script src="family.js?v=20261125e"></script>
+<script src="stage2.js?v=20261125e"></script><script src="family.js?v=20261125e"></script><script src="ai.js?v=20261125f"></script>
 <script src="guide.js?v=20261125c"></script></body>
 </html>
