@@ -183,7 +183,7 @@
     entry(where, ctx) {
       if (where === 'm2') {
         const mine = !ctx; // ctx = 是否在「長輩家」分頁
-        return `<div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
+        return `<div class="card" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FBF3F3,#fff)">${window.JJJS2.logo(52)}<div><b style="color:#8E1E42">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，<br>最後揪大家一起想</div></div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
           ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
           ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
           ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
@@ -230,7 +230,9 @@
       const f = wf(), sim = similar(f), warn = BAN.filter(([re]) => re.test([f.when, f.stuck, f.hope].join(' '))).map(x => x[1]);
       const pilotOther = ph() < 1 && f.field !== '臥室到浴室';
       const fld = (k, label, ph2) => `<label class="muted" style="display:block;margin-bottom:8px">${label}<input class="fld" data-wf="${k}" value="${esc(f[k] || '')}" placeholder="${ph2}" style="margin-top:4px"></label>`;
+      const th = THEMES.find(x => x.id === f.theme), hasB = Object.keys(bld()).length;
       return page('許一個揪心願', `
+      ${th ? `<div class="card" style="border-left:4px solid #C42D5A"><div class="muted" style="font-size:.85em">全國出題｜${th.by}</div><b>${th.n}</b><div class="rs">獎勵：${th.rw}</div></div>` : ''}
       <div class="card" style="background:var(--note)"><b>官方寫作模板</b><div class="rs">照著填，生活顧問與總部就能看懂、比對與審查。內容只有門市與總部看得到，心願牆只顯示整理過的主題。</div></div>
       <div class="card">
         <div class="muted">誰遇到</div><div>${['長輩', '孫輩', '我自己', '其他家人'].map(v => chip('data-wwho', v, f.who === v)).join('')}</div>
@@ -246,16 +248,18 @@
       ${warn.length ? `<div class="card" style="border-left:4px solid #C42D5A"><b>全國電子 AI 顧問阿國提醒</b><div class="rs">內容可能違反「${warn.join('、')}」，請修改後再送出。</div></div>` : ''}
       ${sim.length ? `<div class="card" style="border-left:4px solid #E0A030"><b>全國電子 AI 顧問阿國：找到相似心願</b><div class="rs" style="margin-bottom:6px">直接去按「我也需要」，比重新提案更快達到門檻。</div>${sim.map(t => `<button class="row" data-go="wall" style="width:100%"><span>${esc(t.n)}</span><span class="chev">去共鳴 ›</span></button>`).join('')}</div>` : ''}
       ${pilotOther ? '<div class="card" style="background:var(--note)"><div class="rs">試點期只量產「臥室到浴室」的心願；這個場域的心願會累積起來，作為擴展期開放新場域的需求證據。</div></div>' : ''}
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><b>拼出預覽圖與做法卡</b><div class="rs">${hasB ? `已附 ${hasB} 個零件的做法卡` : '選填：在居家地圖上拼給大家看，更容易得到共鳴'}</div></div><button class="btn ghost" data-go="${hasB ? 'wcard' : 'wbuild'}" style="width:auto;margin:0">${hasB ? '查看' : '去拼'}</button></div></div>
       <textarea id="wishtxt" hidden></textarea>
       <div class="pad"><button class="btn" data-a="wishSend" ${warn.length ? 'disabled style="opacity:.6"' : ''}>送出心願</button>
       <p class="muted" style="font-size:.85em">我們會認真評估每一個心願，但無法保證都能實現；有進度時會通知您。</p></div>`);
     },
   });
-  const wallShow = t => { const m = W_META[t.id] || {}; const g = L.s.wtag; return !g || m.f === g || (m.n || []).includes(g); };
+  const wallShow = t => { if ((L.s.wline || 'own') === 'hq') return false; const m = W_META[t.id] || {}; const g = L.s.wtag; return !g || m.f === g || (m.n || []).includes(g); };
   Object.assign(window.JJJS2 || (window.JJJS2 = {}), {
     wallHead() {
       const g = L.s.wtag || '';
-      return `<div class="pad" style="padding-top:0"><div class="muted" style="font-size:.85em;margin-bottom:4px">依標籤篩選</div>${['', '臥室到浴室', '全屋', '防跌照明', '聯絡與陪伴', '無障礙改善'].map(v => `<button class="slot" style="margin:0 6px 8px 0" data-wtag="${v}" aria-pressed="${g === v}">${v || '全部'}</button>`).join('')}</div>`;
+      if ((L.s.wline || 'own') === 'hq') return this.lineTabs() + this.themes();
+      return this.lineTabs() + `<div class="pad" style="padding-top:0"><div class="muted" style="font-size:.85em;margin-bottom:4px">依標籤篩選</div>${['', '臥室到浴室', '全屋', '防跌照明', '聯絡與陪伴', '無障礙改善'].map(v => `<button class="slot" style="margin:0 6px 8px 0" data-wtag="${v}" aria-pressed="${g === v}">${v || '全部'}</button>`).join('')}</div>`;
     },
     wallShow,
     wallCard(t) {
@@ -267,10 +271,122 @@
       const msg = t.st === 'pre' ? `${c} 個家庭也需要｜已通過每季審查，開放預購`
         : stage < 0 ? `${c} 個家庭也需要｜已達 100 戶，進入下一次每季審查`
         : `${c} 個家庭也需要｜第 ${stage + 1} 關：${W_STAGES[stage][1]}，還差 ${W_STAGES[stage][0] - c} 戶${m.left ? `、剩 ${m.left} 天` : ''}`;
-      return tags + bar + `<div class="muted" style="font-size:.88em">${msg}</div>`;
+      return tags + bar + `<div class="muted" style="font-size:.88em">${msg}</div>` + this.topicExtra(t);
     },
     wallTail() {
+      if ((L.s.wline || 'own') === 'hq') return '';
       return `<div class="card" style="border-style:dashed"><div style="display:flex;justify-content:space-between"><b>爐火忘關自動提醒</b><span class="tag">擴展期證據</span></div><div class="muted" style="font-size:.9em">#廚房 #用火用電安全｜23 個家庭提出</div><div class="rs" style="margin-top:6px">試點期只量產臥室到浴室；廚房的心願先累積，作為擴展期開放揪食光的需求證據。</div></div>`;
+    },
+  });
+
+  // ---------- 揪心願：拼出預覽圖、做法卡、改版、闖關、我家出題／全國出題、品牌觸點 ----------
+  const SLOTS = [['床邊', 3.08, 1.0], ['床尾', 3.35, 2.6], ['走道', 4.2, 3.66], ['門檻', 4.7, 3.55], ['浴室門口', 5.3, 3.25], ['浴室內', 5.6, 2.0]];
+  const ITEMS = {
+    light: { n: '感應夜燈', c: '燈', p: 390, tool: 0, min: 5, step: s => `在${s}離地約 30 公分貼一顆感應夜燈（背膠，不鑽孔）` },
+    strip: { n: '門檻提示燈條', c: '條', p: 590, tool: 0, min: 8, step: s => `在${s}貼門檻提示燈條，讓高低差在夜裡看得見` },
+    btn: { n: '床邊大按鍵開關', c: '鈕', p: 490, tool: 0, min: 5, step: s => `把無線大按鍵開關貼在${s}伸手就按得到的地方` },
+    mat: { n: '止滑地墊', c: '墊', p: 350, tool: 0, min: 2, step: s => `在${s}鋪止滑地墊，邊緣貼平不翹起` },
+    rail: { n: '起身扶手', c: '扶', p: 2800, tool: 1, min: 40, step: s => `在${s}安裝起身扶手（需鑽孔，由技師施工）` },
+  };
+  const DEMO_BUILD = { 0: 'light', 2: 'light', 3: 'strip', 4: 'light' }; // 「可調光感應夜燈」示範做法
+  const bld = () => L.s.build || (L.s.build = {});
+  const pts = () => L.s.pts || (L.s.pts = { total: 0, lv: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } });
+  const award = (lv, n, msg) => { const P = pts(); if (P.lv[lv]) { toast('這一關已完成，同一個心願每關只計一次'); return; } P.lv[lv] = 1; P.total += n; toast(`${msg}｜+${n} 點（生活顧問檢核後入帳）`); };
+  function buildSvg(b, night, edit) {
+    const H = J.HPV, sel = L.s.bitem;
+    const pins = Object.entries(b).map(([i, k]) => ({ x: SLOTS[i][1], y: SLOTS[i][2], k: k === 'light' || k === 'strip' ? 'light' : k }));
+    let g = night ? J.hpNight('wb', pins, true) : '';
+    g += J.hpPath();
+    SLOTS.forEach(([n, x, z], i) => {
+      const [px, py] = J.hpp(x, J.HPJ.FT + .35, z), k = b[i];
+      if (k) g += `<g ${edit ? `data-bslot="${i}" style="cursor:pointer"` : ''} transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="17" fill="${ITEMS[k].tool ? '#E0A030' : '#C42D5A'}" stroke="#fff" stroke-width="4"/><text y="6" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">${ITEMS[k].c}</text></g>`;
+      else if (edit) g += `<g data-bslot="${i}" style="cursor:pointer" transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="15" fill="#fff" fill-opacity=".9" stroke="#C42D5A" stroke-width="3" stroke-dasharray="5 4"/><text y="7" font-size="19" text-anchor="middle" fill="#C42D5A">＋</text>${sel ? '' : `<text y="36" font-size="14" text-anchor="middle" fill="#3D3A40" stroke="#fff" stroke-width="5" paint-order="stroke">${n}</text>`}</g>`;
+    });
+    // 放大到臥室、走道、浴室一帶，零件才不會擠在一起
+    return `<div style="position:relative;aspect-ratio:1.2;overflow:hidden;border-radius:10px"><div class="hpw pm" style="position:absolute;width:165%;left:-52%;top:-10%"><img src="home/plan.jpg" alt="心願預覽圖：林媽媽家臥室到浴室"><svg viewBox="${H.join(' ')}">${g}</svg></div></div>`;
+  }
+  const bItems = b => Object.entries(b).sort((a, c) => a[0] - c[0]).map(([i, k]) => ({ slot: SLOTS[i][0], k, it: ITEMS[k] }));
+  const qr = seed => { let x = seed, c = ''; for (let r = 0; r < 9; r++) for (let q = 0; q < 9; q++) { x = (x * 9301 + 49297) % 233280; const corner = (r < 3 && q < 3) || (r < 3 && q > 5) || (r > 5 && q < 3); if (corner || x / 233280 > .5) c += `<rect x="${q * 4}" y="${r * 4}" width="4" height="4"/>`; } return `<svg viewBox="0 0 36 36" width="64" height="64" style="background:#fff;border:1px solid #ddd;border-radius:4px" aria-label="做法卡 QR Code（示意）"><g fill="#3D3A40">${c}</g></svg>`; };
+  function chime() { try { const A = new (window.AudioContext || window.webkitAudioContext)(); [523.25, 659.25, 783.99].forEach((f, i) => { const o = A.createOscillator(), g = A.createGain(); o.frequency.value = f; o.type = 'sine'; g.gain.setValueAtTime(0, A.currentTime + i * .16); g.gain.linearRampToValueAtTime(.18, A.currentTime + i * .16 + .03); g.gain.exponentialRampToValueAtTime(.001, A.currentTime + i * .16 + .5); o.connect(g); g.connect(A.destination); o.start(A.currentTime + i * .16); o.stop(A.currentTime + i * .16 + .55); }); } catch (e) {} }
+  const THEMES = [
+    { id: 'nb', n: '好鄰居題：幫隔壁獨居長輩想一個方法', by: '全國電子｜揪感心', left: 28, sub: 37, rw: '點數加倍＋Digital City 社區健檢日優先名額', ph: 0 },
+    { id: 'night', n: '500 元內，讓夜路更亮', by: '全國電子', left: 12, sub: 54, rw: '點數加倍＋零件 9 折券', ph: 0 },
+    { id: 'keep', n: '補助結束後，舊冷氣怎麼養得更久', by: '全國電子 × 居家清潔夥伴', left: 40, sub: 0, rw: '點數加倍＋冷氣清洗搭打掃折扣', ph: 1 },
+  ];
+  Object.assign(V, {
+    // 拼出你的心願（像 LEGO 用官方零件拼出作品）
+    wbuild: () => {
+      const b = bld(), night = !!L.s.bnight, sel = L.s.bitem, n = Object.keys(b).length;
+      return page('拼出你的心願', `
+      <div class="card" style="background:var(--note)"><div class="rs">先選零件，再點地圖上的「＋」擺放；再點一次可移除。只在示意屋型上拼，不需要真的動手改裝。</div></div>
+      <div class="card" style="padding:8px 10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>林媽媽家｜臥室到浴室</b><span class="seg" role="group" aria-label="白天或夜間"><button data-bnight="0" aria-pressed="${!night}">白天</button><button data-bnight="1" aria-pressed="${night}">夜間</button></span></div>${buildSvg(b, night, true)}</div>
+      <div class="card"><b>零件盤</b><div style="margin-top:6px">${Object.entries(ITEMS).map(([k, it]) => `<button class="slot" style="margin:0 6px 8px 0" data-bitem="${k}" aria-pressed="${sel === k}">${it.c}｜${it.n}${it.tool ? '（需技師）' : ''}</button>`).join('')}</div>${sel ? `<div class="muted" style="font-size:.85em">已選「${ITEMS[sel].n}」，點地圖上的＋擺放</div>` : ''}</div>
+      <div class="pad">${n ? '<button class="btn" data-go="wcard">產生預覽圖與做法卡</button>' : '<button class="btn ghost" disabled style="opacity:.6">先擺一個零件</button>'}</div>`);
+    },
+    // 做法卡（像食譜：材料、難度、步驟、小撇步）
+    wcard: () => {
+      const b = Object.keys(bld()).length ? bld() : DEMO_BUILD, list = bItems(b), sum = list.reduce((a, x) => a + x.it.p, 0), mins = list.reduce((a, x) => a + x.it.min, 0) + 5, tool = list.some(x => x.it.tool);
+      const cnt = {}; list.forEach(x => { cnt[x.k] = (cnt[x.k] || 0) + 1; });
+      return page('做法卡', `
+      <div class="card" style="padding:8px 10px"><b>心願預覽圖｜夜間</b>${buildSvg(b, true, false)}</div>
+      <div class="card"><div style="display:flex;justify-content:space-between"><b>適用空間</b><span>臥室到浴室，走道約 3 公尺</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><b>難度與時間</b><span>${tool ? '<span class="tag" style="background:#FBF0DC;color:#9A6A12">含需技師步驟</span>' : '<span class="tag ok">免工具</span>'}　約 ${mins} 分鐘</span></div></div>
+      <div class="card"><b>零件清單</b>${Object.entries(cnt).map(([k, c]) => `<div class="row"><span>${ITEMS[k].n} ×${c}</span><span class="muted">約 ${(ITEMS[k].p * c).toLocaleString('en-US')} 元</span></div>`).join('')}<div class="row"><b>合計</b><b>約 ${sum.toLocaleString('en-US')} 元</b></div><div class="muted" style="font-size:.8em">價格為示意；門市或全國電子線上購物都買得到，商品不指名品牌。</div></div>
+      <div class="card"><b>步驟</b>${list.map((x, i) => `<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#C42D5A;flex:none">${i + 1}</b><span class="rs">${x.it.step(x.slot)}${x.it.tool ? ' <span class="tag" style="background:#FBF0DC;color:#9A6A12">需技師</span>' : ''}</span></div>`).join('')}<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#C42D5A">${list.length + 1}</b><span class="rs">關燈從床邊實走一次到浴室，太亮就調低</span></div></div>
+      <div class="card" style="background:var(--note)"><b>小撇步</b><div class="rs">夜燈不要直射眼睛；背膠款先擦乾淨牆面；鑽孔、配線與扶手一律請技師施工。</div></div>
+      <div class="card"><div style="display:flex;gap:12px;align-items:center">${qr(list.length * 97 + sum)}<div><b>分享這張做法卡</b><div class="rs">全國電子 App 揪心願頁的短網址與 QR Code（示意），可經 LINE 官方帳號分享給家人。</div></div></div></div>
+      <div class="pad">
+        <button class="btn" data-wdo="2">我照著做了（第 2 關）</button>
+        <button class="btn ghost" data-go="wremix">我改了這樣做（第 3 關）</button>
+        ${tool ? '<button class="btn ghost" data-req="照做法卡請技師施工">請生活顧問安排技師照這份做法施工</button>' : ''}
+        ${L.s.wf ? '<button class="btn ghost" data-wattach="1">附加到我的心願</button>' : ''}
+      </div>`);
+    },
+    // 我改了這樣做（衍生版＋三個發想問題＋阿國換角度）
+    wremix: () => {
+      const r = L.s.rmx || (L.s.rmx = {});
+      const ask = [['q1', '哪一步最不順？'], ['q2', '你換掉或拿掉了什麼？'], ['q3', '如果能有一個新商品解決這一步，會是什麼？']];
+      const ang = [['換對象', '這個做法給坐輪椅的長輩用，要改什麼？'], ['換地方', '同樣的想法放到廚房會變成什麼？'], ['合在一起', '能不能和另一個心願合成一組？'], ['拿掉一樣', '不插電、不鑽孔，還做得到嗎？']];
+      return page('我改了這樣做', `
+      <div class="card"><div class="muted" style="font-size:.85em">原作｜可調光感應夜燈（陳小姐家庭提案）</div><div class="rs">衍生版會掛在原作下面，原作者與你都會列名。</div></div>
+      <div class="card">
+        <label class="muted" style="display:block;margin-bottom:8px">改了什麼（必填）<input class="fld" data-rm="what" value="${esc(r.what || '')}" placeholder="例：把床邊夜燈換成床底燈條" style="margin-top:4px"></label>
+        <label class="muted" style="display:block;margin-bottom:8px">為什麼（必填）<input class="fld" data-rm="why" value="${esc(r.why || '')}" placeholder="例：媽媽說光從下面來比較不刺眼" style="margin-top:4px"></label></div>
+      <div class="card"><b>做完後的三個問題</b>${ask.map(([k, q]) => `<label class="muted" style="display:block;margin:8px 0">${q}<input class="fld" data-rm="${k}" value="${esc(r[k] || '')}" style="margin-top:4px"></label>`).join('')}</div>
+      <div class="card" style="border-left:4px solid #E0A030"><b>全國電子 AI 顧問阿國：換個角度想想</b><div style="margin-top:6px">${ang.map(([n, q]) => `<button class="slot" style="margin:0 6px 8px 0" data-rang="${esc(q)}">${n}</button>`).join('')}</div>${r.ang ? `<div class="rs">💡 ${esc(r.ang)}</div>` : ''}</div>
+      <div class="pad"><button class="btn" data-wdo="3">送出衍生版（第 3 關）</button>
+        <button class="btn ghost" data-wnew="1">把第 3 題變成新心願（往第 4 關）</button></div>`);
+    },
+    // 揪心願闖關與獎勵
+    wquest: () => {
+      const P = pts(), p = ph();
+      const LV = [['看懂', '看預覽圖與做法卡，按「我也需要」', 10], ['照著做', '照做法卡做出來，上傳完成照（只拍空間）', 50], ['我改了這樣做', '寫出改了什麼、為什麼，並回答三個問題', 100], ['長出新心願', '你的衍生版或新心願共鳴達 20 戶', 200], ['共同設計', '改良點被寫進量產規格', 0]];
+      const rw = [['全國電子點數', 0], ['做法卡零件 9 折券', 0], ['Digital City 社區健檢日優先名額', 0], ['冷氣清洗搭居家打掃折扣', 1], ['節氣共煮優先名額', 1], ['以租代買首期優惠', 1]];
+      return page('揪心願闖關', `
+      <div class="card" style="border-left:5px solid #C42D5A"><div style="display:flex;justify-content:space-between;align-items:center"><b>我的點數</b><b style="font-size:1.4em;color:#C42D5A">${P.total}</b></div><div class="rs">點數併入全國電子會員點數；完成照與衍生版經生活顧問檢核後入帳，每月有上限，不因分享或拉人給點。</div>${P.lv[4] ? '<div style="margin-top:6px"><span class="tag ok">🏅 心願設計師</span></div>' : ''}</div>
+      <div class="card"><b>五個關卡</b>${LV.map(([n, d, v], i) => `<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee);align-items:flex-start"><b style="flex:none;width:26px;height:26px;border-radius:50%;background:${P.lv[i + 1] ? '#C42D5A' : '#F2E6EA'};color:${P.lv[i + 1] ? '#fff' : '#C42D5A'};display:flex;align-items:center;justify-content:center">${P.lv[i + 1] ? '✓' : i + 1}</b><div style="flex:1"><b>${n}</b><div class="rs">${d}</div></div><span class="muted" style="font-size:.85em;white-space:nowrap">${v ? `+${v} 點` : '1% 購物金＋列名'}</span></div>`).join('')}</div>
+      <div class="card"><b>可兌換的獎勵</b>${rw.map(([n, need]) => `<div class="row"><span>${n}</span>${p >= need ? '<span class="tag ok">可兌換</span>' : '<span class="rtag">擴展期開放</span>'}</div>`).join('')}<div class="muted" style="font-size:.8em;margin-top:4px">異業獎勵由合作夥伴提供，用來換曝光；不做現金分潤。</div></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>揪居家提示音</b><div class="rs">長輩按「我很好」、心願成團時都用同一段提示音</div></div><button class="btn ghost" data-chime="1" style="width:auto;margin:0">▶ 試聽</button></div></div>`);
+    },
+  });
+  Object.assign(window.JJJS2, {
+    lineTabs() {
+      const ln = L.s.wline || 'own';
+      return `<div class="pad" style="padding-top:0"><div class="seg" role="group" aria-label="心願路線" style="margin-bottom:8px"><button data-wline="own" aria-pressed="${ln === 'own'}">我家出題</button><button data-wline="hq" aria-pressed="${ln === 'hq'}">全國出題</button></div><div class="rs" style="margin-bottom:8px">${ln === 'own' ? '從自己家遇到的問題出發' : '全國電子出題，揪全國的家庭一起想'}</div><button class="row" data-go="wquest" style="width:100%"><span>🏅 我的闖關進度與點數：<b>${pts().total}</b> 點</span><span class="chev">›</span></button></div>`;
+    },
+    themes() {
+      return `<div class="pad" style="padding-top:0"><div class="rs" style="margin-bottom:8px">依自己家的需求投稿；投稿同樣用寫作模板、標籤與做法卡，獎勵點數加倍。</div></div>` + THEMES.map(x => { const on = ph() >= x.ph; return `<div class="card" style="border-left:4px solid #C42D5A"><div style="display:flex;justify-content:space-between;gap:8px"><b>${x.n}</b>${on ? `<span class="tag">剩 ${x.left} 天</span>` : '<span class="rtag">擴展期</span>'}</div><div class="muted" style="font-size:.88em;margin-top:2px">出題：${x.by}｜已投稿 ${x.sub} 件</div><div class="rs" style="margin-top:4px">獎勵：${x.rw}</div>${on ? `<button class="btn ghost" data-wtheme="${x.id}" style="margin-top:8px">用這題投稿</button>` : '<button class="btn ghost" disabled style="margin-top:8px;opacity:.6">擴展期開放（異業夥伴共同出題）</button>'}</div>`; }).join('');
+    },
+    topicExtra(t) {
+      const D = { dim: [62, 14, '已量產'], switch: [23, 6, '樣品試用中（5 戶）'], voice: [9, 4, ''], mat: [5, 1, ''] }[t.id] || [0, 0, ''];
+      return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="muted" style="font-size:.85em">做過 ${D[0]} 戶・改版 ${D[1]} 版</span>${D[2] ? `<span class="tag ok">${D[2]}</span>` : ''}<button class="btn ghost" data-go="wcard" style="width:auto;margin:0 0 0 auto;padding:6px 12px">看做法卡</button></div>`;
+    },
+    // 揪居家標誌：房子＋紅黃綠三色燈號（呼應居家安全地圖的燈號）
+    logo(sz) {
+      return `<svg width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="揪居家標誌" style="flex:none"><path d="M8 30 L32 9 L56 30" fill="none" stroke="#C42D5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 27 V54 H50 V27" fill="#fff" stroke="#8E1E42" stroke-width="4" stroke-linejoin="round"/><circle cx="23" cy="42" r="5" fill="#C42D5A"/><circle cx="32" cy="42" r="5" fill="#E0A030"/><circle cx="41" cy="42" r="5" fill="#3E9B6B"/></svg>`;
+    },
+    pack() {
+      return `<div class="card"><b>包裝示意</b><div style="margin-top:8px;border:2px solid #C42D5A;border-radius:12px;padding:12px;background:linear-gradient(135deg,#fff,#FBF3F3)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:.8em;color:#C42D5A;font-weight:700">揪心願｜由陳小姐家庭提案</div><div class="big" style="margin:4px 0">可調光感應夜燈組</div><div class="muted" style="font-size:.8em">共同設計：林家、王家、高雄民族店生活顧問</div></div>${qr(123)}</div><div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-weight:700;color:#8E1E42">${this.logo(28)}揪居家，讓家更有電</div><div class="muted" style="font-size:.78em">掃 QR Code 看做法卡｜全國電子</div></div></div>`;
     },
   });
 
@@ -283,10 +399,10 @@
       document.querySelectorAll('[data-wf]').forEach(i => { f[i.dataset.wf] = i.value.trim(); });
       if (!f.hope) { e.stopPropagation(); toast('請寫下「希望」：一句話描述理想的樣子'); return; }
       if (!f.need.length) { e.stopPropagation(); toast('請選一到兩個需求類型'); return; }
-      document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}）`;
+      document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}${f.theme ? '｜全國出題：' + (THEMES.find(x => x.id === f.theme) || {}).n : ''}${Object.keys(bld()).length ? '｜附做法卡' : ''}）`;
       J.S.wcat = f.field; L.s.wf = null; return;
     }
-    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag]');
+    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
     if (!t || t.disabled) return;
     e.stopPropagation();
     const d = t.dataset;
@@ -299,6 +415,17 @@
       if (d.wneed) f.need = f.need.includes(d.wneed) ? f.need.filter(x => x !== d.wneed) : f.need.concat(d.wneed).slice(0, 2);
     }
     else if (d.wtag !== undefined) L.s.wtag = d.wtag;
+    else if (d.bitem) L.s.bitem = L.s.bitem === d.bitem ? '' : d.bitem;
+    else if (d.bslot !== undefined) { const b = bld(), i = d.bslot; if (b[i]) delete b[i]; else if (L.s.bitem) b[i] = L.s.bitem; else { toast('先在零件盤選一個零件'); return; } }
+    else if (d.bnight !== undefined) L.s.bnight = d.bnight === '1';
+    else if (d.wdo === '2') { award(2, 50, '已記錄「我照著做了」，請上傳完成照（只拍空間）'); }
+    else if (d.wdo === '3') { const r = L.s.rmx || {}; document.querySelectorAll('[data-rm]').forEach(i => { r[i.dataset.rm] = i.value.trim(); }); L.s.rmx = r; if (!r.what || !r.why) { toast('請寫出改了什麼、為什麼'); return; } award(3, 100, '衍生版已送出，掛在原作下面'); }
+    else if (d.wattach) { toast('已把做法卡附加到心願'); go('wish'); return; }
+    else if (d.rang) { const r = L.s.rmx || (L.s.rmx = {}); document.querySelectorAll('[data-rm]').forEach(i => { r[i.dataset.rm] = i.value.trim(); }); r.ang = d.rang; }
+    else if (d.wnew) { const r = L.s.rmx || {}; document.querySelectorAll('[data-rm]').forEach(i => { r[i.dataset.rm] = i.value.trim(); }); if (!r.q3) { toast('先回答第 3 題：新商品會是什麼'); return; } const f = wf(); f.hope = r.q3; f.stuck = r.q1 || f.stuck; go('wish'); toast('已帶入新心願草稿'); return; }
+    else if (d.wline) { L.s.wline = d.wline; }
+    else if (d.wtheme) { const f = wf(); f.theme = d.wtheme; go('wish'); return; }
+    else if (d.chime) { chime(); return; }
     else if (d.u3) { const s = L.s.u3; s[d.u3] = !s[d.u3]; }
     else if (d.u3t) L.s.u3t = d.u3t;
     else if (d.u3send) { L.s.u3st = 'sent'; toast('已送審（示意）：生活顧問與總部審核後通知你'); }
