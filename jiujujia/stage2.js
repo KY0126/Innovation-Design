@@ -100,7 +100,7 @@
         : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div></button>`).join('')}
       <div class="card"><div style="display:flex;justify-content:space-between"><span>每月合計</span><b>NT$ ${sum.toLocaleString('en-US')}</b></div>
       ${all ? `<div style="margin-top:8px;padding:8px 10px;background:#FBF3F3;border-radius:8px;font-size:.9em">四個場域都要了，改用<b>揪全家 699 元</b>每月可省 ${sum - 699} 元。</div><button class="btn" data-go="x26" style="margin-top:8px">改看揪全家</button>`
-        : `<div style="margin-top:10px">${add.length || !open(1) ? act(1, '加購並交給生活顧問', 'data-req="加購場域方案"') : '<button class="btn ghost" disabled style="opacity:.6">先選要加購的場域</button>'}</div>`}</div>
+        : `<div style="margin-top:10px">${add.length || !open(1) ? act(1, '加購這些場域', 'data-co="fields"') : '<button class="btn ghost" disabled style="opacity:.6">先選要加購的場域</button>'}</div>`}</div>
       <button class="btn ghost" data-go="x25" style="margin:0 12px 12px;width:calc(100% - 24px)">揪食光：先看廚房診斷結果</button>`);
     },
 
@@ -110,7 +110,7 @@
       ${[['r', '爐具', '傳統瓦斯爐、無熄火保護'], ['r', '偵測器', '沒有煙霧與瓦斯偵測器'], ['y', '插座', '電鍋與微波爐共用一個插座'], ['g', '照明', '流理台亮度足夠']].map(([c, n, d]) => `<div style="padding:6px 0;border-top:1px solid var(--line,#eee)">${light(c)}<b>${n}</b><div class="rs" style="margin-left:18px">${d}</div></div>`).join('')}</div>
       <div class="card"><b>建議組合</b><div class="rs" style="line-height:1.8">IH 爐或熄火保護瓦斯爐、煙霧與瓦斯偵測器、排油煙機（商品不指名品牌）</div>
       <div class="muted" style="font-size:.85em;margin-top:6px">瓦斯管線與插座迴路由協力工班施工；全國電子技師負責設備安裝與教學。</div></div>
-      <div class="pad">${act(1, '選擇改善方式', 'data-req="揪食光改善方式"')}</div>`),
+      <div class="pad">${act(1, '加購揪食光', 'data-co="food"')}</div>`),
 
     // F26 揪全家
     x26: () => page('揪全家｜全屋方案', `${bar(1)}
@@ -120,7 +120,7 @@
       ${[['揪夜安｜安心方案', 449], ['揪食光', 200], ['揪團聚', 150], ['揪清爽', 100]].map(([n, p]) => `<div style="display:flex;justify-content:space-between;padding:4px 0"><span class="muted">${n}</span><span>${p} 元</span></div>`).join('')}
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line,#eee)"><span>分開訂合計</span><s>899 元</s></div>
       <div style="display:flex;justify-content:space-between"><b>改用揪全家</b><b style="color:#D4003C">699 元｜每月省 200 元（約兩成）</b></div></div>
-      <div class="pad">${act(1, '請生活顧問正式報價', 'data-req="揪全家正式報價"')}</div>`),
+      <div class="pad">${act(1, '改用揪全家', 'data-co="all"')}</div>`),
 
     // F27 家電換新建議
     x27: () => page('家電換新建議', `${bar(1)}
@@ -132,11 +132,11 @@
       const t = L.s.term || 36;
       return page('以租代買試算', `${bar(1)}
       <div class="card"><b>洗衣機（洗脫烘）</b><div class="seg" role="group" aria-label="期數" style="margin-top:8px"><button data-term="36" aria-pressed="${t === 36}">36 期</button><button data-term="60" aria-pressed="${t === 60}">60 期</button></div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px"><span>每月租金</span><b>○○ 元（示意）</b></div>
-      <div class="muted" style="font-size:.85em">免押金；實際金額於擴展期與租賃公司或原廠議定。</div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px"><span>每月租金</span><b>${(J.S.cat && (J.S.cat.items.find(x => x.id === 'rent_washer_' + t) || {}).monthly) ? 'NT$ ' + J.S.cat.items.find(x => x.id === 'rent_washer_' + t).monthly : '—'}</b></div>
+      <div class="muted" style="font-size:.85em">免押金；含安裝、每年清洗、耗材與保固。</div></div>
       <div class="card"><b>租金內含</b><div class="rs" style="line-height:1.8">安裝、每年清洗、耗材與保固</div>
       <b style="display:block;margin-top:8px">${t} 期期滿後</b><div class="rs" style="line-height:1.8">家電歸您，或換新機並回收舊機</div></div>
-      <div class="pad">${act(1, '請生活顧問報價', `data-req="以租代買 ${t} 期報價"`)}</div>`);
+      <div class="pad">${act(1, '選這個方案', 'data-co="rent"')}</div>`);
     },
 
     // F29 異業加購
@@ -145,16 +145,16 @@
       return page('異業加購', `${bar(1)}
       ${[['ins', '延保搭居家意外險', '合作產險', '保費不使用長輩關懷資料'], ['clean', '冷氣清洗搭居家打掃', '合作清潔業者', '由生活顧問統一排程，同一天到府']].map(([k, n, w, d]) => `<button class="card opt" data-x29="${k}" aria-pressed="${!!s[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}</b> <span class="muted" style="font-size:.85em">${w}</span><div class="rs">${d}</div></button>`).join('')}
       <div class="card" style="background:var(--note)"><div class="muted" style="font-size:.88em">回饋以全國電子點數計算；合作夥伴看不到長輩關懷資料。</div></div>
-      <div class="pad">${act(1, '交給生活顧問報價', 'data-req="異業加購"')}</div>`);
+      <div class="pad">${act(1, '加購', 'data-co="partner"')}</div>`);
     },
 
     // F30 長輩關懷 2.0
     x30: () => page('長輩關懷 2.0', `${bar(1)}
       <div class="card"><div class="muted" style="font-size:.85em">支援共通標準的既有家電可直接接入，不必全部換新。</div></div>
       <div class="card"><b>家電檔案中的設備</b>
-      ${[['冷氣（2021 年）', 1], ['除濕機（2023 年）', 1], ['電視（2016 年）', 0], ['電鍋', 0]].map(([n, ok]) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line,#eee)"><span>${n}</span>${ok ? '<span class="tag ok">可接入</span>' : '<span class="muted">無法接入</span>'}</div>`).join('')}
+      ${[['冷氣（2021 年）', 1], ['除濕機（2023 年）', 1], ['電視（2016 年）', 0], ['電鍋', 0]].map(([n, ok]) => `<div data-x30dev="${n}" data-ok="${ok}" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line,#eee)"><span>${n}</span>${ok ? '<span class="tag ok">可接入</span>' : '<span class="muted">無法接入</span>'}</div>`).join('')}
       <div class="muted" style="font-size:.85em;margin-top:6px">無法接入的設備可拍銘牌建檔，仍可收到保養提醒。</div></div>
-      <div class="pad">${act(1, '接入可用的設備', 'data-req="長輩關懷 2.0 接入"')}</div>`),
+      <div class="pad">${act(1, '接入可用的設備', 'data-x30save="1"')}</div>`),
 
     // F31 進階影像版
     x31: () => {
@@ -165,14 +165,14 @@
       <div class="card"><div class="muted" style="font-size:.85em">預設仍不裝鏡頭。長輩不同意，就維持無鏡頭版，所有關懷功能照常。</div></div>
       <div class="card"><b>門口攝影機（選配）啟用前，四項都要確認</b>
       ${items.map(([k, t]) => `<button class="row" data-x31="${k}" style="width:100%" aria-pressed="${!!c[k]}"><span>${c[k] ? '☑' : '☐'} ${t}</span></button>`).join('')}</div>
-      <div class="pad">${all ? act(1, '交給長輩本人確認', 'data-req="進階影像版長輩確認"') : '<button class="btn ghost" disabled style="opacity:.6">四項都確認後才能送出</button>'}</div>`);
+      <div class="pad">${all ? act(1, '交給長輩本人確認', 'data-go="x31e"') : '<button class="btn ghost" disabled style="opacity:.6">四項都確認後才能送出</button>'}</div>`);
     },
 
     // F32 節氣食譜
     x32: () => page('揪食光｜節氣食譜', `${bar(1)}
       <div class="card"><b>冬至｜IH 爐煮桂圓紅棗湯圓（示意）</b><div class="rs" style="line-height:1.8;margin-top:4px">合作主廚依您家的設備推薦做法：IH 爐中火 8 分鐘，不必顧火；料理完成會提醒關爐。</div></div>
       <div class="card"><b>Digital City 節氣共煮</b><div class="rs" style="line-height:1.8;margin-top:4px">12/21（日）14:00｜Digital City 高雄民族店（示意）<br>主廚示範、生活顧問接待，可帶長輩一起來</div>
-      <div style="margin-top:8px">${act(1, '報名', 'data-req="節氣共煮報名"')}</div></div>`),
+      <div style="margin-top:8px">${act(1, '報名', 'data-cook="1"')}</div></div>`),
 
     // U3 校園大使：短影音任務（擴展期）
     u3: () => {
@@ -188,7 +188,7 @@
         ${items.map(([k, t]) => `<button class="row" data-u3="${k}" style="width:100%" aria-pressed="${!!c[k]}"><span>${c[k] ? '☑' : '☐'} ${t}</span></button>`).join('')}</div>
       <div class="card"><b>任務流程</b>${flow.map(([n, d], i) => `<div style="display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="flex:none;width:44px;color:#D4003C">${i + 1} ${n}</b><span class="rs">${d}</span></div>`).join('')}</div>
       ${st ? `<div class="card" style="background:var(--ok-soft)"><b>已送審</b><div class="rs">生活顧問與總部審核後通知你；審核不通過會說明要修改哪裡。</div></div>` : ''}
-      <div class="pad">${!open(1) ? '<button class="btn ghost" disabled style="opacity:.6">擴展期開放後即可上傳</button>' : st ? '<button class="btn ghost" disabled style="opacity:.6">已送審，等待審核</button>' : (all && L.s.u3t) ? '<button class="btn" data-u3send="1">上傳影片並送審（示意）</button>' : '<button class="btn ghost" disabled style="opacity:.6">選好主題、四項都確認後才能上傳</button>'}</div>`);
+      <div class="pad">${!open(1) ? '<button class="btn ghost" disabled style="opacity:.6">擴展期開放後即可上傳</button>' : st ? '<button class="btn ghost" disabled style="opacity:.6">已送審，等待審核</button>' : (all && L.s.u3t) ? '<button class="btn" data-u3send="1">上傳影片並送審</button>' : '<button class="btn ghost" disabled style="opacity:.6">選好主題、四項都確認後才能上傳</button>'}</div>`);
     },
 
     // F33 新家與老宅翻修
@@ -218,13 +218,14 @@
 
   // 既有畫面的入口（介面藍圖：F01 揪居家 → F33、F02 家庭模式 → F34、F15 家電健康卡 → F27）
   window.JJJS2 = {
+    L,
     entry(where, ctx) {
       if (where === 'm2') {
         const mine = !ctx; // ctx = 是否在「長輩家」分頁
         return `<div class="card" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FBF3F3,#fff)">${window.JJJS2.logo(52)}<div><b style="color:#A3002E">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，<br>最後揪大家一起想</div></div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
           ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
           ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
-          ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
+          ${row('x0', '全部服務', `目前營運階段：${PHASES[ph()]}`)}</div>`;
       }
       if (where === 'hc') {
         const h = ctx || {}, old = h.years != null && h.years >= 8;
@@ -440,7 +441,7 @@
       document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}${f.theme ? '｜全國出題：' + (THEMES.find(x => x.id === f.theme) || {}).n : ''}${Object.keys(bld()).length ? '｜附做法卡' : ''}）`;
       J.S.wcat = f.field; L.s.wf = null; return;
     }
-    const t = e.target.closest && e.target.closest('[data-zm],[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
+    const t = e.target.closest && e.target.closest('[data-zm],[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag],[data-bitem],[data-bslot],[data-bnight],[data-wdo],[data-wattach],[data-rang],[data-wnew],[data-wline],[data-wtheme],[data-chime]');
     if (!t || t.disabled) return;
     e.stopPropagation();
     const d = t.dataset;
@@ -467,7 +468,6 @@
     else if (d.chime) { chime(); return; }
     else if (d.u3) { const s = L.s.u3; s[d.u3] = !s[d.u3]; }
     else if (d.u3t) L.s.u3t = d.u3t;
-    else if (d.u3send) { L.s.u3st = 'sent'; toast('已送審（示意）：生活顧問與總部審核後通知你'); }
     else if (d.term) L.s.term = +d.term;
     else if (d.f33) L.s.f33 = d.f33;
     else if (d.f34) L.s.f34 = d.f34;
