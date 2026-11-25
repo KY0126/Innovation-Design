@@ -95,8 +95,8 @@ test('⑤ 揪心願：創作 4 步（含自訂零件）、我也需要只限訂�
   await page.click('[data-wcreate]');
   await page.fill('[data-wst="when"]', '晚上起床'); await page.fill('[data-wst="hope"]', '會發光的門檻條');
   await page.click('[data-wnext="1"]');
-  await page.click('[data-wsel="strip"]'); await page.click('[data-wslot="3"]');
-  await page.click('[data-wcnew]'); await page.fill('[data-wcf="name"]', '可調光床底燈條'); await page.fill('[data-wcf="purpose"]', '光從床底照地面'); await page.click('[data-wcsave]'); await page.click('[data-wslot="0"]');
+  await page.click('[data-wsel="strip"]'); await page.click('[data-wcad]', { position: { x: 220, y: 200 } });
+  await page.click('[data-wcat="自訂"]'); await page.click('[data-wcnew]'); await page.fill('[data-wcf="name"]', '可調光床底燈條'); await page.fill('[data-wcf="purpose"]', '光從床底照地面'); await page.click('[data-wcsave]'); await page.click('[data-wcad]', { position: { x: 120, y: 120 } });
   await page.click('[data-wnext="2"]');
   await expect(page.locator('#view')).toContainText('自訂｜待評估');
   await page.click('[data-wnext="3"]');

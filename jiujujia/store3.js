@@ -235,7 +235,8 @@ CREATE TABLE IF NOT EXISTS wish_themes (id INTEGER PRIMARY KEY, title TEXT NOT N
       run('INSERT INTO wish_works(user_id,household_id,title,field,theme_id,parent_id,story,build,status,terms,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,1,?,?)', [u.id, hid, title, field, b.theme_id || null, b.parent_id || null, JSON.stringify(s), '[]', draft ? '草稿' : '共鳴中', t, t]);
       const wid = lastId(), map = {};
       for (const c of (b.cparts || []).slice(0, 5)) { if (!String(c.name || '').trim()) continue; run('INSERT INTO wish_cparts(work_id,user_id,name,purpose,photo,created_at) VALUES(?,?,?,?,?,?)', [wid, u.id, String(c.name).slice(0, 30), String(c.purpose || '').slice(0, 80), String(c.photo || '').slice(0, 90000), t]); map[c.tmp] = lastId(); }
-      const B = build.map(x => x.cpart != null ? { slot: x.slot, cpart: map[x.cpart] || null } : { slot: x.slot, part: x.part }).filter(x => x.part || x.cpart);
+      const xy = x => (Number.isFinite(+x.x) && Number.isFinite(+x.y) && x.x !== null && x.y !== null ? { x: Math.max(0, Math.min(9000, Math.round(+x.x))), y: Math.max(0, Math.min(9000, Math.round(+x.y))) } : {});
+      const B = build.map(x => x.cpart != null ? { slot: x.slot, cpart: map[x.cpart] || null, ...xy(x) } : { slot: x.slot, part: x.part, ...xy(x) }).filter(x => x.part || x.cpart);
       run('UPDATE wish_works SET build=? WHERE id=?', [JSON.stringify(B), wid]);
       run('INSERT INTO wish_updates(work_id,by_name,text,created_at) VALUES(?,?,?,?)', [wid, nameOf(u.id), draft ? '存成草稿：試點期只開放臥室到浴室，這件會當作擴展期的需求證據' : '送出作品，開始累積共鳴', t]);
       addPoints(u.id, wid, b.parent_id ? '送出衍生版（第 3 關）' : '送出作品', b.parent_id ? 100 : 50);
