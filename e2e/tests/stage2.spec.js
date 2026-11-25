@@ -89,15 +89,15 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   // F01／F02 → 揪居家主頁（長輩家）有其他場域入口；切到我家有育兒與寵物
   await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
-  await expect(page.locator('#view')).toContainText('揪居家接下來會開放');
+  await expect(page.locator('#view')).toContainText('全部服務');
   await expect(page.locator('#view [data-go="x24"]').first()).toBeVisible();
   await page.click('[data-home="mine"]'); await page.waitForTimeout(300);
   await expect(page.locator('#view [data-go="x34"]')).toBeVisible();
   // F15 家電健康卡 → F27
-  const id = await page.evaluate(() => (window.JJJ.S.hh.devices[0] || {}).id);
+  const id = await page.evaluate(() => (window.JJJ.S.hh.devices.find(d => d.source === '購買紀錄' && d.years < 10) || {}).id);
   if (id !== undefined) {
     await page.evaluate(i => { window.JJJ.S.hc = i; window.JJJ.go('hc'); }, id); await page.waitForTimeout(300);
-    await page.click('#view [data-go="x27"]');
+    await page.click('#view [data-hcs="2"]');
     await expect(page.locator('#view')).toContainText('先保養延壽');
   }
   // 生活顧問（電腦版）顯示目前階段與擴展期加購提示
