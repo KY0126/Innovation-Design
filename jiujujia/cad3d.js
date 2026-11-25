@@ -19,7 +19,7 @@ function build(o) {
   scene.background = new THREE.Color(night ? 0x1b1c22 : 0xf4f2ef);
   const inB = (x, y) => x >= B[0] - pad && x <= B[2] + pad && y >= B[1] - pad && y <= B[3] + pad;
   const M = {
-    wall: new THREE.MeshStandardMaterial({ color: 0xf3f1ee, roughness: .92 }), cut: new THREE.MeshBasicMaterial({ color: 0x2b2b2e }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xf3f1ee, roughness: .92 }), cut: new THREE.MeshBasicMaterial({ color: 0x5a5560 }),
     white: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .6 }), oak: new THREE.MeshStandardMaterial({ map: fromC(woodC, 1, 1), roughness: .6 }),
     linen: new THREE.MeshStandardMaterial({ map: fab('#e9e4dc'), roughness: .95 }), sage: new THREE.MeshStandardMaterial({ map: fab('#9aa79a'), roughness: .95 }), sofa: new THREE.MeshStandardMaterial({ map: fab('#8c8f96'), roughness: .95 }),
     ceramic: new THREE.MeshStandardMaterial({ color: 0xfdfdfb, roughness: .15 }), glass: new THREE.MeshStandardMaterial({ color: 0xdfeff3, roughness: .05, transparent: true, opacity: .3 }),
@@ -30,9 +30,11 @@ function build(o) {
   const box = (w, h, d, mat, x, y, z, cast = true) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); b.position.set(x, y, z); b.castShadow = cast; b.receiveShadow = true; scene.add(b); return b; };
   const cyl = (r1, r2, h, mat, x, y, z, sz = 1) => { const b = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, h, 24), mat); b.scale.z = sz; b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; scene.add(b); return b; };
   // 地坪
-  box(m(B[2] - B[0]) + .5, .1, m(B[3] - B[1]) + .5, new THREE.MeshStandardMaterial({ color: night ? 0x34353b : 0xdedad5, roughness: 1 }), m((B[0] + B[2]) / 2), -.06, m((B[1] + B[3]) / 2), false);
+  // 底座：只到圖框（像建築剖切模型），四周留一點白邊
+  box(m(B[2] - B[0]) + .3, .14, m(B[3] - B[1]) + .3, new THREE.MeshStandardMaterial({ color: night ? 0x34353b : 0xfbfaf8, roughness: .9 }), m((B[0] + B[2]) / 2), -.07, m((B[1] + B[3]) / 2), false);
+  const clip = (x, y, w, h) => { const x0 = Math.max(x, B[0]), y0 = Math.max(y, B[1]), x1 = Math.min(x + w, B[2]), y1 = Math.min(y + h, B[3]); return x1 > x0 && y1 > y0 ? [x0, y0, x1 - x0, y1 - y0] : null; };
   for (const key of C.FR[o.field] || C.FR['全屋']) {
-    const [, x, y, w, h, fin] = C.ROOMS[key];
+    const [, rx, ry, rw, rh, fin] = C.ROOMS[key], cr = clip(rx, ry, rw, rh); if (!cr) continue; const [x, y, w, h] = cr;
     const mat = fin === 'tile' ? new THREE.MeshStandardMaterial({ map: fromC(tileC, m(w) / .6, m(h) / .6), roughness: .35 }) : new THREE.MeshStandardMaterial({ map: fromC(woodC, m(w) / 2.4, m(h) / 1.2), roughness: .55 });
     const p = new THREE.Mesh(new THREE.PlaneGeometry(m(w), m(h)), mat); p.rotation.x = -Math.PI / 2; p.position.set(m(x + w / 2), .001, m(y + h / 2)); p.receiveShadow = true; scene.add(p);
   }
@@ -45,12 +47,14 @@ function build(o) {
     if (Math.abs(y1h - CUT) < 1e-6) { if (hz) box(L, .006, T, M.cut, c, CUT + .003, m(y1), false); else box(T, .006, L, M.cut, m(x1), CUT + .003, c, false); }
   };
   const near = (x1, y1, x2, y2) => inB(x1, y1) || inB(x2, y2) || inB((x1 + x2) / 2, (y1 + y2) / 2);
-  C.WALLS.forEach(w => { const [x1, y1, x2, y2, t] = w; if (near(x1, y1, x2, y2)) piece(x1, y1, x2, y2, t, 0, CUT, touches(x1, y1, w), touches(x2, y2, w)); });
-  C.WINS.forEach(([x1, y1, x2, y2, t, , size, sill]) => { if (!near(x1, y1, x2, y2)) return; const s = m(sill); if (s > 0) piece(x1, y1, x2, y2, t, 0, Math.min(s, CUT), false, false); if (s < CUT) { const hz = y1 === y2, L = m(hz ? x2 - x1 : y2 - y1), top = CUT; if (hz) box(L, top - s, .01, M.glass, m((x1 + x2) / 2), (s + top) / 2, m(y1), false); else box(.01, top - s, L, M.glass, m(x1), (s + top) / 2, m((y1 + y2) / 2), false); } });
-  C.DOORS.forEach(([[hx, hy], , [ox, oy], w]) => { if (!inB(hx, hy)) return; const L = m(w), hh = CUT - .03; box(ox ? L : .04, hh, oy ? L : .04, M.door, m(hx + ox * w / 2), hh / 2, m(hy + oy * w / 2)); });
+  // 牆裁到圖框內：超出圖框的牆不畫，被圖框切到的那一端不往外延伸
+  const cw = (x1, y1, x2, y2, t) => { const hz = y1 === y2, h = t / 2; if (hz) { if (y1 < B[1] - h || y1 > B[3] + h) return null; const a = Math.max(Math.min(x1, x2), B[0]), b = Math.min(Math.max(x1, x2), B[2]); return b > a ? [a, y1, b, y2, a > Math.min(x1, x2), b < Math.max(x1, x2)] : null; } if (x1 < B[0] - h || x1 > B[2] + h) return null; const a = Math.max(Math.min(y1, y2), B[1]), b = Math.min(Math.max(y1, y2), B[3]); return b > a ? [x1, a, x2, b, a > Math.min(y1, y2), b < Math.max(y1, y2)] : null; };
+  C.WALLS.forEach(w => { const [x1, y1, x2, y2, t] = w, c = cw(x1, y1, x2, y2, t); if (!c) return; const [a1, b1, a2, b2, cut1, cut2] = c; piece(a1, b1, a2, b2, t, 0, CUT, !cut1 && touches(a1, b1, w), !cut2 && touches(a2, b2, w)); });
+  C.WINS.forEach(([wx1, wy1, wx2, wy2, t, , size, sill]) => { const c = cw(wx1, wy1, wx2, wy2, t); if (!c) return; const [x1, y1, x2, y2] = c; const s = m(sill); if (s > 0) piece(x1, y1, x2, y2, t, 0, Math.min(s, CUT), false, false); if (s < CUT) { const hz = y1 === y2, L = m(hz ? x2 - x1 : y2 - y1), top = CUT; if (hz) box(L, top - s, .01, M.glass, m((x1 + x2) / 2), (s + top) / 2, m(y1), false); else box(.01, top - s, L, M.glass, m(x1), (s + top) / 2, m((y1 + y2) / 2), false); } });
+  C.DOORS.forEach(([[hx, hy], , [ox, oy], w]) => { if (!(hx >= B[0] && hx <= B[2] && hy >= B[1] && hy <= B[3])) return; const L = m(w), hh = CUT - .03; box(ox ? L : .04, hh, oy ? L : .04, M.door, m(hx + ox * w / 2), hh / 2, m(hy + oy * w / 2)); });
   // 家具
   C.FURN.forEach(([k, x, y, w, d]) => {
-    if (!inB(x + w / 2, y + d / 2)) return;
+    if (!(x >= B[0] - 50 && y >= B[1] - 50 && x + w <= B[2] + 50 && y + d <= B[3] + 50)) return;
     const X = m(x), Z = m(y), W = m(w), D = m(d), cx = X + W / 2, cz = Z + D / 2;
     if (k === 'bed') { box(W, .28, D, M.oak, cx, .14, cz); box(W, .9, .06, M.oak, cx, .45, Z + .03); box(W - .06, .2, D - .1, M.white, cx, .38, cz + .03); box(.58, .1, .34, M.linen, X + .38, .53, Z + .3); box(.58, .1, .34, M.linen, X + W - .38, .53, Z + .3); box(W + .02, .05, D * .62, M.sage, cx, .5, Z + D - D * .31); }
     else if (k === 'stand') { box(W, .5, D, M.oak, cx, .25, cz); cyl(.09, .12, .2, new THREE.MeshStandardMaterial({ color: 0xf6efe2, roughness: .9 }), cx, .72, cz); }
@@ -124,7 +128,7 @@ export function mount(host, o) {
   const S = ensure(), key = JSON.stringify([o.field, o.night, !!o.compare, (o.items || []).map(i => [i.tag, i.part, i.x, i.y])]);
   if (S.key !== key) {
     S.built = build(o); S.key = key; S.before = o.compare ? build(Object.assign({}, o, { items: [] })) : null; S.r.toneMappingExposure = o.night ? .95 : 1.05;
-    const B = S.built.B, span = Math.max(B[2] - B[0], (B[3] - B[1]) * 1.3) / 1000; S.target.set(m((B[0] + B[2]) / 2), 0, m((B[1] + B[3]) / 2) + .2); if (S.field !== o.field) { S.dist = span * 1.85 + 2; S.field = o.field; }
+    const B = S.built.B, span = Math.max(B[2] - B[0], (B[3] - B[1]) * 1.3) / 1000; S.target.set(m((B[0] + B[2]) / 2), 0, m((B[1] + B[3]) / 2) + .15); if (S.field !== o.field) { S.dist = span * 1.95 + 1.5; S.field = o.field; }
   }
   host.innerHTML = ''; host.appendChild(S.r.domElement); const lab = document.createElement('div'); lab.className = 'w3lab'; host.appendChild(lab);
   S.host = host; S.lab = lab; S.hd = null;

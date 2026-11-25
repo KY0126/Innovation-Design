@@ -197,7 +197,7 @@
   view.addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('[data-wcmp] .wcmp-h'); if (!h || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return; e.preventDefault(); cmpSet(h.parentNode, (S.wcmpPos == null ? 50 : S.wcmpPos) + (e.key === 'ArrowLeft' ? -5 : 5)); });
   // 3D：畫面重繪後掛上 WebGL
   let m3d = null;
-  (window.JJJHOOKS = window.JJJHOOKS || []).push((v, el) => { const h = el.querySelector('[data-w3d]'); if (!h || !S.w3cfg) return; const cfg = S.w3cfg; (m3d = m3d || import('./cad3d.js?v=20261125b')).then(M => { if (h.isConnected) M.mount(h, cfg); }).catch(er => { h.innerHTML = '<div class="muted" style="padding:12px">這台裝置無法顯示 3D：' + esc(er.message) + '</div>'; }); });
+  (window.JJJHOOKS = window.JJJHOOKS || []).push((v, el) => { const h = el.querySelector('[data-w3d]'); if (!h || !S.w3cfg) return; const cfg = S.w3cfg; (m3d = m3d || import('./cad3d.js?v=20261126a')).then(M => { if (h.isConnected) M.mount(h, cfg); }).catch(er => { h.innerHTML = '<div class="muted" style="padding:12px">這台裝置無法顯示 3D：' + esc(er.message) + '</div>'; }); });
   if (!document.getElementById('wcadcss')) document.head.insertAdjacentHTML('beforeend', `<style id="wcadcss">
 .wcad{border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-top:6px}.wcad svg [data-wpin]{touch-action:none}
 .w3d{position:relative;height:270px;border-radius:8px;overflow:hidden;background:#F4F2EF;margin-top:6px}.w3lab{position:absolute;inset:0;pointer-events:none}
