@@ -487,6 +487,15 @@ function tickVans(dt,hour){vans.forEach(vn=>{vn.t+=dt;const working=hour>=9&&hou
  else if(vn.phase==='go'){const p=ptOn(vn.route,Math.min(1,vn.t/3.2));vn.g.setAttribute('transform',`translate(${p[0]},${p[1]})`);if(vn.t>=3.2){vn.phase='work';vn.t=0;vn.tx.textContent=vn.name+'｜'+vn.job;vn.tag.setAttribute('opacity',1)}}
  else if(vn.phase==='work'){if(vn.t>=3.5){vn.phase='back';vn.t=0;vn.tag.setAttribute('opacity',0)}}
  else if(vn.phase==='back'){const p=ptOn([...vn.route].reverse(),Math.min(1,vn.t/3.2));vn.g.setAttribute('transform',`translate(${p[0]},${p[1]})`);if(vn.t>=3.2){vn.phase='idle';vn.t=0}}})}
+// ---------- 營運階段（示範用，存在瀏覽器） ----------
+const PH=()=>{try{return Math.max(0,['試點期','擴展期','延伸期'].indexOf(localStorage.getItem('jjj_phase')||'試點期'))}catch(e){return 0}};
+// ---------- 單店財務模型（同決選構想計畫書） ----------
+const FM0={n:20,mix:60,churn:15};let FM={...FM0};
+const fmC=mix=>255+(mix-60)*0.915; // 安心占比→每戶每月貢獻：40%≈237、60%≈255、80%≈273
+function fmRun(f){const c=fmC(f.mix);let h=0,cum=0,min=0,pos=null,pay=null;const H=[],C=[];
+ for(let m=1;m<=120;m++){h=h*(1-f.churn/100/12)+f.n;const p=h*c-49400-(h>260?29700:0);cum+=p;min=Math.min(min,cum);
+  if(pos===null&&p>0)pos=m;if(pay===null&&m>1&&cum>=0)pay=m;H.push(h);C.push(cum)}
+ return {h:H,cum:C,min,pos,pay}}
 // ---------- UI ----------
 let R=run(),month=1,timer=null,clock=14*60;
 const money=n=>'NT$ '+Math.round(n).toLocaleString('en-US');
@@ -515,7 +524,7 @@ function addLog(type){const h=homes[Math.floor(Math.random()*Math.max(1,shown))]
  el('circle',{cx:h.x,cy:h.y,r:4.5,fill:c,stroke:'#fff','stroke-width':1.4},g);setTimeout(()=>g.remove(),3000)}
 function spark(){const s=document.getElementById('spark');const arr=R.out.map(o=>o.cum/1e4),mn=Math.min(0,...arr),mx=Math.max(0,...arr);const sx=i=>6+i*(288/17),sy=y=>6+66*(1-(y-mn)/((mx-mn)||1));
  s.innerHTML=`<line x1="6" x2="294" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width=".8"/><polyline points="${arr.map((y,i)=>`${sx(i)},${sy(y)}`).join(' ')}" fill="none" stroke="var(--line)" stroke-width="2"/><polyline points="${arr.slice(0,month).map((y,i)=>`${sx(i)},${sy(y)}`).join(' ')}" fill="none" stroke="#C42D5A" stroke-width="2"/><circle cx="${sx(month-1)}" cy="${sy(arr[month-1])}" r="3.5" fill="#C42D5A"/>`;
- document.getElementById('bepS').textContent='示意參數試算，非預估；正式數字待企業提供'}
+ document.getElementById('bepS').textContent='營運示意曲線；回本以「投資效益」分頁的計畫書模型為準'}
 function render(){
  const o=R.out[month-1],p=R.out[month-2];
  document.getElementById('mLabel').textContent=`第 ${month} 個月`;
@@ -525,7 +534,7 @@ function render(){
  document.getElementById('kRev').textContent=money(o.rev);
  document.getElementById('kRevD').innerHTML=p?`較上月 <span class="${o.rev>=p.rev?'up':'dn'}">${o.rev>=p.rev?'+':''}${((o.rev/p.rev-1)*100).toFixed(1)}%</span>`:'—';
  const kc=document.getElementById('kCum');kc.textContent=wan(o.cum);kc.className='n '+(o.cum>=0?'up':'dn');
- document.getElementById('kBep').textContent='示意試算，待企業資料';
+ {const fr=fmRun(FM);document.getElementById('kBep').textContent=`約 ${Math.round(49400/fmC(FM.mix))} 戶｜第 ${fr.pay} 月回本`;}
  document.getElementById('kEv').textContent=Math.round(o.ev)+' 次';
  document.getElementById('kEvD').textContent=`長輩自行確認 ${Math.round(o.fine)}｜通知家人 ${Math.round(o.ev-o.fine)}`;
  document.getElementById('kRet').textContent=v.ret+'%';
@@ -594,8 +603,8 @@ function storeRows(){return STORES.map(([code,m,sm])=>{const vv={...v};if(m.diag
 const nt=n=>(n<0?'−':'')+'NT$ '+Math.abs(Math.round(n)).toLocaleString('en-US');
 function hqRefresh(){try{alerts();if(['dispatch','kpi','wish','content','amb','vc','sys','kb'].includes(cur)){document.getElementById('view').innerHTML=V[cur]();notesToInfo()}}catch(e){}}
 
-const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','長輩關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0]];
-const GROUPS=[['今日工作',['live','bk','wo']],['服務家庭',['hh','care']],['揪心願',['wl','wish']],['門市與人員',['ops','partner','content','acct']],['試點與分析',['kpi','optstat','vc']],['系統',['sys']]];
+const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','長輩關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0],['phase','營運階段',0],['biz','異業夥伴',0]];
+const GROUPS=[['今日工作',['live','bk','wo']],['服務家庭',['hh','care']],['揪心願',['wl','wish']],['門市與人員',['ops','partner','biz','content','acct']],['試點與分析',['kpi','optstat','vc']],['系統',['sys','phase']]];
 const SUB={wo:['dispatch'],wish:['kb'],content:['amb'],vc:['vendor'],sys:['about']};
 const PARENT={};Object.entries(SUB).forEach(([p,L])=>L.forEach(c=>PARENT[c]=p));
 let cur=(location.hash||'').slice(1)||DEFAULT_TAB,selW=0,cls={};
@@ -611,6 +620,20 @@ const AIC={'WS-1103':['新增情境模板',86,'與 12 件「浴室門口濕滑�
 const CAT=[['exist','既有商品可滿足'],['tpl','新增情境模板'],['sku','新選品'],['svc','新服務或夥伴']];
 const toast=t=>{const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)};
 const V={
+phase:()=>{const P=PH(),N=['試點期','擴展期','延伸期'];
+ const F=[['家庭端方案','揪夜安（基本 299／安心 449）','＋揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699','＋育兒與寵物模式'],['家電服務','家電檔案（免費）','＋家電保養、換新建議、以租代買','＋新家與老宅翻修 AR 配置'],['長輩關懷','先問長輩本人、依序通知','＋長輩關懷 2.0（既有家電接入）、進階影像版（長輩同意）','—'],['異業合作','長照轉介 1966、社區集客','＋產險、居家清潔、主廚與營養師、租賃公司','＋建商；學校規劃洽談'],['內容與集客','Digital City 社區健檢日','＋節氣食譜、節氣共煮、校園大使短影音','—'],['新客群','—','新婚與搬家家庭','育兒與寵物家庭；揪夥伴商用版（日照據點、住宿機構、租屋代管、民宿、小店）']];
+ return `<div class="panel pb" style="border-left:4px solid #C42D5A"><b>營運階段開關</b><div class="c-mu" style="font-size:13.5px;margin-top:6px;line-height:1.7">同一套系統依階段開放功能；家庭端與顧問端會依目前階段顯示「可訂」或「擴展期開放」。此開關為示範用，正式版依決策點由總部切換。</div>
+ <div class="seg" role="group" aria-label="營運階段" style="margin-top:12px">${N.map((n,i)=>`<button data-ph="${n}" aria-pressed="${P===i}">${n}</button>`).join('')}</div></div>
+ <div class="panel"><div class="ph">各階段開放的功能 <small>目前：${N[P]}</small></div><div style="overflow-x:auto"><table class="wide"><thead><tr><th>項目</th>${N.map((n,i)=>`<th${i===P?' style="color:#C42D5A"':''}>${n}${i===P?'（目前）':''}</th>`).join('')}</tr></thead><tbody>${F.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((c,i)=>`<td${i>P?' class="c-mu"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
+ <div class="grid2"><div class="panel pb"><b>◆二 試點期 → 擴展期（約第 6 月）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 8px">四項同時達標才切換</div><div class="kv"><span>三個月續訂率</span><b>≥ 85%</b></div><div class="kv"><span>診斷轉訂閱率</span><b>≥ 18%</b></div><div class="kv"><span>技師負荷</span><b>≤ 80%</b></div><div class="kv"><span>誤報率</span><b>≤ 10%</b></div></div>
+ <div class="panel pb"><b>◆三 擴展期 → 延伸期（約第 15 月）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 8px">單店訂閱達損益兩平才切換</div><div class="kv"><span>單店訂閱戶數</span><b>≥ 約 194 戶</b></div><div class="kv"><span>超過 260 戶</span><b>加 0.5 位生活顧問</b></div>
+ <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a class="b" style="text-decoration:none;color:inherit" href="app.html" target="_blank" rel="noopener">開啟揪居家 App</a><a class="b" style="text-decoration:none;color:inherit" href="business.html" target="_blank" rel="noopener">開啟揪夥伴商用版</a></div></div></div>`},
+biz:()=>{const P=PH(),N=['試點期','擴展期','延伸期'];
+ const L=[['長照轉介 1966','公部門','轉介扶手與無障礙補助','臥室到浴室',0],['Digital City 社區健檢日','社區','健檢日集客、居家安全講座','全部',0],['產險公司','產險','延保搭居家意外險','全部',1],['居家清潔業者','清潔','冷氣清洗搭居家打掃','客廳、臥室',1],['主廚與營養師','內容','節氣食譜、節氣共煮示範','廚房',1],['租賃公司','租賃','以租代買、舊機回收','全部',1],['建商','建商','新成屋交屋即配好全屋家電','全屋',2],['輔英科大、樹德科大','學校','規劃洽談','—',2]];
+ const st=i=>i<=P?'<span class="badge c-ok">合作中</span>':i===P+1?'<span class="badge c-am">洽談中</span>':'<span class="badge">未開放</span>';
+ return `<div class="c-mu" style="margin:0 0 10px">目前營運階段：<b>${N[P]}</b>（可在「營運階段」分頁切換）｜夥伴名稱為類別示意</div>
+ <div class="panel"><div class="ph">異業夥伴清單</div><div style="overflow-x:auto"><table class="wide"><thead><tr><th>夥伴</th><th>類型</th><th>合作方式</th><th>對應場域</th><th>開放階段</th><th>狀態</th></tr></thead><tbody>${L.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${N[r[4]]}</td><td>${r[0].includes('輔英')&&P>=2?'<span class="badge c-am">規劃洽談</span>':st(r[4])}</td></tr>`).join('')}</tbody></table></div></div>
+ <div class="panel pb"><b>合作規則</b><div class="kv"><span>資料界線</span><span>夥伴看不到長輩關懷資料；關懷資料不作保費依據</span></div><div class="kv"><span>回饋方式</span><span>全國電子點數或購物金，不做現金分潤</span></div><div class="kv"><span>排程</span><span>清洗、打掃與安裝由生活顧問統一排程、合併到府</span></div></div>`},
 wish:()=>{const w=W[selW];const rows=storeRows();const sum=k=>rows.reduce((a,r)=>a+r.o[k],0);const o=rows[0].o;const wishes=Math.round(sum('wishes')),res=Math.round(sum('res'));const live=o.live;
  const fam=R.out.map((x,i)=>STORES.reduce((a,_,j)=>a,0)||x.subs),sup=R.out.map(x=>x.suppliers);
  const mxF=Math.max(...R.out.map(x=>x.subs)),mxS=Math.max(...sup);const sx=i=>30+i*(250/17),syF=y=>110-90*y/(mxF||1),syS=y=>110-90*y/(mxS||1);
@@ -733,11 +756,21 @@ amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
   <tr><td>文藻外語大學（示意）</td><td>${Math.round(n*0.33)}</td><td>${Math.round(n*0.36)}</td><td>${Math.round(n*0.09)}</td><td>民族店</td></tr>
   <tr><td>○○科大（示意）</td><td>${Math.round(n*0.22)}</td><td>${Math.round(n*0.21)}</td><td>${Math.round(n*0.05)}</td><td>澄清店</td></tr></tbody></table></div>
   <div class="pb c-mu" style="font-size:13px">誘因為購物金、證書與服務學習證明，不給銷售佣金；校園大使看不到任何關懷資料。</div></div></div>`},
-vc:()=>{const rows=[['關懷月費','揪夜安基本 299／安心 449；擴展期場域加價 +100～200，揪全家 699','我方定價','已訂定'],['每月診斷需求','三民區 65 歲以上約 7.2 萬人推估','公開資料＋試點實測','試點驗證'],['診斷轉訂閱率','門檻 ≥18%','試點實測','試點驗證'],['三個月續訂率','門檻 ≥85%','試點實測','試點驗證'],['設備毛利、技師工時成本、門市分攤','—','全國電子','待企業提供'],['顧問工時成本','參考主計總處批發零售業薪資','公開資料＋全國電子','待企業提供']];
- return `<div class="panel pb" style="border-left:4px solid #C42D5A"><b>財務規劃方式</b><div class="c-mu" style="font-size:13.5px;margin-top:6px;line-height:1.7">本平台未取得全國電子內部成本資料，因此不做營收與回收期預估。試點結束後，以實測數字代入下式，算出單店損益兩平戶數，作為是否擴張的依據。</div>
- <div style="margin:12px 0;padding:12px 14px;background:var(--head);border-radius:8px;font-size:15px"><b>損益兩平訂閱戶數</b> ＝ 每月固定成本（顧問與技師工時、門市分攤）÷ 每戶每月貢獻毛利</div></div>
- <div class="panel"><div class="ph">試算所需資料與來源</div><div class="pb"><table><thead><tr><th>項目</th><th>目前數值</th><th>來源</th><th>狀態</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="badge ${r[3]==='已訂定'?'c-ok':r[3]==='待企業提供'?'c-am':''}">${r[3]}</span></td></tr>`).join('')}</tbody></table></div></div>
- <div class="grid2"><div class="panel pb"><b>規模示意（非預估）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">以平均月費 389 元（基本 299 四成、安心 449 六成）、月繳計算，若 80 家 Digital City 每店平均有 200 戶訂閱（單店約 194 戶打平）：</div>
+vc:()=>{const f=FM,r=fmRun(f),c=fmC(f.mix),be=Math.round(49400/c),be2=Math.round(79100/c);
+ const sens=[10,15,20,30].map(n=>[n,fmRun({...f,n})]);
+ const W=560,H=200,x0=40,arr=r.cum.slice(0,36).map(x=>x/1e4),mn=Math.min(-30,...arr),mx=Math.max(60,...arr);
+ const X=m=>x0+(m-1)/35*(W-x0-10),Y=v2=>10+(mx-v2)/(mx-mn)*(H-34);
+ const mk=(m,t,col)=>m&&m<=36?`<circle cx="${X(m)}" cy="${Y(arr[m-1])}" r="4" fill="${col}"/><text x="${X(m)}" y="${Y(arr[m-1])-9}" font-size="12" text-anchor="middle" fill="${col}">${t}</text>`:'';
+ const sl=(k,n,mi,ma,st,u)=>`<div class="p"><div class="t"><label for="fm-${k}">${n}</label><b>${f[k]} ${u}</b></div><input type="range" id="fm-${k}" data-fm="${k}" min="${mi}" max="${ma}" step="${st}" value="${f[k]}"></div>`;
+ const ok=x=>x?`第 ${x} 月`:'36 個月內未達';
+ return `<div class="panel pb" style="border-left:4px solid #C42D5A"><b>單店財務模擬（與決選構想計畫書同一套模型）</b><div class="c-mu" style="font-size:13.5px;margin-top:6px;line-height:1.7">每店每月固定與半固定成本 49,400 元；每戶每月貢獻 = 平均月費 − 年繳折扣 − 變動成本 + 加購毛利。訂閱超過 260 戶加 0.5 位生活顧問（+29,700 元）。拖動下方參數即可看回本時點；團隊推估，非預測，待全國電子提供實際成本後更新。</div></div>
+ <div class="grid2"><div class="panel pb">${sl('n','每月淨新增訂閱',5,40,1,'戶')}${sl('mix','安心方案（449）占比',0,100,10,'%')}${sl('churn','年流失率',5,40,1,'%')}
+  <button class="b" data-a="fmReset" style="margin-top:6px">回到計畫書基準（20 戶／60%／15%）</button></div>
+  <div class="panel pb"><div class="kv"><span>每戶每月貢獻</span><b>${Math.round(c)} 元</b></div><div class="kv"><span>損益兩平戶數</span><b>${be} 戶（加顧問後 ${be2} 戶）</b></div><div class="kv"><span>單月轉正</span><b>${ok(r.pos)}</b></div><div class="kv"><span>累積回本</span><b style="color:#C42D5A">${ok(r.pay)}</b></div><div class="kv"><span>最多先墊</span><b>${wan(r.min)}</b></div><div class="kv"><span>第 36 月累積損益</span><b class="${r.cum[35]>=0?'up':'dn'}">${wan(r.cum[35])}</b></div><div class="kv"><span>第 36 月訂閱戶</span><b>${Math.round(r.h[35])} 戶</b></div></div></div>
+ <div class="panel"><div class="ph">累積損益（萬元）× 月</div><div class="pb"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px" font-family="inherit"><line x1="${x0}" x2="${W-10}" y1="${Y(0)}" y2="${Y(0)}" stroke="#bbb" stroke-dasharray="3 3"/>${[1,12,24,36].map(m=>`<text x="${X(m)}" y="${H-6}" font-size="11" text-anchor="middle" fill="#888">${m}</text>`).join('')}${[Math.ceil(mn/20)*20,0,Math.floor(mx/20)*20].map(v2=>`<text x="${x0-6}" y="${Y(v2)+4}" font-size="11" text-anchor="end" fill="#888">${v2}</text>`).join('')}<polyline points="${arr.map((v2,i)=>`${X(i+1)},${Y(v2)}`).join(' ')}" fill="none" stroke="#C42D5A" stroke-width="2.4"/>${mk(r.pos,'單月轉正','#3D3A40')}${mk(r.pay,'回本','#C42D5A')}</svg></div></div>
+ <div class="grid2"><div class="panel"><div class="ph">敏感度：每月淨新增 × 回本時點</div><div class="pb"><table><thead><tr><th>每月淨新增</th><th>單月轉正</th><th>累積回本</th><th>最多先墊</th></tr></thead><tbody>${sens.map(([n,x])=>`<tr${n===f.n?' style="background:var(--head)"':''}><td>${n} 戶</td><td>${ok(x.pos)}</td><td>${x.pay?'第 '+x.pay+' 月':'超過 120 月'}</td><td>${wan(x.min)}</td></tr>`).join('')}</tbody></table></div></div>
+ <div class="panel"><div class="ph">方案組合 × 損益兩平戶數</div><div class="pb"><table><thead><tr><th>安心占比</th><th>每戶貢獻</th><th>兩平戶數</th></tr></thead><tbody>${[40,60,80].map(m=>`<tr${m===f.mix?' style="background:var(--head)"':''}><td>${m}%</td><td>${Math.round(fmC(m))} 元</td><td>${Math.round(49400/fmC(m))} 戶</td></tr>`).join('')}</tbody></table></div></div></div>
+ <div class="grid2"><div class="panel pb"><b>規模示意（非預估）</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">以平均月費 389 元（基本 299 四成、安心 449 六成）、月繳計算，若 80 家 Digital City 每店平均有 200 戶訂閱：</div>
   <div class="kv"><span>訂閱戶數</span><b>16,000 戶</b></div><div class="kv"><span>每月經常性營收</span><b>約 622 萬元</b></div><div class="kv"><span>每年經常性營收</span><b>約 7,469 萬元</b></div></div>
  <div class="panel pb"><b>三個決策點</b><div class="c-mu" style="font-size:13.5px;margin:6px 0 10px">◆一 第 2 月：整合測試、個資檢查、試裝 3 戶一次驗收通過才接案<br>◆二 第 6 月：以下四項同時達標才進入擴展期<br>◆三 約第 15 月：單店約 194 戶以上才進入延伸期</div>
   <div class="kv"><span>三個月續訂率</span><b>≥ 85%</b></div><div class="kv"><span>診斷轉訂閱率</span><b>≥ 18%</b></div><div class="kv"><span>技師負荷</span><b>≤ 80%</b></div><div class="kv"><span>誤報率</span><b>≤ 10%</b></div></div></div>`},
@@ -1016,6 +1049,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
  const a=b.dataset.a;if(a==='reply')toast('已透過綁定門市回覆家庭（示意）');else if(a==='toTpl')toast('已建立情境模板草案「浴室安心」（示意）');else if(a==='upd')toast('規則已更新為 v1.3，全門市同步（示意）');else if(a==='ask')toast('已回覆顧問（示意）');else if(a==='merge')toast('已合併到府，並以 LINE 通知家人（示意）');else if(a==='aiCls'){cls[W[selW].id]=AIC[W[selW].id][3];hqRender();toast('已採用 AI 分類建議，由總部人員確認（示意）')}else if(a==='importObs')toast('已將觀察結果匯入模擬參數（示意）');else if(a==='rfq')toast('已透過廠商作業後台預先邀請報價（示意）');else if(a==='quote')toast('報價已送出，等待預購達標（示意）')});
 
 
+document.addEventListener('input',e=>{const k=e.target&&e.target.dataset&&e.target.dataset.fm;if(!k)return;FM[k]=+e.target.value;const y=scrollY;document.getElementById('view').innerHTML=V.vc();scrollTo(0,y);const n=document.getElementById('fm-'+k);if(n)n.focus()});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ph]');if(!b)return;try{localStorage.setItem('jjj_phase',b.dataset.ph)}catch(x){}toast('已切換為'+b.dataset.ph+'（示範）');document.getElementById('view').innerHTML=V.phase()});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="fmReset"]');if(!b)return;FM={...FM0};document.getElementById('view').innerHTML=V.vc()});
 window.JJJA={api,toast,go:t=>{cur=t;location.hash=t;liveRender()}};
 authStart();
 })();
