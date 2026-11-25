@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125c"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125g"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -307,6 +307,8 @@ td.nw{white-space:nowrap}
 .subt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.subt button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:3px 12px;font-size:13px}.subt button[aria-current="page"]{background:var(--brand);border-color:var(--brand);color:#fff}
 .wo-ph{display:inline-flex;align-items:center;justify-content:center;width:86px;height:62px;border-radius:6px;background:repeating-linear-gradient(45deg,#EEF0F3,#EEF0F3 6px,#E7E2E4 6px,#E7E2E4 12px);color:var(--muted);font-size:11.5px;margin:0 6px 6px 0;text-align:center;line-height:1.3}
 .ck2{display:inline-block;width:14px;height:14px;border-radius:3px;border:1.5px solid var(--line);margin-right:6px;vertical-align:-2px;text-align:center;font-size:10px;line-height:11px;color:#fff}.ck2.on{background:var(--ok);border-color:var(--ok)}
+.simh{display:flex;align-items:center;gap:8px;margin:18px 0 10px;padding-top:12px;border-top:2px dashed var(--line);color:var(--muted);font-size:13px}.mg{margin-bottom:12px}.mgi{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px}.mk{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}.mk .l{font-size:12.5px;color:var(--muted)}.mk b{font-size:20px}.mk .s{font-size:11.5px;color:var(--muted)}.mk.good b{color:#2E9E5B}.mk.bad b{color:#E5484D}.hb{display:grid;grid-template-columns:110px 1fr 36px;align-items:center;gap:6px;font-size:13px;margin-top:5px}.hb i{display:block;height:8px;border-radius:4px;background:#D4003C;opacity:.75}.hb b{text-align:right}
+#view .b[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 </style>
 </head>
 <body>
@@ -606,9 +608,9 @@ const nt=n=>(n<0?'−':'')+'NT$ '+Math.abs(Math.round(n)).toLocaleString('en-US'
 function hqRefresh(){try{alerts();if(['dispatch','kpi','wish','content','amb','vc','sys','kb'].includes(cur)){document.getElementById('view').innerHTML=V[cur]();notesToInfo()}}catch(e){}}
 
 const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0],['phase','營運階段',0],['biz','異業夥伴',0]];
-const GROUPS=[['今日工作',['live','bk','ops']],['服務家庭',['hh','wl']],['門市與人員',['partner']],['試算與分析（非實際營運）',['kpi']],['系統',['sys']]];
+const GROUPS=[['今日工作',['live','bk','ops']],['服務家庭',['hh','wl']],['門市與人員',['partner']],['試點分析',['kpi']],['系統',['sys']]];
 const NAVN={bk:'派工與工單',hh:'家庭',wl:'揪心願',partner:'人員與夥伴',kpi:'試點分析',sys:'設定'};
-const SUB={bk:['wo','dispatch'],hh:['care'],wl:['wish','kb'],partner:['biz','content','acct','amb'],kpi:['optstat','vc','vendor'],sys:['phase','about']};
+const SUB={bk:['wo','dispatch'],hh:['care'],wl:['wish'],partner:['biz','content','acct','amb'],kpi:['optstat','vc','vendor'],sys:['kb','phase','about']};
 const PARENT={};Object.entries(SUB).forEach(([p,L])=>L.forEach(c=>PARENT[c]=p));
 let cur=(location.hash||'').slice(1)||DEFAULT_TAB,selW=0,cls={};
 const W=[
@@ -932,10 +934,28 @@ kpi:()=>{const rows=storeRowsF();const m=month;const ser=f=>Array.from({length:m
 };
 function nav(){const on=k=>cur===k||PARENT[cur]===k;const item=t=>t?`<button data-tab="${t[0]}" ${on(t[0])?'aria-current="page"':''}><span>${NAVN[t[0]]||t[1]}</span>${t[2]?`<span class="n">${t[2]}</span>`:''}</button>`:'';const T=k=>TABS.find(x=>x[0]===k);document.getElementById('nav').innerHTML=GROUPS.map(([g,L])=>{const its=L.map(T).filter(Boolean);return its.length?'<div class="grp">'+g+'</div>'+its.map(item).join(''):''}).join('');document.getElementById('mtabs').innerHTML=TABS.map(([k,n])=>`<button data-tab="${k}" ${cur===k?'aria-current="page"':''}>${n}</button>`).join('')}
 function subTabs(){const p=PARENT[cur]||cur,L=SUB[p];if(!L)return '';return `<div class="subt">${[p,...L].map(k=>{const t=TABS.find(x=>x[0]===k);return t?`<button data-tab="${k}" ${cur===k?'aria-current="page"':''}>${t[1]}</button>`:''}).join('')}</div>`}
-function hqRender(){nav();const t=TABS.find(x=>x[0]===cur)||TABS[0];cur=t[0];document.getElementById('title').textContent=t[1];const isLive=LIVE.includes(cur),isOps=cur==='ops';const pv=document.getElementById('pv');pv.textContent=isOps?'公開＋即時＋模擬':isLive?'即時資料':'模擬資料';pv.classList.toggle('live',isLive||isOps);document.getElementById('opsView').hidden=true;document.getElementById('mapView').hidden=!isOps;document.getElementById('view').hidden=isOps;if(isOps)mountMap();else{document.getElementById('view').innerHTML=subTabs()+V[cur]();if(!isLive)notesToInfo()}if(isLive||isOps)document.getElementById('alerts').innerHTML='';else alerts()}
+// ===== 工作包 6：總部真資料。上方「即時」由資料庫計算，下方原本的試算標示「模擬」 =====
+const SIMH=t=>`<div class="simh"><span class="badge c-mu">模擬</span>${t}</div>`;
+const LIVEH=(t,sub)=>`<div class="ph">${t} <span style="display:flex;gap:6px;align-items:center"><small>${sub||''}</small><span class="badge c-ok">即時</span></span></div>`;
+const _V0=Object.assign({},V);
+V.kpi=()=>{const M=LD.met;const st=(CFG&&CFG.stores)||[];return `<div class="panel">${LIVEH('試點實績','每個指標都標明讀哪張資料表；新身分加入時登記新來源即可')}<div class="pb">
+ ${ME&&ME.role==='hq'?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="b" data-mst="" aria-pressed="${!LD.mst}">全部門市</button>${st.map(x=>`<button class="b" data-mst="${esc(x)}" aria-pressed="${LD.mst===x}">${esc(SHORT(x))}</button>`).join('')}</div>`:''}
+ ${!M?'<span class="c-mu">載入中…</span>':M.groups.map(g=>`<div class="mg"><b>${esc(g.g)}</b><div class="mgi">${g.items.map(x=>`<div class="mk ${x.ok===false?'bad':x.ok?'good':''}"><span class="l">${esc(x.l)}</span><b>${x.v==null?'—':(x.u==='元'?'NT$ '+Number(x.v).toLocaleString('en-US'):x.v+(x.u==='%'?'%':' '+x.u))}</b><span class="s">${x.t!=null?`目標 ${x.hi===0?'≤':'≥'}${x.t}${x.u==='%'?'%':' '+x.u}｜`:''}來源：${esc(x.src)}</span></div>`).join('')}</div></div>`).join('')}
+ ${M?`<div class="c-mu" style="font-size:12.5px;margin-top:6px">更新時間 ${esc(M.at)}｜資料筆數少時比例僅供參考</div>`:''}</div></div>`+SIMH('以下為試點規劃的營運模擬（第 '+month+' 個月），不是實際營運數字')+_V0.kpi()};
+V.wish=()=>{const W2=LD.ws;const bar=(L)=>{const mx=Math.max(1,...L.map(x=>x.n));return L.map(x=>`<div class="hb"><span>${esc(x.k)}</span><i style="width:${Math.round(x.n/mx*100)}%"></i><b>${x.n}</b></div>`).join('')};
+ return `<div class="panel">${LIVEH('揪心願彙整','由 wishes、wish_topics、wish_votes 計算')}<div class="pb">${!W2?'<span class="c-mu">載入中…</span>':`
+ <div class="kpis"><div class="kpi panel"><div class="l">心願總數</div><div class="v">${W2.total}</div></div>${W2.byStatus.slice(0,4).map(x=>`<div class="kpi panel"><div class="l">${esc(x.k)}</div><div class="v">${x.n}</div></div>`).join('')}</div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px"><div><b>依場域</b>${bar(W2.byCat)}</div><div><b>依來源</b>${bar(W2.bySource)}</div><div><b>依門市</b>${bar(W2.byStore)}</div></div>
+ <div style="margin-top:12px"><b>共鳴主題（我也需要）</b><table><tr><th>主題</th><th>共鳴</th><th>門檻</th><th>狀態</th></tr>${W2.topics.map(t=>`<tr><td>${esc(t.n)}</td><td>${t.votes}</td><td>${t.threshold||'—'}</td><td>${esc(t.status)}</td></tr>`).join('')}</table></div>
+ <div style="margin-top:12px"><b>最新心願</b>${W2.recent.map(w=>`<div class="item"><span class="t"><b>${esc(w.category||'')}</b>｜${esc(w.text)}<div class="s">${esc(w.code)}｜${esc(SHORT(w.store))}｜${esc(w.source)}</div></span>${stBadge(w.status)}</div>`).join('')}</div>`}</div></div>`+SIMH('以下為揪心願漏斗與分類建議的示意（模擬資料）')+_V0.wish()};
+V.partner=()=>{const P=LD.sst;return `<div class="panel">${LIVEH('人員','由 users、bookings、plans、quotes、work_packages、acceptance_results 計算')}<div class="pb">${!P?'<span class="c-mu">載入中…</span>':`<table><tr><th>姓名</th><th>身分</th><th>門市</th><th>工作量</th><th>最後登入</th></tr>${P.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(ROLE[x.role]||x.role)}</td><td>${esc(SHORT(x.store)||'總部')}</td><td>${x.role==='advisor'?`問診 ${x.cases}｜方案 ${x.plans}｜正式報價 ${x.quotes}`:x.role==='tech'?`工作包 ${x.pkDone}／${x.pk} 完成｜驗收 ${x.acc}`:'—'}</td><td>${esc(x.last_login||'—')}</td></tr>`).join('')}</table>`}</div></div>`+SIMH('以下為協力工班與施工分流（示範資料）')+_V0.partner()};
+V.sys=()=>{const r=LD.rules;return `<div class="panel">${LIVEH('關懷判斷規則','存在 config 表；家庭 App「通知設定」顯示同一份')}<div class="pb">${!r?'<span class="c-mu">載入中…</span>':`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+ <label>浴室停留超過（分）<input class="in" id="rB" type="number" value="${r.bath_min}"></label><label>早上無活動超過<input class="in" id="rM" value="${esc(r.morning)}"></label><label>長輩未回應多久通知家人（分）<input class="in" id="rE" type="number" value="${r.elder_wait}"></label><label>家人未回應多久通知下一位（分）<input class="in" id="rF" type="number" value="${r.family_wait}"></label></div>
+ ${ME&&ME.role==='hq'?'<button class="b pri" data-la="rulesSave" style="margin-top:10px">儲存規則</button>':'<div class="c-mu" style="margin-top:8px">只有總部可以修改</div>'}`}</div></div>`+SIMH('以下為資料流與系統串接示意（模擬）')+_V0.sys()};
+function hqRender(){nav();const t=TABS.find(x=>x[0]===cur)||TABS[0];cur=t[0];document.getElementById('title').textContent=t[1];const isLive=LIVE.includes(cur),isOps=cur==='ops';const pv=document.getElementById('pv');pv.textContent=isOps?'公開＋即時＋模擬':MIXED.includes(cur)?'即時＋模擬':isLive?'即時資料':'模擬資料';pv.classList.toggle('live',isLive||isOps);document.getElementById('opsView').hidden=true;document.getElementById('mapView').hidden=!isOps;document.getElementById('view').hidden=isOps;if(isOps)mountMap();else{document.getElementById('view').innerHTML=subTabs()+V[cur]();if(!isLive||MIXED.includes(cur))notesToInfo()}if(isLive||isOps)document.getElementById('alerts').innerHTML='';else alerts()}
 let MAPM=null;function mountMap(){if(MAPM)return;const el=document.getElementById('mapView');el.innerHTML='<div class="panel pb c-mu">服務地圖載入中…</div>';const ld=src=>new Promise((ok,no)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const x=document.createElement('script');x.src=src;x.onload=ok;x.onerror=()=>no(new Error(src));document.head.appendChild(x)});Promise.all([ld('map/geo.js'),ld('map/stores.js')]).then(()=>import('./map/servicemap.js')).then(m=>{MAPM=m.mountServiceMap(el,{api,toast})}).catch(e=>{el.innerHTML='<div class="panel pb">服務地圖載入失敗：'+esc(e.message)+'</div>'})}
 // ===== 即時營運（連接 API 的真實資料）=====
-const LIVE=['live','bk','wo','hh','care','wl','acct','optstat'];
+const LIVE=['live','bk','wo','hh','care','wl','acct','optstat','kpi','wish','partner','sys'],MIXED=['kpi','wish','partner','sys'];
 const LD={wsel:null,wcls:null,seli:{},notice:''};let ME=null,CFG=null,LBUSY=false;
 const ESC_RE=new RegExp('[&<>'+String.fromCharCode(34,39)+']','g'),ESC_MAP={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
 const esc=s=>String(s==null?'':s).replace(ESC_RE,c=>ESC_MAP[c]);
@@ -965,6 +985,10 @@ async function loadLive(tab){
  else if(tab==='care')LD.care=(await api('/admin/care')).events;
  else if(tab==='acct')LD.users=(await api('/admin/users')).users;
  else if(tab==='optstat')LD.handoffs=(await api('/advisor/handoffs')).handoffs;
+ else if(tab==='kpi')LD.met=await api('/admin/metrics'+(LD.mst?'?store='+encodeURIComponent(LD.mst):''));
+ else if(tab==='wish')LD.ws=await api('/admin/wish-summary');
+ else if(tab==='partner')LD.sst=(await api('/admin/staff-stats')).staff;
+ else if(tab==='sys')LD.rules=(await api('/admin/settings')).rules;
  if(tab!=='live'){try{LD.ov=await api('/admin/overview')}catch(e){}}
  setBadges()}
 function setBadges(){const k=LD.ov&&LD.ov.kpi;if(!k)return;const s=(id,n)=>{const t=TABS.find(x=>x[0]===id);if(t)t[2]=n};s('bk',k.consult_unassigned+k.install_unscheduled);s('wl',k.wishes_open);nav()}
@@ -1068,6 +1092,8 @@ async function liveAction(b){const a=b.dataset.la,id=b.dataset.id;
 document.addEventListener('change',e=>{const f=e.target.dataset&&e.target.dataset.f;if(!f)return;if(f==='store'){selStore=e.target.value;hqRender()}else if(f==='month'){month=+e.target.value;render()}else if(f==='sc'&&e.target.value){v={...SC[e.target.value]};document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.sc===e.target.value));recompute()}});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.closest('#gate'))return;
+ if(b.dataset.la==='rulesSave'){lbusy(b,async()=>{const g=id=>document.getElementById(id).value;LD.rules=(await api('/admin/settings',{method:'PUT',body:{rules:{bath_min:+g('rB'),morning:g('rM'),elder_wait:+g('rE'),family_wait:+g('rF')}}})).rules;hqRender();toast('已儲存，家庭 App 的通知設定同步顯示')});return}
+ if(b.dataset.mst!==undefined){LD.mst=b.dataset.mst||null;liveRender();return}
  if(b.dataset.la){liveAction(b);return}
  if(b.dataset.sort){kpiSort=kpiSort===b.dataset.sort?'':b.dataset.sort;hqRender();return}
  if(b.dataset.asg){asg[b.dataset.asg]=1;toast('已指派並通知技師與家人（示意）');hqRender();return}
