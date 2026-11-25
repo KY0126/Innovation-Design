@@ -3,10 +3,8 @@
 (function () {
   const J = window.JJJ; if (!J) return;
   const { V, hdr, toast, render, go } = J;
-  const PH_KEY = 'jjj_phase';
   const PHASES = ['試點期', '擴展期', '延伸期'];
-  const ph = () => { try { return Math.max(0, PHASES.indexOf(localStorage.getItem(PH_KEY) || '試點期')); } catch (e) { return 0; } };
-  window.JJJPHASE = ph;
+  const ph = () => window.JJJPHASE ? window.JJJPHASE() : 0;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const L = { s: {} }; // 本模組自己的畫面狀態
   const need = n => n === 2 ? '延伸期' : '擴展期';
@@ -60,10 +58,10 @@
       <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 掃描與家電檔案，只補掃新空間。月費依風險分級。</div></div>
       ${FIELDS.map(([k, n, w, p, d]) => k === 'night'
         ? `<div class="card" style="border-left:5px solid #C42D5A"><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
-        : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div>${k === 'food' ? `<div class="muted" style="font-size:.85em;margin-top:4px">先看廚房診斷 ›</div>` : ''}</button>`).join('')}
+        : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div></button>`).join('')}
       <div class="card"><div style="display:flex;justify-content:space-between"><span>每月合計</span><b>NT$ ${sum.toLocaleString('en-US')}</b></div>
       ${all ? `<div style="margin-top:8px;padding:8px 10px;background:#FBF3F3;border-radius:8px;font-size:.9em">四個場域都要了，改用<b>揪全家 699 元</b>每月可省 ${sum - 699} 元。</div><button class="btn" data-go="x26" style="margin-top:8px">改看揪全家</button>`
-        : `<div style="margin-top:10px">${act(1, '加購並交給生活顧問', 'data-req="加購場域方案"')}</div>`}</div>
+        : `<div style="margin-top:10px">${add.length || !open(1) ? act(1, '加購並交給生活顧問', 'data-req="加購場域方案"') : '<button class="btn ghost" disabled style="opacity:.6">先選要加購的場域</button>'}</div>`}</div>
       <button class="btn ghost" data-go="x25" style="margin:0 12px 12px;width:calc(100% - 24px)">揪食光：先看廚房診斷結果</button>`);
     },
 
@@ -161,6 +159,29 @@
            <div class="card"><div class="rs">預設不裝鏡頭。</div></div>`}`);
     },
   });
+
+  // 既有畫面的入口（介面藍圖：F01 揪居家 → F33、F02 家庭模式 → F34、F15 家電健康卡 → F27）
+  window.JJJS2 = {
+    entry(where, ctx) {
+      if (where === 'm2') {
+        const mine = !ctx; // ctx = 是否在「長輩家」分頁
+        return `<div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
+          ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
+          ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
+          ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
+      }
+      if (where === 'hc') {
+        const h = ctx || {}, old = h.years != null && h.years >= 8;
+        return `<div class="card" style="padding:4px 14px">${row('x27', old ? `已用 ${h.years} 年：看換新建議` : '家電換新建議', '先保養延壽，效能不足才換新；可選以租代買', 1)}</div>`;
+      }
+      if (where === 'a1') { // 生活顧問手機版：依目前階段提醒可提案的方案
+        const p = ph();
+        const t = ['試點期｜只提案揪夜安（基本 299／安心 449）；其他場域可幫家人登記', '擴展期｜可加購揪食光 +200、揪團聚 +150、揪清爽 +100，四場域改揪全家 699；可提以租代買', '延伸期｜另可接新家與老宅翻修、育兒與寵物家庭'][p];
+        return `<div class="card" style="background:var(--note);padding:8px 14px"><span class="${p ? 'tag ok' : 'rtag'}">營運階段</span> <span style="font-size:.88em">${t}</span></div>`;
+      }
+      return '';
+    },
+  };
 
   // 本模組的點擊事件（在原 App 的事件處理之前攔截自己的屬性）
   document.addEventListener('click', e => {

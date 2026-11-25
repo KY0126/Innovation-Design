@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
+<script src="phase.js?v=20261123b"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜消費者端 APP</title>
@@ -627,6 +628,7 @@ m2:()=>{const p=S.home==='parents',H=S.hh,h=H.household,fm=S.famMine||{},dv=DEV(
  <div class="sec">揪心願</div><div class="card"><div class="muted" style="margin-bottom:8px">家裡還需要什麼？說給我們聽，總部會整理成新的方案或服務。</div>
   ${(H.wishes||[]).map(w=>`<div class="row" style="align-items:flex-start"><span>${esc(w.text)}${w.reply?`<span class="muted" style="display:block;font-size:.85em">門市回覆：${esc(w.reply)}</span>`:''}</span><span class="tag ${w.status==='已回覆'?'ok':''}">${w.status==='已回覆'?'門市已回覆':'已送出'}</span></div>`).join('')}
   <button class="btn" data-go="wish" style="margin-top:10px">許一個揪心願</button><button class="btn ghost" data-go="wall">看看大家的心願</button></div>
+ ${window.JJJS2?JJJS2.entry('m2',p):''}
  ${p?`<div class="card"><b>綁定門市｜${esc(h.store)}</b><div class="muted">${J()?'年度健檢：安裝滿一年由門市排程':'年度健檢將於啟用關懷後安排'}</div><div class="row" style="margin-top:6px"><span>你的生活顧問｜${esc(H.plan&&H.plan.advisor?H.plan.advisor:(ADVS[h.store]||ADVS['Digital City 高雄民族店']).nick)}</span><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div></div>`:''}
  </div>${nav('m1')}`},
 wish:()=>{const c=S.wcat||'';return `${hdr('許一個揪心願')}<div class="scroll" style="padding-top:12px"><div class="pad">
@@ -667,6 +669,7 @@ function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar
 Object.assign(V,{
 a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;return `${stf('揪居家｜生活顧問・今天',false)}<div class="scroll">
  <div class="step">${esc(S.me.store||'全部門市')}｜生活顧問 ${esc(S.me.name)}${H?'｜'+esc(H.today):''}</div>
+ ${window.JJJS2?JJJS2.entry('a1'):''}
  ${K?`<div class="kp4">${[['今日諮詢',K.consults,'#advC'],['待審差異',K.review,'#advD'],['待派工',K.dispatch,'#advR'],['方案待確認',K.waiting,'#advW']].map(([n,v,h])=>`<button data-jump="${h}" class="${v&&n!=='今日諮詢'?'hot':''}"><span class="muted" style="font-size:.85em">${n}</span><b>${v}</b></button>`).join('')}</div><div class="insight">💡 ${esc(H.insight)}</div>`:''}
  ${(()=>{const P=H?H.diffs.filter(d=>d.status==='待審核'):[];return P.length?`<div class="card" id="advD" style="border-left:4px solid var(--brand)"><b style="color:var(--brand-ink)">待審差異 ${P.length} 則</b><div style="margin:4px 0">${P.slice(0,2).map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.by||'技師')}｜${esc(d.household||'')}：${esc(d.text)}</div>`).join('')}</div><div class="rs">請到<b style="color:var(--brand)">電腦版</b>（企業管理端）核准，核准後更新圖面版本</div></div>`:''})()}
  ${(()=>{let D=[];try{D=JSON.parse(localStorage.getItem('jjj_adv_drafts')||'[]')}catch(e){}return D.length?`<div class="card"><b>方案草稿 ${D.length} 份</b>${D.map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.household)}・${esc(d.at)} 到店陪同</div>`).join('')}<div class="rs">待電腦版整合成正式報價（有版本號），長輩同意的是正式版本</div></div>`:''})()}
@@ -946,6 +949,7 @@ hc:()=>{const h=(S.hh?S.hh.devices:[]).find(d=>d.id===S.hc);if(!h)return V.m2();
   ${h.years!=null?`<div class="row"><span>使用年數</span><b>${h.years} 年</b></div>`:''}${h.grade?`<div class="row"><span>能源效率</span><b>${h.grade} 級</b></div>`:''}${h.kwh?`<div class="row"><span>年耗電（估算）</span><b>約 ${h.kwh} 度</b></div>`:''}<div class="row"><span>保固</span><span>${esc(h.warranty||'—')}</span></div></div>
  ${sv?``
  :`<div class="card" style="background:var(--ok-soft)"><div>設備運作正常；電量偏低或需要年度健檢時，會在「揪居家」主動提醒。</div></div>`}
+ ${window.JJJS2?JJJS2.entry('hc',h):''}
  <div class="pad"><button class="btn ghost" data-a="back">回到揪居家</button></div></div>`}
 });
 const TSTEPS=[['m','量測動線寬度與門檻','床邊到浴室門口的走道寬度、浴室門檻高度，寫入驗收清單'],['ph0','拍攝施工前照片','只拍設備位置，不拍人；浴室內部須長輩同意'],['g','安裝閘道器並連線','確認家中網路，並與先前裝好的夜燈配對'],['s','門窗感測器 ×2（浴室門、臥室門）','黏貼於門框，測試開關觸發'],['b','浴室緊急按鈕','安裝於馬桶旁，長輩伸手可及高度'],['scan','掃描設備序號','自動登錄家電檔案（各產品團隊共用）'],['fine','請長輩按一次「我很好」','確認長輩知道怎麼結束詢問'],['test','送出測試通知給家人','家人的 App 收到測試訊息'],['ph1','拍攝完工後照片','與施工前照片同角度，附在完工報告'],['rc','包材與廢電池帶回','紙箱、包材與替換下的舊電池帶回門市回收'],['teach','一對一教學與紙本說明','留下「我很好」與夜燈使用說明卡，貼在床邊']];

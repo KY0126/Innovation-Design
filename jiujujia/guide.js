@@ -14,7 +14,7 @@
   };
   const PLACE = { app: '揪居家 App', con: '企業管理端（電腦版）', adm: '企業管理端（電腦版）' };
   const WHO = { 'chen@example.com': '陳小姐（三明治世代）', 'li@example.com': '李小姐（關懷中家庭）', 'advisor@example.com': '王小明（生活顧問）', 'tech@example.com': '吳技師（全國電子技師）', 'manager@example.com': '張經理（總部）' };
-  const CH = ['先評估', '再改善', '後關心', '總部'];
+  const CH = ['先評估', '再改善', '後關心', '總部', '接下來'];
   const F = (o) => Object.assign({ end: 'family', as: 'chen@example.com' }, o);
   const A = (o) => Object.assign({ end: 'advisor', as: 'advisor@example.com' }, o);
   const T = (o) => Object.assign({ end: 'tech', as: 'tech@example.com' }, o);
@@ -145,8 +145,20 @@
       flow: ['企業管理端'] }),
     M({ ch: 3, t: '試點指標', nav: { tab: 'kpi' },
       items: [['#view', '續訂率、轉換率、技師負荷、誤報率，<b>四項達標才擴展</b>']],
-      why: '試點是為了驗證假設，不是為了衝量；沒達標就回到前面的步驟調整。導覽到這裡結束，可以自由操作。',
+      why: '試點是為了驗證假設，不是為了衝量；沒達標就回到前面的步驟調整。',
       flow: ['企業管理端'] }),
+    M({ ch: 4, t: '營運階段開關', nav: { tab: 'phase' },
+      items: [['[data-ph="擴展期"]', '同一套系統切換<b>試點期／擴展期／延伸期</b>（示範用）'], ['~各階段開放的功能@.panel', '每個階段開放哪些方案與服務；◆二、◆三 達標才切換']],
+      why: '試點只賣揪夜安；決策點過關後，總部切到下一階段，家庭端與顧問端同時開放新方案。',
+      flow: ['企業管理端', '揪居家 App', '生活顧問'] }),
+    F({ ch: 4, t: '擴展期與延伸期會開放什麼', nav: ['home', 'x0'],
+      items: [['~擴展期｜同一個家多顧幾個地方', '<b>擴展期</b>：其他場域、揪全家、換新與以租代買、異業加購'], ['~延伸期｜新家庭也能用', '<b>延伸期</b>：新家與老宅翻修、育兒與寵物']],
+      why: '還沒開放的功能可以先看內容、先登記；開放時優先通知，不必再找入口。',
+      flow: ['App｜家庭'] }),
+    F({ ch: 4, t: '全家場域方案', nav: ['home', 'x0', 'x24'],
+      items: [['[data-x24="food"]', '揪食光、揪團聚、揪清爽依風險加價'], ['~已訂閱@.card', '已訂閱的揪夜安沿用 AR 掃描與家電檔案']],
+      why: '四個場域都選時，畫面會建議改用揪全家 699 元，每月省 200 元。導覽到這裡結束，可以自由操作。',
+      flow: ['App｜家庭'] }),
   ];
   // ---------- 樣式 ----------
   const css = document.createElement('style');
