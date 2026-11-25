@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="phase.js?v=20261123b"></script>
+<script src="store.js?v=20261124a"></script>
+<script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜消費者端 APP</title>
@@ -353,9 +354,12 @@ async function loadCases(){const d=await api('/advisor/bookings');S.today=d.toda
 async function loadTodos(){S.todos=await api('/advisor/todos')}
 async function loadOrders(){const d=await api('/tech/orders');S.today=d.today;S.orders=d.orders}
 async function loadTopics(){S.topics=await api('/wish-topics')}
-const LOAD={b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome()]),d3:loadTodos,t1:loadOrders,wall:loadTopics,pre:loadTopics};
+async function loadDrafts(){S.drafts=(await api('/advisor/drafts')).drafts}
+async function loadQuote(){S.quote=(await api('/home/quote')).quote}
+const LOAD={pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,wall:loadTopics,pre:loadTopics};
 async function savePrefs(o){if(S.me&&S.me.role==='family'){try{const d=await api('/home/prefs',{method:'PUT',body:o});S.hh.household.prefs=d.prefs}catch(e){toast(e.message)}}}
 async function sendReq(kind,note){try{const d=await api('/requests',{method:'POST',body:{kind,note}});toast(d.duplicate?'已送出過，門市處理中':'已送出「'+kind+'」，門市會與您聯絡')}catch(e){toast(e.message)}}
+addEventListener('jjjphase',()=>{if(S.me)render()});
 async function boot(){
  try{S.cfg=await api('/config',{noAuthRedirect:true})}catch(e){document.getElementById('view').innerHTML='<div class="ld">無法連線到伺服器，請稍後重新整理。</div>';return}
  if(S.cfg.catalog)CAT.splice(0,CAT.length,...S.cfg.catalog);
@@ -674,7 +678,7 @@ a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;const nx=L&&L[0],na=nx&&n
   ${na?`<div style="margin:6px 0 2px;font-size:.92em">AR 掃描（場勘）：${nm.corridor_cm?'走道 '+nm.corridor_cm+' cm':''}${nm.threshold_cm!=null?'、門檻 '+nm.threshold_cm+' cm':''}</div><div style="font-size:.92em">${nl.length?nl.map(x=>`<span class="dot" style="background:${x[1]==='r'?'#D93A3A':'#E6A23C'}"></span> ${esc(x[0])}${x[1]==='r'?'紅燈':'黃燈'}`).join('　'):'居家安全檢核：全部綠燈'}</div>`:'<div class="rs">家人尚未完成線上診斷，現場陪同填寫與量測</div>'}
   <button class="btn" data-a="advCase" data-id="${nx.id}" style="margin-top:10px">開始問診</button><button class="btn ghost" data-a="aHandElder">把手機轉給長輩確認（大字）</button></div>`:''}
  ${(()=>{const P=H?H.diffs.filter(d=>d.status==='待審核'):[];return P.length?`<div class="card" id="advD" style="border-left:4px solid var(--brand)"><b style="color:var(--brand-ink)">待審差異 ${P.length} 則</b><div style="margin:4px 0">${P.slice(0,2).map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.by||'技師')}｜${esc(d.household||'')}：${esc(d.text)}</div>`).join('')}</div><div class="rs">請到<b style="color:var(--brand)">電腦版</b>（企業管理端）核准，核准後更新圖面版本</div></div>`:''})()}
- ${(()=>{let D=[];try{D=JSON.parse(localStorage.getItem('jjj_adv_drafts')||'[]')}catch(e){}return D.length?`<div class="card"><b>方案草稿 ${D.length} 份</b>${D.map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.household)}・${esc(d.at)} 到店陪同</div>`).join('')}<div class="rs">待電腦版整合成正式報價（有版本號），長輩同意的是正式版本</div></div>`:''})()}
+ ${(()=>{const D=S.drafts||[];return D.length?`<div class="card"><b>方案草稿 ${D.length} 份</b>${D.map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.elder_name)}家・${esc(mdx(d.created_at))} 到店陪同</div>`).join('')}<div class="rs">待電腦版整合成正式報價（有版本號），長輩同意的是正式版本</div></div>`:''})()}
  ${H&&H.installs.length?`<div class="sec">今日到府</div>${H.installs.map(w=>`<button class="card" data-board="${w.household_id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(w.label)}　${esc(w.household)}</b><span class="tag">${esc(w.status)}</span></div><div>${w.packages.map(k=>`<span class="pk" style="background:${k.status==='已完成'?'var(--ok)':PKC[k.code]}">${esc(k.name.split('（')[0])}${k.assignee?'｜'+esc(k.assignee):''}｜${esc(k.status)}</span>`).join('')}</div></button>`).join('')}`:''}
  <span id="advC"></span>
  <div class="sec" style="display:flex;justify-content:space-between;align-items:center"><span>今天與近期行程</span><button class="tag" data-a="reload">重新整理</button></div>
@@ -1034,8 +1038,9 @@ function topCard(){const H=S.hh,ins=H&&H.install,ev=H&&H.care&&H.care[0],p=H&&H.
  const r3=c===2?['cu',d2?d2+'<br>起':'現在','後關心｜進行中','夜間關懷、主動提醒']:['td','','後關心',c===1?'驗收後啟用':'夜間關懷、主動提醒'];
  return `<div class="jhero${J()?' today-sum':''}" aria-label="居家安全三步驟"><div class="jtop"><div class="jk">${EN()}家${p?'・'+esc(planName(p.plan).split('｜')[0]):''}</div><b class="jh1">${h}</b><div class="jl">${l}</div></div><div class="jbd">${JT([r1,r2,r3])}<div class="jbts">${bt}</div></div></div>`}
 Object.assign(V,{
-pl:()=>{const H=S.hh,p=H&&H.plan;if(!p)return `${hdr('專屬居家方案')}<div class="scroll" style="padding-top:12px"><div class="card muted">生活顧問尚未傳送方案。</div></div>`;const a={sel:p.sel,later:p.later},h=H.household,pend=p.status==='待確認',ins=H.install;
+pl:()=>{const H=S.hh,p=H&&H.plan;const qc=S.quote?`<div class="card" style="background:var(--brand-soft)"><b style="color:var(--brand-ink)">正式報價 v${S.quote.v}</b><div class="rs">生活顧問在門市電腦整合的正式版本｜一次費用 NT$ ${Number(S.quote.total).toLocaleString('en-US')}${S.quote.pending?'｜另有 '+S.quote.pending+' 項到府估價':''}</div></div>`:'';if(!p)return `${hdr('專屬居家方案')}<div class="scroll" style="padding-top:12px">${qc}<div class="card muted">${qc?'手機方案草稿尚未同步，以上是正式報價。':'生活顧問尚未傳送方案。'}</div></div>`;const a={sel:p.sel,later:p.later},h=H.household,pend=p.status==='待確認',ins=H.install;
  return `${hdr('專屬居家方案')}<div class="scroll" style="padding-top:12px">
+ ${qc}
  <div class="card"><div class="rs">${esc(p.created_at.slice(5,10).replace('-','/'))}｜${esc(h.store)}｜由生活顧問${esc(p.advisor||'')}規劃</div><b style="font-size:1.12em">${EN()}家｜${esc(planName(p.plan).split('｜')[0])}</b><div class="rs">${a.sel.morning?'臥室與晨起作息':'臥室到浴室'}｜由場域組合的專屬方案</div>
   <div style="display:flex;gap:12px;align-items:center;margin-top:8px">${ringSVG(a)}<div class="rs" style="line-height:1.75">${CAT.filter(c=>a.sel[c.id]).map(c=>`<div><span class="dot" style="background:${RING[c.ring][1]}"></span> ${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div>○ ${c.n}（之後評估）</div>`).join('')}</div></div></div>
  <div class="card" style="padding:4px 14px"><div class="row"><span>一次性費用</span><b>${fmt(p.one_time)}</b></div>${p.monthly?`<div class="row"><span>關懷月費</span><span style="text-align:right"><b>${fmt(p.monthly)}／月</b><span class="muted" style="display:block;font-size:.85em">不綁約；年繳 ${fmt(p.yearly)}（10 付 12）</span></span></div><div class="row"><span>兄弟姊妹分攤</span><span class="muted">2 人各約 ${fmt(Math.round(p.monthly/2))}／月</span></div>`:''}<div class="rs" style="padding:4px 0 8px">試點定價，實際依門市盤點；費用於門市或 App 行動支付付款</div></div>
@@ -1167,7 +1172,7 @@ apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
  return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">
  <div class="step">把手機轉給${EN()}看｜大字顯示</div>
- ${(()=>{let Q={};try{Q=JSON.parse(localStorage.getItem('jjj_v5_quotes')||'{}')}catch(e){}const L=Q[B.household_id]||[],v=L.reduce((a,b)=>!a||b.v>a.v?b:a,null);return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
+ ${(()=>{const L=S.quotes||[],v=L.reduce((a,b)=>!a||b.v>a.v?b:a,null);return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
  ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。臥室與浴室不含鏡頭。'})}
  <div class="card"><b>會裝這些</b>${pins.filter(p=>p.k!=='note').map(p=>`<div class="row"><span><span class="dot" style="background:${PKC[p.pkg]}"></span> ${esc(p.label)}</span><span class="rs">${esc(p.room||'')}</span></div>`).join('')}</div>
  <div class="card okbox" style="margin:0 12px 12px">${(pins.some(p=>/攝影機/.test(p.label||''))||!!(B.plan&&B.plan.sel&&B.plan.sel.cam))?'臥室浴室不裝鏡頭；走廊攝影機平常只在本機錄影、沒人看。':'不裝鏡頭、不錄音。'}晚上起床燈會自己亮；沒事時按一下「我很好」就好。</div>
@@ -1226,7 +1231,7 @@ tdf:()=>{const o=S.order,f=S.tdf||(S.tdf={level:'輕微',text:'',photo:false});c
 function diffRow(d){return `<div class="it" style="align-items:flex-start"><span style="flex:1"><b style="font-weight:500">${esc(d.household||'')}｜${d.pkg} ${PKN[d.pkg]||''}${d.pin?'｜'+esc(d.pin):''}</b><div class="rs">${esc(d.text)}｜${esc(d.by||'')}｜${esc(d.when)}${d.photo?'｜附照片':''}</div>${d.status!=='待審核'?`<div class="rs" style="color:${d.status==='已核准'?'var(--ok)':'var(--muted)'}">${esc(d.status)}${d.new_ver?'｜圖面 v'+d.new_ver:''}</div>`:''}</span>
  ${d.status==='待審核'?`<span style="display:flex;flex-direction:column;gap:6px;flex:none">${d.level==='暫停'?'<span class="tag" style="background:#FFE3DA;color:#B33A1C">暫停施工中</span>':''}<button class="tag ok" data-dfok="${d.id}" style="border:0">核准</button><button class="tag" data-dfno="${d.id}" style="border:0;background:var(--bg);color:var(--muted)">退回</button></span>`:''}</div>`}
 async function loadAdvHome(){S.ahome=await api('/advisor/home')}
-async function openBoard(hid){S.board=await api('/advisor/plan/'+hid);S.pmPins=null;S.pmSel=null;S.pmDirty=false}
+async function openBoard(hid){const [b,q]=await Promise.all([api('/advisor/plan/'+hid),api('/advisor/quotes/'+hid).catch(()=>({quotes:[]}))]);S.board=b;S.quotes=q.quotes||[];S.pmPins=null;S.pmSel=null;S.pmDirty=false}
 async function refreshOrder(){if(!S.order)return;S.order=await api('/tech/orders/'+S.order.id)}
 function cmpSet(id,p){CMP[id]=CMP[id]||{};CMP[id].p=p;const w=document.querySelector('#cmp_'+id+' .cmpw');if(w)w.style.setProperty('--p',p+'%')}
 
@@ -1405,7 +1410,7 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='famAcc')busy(t,async()=>{applyHome(await api('/install/accept',{method:'POST',body:{}}));toast('已驗收，長輩關懷啟用');rr()});
  else if(a==='famRej'){const note=(document.getElementById('famRej').value||'').trim();if(!note){toast('請寫下哪裡有問題');return}busy(t,async()=>{applyHome(await api('/install/reject',{method:'POST',body:{note,areas:[]}}));toast('已退回，門市與技師會再處理');rr()})}
  else if(a==='tAccGo'){S.acc={};S.accNote='';go('tacc')}
- else if(a==='accOk')busy(t,async()=>{const fp=!(S.order.log||[]).some(x=>/退回/.test(x.action||''));const code=S.order.code;S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});try{const m=JSON.parse(localStorage.getItem('jjj_fp')||'{}');m[code]=fp;localStorage.setItem('jjj_fp',JSON.stringify(m))}catch(e){}toast(EN()+'驗收完成'+(fp?'（一次通過）':'（退回後通過）')+'，摘要已同步給家人');S.stack=['t1','t4'];render()});
+ else if(a==='accOk')busy(t,async()=>{const fp=!(S.order.log||[]).some(x=>/退回/.test(x.action||''));const code=S.order.code;S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});try{await api('/tech/acceptance-result',{method:'POST',body:{code,first_pass:fp}})}catch(e){}toast(EN()+'驗收完成'+(fp?'（一次通過）':'（退回後通過）')+'，摘要已同步給家人');S.stack=['t1','t4'];render()});
  else if(a==='accNo'){const el=document.getElementById('accNote');const note=(el&&el.value||'').trim();if(!note){toast('請寫下哪裡有問題');return}busy(t,async()=>{S.order=await api('/tech/orders/'+S.order.id+'/reject',{method:'POST',body:{areas:Object.keys(S.acc).filter(g=>S.acc[g]===0),note}});toast('已退回，相關項目改回待施工');S.stack=['t1','tc'];S.ttab='work';render()})}
  else if(a==='tdfPhoto'){S.tdf.photo=!S.tdf.photo;rr()}
  else if(a==='tdfSend'){const f=S.tdf,el=document.getElementById('tdfTxt');if(el)f.text=el.value.trim()||f.text;if(!f.text){toast('請描述現場差異');return}const pins=S.order.pv?S.order.pv.pins:[],sp=pins.find(p=>p.id===S.tpin),pk=sp?sp.pkg:(S.stack.includes('tp')?S.tpkg:'A');
@@ -1427,7 +1432,7 @@ document.getElementById('view').addEventListener('click',e=>{
  else if(a==='advReport')toast('已回報給總部知識管理');
  else if(a==='advQuote')go('a4');
  else if(a==='advConfirm'){go('a5')}
- else if(a==='advDone'){const x=A(),c=S.case;busy(t,async()=>{const dur=Math.round((Date.now()-x.t0)/1000);await api('/advisor/plans',{method:'POST',body:{household_id:c.household_id,booking_id:c.id,sel:x.sel,later:x.later,plan:x.plan,pay:x.pay,c2n:x.c2n,c2p:x.c2p,ewish:x.ewish||'',escort:!!x.escort,duration_s:dur}});x.t1=Date.now();try{const D=JSON.parse(localStorage.getItem('jjj_adv_drafts')||'[]').filter(d=>d.hid!==c.household_id);const n=new Date();D.push({hid:c.household_id,household:c.household,at:(n.getMonth()+1)+'/'+n.getDate()});localStorage.setItem('jjj_adv_drafts',JSON.stringify(D))}catch(e){}S.cases=null;S.stack=['a1','a6'];render()})}
+ else if(a==='advDone'){const x=A(),c=S.case;busy(t,async()=>{const dur=Math.round((Date.now()-x.t0)/1000);await api('/advisor/plans',{method:'POST',body:{household_id:c.household_id,booking_id:c.id,sel:x.sel,later:x.later,plan:x.plan,pay:x.pay,c2n:x.c2n,c2p:x.c2p,ewish:x.ewish||'',escort:!!x.escort,duration_s:dur}});x.t1=Date.now();S.cases=null;S.drafts=null;S.stack=['a1','a6'];render()})}
  else if(a==='advPrint')window.print();
  else if(a==='advAgain'){S.stack=['a1'];S.cases=null;render();Promise.all([loadCases(),loadAdvHome()]).then(render).catch(x=>toast(x.message))}
  else if(a==='famGrand'){S.fam=S.fam||{grand:true};S.fam.grand=!S.fam.grand;toast(S.fam.grand?'已開放孫輩查看簡化摘要':'已取消孫輩查看權限');render();savePrefs({grand:S.fam.grand})}
@@ -1463,7 +1468,7 @@ async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach
 window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261027i"></script>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261124b"></script>
 <script>
 // 手機框：電腦上固定 393×852，視窗較矮時等比例縮小；右側留給導覽面板
 (function(){const sh=document.getElementById('app');const F=window.JJJFRAME={};

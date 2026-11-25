@@ -1,7 +1,7 @@
 // 揪居家 v5 擴充（消費者端）：看結果 → 選方式（一次一個空間）→ 交給生活顧問；材質款式；服務進度
-// 原型：資料存在這台瀏覽器（模擬後端＋localStorage）；價格與工期皆為示範資料
+// 家人選的改善方式與交付紀錄存在資料庫（/api/home/choices、/api/home/handoff）；價格與工期皆為示範資料
 (function () {
-  const LSX = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  const API = (p, o = {}) => fetch('/api' + p, { method: o.method || 'GET', headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' }, body: o.body ? JSON.stringify(o.body) : undefined }).then(r => r.ok ? r.json() : Promise.reject(r.status));
   const e = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const J = window.JJJ; if (!J || !J.V) return;
 
@@ -33,8 +33,15 @@
       ] }
   };
   const LC = { r: ['紅燈', '#C42D5A'], y: ['黃燈', '#E0A030'], g: ['綠燈', '#138F3B'] };
-  const ST = Object.assign({ sp: 'hall', sel: {}, ok: {}, style: {}, combo: 'fast', more: false, pct: 50, view: 'ar', door: {}, mount: 'tape' }, LSX.get('jjj_v5_opt2') || {});
-  const save = () => LSX.set('jjj_v5_opt2', ST);
+  const ST = { sp: 'hall', sel: {}, ok: {}, style: {}, combo: 'fast', more: false, pct: 50, view: 'ar', door: {}, mount: 'tape' };
+  let HN = 0, saveT = null, loaded = false;
+  const isFam = () => J.S && J.S.me && J.S.me.role === 'family';
+  const save = () => { if (!isFam()) return; clearTimeout(saveT); saveT = setTimeout(() => API('/home/choices', { method: 'PUT', body: { state: ST } }).catch(() => {}), 300); };
+  const load = () => { if (!isFam()) return Promise.resolve(); return Promise.all([API('/home/choices'), API('/home/handoffs')]).then(([c, h]) => { if (c.state) Object.assign(ST, c.state); HN = (h.handoffs || []).length; loaded = true; J.render(); }).catch(() => {}); };
+  window.addEventListener('storage', e => { if (e.key === 'jjj_web_db_v7') setTimeout(load, 80); });
+  const tryLoad = () => { if (loaded) return; if (isFam()) load(); else if (!(J.S && J.S.me)) setTimeout(tryLoad, 500); };
+  window.addEventListener('jjjlogin', () => { loaded = false; tryLoad(); });
+  tryLoad();
   const optOf = (sp, id) => SP[sp].opts.find(o => o.id === id);
   const cur = sp => optOf(sp, ST.sel[sp] || SP[sp].combo.fast);
   const PR = ['免費', '千元內', '一到三千元', '約 3 千元以上'];
@@ -139,7 +146,7 @@
         <div class="row"><span>六個空間</span><b style="color:${allGreen ? LC.g[1] : LC.y[1]}">● ${allGreen ? '全部綠燈（預估）' : '仍有待處理'}</b></div>
         <div class="muted" style="font-size:.8em;margin-top:4px">需要動工的項目由協力工班先完成，全國電子技師再安裝設備；完工後依實際條件重新判定燈號。</div>
         <div class="muted" style="font-size:.8em;margin-top:4px">計價方式：設備與長輩關懷月費以場域計價；地板、門檻等工程依 AR 量出的尺寸計價（地板按坪、燈條按公尺），由協力工班報價、生活顧問整合。</div></div>
-      <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', (LSX.get('jjj_v5_handoff') || []).length ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '協力工班先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
+      <div class="card"><b>進度</b>${J.JT([['dn', '', '選方式', '各空間的改善方式已選好'], ['cu', '現在', HN ? '估價｜進行中' : '估價｜下一步', '生活顧問整合成一張報價'], ['td', '', '長輩確認', '長輩本人同意才成交'], ['td', '', '施工', '協力工班先、全國電子技師後'], ['td', '', '驗收', '長輩逐區說「沒問題」']])}
         <div class="muted" style="font-size:.82em;margin-top:6px">長輩本人同意才成交；先施工、再安裝設備。協力工班施工附書面保固；符合資格者可申請長照居家無障礙改善補助，生活顧問協助轉介 1966，不保證核准。</div></div>
       <div class="muted" style="font-size:.8em;padding:0 16px">燈號只協助排序、不取代專業評估；對比為示意、不是施工圖。</div>
       <div class="v5bar"><div class="r"><span>一張報價（${est ? '含改造工程' : '全國電子＋協力工班'}）</span><b>${PR[lv] || '免費'}${est ? '・需到府估價' : ''}</b></div>
@@ -170,10 +177,9 @@
     if (t.hasAttribute('data-v5handoff')) {
       const items = Object.keys(SP).map(k => { const o = cur(k); return { space: SP[k].n, type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: SP[k].l, to: o.r, style: o.floor ? (ST.style[o.id] || FLOORS[o.floor].s[0][0]) : null }; });
       if (ST.door.on) { const o = optOf('bath', ST.door.id); items.push({ space: '浴室門', type: o.t, name: o.n, price: o.p, days: o.d, by: o.by, est: !!o.est, from: 'y', to: o.r, style: null }); }
-      const all = LSX.get('jjj_v5_handoff') || []; const d = new Date(), pad = n => String(n).padStart(2, '0');
+      const d = new Date(), pad = n => String(n).padStart(2, '0');
       items.push({ space: '安裝方式', type: '全國電子安裝', name: MOUNT[ST.mount].n, price: '—', days: '—', by: '家人選定', est: false, from: 'g', to: 'g', style: null });
-      all.unshift({ household: '林媽媽家', from: '陳小姐', at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`, items });
-      LSX.set('jjj_v5_handoff', all.slice(0, 5));
+      API('/home/handoff', { method: 'POST', body: { at: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`, items } }).then(() => { HN++; }).catch(() => {});
       J.toast('已交給生活顧問王小明，報價完成後通知你');
       const st = J.S.stack, i = st.indexOf('optA'); if (i >= 0) { J.S.stack = st.slice(0, i); J.render(); }
     }

@@ -45,7 +45,9 @@ footer{color:var(--mu);font-size:12.5px;padding:0 20px 20px}
 </main>
 <footer>揪居家｜團隊 五子登科｜InnoConnect+ 2026 全國電子提案。延伸期示範畫面；客戶、據點、設備與日期皆為虛構示意。</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="phase.js?v=20261123b"></script>
+<script src="backend.js?v=20261027i"></script>
+<script src="store.js?v=20261124a"></script>
+<script src="phase.js?v=20261124a"></script>
 <script>
 (function(){
 const PH=()=>window.JJJPHASE?JJJPHASE():0;
@@ -84,7 +86,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
   const blob=new Blob(['﻿'+rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n')],{type:'text/csv'});const u=URL.createObjectURL(blob);const l=document.createElement('a');l.href=u;l.download='保養紀錄_示意.csv';l.click();setTimeout(()=>URL.revokeObjectURL(u),1000);toast('已匯出（示意資料）');return}
  toast({merge:'已合併成一次到府，生活顧問會聯絡您確認時段（示意）',book:'已預約休館時段（示意）',fix:'已送出報修，並帶入家電檔案（示意）',later:'稍後提醒'}[a]);
 });
-addEventListener('storage',e=>{if(e.key==='jjj_phase')render()});
+addEventListener('jjjphase',()=>render());
 render();
 })();
 </script>

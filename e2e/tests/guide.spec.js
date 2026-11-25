@@ -61,7 +61,7 @@ test('導覽全部步驟跨 App 與企業管理端走完：每步編號框都找
     if (has('act')) {
       await page.click('#jg [data-t="act"]');
       await expect.poll(async () => { const s = await panel(page); return !s || (!s.busy && (s.h !== st.h || !s.btns.includes('act'))); }, { timeout: 20_000 }).toBeTruthy();
-      if (st.h === '請生活顧問報價') S.handoff = await page.evaluate(() => JSON.parse(localStorage.getItem('jjj_v5_handoff') || '[]'));
+      if (st.h === '請生活顧問報價') { await page.waitForTimeout(400); S.handoff = await page.evaluate(async () => (await (await fetch('/api/home/handoffs')).json()).handoffs || []); }
       if (st.h.includes('現場不符就回報')) S.diff = await snap(page);
       if (st.h === '長輩逐區驗收') S.accept = await snap(page);
       if (st.h.includes('後關心｜揪居家')) S.book = await snap(page);

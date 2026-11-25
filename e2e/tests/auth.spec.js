@@ -107,9 +107,13 @@ test.describe('生活顧問：手機版與電腦版分工', () => {
   });
   test('把手機轉給長輩：顯示電腦版整合好的正式版本，按「同意這一版」', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
-    await page.evaluate(() => localStorage.setItem('jjj_v5_quotes', JSON.stringify({ 3: [{ v: 2, at: '10/27', total: 9900, items: ['示範'] }, { v: 1, at: '10/26', total: 9100, items: ['示範'] }] })));
     await page.click('[data-demo="advisor@example.com"]');
     await expect(page.locator('#view')).toContainText('生活顧問・今天');
+    // 正式報價存在資料庫（quotes 表），由電腦版送出；這裡用 API 先送兩個版本
+    await page.evaluate(async () => {
+      const post = b => fetch('/api/advisor/quotes/3', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' }, body: JSON.stringify(b) });
+      await post({ at: '10/26', total: 9100, items: ['示範'] }); await post({ at: '10/27', total: 9900, items: ['示範'] });
+    });
     await page.locator('#view [data-board="3"]').first().click();
     await page.waitForTimeout(1500);
     await page.evaluate(() => JJJ.go('aec'));
