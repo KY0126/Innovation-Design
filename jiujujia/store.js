@@ -53,6 +53,12 @@ CREATE TABLE IF NOT EXISTS family_handoffs (
   by_id INTEGER,
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
+CREATE TABLE IF NOT EXISTS assessment_drafts (
+  household_id INTEGER PRIMARY KEY,
+  data TEXT NOT NULL DEFAULT '{}',
+  updated_by INTEGER,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
 CREATE TABLE IF NOT EXISTS acceptance_results (
   booking_code TEXT PRIMARY KEY,
   first_pass INTEGER NOT NULL,
@@ -67,7 +73,7 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
     return ready;
   }
   // 其他分頁改了資料庫時，backend.js 會整個換掉資料庫；每次處理前確認這幾張表都在
-  function ensure() { if (!one0("SELECT 1 AS x FROM sqlite_master WHERE type='table' AND name='acceptance_results'")) W().exec(SCHEMA); }
+  function ensure() { if (!one0("SELECT 1 AS x FROM sqlite_master WHERE type='table' AND name='assessment_drafts'")) W().exec(SCHEMA); }
   function one0(sql) { try { return W().prepare(sql).get(); } catch (e) { return null; } }
   function all(sql, args = []) { return W().prepare(sql).all(...args); }
   function one(sql, args = []) { return W().prepare(sql).get(...args); }
@@ -149,6 +155,9 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
     ['GET', /^\/api\/advisor\/choices\/(\d+)$/, 'staff', (u, m) => { const r = one('SELECT state FROM family_choices WHERE household_id=?', [+m[1]]); return J({ state: r ? parse(r.state) : null }); }],
     ['GET', /^\/api\/advisor\/handoffs$/, 'staff', () => J({ handoffs: all('SELECT household_id AS hid,items,at FROM family_handoffs ORDER BY id DESC LIMIT 20').map(h => ({ ...h, items: parse(h.items) || [] })) })],
     ['GET', /^\/api\/advisor\/drafts$/, 'staff', (u) => J({ drafts: all("SELECT p.household_id AS hid, h.elder_name, p.created_at FROM plans p JOIN households h ON h.id=p.household_id WHERE p.advisor_id=? AND p.status='待確認' ORDER BY p.id DESC", [u.id]) })],
+    ['GET', /^\/api\/home\/assessment-draft$/, 'family', async (u) => { const hid = await myHousehold(u); const r = hid && one('SELECT data,updated_at FROM assessment_drafts WHERE household_id=?', [hid]); return J({ draft: r ? parse(r.data) : null, at: r ? r.updated_at : null }); }],
+    ['PUT', /^\/api\/home\/assessment-draft$/, 'family', async (u, m, b) => { const hid = await myHousehold(u); if (!hid) return ERR('找不到家庭', 404); run("INSERT OR REPLACE INTO assessment_drafts(household_id,data,updated_by,updated_at) VALUES(?,?,?,datetime('now','localtime'))", [hid, JSON.stringify(b.draft || {}), u.id]); persist(); return J({ ok: true }); }],
+    ['DELETE', /^\/api\/home\/assessment-draft$/, 'family', async (u) => { const hid = await myHousehold(u); if (hid) { run('DELETE FROM assessment_drafts WHERE household_id=?', [hid]); persist(); } return J({ ok: true }); }],
     ['POST', /^\/api\/tech\/acceptance-result$/, 'tech', (u, m, b) => { run('INSERT OR REPLACE INTO acceptance_results(booking_code,first_pass,by_id) VALUES(?,?,?)', [String(b.code || ''), b.first_pass ? 1 : 0, u.id]); persist(); return J({ ok: true }); }],
   ];
 
