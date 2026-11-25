@@ -40,6 +40,7 @@
         ${row('x30', '長輩關懷 2.0', '家裡現有的家電也能接入', 1)}
         ${row('x31', '揪夜安進階影像版', '長輩本人同意才裝，預設仍不裝鏡頭', 1)}
         ${row('x32', '揪食光：節氣食譜', '合作主廚食譜與節氣共煮', 1)}
+        ${row('u3', '校園大使短影音任務', '拍攝前確認長輩同意、不露臉、不拍地址', 1)}
       </div>
       <div class="ly"><h3>延伸期｜新家庭也能用</h3></div>
       <div class="card" style="padding:4px 14px">
@@ -135,6 +136,23 @@
       <div class="card"><b>Digital City 節氣共煮</b><div class="rs" style="line-height:1.8;margin-top:4px">12/21（日）14:00｜Digital City 高雄民族店（示意）<br>主廚示範、生活顧問接待，可帶長輩一起來</div>
       <div style="margin-top:8px">${act(1, '報名', 'data-req="節氣共煮報名"')}</div></div>`),
 
+    // U3 校園大使：短影音任務（擴展期）
+    u3: () => {
+      const c = L.s.u3 || (L.s.u3 = {}), st = L.s.u3st || '';
+      const items = [['a', '長輩本人同意拍攝（家人在場確認）'], ['b', '不拍長輩的臉，只拍設備與動線'], ['c', '不拍地址、門牌與窗外街景'], ['d', '不進臥室與浴室內部拍攝']];
+      const all = items.every(([k]) => c[k]);
+      const flow = [['拍攝', '60 秒以內，主題擇一'], ['送審', '生活顧問與總部審核隱私與用語'], ['上架', '審核通過後由全國電子官方社群發布'], ['獎勵', '每月任務津貼＋團隊點數，不抽成、不做個人排名']];
+      return page('校園大使｜短影音任務', `${bar(1)}
+      <div class="card"><b>文藻外語大學 × Digital City 高雄民族店（規劃洽談，畫面示意）</b><div class="rs" style="margin-top:4px">把居家觀察學到的事，拍成 60 秒短影音，讓更多家人知道長輩夜裡怎麼走才安全。</div></div>
+      <div class="card"><b>本月主題（擇一）</b>
+        ${[['t1', '夜裡起床的那 5 步：臥室到浴室怎麼亮'], ['t2', '門檻 2 公分也會絆倒：三種不鑽孔的改法'], ['t3', '節氣共煮花絮：主廚示範、顧問接待']].map(([k, t]) => `<button class="row" data-u3t="${k}" style="width:100%" aria-pressed="${L.s.u3t === k}"><span>${L.s.u3t === k ? '◉' : '○'} ${t}</span></button>`).join('')}</div>
+      <div class="card"><b>拍攝前確認（四項都要勾）</b>
+        ${items.map(([k, t]) => `<button class="row" data-u3="${k}" style="width:100%" aria-pressed="${!!c[k]}"><span>${c[k] ? '☑' : '☐'} ${t}</span></button>`).join('')}</div>
+      <div class="card"><b>任務流程</b>${flow.map(([n, d], i) => `<div style="display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="flex:none;width:44px;color:#C42D5A">${i + 1} ${n}</b><span class="rs">${d}</span></div>`).join('')}</div>
+      ${st ? `<div class="card" style="background:var(--ok-soft)"><b>已送審</b><div class="rs">生活顧問與總部審核後通知你；審核不通過會說明要修改哪裡。</div></div>` : ''}
+      <div class="pad">${!open(1) ? '<button class="btn ghost" disabled style="opacity:.6">擴展期開放後即可上傳</button>' : st ? '<button class="btn ghost" disabled style="opacity:.6">已送審，等待審核</button>' : (all && L.s.u3t) ? '<button class="btn" data-u3send="1">上傳影片並送審（示意）</button>' : '<button class="btn ghost" disabled style="opacity:.6">選好主題、四項都確認後才能上傳</button>'}</div>`);
+    },
+
     // F33 新家與老宅翻修
     x33: () => {
       const t = L.s.f33 || 'old';
@@ -174,6 +192,9 @@
         const h = ctx || {}, old = h.years != null && h.years >= 8;
         return `<div class="card" style="padding:4px 14px">${row('x27', old ? `已用 ${h.years} 年：看換新建議` : '家電換新建議', '先保養延壽，效能不足才換新；可選以租代買', 1)}</div>`;
       }
+      if (where === 'obsR') { // U2 → U3：校園大使下一個任務
+        return `<button class="btn ghost" data-go="u3">下一個任務：60 秒短影音${open(1) ? '' : '（擴展期開放）'}</button>`;
+      }
       if (where === 'a1') { // 生活顧問手機版：依目前階段提醒可提案的方案
         const p = ph();
         const t = ['試點期｜只提案揪夜安（基本 299／安心 449）；其他場域可幫家人登記', '擴展期｜可加購揪食光 +200、揪團聚 +150、揪清爽 +100，四場域改揪全家 699；可提以租代買', '延伸期｜另可接新家與老宅翻修、育兒與寵物家庭'][p];
@@ -185,13 +206,16 @@
 
   // 本模組的點擊事件（在原 App 的事件處理之前攔截自己的屬性）
   document.addEventListener('click', e => {
-    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34]');
+    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send]');
     if (!t || t.disabled) return;
     e.stopPropagation();
     const d = t.dataset;
     if (d.x24) { if (!open(1)) return; const s = L.s.f24; s[d.x24] = !s[d.x24]; }
     else if (d.x29) { if (!open(1)) return; const s = L.s.f29; s[d.x29] = !s[d.x29]; }
     else if (d.x31) { const s = L.s.f31; s[d.x31] = !s[d.x31]; }
+    else if (d.u3) { const s = L.s.u3; s[d.u3] = !s[d.u3]; }
+    else if (d.u3t) L.s.u3t = d.u3t;
+    else if (d.u3send) { L.s.u3st = 'sent'; toast('已送審（示意）：生活顧問與總部審核後通知你'); }
     else if (d.term) L.s.term = +d.term;
     else if (d.f33) L.s.f33 = d.f33;
     else if (d.f34) L.s.f34 = d.f34;
