@@ -18,7 +18,9 @@
 
   V.arm = () => {
     const a = A(), f = FIELDS.find(x => x[0] === a.k);
-    const top = `<div class="top"><button class="back" data-a="back" aria-label="返回上一頁">‹ 返回</button><h1>手機實測</h1><span class="tsp"></span></div>`;
+    const bar = `<div class="top"><button class="back" data-a="back" aria-label="返回上一頁">‹ 返回</button><h1>量測尺寸</h1><span class="tsp"></span></div>`;
+    // 選項目與結果頁放「AR 量測｜手動輸入」切換；拍照點點時專心點，不放切換
+    const top = a.step === 'pick' || a.step === 'done' ? bar + J.measSeg('ar') : bar;
     if (a.step === 'pick') return `${top}<div class="scroll" style="padding-top:12px">
       <div class="sec">要量哪一項？</div><div class="glist">${FIELDS.map(([k, l, u, xrFit]) => `<button class="gi" data-armk="${k}" aria-pressed="${a.k === k}"><span><b>${a.k === k ? '◉' : '○'} ${l}</b><span class="muted" style="display:block;font-size:.88em">${xrFit ? 'AR 或照片都能量' : '建議用照片：卡片貼著門檻放'}${S.meas[k] != null ? `｜目前 ${esc(S.meas[k])} ${u}` : ''}</span></span></button>`).join('')}</div>
       <div class="sec">量測方式</div>
@@ -38,12 +40,13 @@
     const v = fmtVal(a.k, a.val);
     return `${top}<div class="scroll" style="padding-top:16px"><div class="card" style="text-align:center;padding:24px 16px"><div class="muted">${esc(f[1])}</div><div style="font-size:2.2em;font-weight:700;margin:6px 0">約 ${v} ${f[2]}</div>
       <div class="rs">${a.mode === 'xr' ? 'AR 實測｜約 ±1～3 cm｜不拍照、不存影像，只存這個數字' : '照片比例尺｜約 ±3–5 cm，僅供參考；門市到府會再複量'}</div></div>
-      ${img && a.mode === 'photo' ? '<div class="armw" style="height:auto"><canvas id="armC"></canvas></div>' : ''}
-      <div class="pad"><button class="btn" data-aruse="1">使用這個數字</button><button class="btn ghost" data-arback="pick">重新量</button></div></div>`;
+      <div class="pad"><button class="btn" data-aruse="1">使用這個數字</button><button class="btn ghost" data-arback="pick">重新量</button><button class="btn ghost" data-arman="1">改用手動輸入</button><div class="muted" style="font-size:.85em;text-align:center;margin-top:6px">不滿意可改用手動輸入：剛量到的數字會先填好，直接改成捲尺量的數字</div></div>
+      ${img && a.mode === 'photo' ? '<div class="armw" style="height:auto"><canvas id="armC"></canvas></div>' : ''}</div>`;
   };
 
   // 畫面更新後：接上相機、重畫照片與標記；離開就關相機
   (window.JJJHOOKS || (window.JJJHOOKS = [])).push((v, view) => {
+    if (v === 'ar' && S.measFocus) { const el = view.querySelector('#m_' + S.measFocus); S.measFocus = null; if (el) { el.focus(); el.select && el.select(); el.scrollIntoView({ block: 'center' }); } }
     if (v !== 'arm') { stop(); return; }
     const a = A(), vd = view.querySelector('#armV'); if (vd && stream) vd.srcObject = stream;
     const c = view.querySelector('#armC'); if (c && img) draw(c, a);
@@ -155,7 +158,7 @@
 
   const view = document.getElementById('view');
   view.addEventListener('click', e => {
-    const t = e.target.closest('[data-armk],[data-arstart],[data-arshot],[data-arback],[data-arundo],[data-aruse],[data-artap]'); if (!t) return; e.stopPropagation();
+    const t = e.target.closest('[data-armk],[data-arstart],[data-arshot],[data-arback],[data-arundo],[data-aruse],[data-artap],[data-arman]'); if (!t) return; e.stopPropagation();
     const a = A(), d = t.dataset;
     if (d.armk) { a.k = d.armk; render(); }
     else if (d.arstart === 'xr') startXR();
@@ -164,6 +167,14 @@
     else if (d.arback) { stop(); a.step = d.arback; a.pts = []; a.card = null; a.tgt = null; render(); }
     else if (d.arundo) { a.pts = []; render(); }
     else if (d.artap) tap(e, t);
+    else if (d.arman) {
+      // 切到手動輸入；從結果頁來的，先把剛量到的數字填進去，游標停在那一格
+      stop(); let msg = '';
+      if (a.step === 'done' && a.val != null) { const v = fmtVal(a.k, a.val); S.meas[a.k] = String(v); S.measSrc = Object.assign({}, S.measSrc, { [a.k]: a.mode }); S.measFocus = a.k; msg = '已先填入 ' + v + ' ' + unit(a.k) + '，可直接修改'; }
+      S.armode = 'manual'; a.step = 'pick'; img = null;
+      const i = J.S.stack.lastIndexOf('ar'); if (i >= 0) J.S.stack = J.S.stack.slice(0, i + 1); else J.S.stack.pop();
+      render(); if (msg) toast(msg);
+    }
     else if (d.aruse) {
       const v = fmtVal(a.k, a.val);
       S.meas[a.k] = String(v); S.measSrc = Object.assign({}, S.measSrc, { [a.k]: a.mode }); S.armode = 'manual';

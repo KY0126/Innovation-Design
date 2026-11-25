@@ -87,3 +87,30 @@ test('Android AR（模擬 WebXR）：準心、起點、虛線與即時距離，�
   await expect(page.locator('#view')).toContainText('約 90 cm');
   await expect(page.locator('#view')).toContainText('不存影像');
 });
+
+test('量測頁共用「AR 量測｜手動輸入」：量完不滿意改用手動輸入，數字先填好，改了標成手動', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const errs = await fresh(page);
+  await toArm(page);
+  await expect(page.locator('.armode [aria-pressed="true"]')).toHaveText('AR 量測');
+  await page.click('[data-arstart="cam"]');
+  await page.waitForFunction(() => { const v = document.getElementById('armV'); return v && v.videoWidth > 0; });
+  await page.click('[data-arshot]');
+  const [w] = await page.locator('#armC').evaluate(el => [el.width]);
+  await tapPx(page, w * 0.1, 100); await tapPx(page, w * 0.2, 100);
+  await tapPx(page, w * 0.05, 200); await tapPx(page, w * 0.95, 200);
+  await expect(page.locator('#view')).toContainText('約 77 cm');
+  await page.click('[data-arman]');
+  await expect(page.locator('.armode [aria-pressed="true"]')).toHaveText('手動輸入');
+  await expect(page.locator('#m_corridor_cm')).toHaveValue('77');
+  await expect(page.locator('#m_corridor_cm')).toBeFocused();
+  await page.fill('#m_corridor_cm', '80');
+  await expect(page.locator('#m_corridor_cm').locator('xpath=ancestor::label').locator('.tag')).toHaveText('手動');
+  // 從手動輸入切回 AR 量測
+  await page.click('.armode [data-go="arm"]');
+  await expect(page.locator('#view')).toContainText('要量哪一項');
+  await page.click('.armode [data-arman]');
+  await expect(page.locator('#m_corridor_cm')).toHaveValue('80');
+  expect(errs).toEqual([]);
+});
