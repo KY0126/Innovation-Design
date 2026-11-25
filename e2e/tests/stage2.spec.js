@@ -90,7 +90,7 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   // F01／F02 → 揪居家主頁（長輩家）有其他場域入口；切到我家有育兒與寵物
   await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
   await expect(page.locator('#view')).toContainText('揪居家接下來會開放');
-  await expect(page.locator('#view [data-go="x24"]')).toBeVisible();
+  await expect(page.locator('#view [data-go="x24"]').first()).toBeVisible();
   await page.click('[data-home="mine"]'); await page.waitForTimeout(300);
   await expect(page.locator('#view [data-go="x34"]')).toBeVisible();
   // F15 家電健康卡 → F27

@@ -16,7 +16,7 @@
   const act = (n, label, attr) => open(n)
     ? `<button class="btn" ${attr}>${label}</button>`
     : `<button class="btn ghost" disabled style="opacity:.6">${need(n)}開放後即可${label.replace(/^./, c => c)}</button>`;
-  const light = c => `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${{ r: '#C42D5A', y: '#E0A030', g: '#3E9B6B' }[c]};margin-right:6px;vertical-align:-1px"></span>`;
+  const light = c => `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${{ r: '#D4003C', y: '#E0A030', g: '#3E9B6B' }[c]};margin-right:6px;vertical-align:-1px"></span>`;
   const row = (go2, t, d, n) => `<button class="row" data-go="${go2}" style="width:100%"><span>${t}${n !== undefined ? ` <span class="${open(n) ? 'tag ok' : 'rtag'}" style="font-size:.75em">${need(n)}</span>` : ''}<span class="muted" style="display:block;font-size:.85em">${d}</span></span><span class="chev">›</span></button>`;
   const page = (t, body) => `${hdr(t)}<div class="scroll" style="padding-top:12px">${body}</div>`;
 
@@ -41,24 +41,24 @@
       const H = J.HPV, FT = J.HPJ.FT;
       Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
         const P = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(([x, z]) => J.hpp(x + .05, FT + .02, z + .05).map(v => v.toFixed(0)).join(',')).join(' ');
-        g += `<polygon points="${P}" fill="${on(k) ? 'rgba(196,45,90,.22)' : 'rgba(120,120,120,.12)'}" stroke="${on(k) ? '#C42D5A' : '#8C9096'}" stroke-width="${on(k) ? 5 : 3}" ${on(k) ? '' : 'stroke-dasharray="10 8"'}/>`;
+        g += `<polygon points="${P}" fill="${on(k) ? 'rgba(196,45,90,.22)' : 'rgba(120,120,120,.12)'}" stroke="${on(k) ? '#D4003C' : '#8C9096'}" stroke-width="${on(k) ? 5 : 3}" ${on(k) ? '' : 'stroke-dasharray="10 8"'}/>`;
       });
       g += J.hpPath();
       Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
         const [px, py] = J.hpp((x0 + x1) / 2, FT + .5, (z0 + z1) / 2), f = FIELDS.find(F => F[0] === ZN[k][1]);
-        g += `<text x="${px.toFixed(0)}" y="${py.toFixed(0)}" font-size="30" font-weight="700" text-anchor="middle" fill="${on(k) ? '#8E1E42' : '#5E6168'}" stroke="#fff" stroke-width="8" paint-order="stroke">${ZN[k][0]}${on(k) ? '' : '｜' + f[1]}</text>`;
+        g += `<text x="${px.toFixed(0)}" y="${py.toFixed(0)}" font-size="30" font-weight="700" text-anchor="middle" fill="${on(k) ? '#A3002E' : '#5E6168'}" stroke="#fff" stroke-width="8" paint-order="stroke">${ZN[k][0]}${on(k) ? '' : '｜' + f[1]}</text>`;
       });
       return `<div class="card zmap">${tabs}<div style="position:relative;border-radius:10px;overflow:hidden;background:#F6F3EE"><img src="home/plan.jpg" alt="林媽媽家 3D 居家模型：四個場域的範圍" style="display:block;width:100%"><svg viewBox="${H.join(' ')}" style="position:absolute;inset:0;width:100%;height:100%">${g}</svg></div>
-        <div class="rs" style="margin-top:6px"><span style="color:#C42D5A">■</span> 揪夜安（試點期可訂）：臥室、走道、浴室、玄關<br><span style="color:#8C9096">▢</span> ${ex ? '擴展期已開放' : '擴展期'}：揪食光、揪團聚、揪清爽</div></div>`;
+        <div class="rs" style="margin-top:6px"><span style="color:#D4003C">■</span> 揪夜安（試點期可訂）：臥室、走道、浴室、玄關<br><span style="color:#8C9096">▢</span> ${ex ? '擴展期已開放' : '擴展期'}：揪食光、揪團聚、揪清爽</div></div>`;
     }
     const S = 30, X = x => (x * S + 10).toFixed(0), Z = z => (z * S + 10).toFixed(0);
     Object.entries(HPR).forEach(([k, [x0, z0, x1, z1]]) => {
-      g += `<rect x="${X(x0)}" y="${Z(z0)}" width="${((x1 - x0) * S).toFixed(0)}" height="${((z1 - z0) * S).toFixed(0)}" fill="${on(k) ? '#FBEAF0' : '#F3F3F3'}" stroke="${on(k) ? '#C42D5A' : '#9A9A9A'}" stroke-width="${on(k) ? 2 : 1.2}" ${on(k) ? '' : 'stroke-dasharray="5 4"'}/>`;
+      g += `<rect x="${X(x0)}" y="${Z(z0)}" width="${((x1 - x0) * S).toFixed(0)}" height="${((z1 - z0) * S).toFixed(0)}" fill="${on(k) ? '#FBEAF0' : '#F3F3F3'}" stroke="${on(k) ? '#D4003C' : '#9A9A9A'}" stroke-width="${on(k) ? 2 : 1.2}" ${on(k) ? '' : 'stroke-dasharray="5 4"'}/>`;
       const [lx, lz] = LBL2[k] || [(x0 + x1) / 2, z0 + .5];
-      g += `<text x="${X(lx)}" y="${Z(lz)}" font-size="11" text-anchor="middle" fill="${on(k) ? '#8E1E42' : '#666'}">${ZN[k][0]}</text>`;
+      g += `<text x="${X(lx)}" y="${Z(lz)}" font-size="11" text-anchor="middle" fill="${on(k) ? '#A3002E' : '#666'}">${ZN[k][0]}</text>`;
     });
-    g += `<polyline points="${NPATH.map(([x, z]) => X(x) + ',' + Z(z)).join(' ')}" fill="none" stroke="#C42D5A" stroke-width="2" stroke-dasharray="4 3"/>`;
-    DEV2.forEach(([c, x, z]) => { g += `<g transform="translate(${X(x)},${Z(z)})"><circle r="9" fill="#C42D5A" stroke="#fff" stroke-width="2"/><text y="4" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">${c}</text></g>`; });
+    g += `<polyline points="${NPATH.map(([x, z]) => X(x) + ',' + Z(z)).join(' ')}" fill="none" stroke="#D4003C" stroke-width="2" stroke-dasharray="4 3"/>`;
+    DEV2.forEach(([c, x, z]) => { g += `<g transform="translate(${X(x)},${Z(z)})"><circle r="9" fill="#D4003C" stroke="#fff" stroke-width="2"/><text y="4" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">${c}</text></g>`; });
     return `<div class="card zmap">${tabs}<svg viewBox="0 0 290 290" style="width:100%;display:block;background:#fff" role="img" aria-label="林媽媽家 2D 平面圖：揪夜安設備位置與夜間路線">${g}</svg>
       <div class="rs" style="margin-top:6px">夜＝感應夜燈　檻＝門檻提示燈條　感＝門窗感測器　鈕＝緊急按鈕；虛線是床邊到浴室的夜間路線</div>
       <div class="muted" style="font-size:.8em;margin-top:4px">依 3D 模型座標推出的示意圖，不是丈量施工圖；正式版由 AR 掃描（場勘）產生，生活顧問用來整合報價、技師當施工圖底圖。</div></div>`;
@@ -96,7 +96,7 @@
       ${zoneMap()}
       <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 掃描與家電檔案，只補掃新空間。月費依風險分級。</div></div>
       ${FIELDS.map(([k, n, w, p, d]) => k === 'night'
-        ? `<div class="card" style="border-left:5px solid #C42D5A"><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
+        ? `<div class="card" ><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
         : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div></button>`).join('')}
       <div class="card"><div style="display:flex;justify-content:space-between"><span>每月合計</span><b>NT$ ${sum.toLocaleString('en-US')}</b></div>
       ${all ? `<div style="margin-top:8px;padding:8px 10px;background:#FBF3F3;border-radius:8px;font-size:.9em">四個場域都要了，改用<b>揪全家 699 元</b>每月可省 ${sum - 699} 元。</div><button class="btn" data-go="x26" style="margin-top:8px">改看揪全家</button>`
@@ -114,12 +114,12 @@
 
     // F26 揪全家
     x26: () => page('揪全家｜全屋方案', `${bar(1)}
-      <div class="card" style="border-left:5px solid #C42D5A"><b style="font-size:1.1em">揪全家　每月 NT$ 699</b>
+      <div class="card" ><b style="font-size:1.1em">揪全家　每月 NT$ 699</b>
       <div class="rs" style="line-height:1.8;margin-top:6px">・四個場域一起顧：臥室到浴室、廚房、客廳、洗衣陽台<br>・安心等級服務：生活顧問每月關心、年度健檢<br>・首年設定費減免</div></div>
       <div class="card"><b>和分開訂購比較</b>
       ${[['揪夜安｜安心方案', 449], ['揪食光', 200], ['揪團聚', 150], ['揪清爽', 100]].map(([n, p]) => `<div style="display:flex;justify-content:space-between;padding:4px 0"><span class="muted">${n}</span><span>${p} 元</span></div>`).join('')}
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line,#eee)"><span>分開訂合計</span><s>899 元</s></div>
-      <div style="display:flex;justify-content:space-between"><b>改用揪全家</b><b style="color:#C42D5A">699 元｜每月省 200 元（約兩成）</b></div></div>
+      <div style="display:flex;justify-content:space-between"><b>改用揪全家</b><b style="color:#D4003C">699 元｜每月省 200 元（約兩成）</b></div></div>
       <div class="pad">${act(1, '請生活顧問正式報價', 'data-req="揪全家正式報價"')}</div>`),
 
     // F27 家電換新建議
@@ -186,7 +186,7 @@
         ${[['t1', '夜裡起床的那 5 步：臥室到浴室怎麼亮'], ['t2', '門檻 2 公分也會絆倒：三種不鑽孔的改法'], ['t3', '節氣共煮花絮：主廚示範、顧問接待']].map(([k, t]) => `<button class="row" data-u3t="${k}" style="width:100%" aria-pressed="${L.s.u3t === k}"><span>${L.s.u3t === k ? '◉' : '○'} ${t}</span></button>`).join('')}</div>
       <div class="card"><b>拍攝前確認（四項都要勾）</b>
         ${items.map(([k, t]) => `<button class="row" data-u3="${k}" style="width:100%" aria-pressed="${!!c[k]}"><span>${c[k] ? '☑' : '☐'} ${t}</span></button>`).join('')}</div>
-      <div class="card"><b>任務流程</b>${flow.map(([n, d], i) => `<div style="display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="flex:none;width:44px;color:#C42D5A">${i + 1} ${n}</b><span class="rs">${d}</span></div>`).join('')}</div>
+      <div class="card"><b>任務流程</b>${flow.map(([n, d], i) => `<div style="display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="flex:none;width:44px;color:#D4003C">${i + 1} ${n}</b><span class="rs">${d}</span></div>`).join('')}</div>
       ${st ? `<div class="card" style="background:var(--ok-soft)"><b>已送審</b><div class="rs">生活顧問與總部審核後通知你；審核不通過會說明要修改哪裡。</div></div>` : ''}
       <div class="pad">${!open(1) ? '<button class="btn ghost" disabled style="opacity:.6">擴展期開放後即可上傳</button>' : st ? '<button class="btn ghost" disabled style="opacity:.6">已送審，等待審核</button>' : (all && L.s.u3t) ? '<button class="btn" data-u3send="1">上傳影片並送審（示意）</button>' : '<button class="btn ghost" disabled style="opacity:.6">選好主題、四項都確認後才能上傳</button>'}</div>`);
     },
@@ -209,7 +209,7 @@
       return page('育兒與寵物模式', `${bar(2)}
       <div class="seg" role="group" aria-label="模式" style="margin:0 12px 10px"><button data-f34="baby" aria-pressed="${t === 'baby'}">育兒</button><button data-f34="pet" aria-pressed="${t === 'pet'}">寵物</button></div>
       ${t === 'baby'
-        ? `<div class="card"><b>嬰兒房</b><div style="display:flex;justify-content:space-between;margin-top:6px"><span>溫度／濕度</span><b>24°C／72%</b></div><div class="rs" style="color:#C42D5A">濕度偏高（建議 50–60%）</div><button class="btn" data-x34="dry" style="margin-top:8px">一鍵開除濕機</button></div>
+        ? `<div class="card"><b>嬰兒房</b><div style="display:flex;justify-content:space-between;margin-top:6px"><span>溫度／濕度</span><b>24°C／72%</b></div><div class="rs" style="color:#D4003C">濕度偏高（建議 50–60%）</div><button class="btn" data-x34="dry" style="margin-top:8px">一鍵開除濕機</button></div>
            <div class="card"><div class="rs">夜間餵奶沿用揪夜安的感應夜燈，起身就亮、不吵醒寶寶。</div></div>`
         : `<div class="card"><b>出門模式</b><div class="rs" style="line-height:1.8;margin-top:4px">出門後維持冷氣與除濕；室溫過高、門窗沒關好會提醒。</div><button class="btn" data-x34="away" style="margin-top:8px">開啟出門模式</button></div>
            <div class="card"><div class="rs">預設不裝鏡頭。</div></div>`}`);
@@ -221,7 +221,7 @@
     entry(where, ctx) {
       if (where === 'm2') {
         const mine = !ctx; // ctx = 是否在「長輩家」分頁
-        return `<div class="card" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FBF3F3,#fff)">${window.JJJS2.logo(52)}<div><b style="color:#8E1E42">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，<br>最後揪大家一起想</div></div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
+        return `<div class="card" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FBF3F3,#fff)">${window.JJJS2.logo(52)}<div><b style="color:#A3002E">揪居家，讓家更有電</b><div class="rs" style="font-size:.82em">先揪懂一個家，再揪順每次服務，<br>最後揪大家一起想</div></div></div><div class="card" style="padding:4px 14px"><div class="muted" style="font-size:.85em;padding:8px 0 2px">揪居家接下來會開放</div>
           ${mine ? row('x34', '育兒與寵物模式', '嬰兒房溫濕度、寵物出門模式', 2) : row('x24', '其他場域方案', '揪食光、揪團聚、揪清爽、揪全家', 1)}
           ${row('x33', '新家與老宅翻修', 'AR 配置全屋家電，一次規劃到位', 2)}
           ${row('x0', '看全部擴展期與延伸期功能', `目前營運階段：${PHASES[ph()]}`)}</div>`;
@@ -270,7 +270,7 @@
       const fld = (k, label, ph2) => `<label class="muted" style="display:block;margin-bottom:8px">${label}<input class="fld" data-wf="${k}" value="${esc(f[k] || '')}" placeholder="${ph2}" style="margin-top:4px"></label>`;
       const th = THEMES.find(x => x.id === f.theme), hasB = Object.keys(bld()).length;
       return page('許一個揪心願', `
-      ${th ? `<div class="card" style="border-left:4px solid #C42D5A"><div class="muted" style="font-size:.85em">全國出題｜${th.by}</div><b>${th.n}</b><div class="rs">獎勵：${th.rw}</div></div>` : ''}
+      ${th ? `<div class="card" ><div class="muted" style="font-size:.85em">全國出題｜${th.by}</div><b>${th.n}</b><div class="rs">獎勵：${th.rw}</div></div>` : ''}
       <div class="card" style="background:var(--note)"><b>官方寫作模板</b><div class="rs">照著填，生活顧問與總部就能看懂、比對與審查。內容只有門市與總部看得到，心願牆只顯示整理過的主題。</div></div>
       <div class="card">
         <div class="muted">誰遇到</div><div>${['長輩', '孫輩', '我自己', '其他家人'].map(v => chip('data-wwho', v, f.who === v)).join('')}</div>
@@ -283,8 +283,8 @@
         <div class="muted">希望價格帶</div><div>${W_PRICE.map(v => chip('data-wprice', v, f.price === v)).join('')}</div>
         <div class="muted" style="font-size:.85em">照片（選填）：只拍空間，不拍人、不拍地址與門牌</div>
       </div>
-      ${warn.length ? `<div class="card" style="border-left:4px solid #C42D5A"><b>全國電子 AI 顧問阿國提醒</b><div class="rs">內容可能違反「${warn.join('、')}」，請修改後再送出。</div></div>` : ''}
-      ${sim.length ? `<div class="card" style="border-left:4px solid #E0A030"><b>全國電子 AI 顧問阿國：找到相似心願</b><div class="rs" style="margin-bottom:6px">直接去按「我也需要」，比重新提案更快達到門檻。</div>${sim.map(t => `<button class="row" data-go="wall" style="width:100%"><span>${esc(t.n)}</span><span class="chev">去共鳴 ›</span></button>`).join('')}</div>` : ''}
+      ${warn.length ? `<div class="card" ><b>全國電子 AI 顧問阿國提醒</b><div class="rs">內容可能違反「${warn.join('、')}」，請修改後再送出。</div></div>` : ''}
+      ${sim.length ? `<div class="card" ><b>全國電子 AI 顧問阿國：找到相似心願</b><div class="rs" style="margin-bottom:6px">直接去按「我也需要」，比重新提案更快達到門檻。</div>${sim.map(t => `<button class="row" data-go="wall" style="width:100%"><span>${esc(t.n)}</span><span class="chev">去共鳴 ›</span></button>`).join('')}</div>` : ''}
       ${pilotOther ? '<div class="card" style="background:var(--note)"><div class="rs">試點期只量產「臥室到浴室」的心願；這個場域的心願會累積起來，作為擴展期開放新場域的需求證據。</div></div>' : ''}
       <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><b>拼出預覽圖與做法卡</b><div class="rs">${hasB ? `已附 ${hasB} 個零件的做法卡` : '選填：在居家地圖上拼給大家看，更容易得到共鳴'}</div></div><button class="btn ghost" data-go="${hasB ? 'wcard' : 'wbuild'}" style="width:auto;margin:0">${hasB ? '查看' : '去拼'}</button></div></div>
       <textarea id="wishtxt" hidden></textarea>
@@ -337,8 +337,8 @@
     g += J.hpPath();
     SLOTS.forEach(([n, x, z], i) => {
       const [px, py] = J.hpp(x, J.HPJ.FT + .35, z), k = b[i];
-      if (k) g += `<g ${edit ? `data-bslot="${i}" style="cursor:pointer"` : ''} transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="17" fill="${ITEMS[k].tool ? '#E0A030' : '#C42D5A'}" stroke="#fff" stroke-width="4"/><text y="6" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">${ITEMS[k].c}</text></g>`;
-      else if (edit) g += `<g data-bslot="${i}" style="cursor:pointer" transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="15" fill="#fff" fill-opacity=".9" stroke="#C42D5A" stroke-width="3" stroke-dasharray="5 4"/><text y="7" font-size="19" text-anchor="middle" fill="#C42D5A">＋</text>${sel ? '' : `<text y="36" font-size="14" text-anchor="middle" fill="#3D3A40" stroke="#fff" stroke-width="5" paint-order="stroke">${n}</text>`}</g>`;
+      if (k) g += `<g ${edit ? `data-bslot="${i}" style="cursor:pointer"` : ''} transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="17" fill="${ITEMS[k].tool ? '#E0A030' : '#D4003C'}" stroke="#fff" stroke-width="4"/><text y="6" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">${ITEMS[k].c}</text></g>`;
+      else if (edit) g += `<g data-bslot="${i}" style="cursor:pointer" transform="translate(${px.toFixed(0)},${py.toFixed(0)})"><circle r="15" fill="#fff" fill-opacity=".9" stroke="#D4003C" stroke-width="3" stroke-dasharray="5 4"/><text y="7" font-size="19" text-anchor="middle" fill="#D4003C">＋</text>${sel ? '' : `<text y="36" font-size="14" text-anchor="middle" fill="#3D3A40" stroke="#fff" stroke-width="5" paint-order="stroke">${n}</text>`}</g>`;
     });
     // 放大到臥室、走道、浴室一帶，零件才不會擠在一起
     return `<div style="position:relative;aspect-ratio:1.2;overflow:hidden;border-radius:10px"><div class="hpw pm" style="position:absolute;width:165%;left:-52%;top:-10%"><img src="home/plan.jpg" alt="心願預覽圖：林媽媽家臥室到浴室"><svg viewBox="${H.join(' ')}">${g}</svg></div></div>`;
@@ -370,7 +370,7 @@
       <div class="card"><div style="display:flex;justify-content:space-between"><b>適用空間</b><span>臥室到浴室，走道約 3 公尺</span></div>
         <div style="display:flex;justify-content:space-between;margin-top:4px"><b>難度與時間</b><span>${tool ? '<span class="tag" style="background:#FBF0DC;color:#9A6A12">含需技師步驟</span>' : '<span class="tag ok">免工具</span>'}　約 ${mins} 分鐘</span></div></div>
       <div class="card"><b>零件清單</b>${Object.entries(cnt).map(([k, c]) => `<div class="row"><span>${ITEMS[k].n} ×${c}</span><span class="muted">約 ${(ITEMS[k].p * c).toLocaleString('en-US')} 元</span></div>`).join('')}<div class="row"><b>合計</b><b>約 ${sum.toLocaleString('en-US')} 元</b></div><div class="muted" style="font-size:.8em">價格為示意；門市或全國電子線上購物都買得到，商品不指名品牌。</div></div>
-      <div class="card"><b>步驟</b>${list.map((x, i) => `<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#C42D5A;flex:none">${i + 1}</b><span class="rs">${x.it.step(x.slot)}${x.it.tool ? ' <span class="tag" style="background:#FBF0DC;color:#9A6A12">需技師</span>' : ''}</span></div>`).join('')}<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#C42D5A">${list.length + 1}</b><span class="rs">關燈從床邊實走一次到浴室，太亮就調低</span></div></div>
+      <div class="card"><b>步驟</b>${list.map((x, i) => `<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#D4003C;flex:none">${i + 1}</b><span class="rs">${x.it.step(x.slot)}${x.it.tool ? ' <span class="tag" style="background:#FBF0DC;color:#9A6A12">需技師</span>' : ''}</span></div>`).join('')}<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--line,#eee)"><b style="color:#D4003C">${list.length + 1}</b><span class="rs">關燈從床邊實走一次到浴室，太亮就調低</span></div></div>
       <div class="card" style="background:var(--note)"><b>小撇步</b><div class="rs">夜燈不要直射眼睛；背膠款先擦乾淨牆面；鑽孔、配線與扶手一律請技師施工。</div></div>
       <div class="card"><div style="display:flex;gap:12px;align-items:center">${qr(list.length * 97 + sum)}<div><b>分享這張做法卡</b><div class="rs">全國電子 App 揪心願頁的短網址與 QR Code（示意），可經 LINE 官方帳號分享給家人。</div></div></div></div>
       <div class="pad">
@@ -391,7 +391,7 @@
         <label class="muted" style="display:block;margin-bottom:8px">改了什麼（必填）<input class="fld" data-rm="what" value="${esc(r.what || '')}" placeholder="例：把床邊夜燈換成床底燈條" style="margin-top:4px"></label>
         <label class="muted" style="display:block;margin-bottom:8px">為什麼（必填）<input class="fld" data-rm="why" value="${esc(r.why || '')}" placeholder="例：媽媽說光從下面來比較不刺眼" style="margin-top:4px"></label></div>
       <div class="card"><b>做完後的三個問題</b>${ask.map(([k, q]) => `<label class="muted" style="display:block;margin:8px 0">${q}<input class="fld" data-rm="${k}" value="${esc(r[k] || '')}" style="margin-top:4px"></label>`).join('')}</div>
-      <div class="card" style="border-left:4px solid #E0A030"><b>全國電子 AI 顧問阿國：換個角度想想</b><div style="margin-top:6px">${ang.map(([n, q]) => `<button class="slot" style="margin:0 6px 8px 0" data-rang="${esc(q)}">${n}</button>`).join('')}</div>${r.ang ? `<div class="rs">💡 ${esc(r.ang)}</div>` : ''}</div>
+      <div class="card" ><b>全國電子 AI 顧問阿國：換個角度想想</b><div style="margin-top:6px">${ang.map(([n, q]) => `<button class="slot" style="margin:0 6px 8px 0" data-rang="${esc(q)}">${n}</button>`).join('')}</div>${r.ang ? `<div class="rs">💡 ${esc(r.ang)}</div>` : ''}</div>
       <div class="pad"><button class="btn" data-wdo="3">送出衍生版（第 3 關）</button>
         <button class="btn ghost" data-wnew="1">把第 3 題變成新心願（往第 4 關）</button></div>`);
     },
@@ -401,8 +401,8 @@
       const LV = [['看懂', '看預覽圖與做法卡，按「我也需要」', 10], ['照著做', '照做法卡做出來，上傳完成照（只拍空間）', 50], ['我改了這樣做', '寫出改了什麼、為什麼，並回答三個問題', 100], ['長出新心願', '你的衍生版或新心願共鳴達 20 戶', 200], ['共同設計', '改良點被寫進量產規格', 0]];
       const rw = [['全國電子點數', 0], ['做法卡零件 9 折券', 0], ['Digital City 社區健檢日優先名額', 0], ['冷氣清洗搭居家打掃折扣', 1], ['節氣共煮優先名額', 1], ['以租代買首期優惠', 1]];
       return page('揪心願闖關', `
-      <div class="card" style="border-left:5px solid #C42D5A"><div style="display:flex;justify-content:space-between;align-items:center"><b>我的點數</b><b style="font-size:1.4em;color:#C42D5A">${P.total}</b></div><div class="rs">點數併入全國電子會員點數；完成照與衍生版經生活顧問檢核後入帳，每月有上限，不因分享或拉人給點。</div>${P.lv[4] ? '<div style="margin-top:6px"><span class="tag ok">🏅 心願設計師</span></div>' : ''}</div>
-      <div class="card"><b>五個關卡</b>${LV.map(([n, d, v], i) => `<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee);align-items:flex-start"><b style="flex:none;width:26px;height:26px;border-radius:50%;background:${P.lv[i + 1] ? '#C42D5A' : '#F2E6EA'};color:${P.lv[i + 1] ? '#fff' : '#C42D5A'};display:flex;align-items:center;justify-content:center">${P.lv[i + 1] ? '✓' : i + 1}</b><div style="flex:1"><b>${n}</b><div class="rs">${d}</div></div><span class="muted" style="font-size:.85em;white-space:nowrap">${v ? `+${v} 點` : '1% 購物金＋列名'}</span></div>`).join('')}</div>
+      <div class="card" ><div style="display:flex;justify-content:space-between;align-items:center"><b>我的點數</b><b style="font-size:1.4em;color:#D4003C">${P.total}</b></div><div class="rs">點數併入全國電子會員點數；完成照與衍生版經生活顧問檢核後入帳，每月有上限，不因分享或拉人給點。</div>${P.lv[4] ? '<div style="margin-top:6px"><span class="tag ok">🏅 心願設計師</span></div>' : ''}</div>
+      <div class="card"><b>五個關卡</b>${LV.map(([n, d, v], i) => `<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee);align-items:flex-start"><b style="flex:none;width:26px;height:26px;border-radius:50%;background:${P.lv[i + 1] ? '#D4003C' : '#F2E6EA'};color:${P.lv[i + 1] ? '#fff' : '#D4003C'};display:flex;align-items:center;justify-content:center">${P.lv[i + 1] ? '✓' : i + 1}</b><div style="flex:1"><b>${n}</b><div class="rs">${d}</div></div><span class="muted" style="font-size:.85em;white-space:nowrap">${v ? `+${v} 點` : '1% 購物金＋列名'}</span></div>`).join('')}</div>
       <div class="card"><b>可兌換的獎勵</b>${rw.map(([n, need]) => `<div class="row"><span>${n}</span>${p >= need ? '<span class="tag ok">可兌換</span>' : '<span class="rtag">擴展期開放</span>'}</div>`).join('')}<div class="muted" style="font-size:.8em;margin-top:4px">異業獎勵由合作夥伴提供，用來換曝光；不做現金分潤。</div></div>
       <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>揪居家提示音</b><div class="rs">長輩按「我很好」、心願成團時都用同一段提示音</div></div><button class="btn ghost" data-chime="1" style="width:auto;margin:0">▶ 試聽</button></div></div>`);
     },
@@ -413,7 +413,7 @@
       return `<div class="pad" style="padding-top:0"><div class="seg" role="group" aria-label="心願路線" style="margin-bottom:8px"><button data-wline="own" aria-pressed="${ln === 'own'}">我家出題</button><button data-wline="hq" aria-pressed="${ln === 'hq'}">全國出題</button></div><div class="rs" style="margin-bottom:8px">${ln === 'own' ? '從自己家遇到的問題出發' : '全國電子出題，揪全國的家庭一起想'}</div><button class="row" data-go="wquest" style="width:100%"><span>🏅 我的闖關進度與點數：<b>${pts().total}</b> 點</span><span class="chev">›</span></button></div>`;
     },
     themes() {
-      return `<div class="pad" style="padding-top:0"><div class="rs" style="margin-bottom:8px">依自己家的需求投稿；投稿同樣用寫作模板、標籤與做法卡，獎勵點數加倍。</div></div>` + THEMES.map(x => { const on = ph() >= x.ph; return `<div class="card" style="border-left:4px solid #C42D5A"><div style="display:flex;justify-content:space-between;gap:8px"><b>${x.n}</b>${on ? `<span class="tag">剩 ${x.left} 天</span>` : '<span class="rtag">擴展期</span>'}</div><div class="muted" style="font-size:.88em;margin-top:2px">出題：${x.by}｜已投稿 ${x.sub} 件</div><div class="rs" style="margin-top:4px">獎勵：${x.rw}</div>${on ? `<button class="btn ghost" data-wtheme="${x.id}" style="margin-top:8px">用這題投稿</button>` : '<button class="btn ghost" disabled style="margin-top:8px;opacity:.6">擴展期開放（異業夥伴共同出題）</button>'}</div>`; }).join('');
+      return `<div class="pad" style="padding-top:0"><div class="rs" style="margin-bottom:8px">依自己家的需求投稿；投稿同樣用寫作模板、標籤與做法卡，獎勵點數加倍。</div></div>` + THEMES.map(x => { const on = ph() >= x.ph; return `<div class="card" ><div style="display:flex;justify-content:space-between;gap:8px"><b>${x.n}</b>${on ? `<span class="tag">剩 ${x.left} 天</span>` : '<span class="rtag">擴展期</span>'}</div><div class="muted" style="font-size:.88em;margin-top:2px">出題：${x.by}｜已投稿 ${x.sub} 件</div><div class="rs" style="margin-top:4px">獎勵：${x.rw}</div>${on ? `<button class="btn ghost" data-wtheme="${x.id}" style="margin-top:8px">用這題投稿</button>` : '<button class="btn ghost" disabled style="margin-top:8px;opacity:.6">擴展期開放（異業夥伴共同出題）</button>'}</div>`; }).join('');
     },
     topicExtra(t) {
       const D = { dim: [62, 14, '已量產'], switch: [23, 6, '樣品試用中（5 戶）'], voice: [9, 4, ''], mat: [5, 1, ''] }[t.id] || [0, 0, ''];
@@ -421,10 +421,10 @@
     },
     // 揪居家標誌：房子＋紅黃綠三色燈號（呼應居家安全地圖的燈號）
     logo(sz) {
-      return `<svg width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="揪居家標誌" style="flex:none"><path d="M8 30 L32 9 L56 30" fill="none" stroke="#C42D5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 27 V54 H50 V27" fill="#fff" stroke="#8E1E42" stroke-width="4" stroke-linejoin="round"/><circle cx="23" cy="42" r="5" fill="#C42D5A"/><circle cx="32" cy="42" r="5" fill="#E0A030"/><circle cx="41" cy="42" r="5" fill="#3E9B6B"/></svg>`;
+      return `<svg width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="揪居家標誌" style="flex:none"><path d="M8 30 L32 9 L56 30" fill="none" stroke="#D4003C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 27 V54 H50 V27" fill="#fff" stroke="#A3002E" stroke-width="4" stroke-linejoin="round"/><circle cx="23" cy="42" r="5" fill="#D4003C"/><circle cx="32" cy="42" r="5" fill="#E0A030"/><circle cx="41" cy="42" r="5" fill="#3E9B6B"/></svg>`;
     },
     pack() {
-      return `<div class="card"><b>包裝示意</b><div style="margin-top:8px;border:2px solid #C42D5A;border-radius:12px;padding:12px;background:linear-gradient(135deg,#fff,#FBF3F3)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:.8em;color:#C42D5A;font-weight:700">揪心願｜由陳小姐家庭提案</div><div class="big" style="margin:4px 0">可調光感應夜燈組</div><div class="muted" style="font-size:.8em">共同設計：林家、王家、高雄民族店生活顧問</div></div>${qr(123)}</div><div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-weight:700;color:#8E1E42">${this.logo(28)}揪居家，讓家更有電</div><div class="muted" style="font-size:.78em">掃 QR Code 看做法卡｜全國電子</div></div></div>`;
+      return `<div class="card"><b>包裝示意</b><div style="margin-top:8px;border:2px solid #D4003C;border-radius:12px;padding:12px;background:linear-gradient(135deg,#fff,#FBF3F3)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:.8em;color:#D4003C;font-weight:700">揪心願｜由陳小姐家庭提案</div><div class="big" style="margin:4px 0">可調光感應夜燈組</div><div class="muted" style="font-size:.8em">共同設計：林家、王家、高雄民族店生活顧問</div></div>${qr(123)}</div><div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-weight:700;color:#A3002E">${this.logo(28)}揪居家，讓家更有電</div><div class="muted" style="font-size:.78em">掃 QR Code 看做法卡｜全國電子</div></div></div>`;
     },
   });
 

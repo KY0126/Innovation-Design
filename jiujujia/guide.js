@@ -104,7 +104,7 @@
       why: '生活顧問在門市把手機轉給長輩，用大字說明。手機版只產出方案草稿，長輩同意的是電腦版整合好的正式報價（有版本號），避免各說各話。',
       flow: ['App｜生活顧問', 'App｜家庭・專屬方案', '企業管理端｜預約與派工'], last: '接下來換成吳技師，看他怎麼照圖安裝。' }),
     T({ ch: 1, t: '技師｜今日工單', nav: ['t1'],
-      items: [['.card.focus', '今天的工單聚焦，<b>只看得到自己的</b>'], ['.card.dimmed', '其他日期或已完成的工單淡化顯示'], ['~技師只看得到工單所需資訊', '只看得到<b>工單所需資訊</b>，完整地址出發當天才顯示']],
+      items: [['.card.focus', '今天的工單聚焦，<b>只看得到自己的</b>'], ['[data-snav="thist"]', '其他日期或已完成的工單在「<b>工單紀錄</b>」'], ['~技師只看得到工單所需資訊', '只看得到<b>工單所需資訊</b>，完整地址出發當天才顯示']],
       why: '技師只拿到完成工作需要的資訊；住址與作息不會出現在其他人的畫面。',
       flow: ['企業管理端｜派工', 'App｜技師'], act: { click: '.card.focus', label: '幫我打開工單 ①' } }),
     T({ ch: 1, t: '現在這一步', 
@@ -199,38 +199,38 @@
   css.textContent = `
 #jg{position:fixed;z-index:9995;background:#fff;color:#3D3A40;border-radius:20px;box-shadow:0 14px 36px rgba(61,58,64,.18);font:15px/1.6 "Noto Sans TC","PingFang TC",system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
 #jg[hidden]{display:none}
-#jg .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 0;font-size:13.5px;color:#8C8389}#jg .hd b{color:#C42D5A}
+#jg .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 0;font-size:13.5px;color:#8C8389}#jg .hd b{color:#D4003C}
 #jg .hd button{border:0;background:none;color:#8C8389;cursor:pointer;font:inherit;padding:4px 6px;border-radius:8px}#jg .hd button:hover{background:#F6F4F2}
 #jg .bd{padding:6px 20px 16px;overflow:auto;flex:1}
 #jg .tl{display:flex;margin:10px 0 12px}#jg .tl div{flex:1;text-align:center;font-size:12.5px;font-weight:700;color:#A8A5A0;position:relative}
 #jg .tl i{display:block;width:14px;height:14px;border-radius:50%;background:#C9C7C3;margin:0 auto 5px;position:relative;z-index:1}
 #jg .tl div:not(:last-child)::after{content:"";position:absolute;top:5px;left:50%;right:-50%;height:4px;background:#DDDBD7}
-#jg .tl .dn{color:#8E1E42}#jg .tl .dn i,#jg .tl .dn::after{background:#C42D5A!important}
-#jg .tl .cu{color:#C42D5A}#jg .tl .cu i{background:#C42D5A;box-shadow:0 0 0 5px #F2C94C;width:18px;height:18px;margin-top:-2px}
-#jg .who{display:inline-block;background:#F7E9EE;color:#8E1E42;font-weight:900;font-size:13px;border-radius:8px;padding:2px 10px}
+#jg .tl .dn{color:#A3002E}#jg .tl .dn i,#jg .tl .dn::after{background:#D4003C!important}
+#jg .tl .cu{color:#D4003C}#jg .tl .cu i{background:#D4003C;box-shadow:0 0 0 5px #F2C94C;width:18px;height:18px;margin-top:-2px}
+#jg .who{display:inline-block;background:#FAE0E8;color:#A3002E;font-weight:900;font-size:13px;border-radius:8px;padding:2px 10px}
 #jg h2{margin:6px 0 8px;font-size:22px;line-height:1.35;font-weight:900}
 #jg .sec{font-size:12.5px;color:#8C8389;font-weight:700;margin:10px 0 4px}
-#jg .li{display:flex;gap:10px;margin:6px 0;font-size:15px}#jg .li i{flex:none;width:24px;height:24px;border-radius:50%;background:#C42D5A;color:#fff;font-style:normal;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}#jg .li b{color:#C42D5A}
+#jg .li{display:flex;gap:10px;margin:6px 0;font-size:15px}#jg .li i{flex:none;width:24px;height:24px;border-radius:50%;background:#D4003C;color:#fff;font-style:normal;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}#jg .li b{color:#D4003C}
 #jg .li.miss{opacity:.55}
 #jg .why{background:#F6F4F2;border-radius:12px;padding:9px 12px;font-size:14px}
-#jg .flow{display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:13px}#jg .flow span{border:1.5px solid #E3D3D9;border-radius:14px;padding:2px 9px;font-weight:700}#jg .flow span.me{background:#C42D5A;border-color:#C42D5A;color:#fff}#jg .flow em{font-style:normal;color:#C42D5A;font-weight:900}
+#jg .flow{display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:13px}#jg .flow span{border:1.5px solid #E3D3D9;border-radius:14px;padding:2px 9px;font-weight:700}#jg .flow span.me{background:#D4003C;border-color:#D4003C;color:#fff}#jg .flow em{font-style:normal;color:#D4003C;font-weight:900}
 #jg .msg{margin-top:10px;background:#FFF6D6;border-radius:10px;padding:8px 12px;font-size:14px}
 #jg .ft{display:flex;gap:8px;padding:12px 20px 16px;border-top:1px solid #EEE7E4}
 #jg .ft button{height:40px;border-radius:10px;border:1.5px solid #DDD5D0;background:#fff;font:inherit;font-size:14.5px;font-weight:700;padding:0 12px;cursor:pointer;color:#3D3A40}
-#jg .ft button.p{flex:1;background:#C42D5A;border-color:#C42D5A;color:#fff}
+#jg .ft button.p{flex:1;background:#D4003C;border-color:#D4003C;color:#fff}
 #jg .ft button:disabled{opacity:.5;cursor:default}
 #jg .toc{margin-top:12px;border-top:1px solid #EEE7E4;padding-top:6px;font-size:13px;color:#6F6670}
-#jg .toc summary{cursor:pointer;font-weight:700;color:#8E1E42;padding:4px 0}
+#jg .toc summary{cursor:pointer;font-weight:700;color:#A3002E;padding:4px 0}
 #jg .toc button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;padding:3px 4px;border-radius:6px;cursor:pointer;color:#6F6670}
-#jg .toc button:hover{background:#F6F4F2}#jg .toc button.d{color:#8E1E42}#jg .toc button.c{color:#C42D5A;font-weight:900}
+#jg .toc button:hover{background:#F6F4F2}#jg .toc button.d{color:#A3002E}#jg .toc button.c{color:#D4003C;font-weight:900}
 #jg .toc .e{font-size:12px;color:#A8A1A5;margin:6px 0 2px;font-weight:700}
 #jg.sheet{left:8px!important;right:8px!important;bottom:8px!important;top:auto!important;width:auto!important;max-height:46vh;border-radius:16px}
 body.jgSheet{padding-bottom:48vh!important}body.jgSheet #view .scroll{padding-bottom:48vh!important}
 #jg.sheet.min .bd .rest,#jg.sheet.min .toc{display:none}
 #jg.sheet .grab{display:block;width:40px;height:4px;border-radius:2px;background:#D5CDC9;margin:8px auto 0}
 #jg .grab{display:none}
-.jgb{position:fixed;z-index:9994;border:3px solid #C42D5A;border-radius:10px;box-shadow:0 0 0 3px rgba(255,255,255,.8);pointer-events:none;display:none}
-.jgb i{position:absolute;left:-15px;top:-15px;width:26px;height:26px;border-radius:50%;background:#C42D5A;color:#fff;font:900 14px/26px "Noto Sans TC",sans-serif;text-align:center;font-style:normal;box-shadow:0 0 0 3px #fff}
+.jgb{position:fixed;z-index:9994;border:3px solid #D4003C;border-radius:10px;box-shadow:0 0 0 3px rgba(255,255,255,.8);pointer-events:none;display:none}
+.jgb i{position:absolute;left:-15px;top:-15px;width:26px;height:26px;border-radius:50%;background:#D4003C;color:#fff;font:900 14px/26px "Noto Sans TC",sans-serif;text-align:center;font-style:normal;box-shadow:0 0 0 3px #fff}
 /* 右下角浮動元件（開啟導覽、瀏覽器展示版）約 110px 高：各頁捲動區底部留白，最後的按鈕才不會被蓋住 */
 .scroll{padding-bottom:76px!important}
 body>.ft,#app .ft,.ft{padding-bottom:70px!important}
@@ -245,16 +245,16 @@ body:has(.arsheet) #jgOpen,body:has(.arsheet) #webDemo{display:none!important}
 #webDemo .wdx small{color:#DDD;font-size:11px;text-align:center}
 #webDemo .wdx button{font:700 13px "Noto Sans TC",system-ui,sans-serif!important;padding:7px 10px!important;border-radius:10px!important}
 #webDemo #jgOpen{position:static!important;box-shadow:none;right:auto;bottom:auto!important;top:auto!important}
-#jgOpen{position:fixed;right:16px;bottom:16px;z-index:9993;background:#C42D5A;color:#fff;border:0;border-radius:22px;padding:10px 16px;font:700 14px "Noto Sans TC",system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer}
+#jgOpen{position:fixed;right:16px;bottom:16px;z-index:9993;background:#D4003C;color:#fff;border:0;border-radius:22px;padding:10px 16px;font:700 14px "Noto Sans TC",system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer}
 body.jgDock{margin-right:var(--jgm,420px)!important}body.jgDock #cGate,body.jgDock #gate{right:var(--jgm,420px)}
-#jg .jgn{border:2px solid #C42D5A;background:#F7E9EE;border-radius:12px;padding:8px 12px;margin:2px 0 10px;color:#8E1E42;font-weight:700;line-height:1.5}
+#jg .jgn{border:2px solid #D4003C;background:#FAE0E8;border-radius:12px;padding:8px 12px;margin:2px 0 10px;color:#A3002E;font-weight:700;line-height:1.5}
 #jg .jgn small{display:block;font-weight:400;color:#6F6670;font-size:13px}
 #jg .jgn.big{font-size:16px}
 #jg .jbt{display:block;width:100%;text-align:center;border-radius:10px;padding:9px;font:inherit;font-weight:700;margin:8px 0;cursor:pointer;border:1.5px solid #DDD5D0;background:#fff;color:#3D3A40}
-#jg .jbt.p{background:#C42D5A;border-color:#C42D5A;color:#fff}
+#jg .jbt.p{background:#D4003C;border-color:#D4003C;color:#fff}
 #jg.nc .bd>.who,#jg.nc .bd>h2,#jg.nc .s1,#jg.nc .rest,#jg.nc .ft [data-t=act]{display:none}
 #jg.nc .li,#jg.nd .li{opacity:.45}
-#jg.nd .ft [data-t=prev]{border:2px solid #C42D5A;color:#C42D5A}
+#jg.nd .ft [data-t=prev]{border:2px solid #D4003C;color:#D4003C}
 `;
   document.head.appendChild(css);
   // ---------- 小工具 ----------

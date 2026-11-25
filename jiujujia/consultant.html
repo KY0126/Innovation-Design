@@ -10,8 +10,8 @@
 <title>揪居家｜生活顧問端</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--brand:#C42D5A;--brand-soft:#F7E9EE;--ink:#3D3A40;--muted:#6F6670;--line:#E7E2E4;--bg:#F6F4F2;--card:#FFFFFF;--head:#F8F9FB;--side:#3D3A40;--sideink:#C9CED6;
- --r:#C42D5A;--y:#D9971F;--g:#138F3B;--note:#FAF6EE;box-sizing:border-box}
+:root{--brand:#D4003C;--brand-soft:#FAE0E8;--ink:#3D3A40;--muted:#6F6670;--line:#E7E2E4;--bg:#F6F4F2;--card:#FFFFFF;--head:#F8F9FB;--side:#3D3A40;--sideink:#C9CED6;
+ --r:#D4003C;--y:#D9971F;--g:#138F3B;--note:#FAF6EE;box-sizing:border-box}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}}
 :root[data-theme="dark"]{--ink:#E6E8EB;--muted:#9AA1AB;--line:#2E333A;--bg:#14171B;--card:#1C2026;--head:#20252C;--side:#0F1215;--brand-soft:#3A1A24;--note:#2A2620}
 *,*:before,*:after{box-sizing:inherit}
@@ -40,7 +40,7 @@ main{padding:16px 18px 80px;max-width:1180px}
 .ph{padding:10px 14px;font-weight:700;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline;background:var(--head)}
 .ph small{font-weight:400;color:var(--muted);font-size:12px}
 .pb{padding:12px 14px}
-.prog .kpi{text-align:left;cursor:pointer;border:1.5px solid var(--line,#E6E1DE);position:relative}.prog .kpi.on{border-color:var(--brand,#C42D5A);background:#FBF3F3}.prog .kpi:not(:last-child)::after{content:"›";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:#B9B2AE;font-size:18px}
+.prog .kpi{text-align:left;cursor:pointer;border:1.5px solid var(--line,#E6E1DE);position:relative}.prog .kpi.on{border-color:var(--brand,#D4003C);background:#FBF3F3}.prog .kpi:not(:last-child)::after{content:"›";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:#B9B2AE;font-size:18px}
 .wb2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}.wb2 .panel{margin-bottom:14px}@media (max-width:1000px){.wb2{grid-template-columns:1fr}}
 .item.on{background:#FBF3F3}.certb{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:#E8F3EC;color:#2F7A4D;font-size:12px;font-weight:700}
 .nav .grp{font-size:12px;color:#A9A2A0;padding:12px 12px 4px}
@@ -49,7 +49,7 @@ main{padding:16px 18px 80px;max-width:1180px}
 .kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:24px;font-weight:700}
 .item{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);width:100%;text-align:left}
 .item:first-child{border-top:0}.item .t{flex:1;min-width:0}.item .s{font-size:12px;color:var(--muted)}
-.tag{display:inline-block;font-size:12px;border-radius:9px;padding:1px 8px;background:var(--brand-soft);color:#8E1E42;white-space:nowrap}
+.tag{display:inline-block;font-size:12px;border-radius:9px;padding:1px 8px;background:var(--brand-soft);color:#A3002E;white-space:nowrap}
 .tag.gray{background:var(--head);color:var(--muted);border:1px solid var(--line)}.tag.ok{background:#E3F2E8;color:#0E6B2D}.tag.am{background:#FFF1D6;color:#8A5A00}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:10px 0 14px}
@@ -86,22 +86,22 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
 @media (max-width:860px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;overflow-x:auto;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:52px;z-index:4}
  .mtabs button{white-space:nowrap;border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:13px}.mtabs button[aria-current="page"]{background:var(--brand);color:#fff;border-color:var(--brand)}
  main{padding:12px}.proto{margin-left:0}}
-.certs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.cert{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line,#E7E2E4);border-radius:10px;padding:10px 12px}.cert b{font-size:14px}.cert .mu{font-size:12px}.cert.adv{background:#FBEFF3}@media (max-width:1100px){.certs{grid-template-columns:repeat(2,minmax(0,1fr))}}.tips{margin:0;padding-left:18px;display:grid;gap:8px}.tips b{margin-right:8px;color:var(--brand,#C42D5A)}
+.certs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.cert{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line,#E7E2E4);border-radius:10px;padding:10px 12px}.cert b{font-size:14px}.cert .mu{font-size:12px}.cert.adv{background:#FBEFF3}@media (max-width:1100px){.certs{grid-template-columns:repeat(2,minmax(0,1fr))}}.tips{margin:0;padding-left:18px;display:grid;gap:8px}.tips b{margin-right:8px;color:var(--brand,#D4003C)}
 .b[aria-pressed="true"]{background:#FAE0E8;border-color:#D4003C;color:#A3002E}
 </style>
 <style>
 #cGate{position:fixed;inset:0;z-index:9000;background:#ECE7E3;display:flex;align-items:center;justify-content:center;padding:24px}
 #cGate[hidden]{display:none}
 #cGate .box{width:min(920px,100%);min-height:460px;display:flex;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(61,58,64,.2);background:#fff}
-#cGate .sd{width:44%;background:linear-gradient(160deg,#B23A62,#8E1E42 60%,#6E1634);color:#fff;padding:40px 32px}
+#cGate .sd{width:44%;background:linear-gradient(160deg,#B23A62,#A3002E 60%,#6E1634);color:#fff;padding:40px 32px}
 #cGate .sd .tg{display:inline-block;background:rgba(255,255,255,.18);border-radius:8px;padding:2px 10px;font-size:14px;font-weight:700}
 #cGate .sd h2{margin:10px 0 6px;font-size:28px}#cGate .sd p{margin:0 0 14px;opacity:.9}#cGate .sd li{margin:8px 0}
 #cGate form{flex:1;padding:44px 40px;background:#FBFAF9;color:#3D3A40}#cGate h3{margin:0 0 4px;font-size:22px}#cGate .sub{font-size:14px;color:#6F6670;margin-bottom:14px}
 #cGate label{display:block;font-size:14px;color:#6F6670;margin-top:10px}#cGate input{display:block;width:100%;margin-top:4px;height:40px;border:1px solid #DDD5D0;border-radius:8px;padding:0 10px;font:inherit}
-#cGate .go{display:block;width:100%;height:42px;margin-top:14px;border:0;border-radius:10px;background:#C42D5A;color:#fff;font:inherit;font-weight:700;cursor:pointer}
-#cGate .dm{margin-top:14px;border:2px dashed #E6B3C3;border-radius:12px;padding:10px}#cGate .dm b{font-size:13px;color:#8E1E42}
-#cGate .dm button{display:block;width:100%;margin-top:8px;height:44px;border-radius:10px;border:2px solid #C42D5A;background:#F7E9EE;color:#8E1E42;font:inherit;font-weight:900;cursor:pointer}
-#cGate .er{color:#B33A1C;font-size:14px;margin-top:8px;min-height:1em}#cGate .oth{font-size:13px;color:#6F6670;margin-top:12px}#cGate .oth a{color:#C42D5A;font-weight:700}
+#cGate .go{display:block;width:100%;height:42px;margin-top:14px;border:0;border-radius:10px;background:#D4003C;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+#cGate .dm{margin-top:14px;border:2px dashed #E6B3C3;border-radius:12px;padding:10px}#cGate .dm b{font-size:13px;color:#A3002E}
+#cGate .dm button{display:block;width:100%;margin-top:8px;height:44px;border-radius:10px;border:2px solid #D4003C;background:#FAE0E8;color:#A3002E;font:inherit;font-weight:900;cursor:pointer}
+#cGate .er{color:#B33A1C;font-size:14px;margin-top:8px;min-height:1em}#cGate .oth{font-size:13px;color:#6F6670;margin-top:12px}#cGate .oth a{color:#D4003C;font-weight:700}
 @media (max-width:700px){#cGate .box{flex-direction:column}#cGate .sd{width:auto;padding:24px}}
 </style>
 </head>
@@ -205,7 +205,7 @@ function vWb(){const h=ST.home,ho=handoffs(),P=cases(),stg=ST.stg||'all';
  if(stg==='today')left=`<div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>`;
  else if(stg==='quote')left=`<div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map(x=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。家人在 App「選改善方式」後按「交給生活顧問整合報價」就會出現在這裡。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林媽媽家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>`;
  else if(stg==='after')left=`<div class="panel"><div class="ph">售後與待補充現場資訊</div><div class="pb">${(ST.todos.requests||[]).map(r=>`<div class="item"><span class="t"><b>${esc(r.household)}</b>｜${esc(r.kind)}<div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')}${(ST.todos.care||[]).map(c=>`<div class="item"><span class="t"><b>${esc(c.household)}</b>｜${esc(c.title)}<div class="s">${esc(c.when)}｜${esc(c.outcome)}</div></span><span class="tag ok">事後關心</span></div>`).join('')}</div></div>`;
- else left=`${cur?`<div class="panel curcase" style="border:2px solid var(--brand,#C42D5A)"><div class="ph">目前案件 <small>${esc(stage(cur)[0])}</small></div><div class="pb"><div style="font-size:16px"><b>${esc(cur.household)}</b>｜${esc(cur.elder_name)}　<span class="mu">${esc(cur.elder_note||'')}</span></div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="b pri" data-case="${cur.household_id}" data-tabgo="${act(cur)[1]}">${act(cur)[0]}</button><button class="b" data-case="${cur.household_id}" data-tabgo="5">打開報價草稿</button><button class="b" data-case="${cur.household_id}">案件摘要</button></div></div></div>`:''}
+ else left=`${cur?`<div class="panel curcase" style="border:2px solid var(--brand,#D4003C)"><div class="ph">目前案件 <small>${esc(stage(cur)[0])}</small></div><div class="pb"><div style="font-size:16px"><b>${esc(cur.household)}</b>｜${esc(cur.elder_name)}　<span class="mu">${esc(cur.elder_note||'')}</span></div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="b pri" data-case="${cur.household_id}" data-tabgo="${act(cur)[1]}">${act(cur)[0]}</button><button class="b" data-case="${cur.household_id}" data-tabgo="5">打開報價草稿</button><button class="b" data-case="${cur.household_id}">案件摘要</button></div></div></div>`:''}
   <div class="panel"><div class="ph">${stg==='all'?'全部案件':STG.find(x=>x[0]===stg)[1]} <small>點一下選案件</small></div><div class="pb">${L.map(p=>`<button class="item ${cur===p?'on':''}" data-wsel="${p.household_id}"><span class="t"><b>${esc(p.household)}</b>｜${esc(p.elder_name)}　<span class="s">${esc(stage(p)[0])}</span></span><span class="tag ${stage(p)[1]}">${stage(p)[0].split('｜')[0]}</span><span class="mu">›</span></button>`).join('')||'<span class="mu">這個階段目前沒有案件</span>'}</div></div>`;
  return `<div class="kpis prog" role="group" aria-label="案件進度：點一下篩選下方清單">${STG.map(([k,l,n])=>`<button data-stg="${k}" class="kpi ${stg===k?'on':''}" aria-pressed="${stg===k}"><div class="l">${l}</div><div class="v">${n}</div></button>`).join('')}</div>
  ${stg!=='all'?'<div style="margin:-6px 0 10px"><button class="b" data-stg="all">顯示全部案件</button></div>':''}
@@ -285,7 +285,7 @@ function tWork(p){const PV=(p.pv||{}).pins||[],ch=chosen(p.household_id).filter(
   ['A','關懷設備','全國電子技師',an?`${ad}／${an} 完成`:'—',pinRows('A')],
   ['V','長輩逐區驗收','技師陪同',acc?'已驗收':'等待',['臥室','走道','浴室','玄關'].map(r=>(acc?'<span class="ok">✓ ':'<span class="no">○ ')+r+'</span>').join('<br>')+'<br><span class="no">長輩說有問題就退回相關項目</span>']];
  return `<div class="panel"><div class="ph">工作包與施工順序 <small>需要動工的項目由協力工班先完成，全國電子技師再安裝設備</small></div><div class="pb">
- <div class="item" style="border:1px dashed #C42D5A;border-radius:6px;padding:6px 8px;margin-bottom:8px"><span class="t"><b>AI 推薦人力</b><div class="s">依時段與地區，推薦這週有空的協力工班「示範地坪 C」與全國電子技師「吳技師」，同一天先施工、後安裝，一次到府</div></span><span class="sm mu">示範資料</span></div>
+ <div class="item" style="border:1px dashed #D4003C;border-radius:6px;padding:6px 8px;margin-bottom:8px"><span class="t"><b>AI 推薦人力</b><div class="s">依時段與地區，推薦這週有空的協力工班「示範地坪 C」與全國電子技師「吳技師」，同一天先施工、後安裝，一次到府</div></span><span class="sm mu">示範資料</span></div>
  <div class="jh">${st.map(x=>`<div class="s ${x}"><i></i></div>`).join('')}</div>
  <div class="wk">${C.map(([k,n,team,tg,body],i)=>`<div class="pk${O[k]?' open':''}"><b>${n}</b><button class="tg" data-pk="${k}" aria-expanded="${!!O[k]}">${O[k]?'收合 ▴':'明細 ▾'}</button><div class="sm">${team}</div><span class="${T[st[i]]}" style="margin-top:6px;display:inline-block">${tg}</span>${O[k]?`<div class="acc">${body}</div>`:''}</div>`).join('')}</div>
  <p class="mu sm" style="margin-top:10px">前置工作未完成時，後續工單顯示等待；支援待料、延期、客戶改期與異常。技師現場差異回報後由顧問核准，顧問不能覆蓋技師的原始核對紀錄。</p></div></div>`}
@@ -358,6 +358,6 @@ window.JCON={ST,render};
 boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
 })();
 </script>
-<script src="guide.js?v=20261124a"></script>
+<script src="guide.js?v=20261125b"></script>
 </body>
 </html>

@@ -44,7 +44,7 @@ test.describe('放錯入口會被擋下', () => {
 });
 // 3. 一鍵登入：同一個 App 依身分進到各自首頁；電腦版兩個入口
 test.describe('一鍵示範登入', () => {
-  for (const [who, email, text] of [['家庭｜陳小姐', 'chen@example.com', '居家知識'], ['生活顧問｜王小明（手機）', 'advisor@example.com', '生活顧問・今天'], ['技師｜吳技師', 'tech@example.com', '我的工單']]) {
+  for (const [who, email, text] of [['家庭｜陳小姐', 'chen@example.com', '居家知識'], ['生活顧問｜王小明（手機）', 'advisor@example.com', '今日行程'], ['技師｜吳技師', 'tech@example.com', '今日工單']]) {
     test(`揪居家 App：${who}`, async ({ page }) => {
       const errs = await fresh(page); await page.goto('/jiujujia/app.html');
       await page.click(`[data-demo="${email}"]`);
@@ -108,7 +108,7 @@ test.describe('生活顧問：手機版與電腦版分工', () => {
   test('把手機轉給長輩：顯示電腦版整合好的正式版本，按「同意這一版」', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
     await page.click('[data-demo="advisor@example.com"]');
-    await expect(page.locator('#view')).toContainText('生活顧問・今天');
+    await expect(page.locator('#view')).toContainText('今日行程');
     // 正式報價存在資料庫（quotes 表），由電腦版送出；這裡用 API 先送兩個版本
     await page.evaluate(async () => {
       const post = b => fetch('/api/advisor/quotes/3', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' }, body: JSON.stringify(b) });

@@ -7,15 +7,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>揪居家｜消費者端 APP</title>
-<meta name="theme-color" content="#C42D5A">
+<meta name="theme-color" content="#D4003C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --brand:#C42D5A;--brand-soft:#F7E9EE;--brand-ink:#8E1E42;
+  --brand:#D4003C;--brand-soft:#FAE0E8;--brand-ink:#A3002E;
   --bg:#F6F4F2;--card:#FFFFFF;--ink:#3D3A40;--muted:#6F6670;--line:#E7E2E4;
-  --ok:#8E1E42;--ok-soft:#F7E9EE;--note:#FAF6EE;--page:#E4E3DF;
+  --ok:#A3002E;--ok-soft:#FAE0E8;--note:#FAF6EE;--page:#E4E3DF;
   --fs:15px;
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -55,7 +55,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .jh .cu{color:var(--brand);font-weight:900}.jh .cu i{background:var(--brand);width:16px;height:16px;margin:2px auto 4px;box-shadow:0 0 0 5px #F2C94C}
 .jh .js small{display:block;font-weight:400;color:var(--muted);font-size:.9em;margin-top:1px}.jh .td small{color:#B8B5B0}
 .jhero{display:block;width:calc(100% - 24px);margin:0 12px 12px;border-radius:14px;overflow:hidden;background:var(--card);text-align:left}
-.jhero .jtop{background:linear-gradient(135deg,#C42D5A,#8E1E42);color:#fff;padding:14px}
+.jhero .jtop{background:linear-gradient(135deg,#D4003C,#A3002E);color:#fff;padding:14px}
 .jhero .jk{font-size:.82em;opacity:.92}.jhero .jh1{display:block;font-size:1.35em;font-weight:900;margin-top:2px}.jhero .jl{font-size:.86em;margin-top:4px;line-height:1.45}
 .jhero .jbd{padding:8px 14px 14px}.jhero .jbts{display:flex;gap:8px;margin-top:2px}.jhero .jbts .btn{margin:0;flex:1}
 .jh.arjh{display:flex;background:rgba(255,255,255,.95);border-radius:12px;padding:8px 4px 6px;margin-bottom:8px}
@@ -64,8 +64,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .ribbon{background:var(--ink);color:var(--bg);font-size:12px;padding:5px 14px;display:flex;justify-content:space-between;align-items:center}
 .ribbon button{font-size:12px;text-decoration:underline}
 .top{background:var(--card);display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);min-height:52px}
-.top h1{font-size:17px;margin:0;font-weight:700;flex:1}
-.back{color:var(--brand);font-size:22px;line-height:1;width:28px;height:28px}
+.top h1{font-size:17px;margin:0;font-weight:700;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{color:var(--ink);font-size:15px;line-height:1;width:auto;min-width:64px;height:32px;text-align:left;white-space:nowrap}.top .back{flex:none}.tsp{flex:none;width:64px}.top .aplus{flex:none;min-width:64px}
 .aplus{font-size:13px;border:1px solid var(--line);border-radius:14px;padding:3px 10px;color:var(--muted)}
 .aplus[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px}
@@ -109,9 +109,13 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .c3 .row{align-items:flex-start;justify-content:flex-start;gap:8px}.c3 .n3{flex:none;color:var(--brand);font-weight:700}
 .toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88%;width:max-content;text-align:center;z-index:20}
 .toast.show{opacity:1}
-.stf{background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:11px 14px;min-height:50px}
-.stf h1{font-size:16px;margin:0;flex:1;font-weight:700}
-.stf .back{color:#fff}
+.stf{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:11px 14px;min-height:50px}
+.stf h1{font-size:16px;margin:0;flex:1;font-weight:700;text-align:center}.stf .back,.stf .tsp{flex:none;min-width:64px;font-size:15px;text-align:left}
+.stf .back{color:var(--brand)}
+.glist{background:var(--card);border-radius:14px;margin:0 12px 4px;overflow:hidden}.glist .gi{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:14px;border-bottom:1px solid var(--line);min-height:52px}.glist .gi:last-child{border-bottom:0}
+.btn.logout{background:#fff;color:#D4003C;border:1.5px solid #D4003C}
+.av{width:48px;height:48px;border-radius:50%;background:#FAE0E8;color:#A3002E;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2em;flex:none}
+.snav button[aria-current="page"] svg{fill:#FAE0E8}
 .stf .clk{font-size:12px;background:rgba(255,255,255,.18);border-radius:10px;padding:2px 8px;font-variant-numeric:tabular-nums}
 .step{font-size:13px;color:var(--muted);padding:10px 16px 4px}
 .chip{display:inline-block;border:1.5px solid var(--line);border-radius:18px;padding:7px 13px;margin:0 6px 8px 0;font-size:.95em;background:var(--card)}
@@ -123,7 +127,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .it:first-of-type{border-top:0}
 .ck{width:20px;height:20px;border-radius:5px;border:2px solid var(--line);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
 .ck.on{background:var(--brand);border-color:var(--brand)}
-.ck.later{border-style:dashed;border-color:#8E1E42;color:#8E1E42}
+.ck.later{border-style:dashed;border-color:#A3002E;color:#A3002E}
 .rs{font-size:.84em;color:var(--muted)}
 .rtag{font-size:11px;color:var(--brand-ink);background:var(--brand-soft);border-radius:8px;padding:1px 6px;margin-left:4px}
 .warn{background:var(--brand-soft);color:var(--brand-ink);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.9em}
@@ -141,7 +145,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .chat{background:#F3D3DC;flex:1;overflow-y:auto;padding:14px 12px 16px}
 :root[data-theme="dark"] .chat{background:#3A1A24}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chat{background:#3A1A24}}
-.lh{background:#8E1E42;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:8px;min-height:50px}
+.lh{background:#A3002E;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:8px;min-height:50px}
 .lh .back{color:#fff}
 .bub{background:var(--card);border-radius:16px;overflow:hidden;max-width:310px}
 .bub .hd{padding:12px}
@@ -161,7 +165,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .entry .eh{width:40px;height:40px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .entry .es{display:block;font-size:.86em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hintbar{background:var(--note);color:var(--muted);font-size:13px;padding:7px 14px;text-align:center;border-top:1px solid var(--line)}
-.tip{background:#F7E9EE;color:#8E1E42;font-size:13px;padding:8px 14px;border-bottom:1px solid #F3C7D3}
+.tip{background:#FAE0E8;color:#A3002E;font-size:13px;padding:8px 14px;border-bottom:1px solid #F3C7D3}
 .adm td,.adm th{padding:6px 4px;border-bottom:1px solid var(--line);font-size:12.5px;text-align:left}
 .pbar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--brand);border-radius:4px}
 .avt{width:46px;height:46px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2em;flex-shrink:0}
@@ -208,7 +212,7 @@ select.fld{appearance:auto;-webkit-appearance:auto}
 .arhead{display:flex;align-items:center;gap:8px;padding:9px 12px}
 .arhead .back{color:#fff;width:22px;height:22px;font-size:22px;line-height:1}
 .arhead b{flex:1;font-size:16px}
-.artag{font-size:12px;background:#F7E9EE;color:#8E1E42;border-radius:10px;padding:2px 9px;white-space:nowrap}
+.artag{font-size:12px;background:#FAE0E8;color:#A3002E;border-radius:10px;padding:2px 9px;white-space:nowrap}
 .arprog{padding:8px 12px 9px;font-size:13px}
 .arprog .r{display:flex;justify-content:space-between}
 .arprog .pb{height:6px;background:rgba(255,255,255,.28);border-radius:3px;margin-top:6px;overflow:hidden}
@@ -216,7 +220,7 @@ select.fld{appearance:auto;-webkit-appearance:auto}
 .archips{display:flex;gap:6px;flex-wrap:wrap}
 .archips span{font-size:13px;border-radius:15px;padding:5px 11px;background:rgba(58,58,56,.78);color:#fff;white-space:nowrap}
 .archips .go{background:#E0A030}
-.archips .ok{background:#8E1E42} .archips .ai{background:rgba(58,58,56,.86)} .archips .ai:before{content:'AI';background:#C42D5A;color:#fff;font-weight:700;font-size:11px;border-radius:5px;padding:0 5px;margin-right:6px} .armat .mi{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px} .armat .mi .r{display:flex;align-items:center;gap:6px} .armat .mi b{flex:1} .armat .mi .e{font-size:.86em;color:var(--brand);margin-top:2px} .armat .mi button{border:1px solid var(--line);border-radius:8px;padding:2px 9px;font-size:.85em} .armat .mi button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.archips .ok{background:#A3002E} .archips .ai{background:rgba(58,58,56,.86)} .archips .ai:before{content:'AI';background:#D4003C;color:#fff;font-weight:700;font-size:11px;border-radius:5px;padding:0 5px;margin-right:6px} .armat .mi{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px} .armat .mi .r{display:flex;align-items:center;gap:6px} .armat .mi b{flex:1} .armat .mi .e{font-size:.86em;color:var(--brand);margin-top:2px} .armat .mi button{border:1px solid var(--line);border-radius:8px;padding:2px 9px;font-size:.85em} .armat .mi button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
 .arsheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;padding:12px 12px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(0,0,0,.18)}
 .arseg{display:flex;gap:6px;margin-bottom:8px}
 .arseg span{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;font-size:.9em;color:var(--muted)}
@@ -242,26 +246,27 @@ select.fld{appearance:auto;-webkit-appearance:auto}
 .cmp .hpw,.cmpw{position:relative;margin-top:8px;border-radius:10px;overflow:hidden;background:#F6F3EE;user-select:none;-webkit-user-select:none}
 .cmpw .cmpa{position:absolute;inset:0;clip-path:inset(0 0 0 var(--p))}.cmpw .cmpa img{display:block;width:100%}
 .cmph{position:absolute;top:0;bottom:0;left:var(--p);width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
-.cmph span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#C42D5A;border-radius:16px;padding:3px 9px;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
-.cmpt{position:absolute;top:8px;font-size:12px;font-weight:700;background:rgba(0,0,0,.62);color:#fff;border-radius:10px;padding:2px 9px;pointer-events:none}.cmpt.l{left:8px}.cmpt.r{right:8px;background:#C42D5A}
+.cmph span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#D4003C;border-radius:16px;padding:3px 9px;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
+.cmpt{position:absolute;top:8px;font-size:12px;font-weight:700;background:rgba(0,0,0,.62);color:#fff;border-radius:10px;padding:2px 9px;pointer-events:none}.cmpt.l{left:8px}.cmpt.r{right:8px;background:#D4003C}
 .cmpw input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize;-webkit-appearance:none;appearance:none}
 .cmpseg{flex:none}.cmpseg button{padding:3px 10px;font-size:13px}
 .hall{aspect-ratio:1/1}.hall .hs{position:absolute;left:0;top:-32%;width:100%;height:160%}.hall .hs img{width:100%;height:100%;display:block}
 .hall img.dk{filter:brightness(.26) saturate(.45)}.hall img.lt{filter:brightness(.45) saturate(.8)}
 .hall .glow{position:absolute;width:52%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,214,130,.9),rgba(255,190,90,.38) 34%,rgba(255,190,90,0) 70%);mix-blend-mode:screen;pointer-events:none}
-.hall .nl,.hall .thr{position:absolute;transform:translate(-50%,-50%);font-size:11px;border-radius:10px;padding:1px 7px;white-space:nowrap;font-weight:700}.hall .nl{background:rgba(255,255,255,.92);color:#8E1E42}.hall .thr{background:#E0A030;color:#fff}
+.hall .nl,.hall .thr{position:absolute;transform:translate(-50%,-50%);font-size:11px;border-radius:10px;padding:1px 7px;white-space:nowrap;font-weight:700}.hall .nl{background:rgba(255,255,255,.92);color:#A3002E}.hall .thr{background:#E0A030;color:#fff}
 .pm{position:relative;border-radius:10px;overflow:hidden;background:#F6F3EE;margin-top:6px}.pm img{display:block;width:100%}.pm svg{position:absolute;inset:0;width:100%;height:100%}.pm.edit{cursor:crosshair}
 details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-top:6px}
 .kp4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 12px 10px}.kp4 button{background:var(--card);border-radius:12px;padding:10px 12px;text-align:left;border:1.5px solid transparent}.kp4 b{display:block;font-size:1.5em;line-height:1.2}.kp4 .hot{border-color:var(--brand)}.kp4 .hot b{color:var(--brand)}
-.insight{margin:0 12px 10px;background:var(--note);border-left:4px solid var(--brand);border-radius:10px;padding:9px 12px;font-size:.93em}
-.focus{border-left:5px solid var(--brand)!important}.dimmed{opacity:.5}
+.insight{margin:0 12px 10px;background:var(--note);border-radius:10px;padding:9px 12px;font-size:.93em}
+.dimmed{opacity:.5}
 .tmapc{position:sticky;top:0;z-index:3;box-shadow:0 6px 14px rgba(0,0,0,.08)}.tmapc .pm{width:72%;margin:4px auto 0}.tmapc .tlg{justify-content:center;margin-top:4px}
 .pkrow{display:flex;gap:6px;flex-wrap:wrap;margin:0 12px 10px}.pkc{font-size:12.5px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:5px 9px;color:var(--muted)}.pkc b{display:block;color:var(--ink);font-size:13px}.pkc.me{border-color:var(--brand)}
 .tlg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:12.5px;color:var(--muted)}.tlg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 .tgrp{background:var(--card);border-radius:14px;margin:0 12px 8px;overflow:hidden}.tgh{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;text-align:left}.tgn{font-weight:700;min-width:44px}.tgd{flex:1;display:flex;gap:4px;flex-wrap:wrap}.tgd{align-items:center}.tgn2{font-style:normal;min-width:22px;height:22px;border-radius:11px;color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}.tgok{color:var(--ok);font-size:.88em;font-weight:700}.tgdf{font-size:12px;background:#FFE3DA;color:#B33A1C;border-radius:9px;padding:1px 7px}
 .tgrp.open .tgh{border-bottom:1px solid var(--line);background:var(--brand-soft)}.trow{border-bottom:1px solid var(--line)}.trow:last-child{border-bottom:0}.trow.sel{background:#FFF7F9}
 .trh{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px}.tno{flex:none;width:28px;height:28px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}.tdet{padding:0 14px 12px 52px}
-.pk{display:inline-block;font-size:12px;border-radius:9px;padding:1px 7px;margin:4px 4px 0 0;color:#fff}
+.pkl{margin-top:8px;border-top:1px solid var(--line)}.pkr{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.92em}.pkr:last-child{border-bottom:0;padding-bottom:0}.pkn{flex:1;color:var(--ink)}.pka{color:var(--muted);min-width:3.5em}.pks{color:var(--muted);min-width:4.5em;text-align:right}.pks.ok{color:#2E9E5B}.pks.on{color:#A3002E;font-weight:600}
+.onote{margin-top:6px;font-size:.88em;color:#A3002E}.onote::before{content:'注意　';font-weight:700}
 .hplan .hpw{position:relative;margin-top:8px;border-radius:10px;overflow:hidden;background:#F6F3EE}.hplan .hpw img{display:block;width:100%}.hplan .hpw svg{position:absolute;inset:0;width:100%;height:100%}.hplan .hpr{animation:hpPulse 1.6s ease-in-out infinite}@keyframes hpPulse{50%{fill-opacity:.5}}
 
 /* 示範帳號一鍵登入 */
@@ -279,15 +284,38 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
  .sbar{display:flex;position:absolute;left:0;right:0;top:0;height:44px;justify-content:space-between;align-items:center;padding:4px 32px 0 38px;font:600 15px/1 -apple-system,"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:var(--bg);z-index:55}
  .sbar svg{display:block}
  #ends{display:flex;position:fixed;left:0;right:0;top:0;height:56px;align-items:center;gap:8px;padding:0 20px;background:rgba(246,244,242,.95);border-bottom:1px solid #E5DED9;z-index:9990;font:14px "Noto Sans TC",system-ui,sans-serif}
- #ends b{color:#8E1E42;font-size:16px;margin-right:6px}
+ #ends b{color:#A3002E;font-size:16px;margin-right:6px}
  #ends a,#ends button{padding:5px 12px;border-radius:16px;border:1px solid #DDD5D0;background:#fff;color:#5A5560;text-decoration:none;cursor:pointer;font:inherit}
- #ends a.on{background:#C42D5A;border-color:#C42D5A;color:#fff;font-weight:700}
+ #ends a.on{background:#D4003C;border-color:#D4003C;color:#fff;font-weight:700}
  #ends .sp{flex:1}
  #webDemo{display:none!important}
 }
+/* 版型：區塊卡片、區塊內分類軸、常用按鈕、捷徑橫幅、橫滑卡片、燈號（工作包：版型調整） */
+.sx{background:var(--card);border-radius:16px;margin:12px;padding:14px}
+.sxh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.sxh b{font-size:1.1em;font-weight:600}
+.sxm{background:none;border:0;padding:4px 0;font:inherit;font-size:.9em;color:var(--muted)}.chev{color:var(--brand)}
+.sxs{font-size:.92em;color:var(--muted);margin-bottom:4px}
+.sxt{display:flex;gap:20px;border-bottom:1px solid var(--line);margin:-2px 0 8px;overflow-x:auto;scrollbar-width:none}
+.sxt button{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:6px 0 8px;font:inherit;color:var(--muted)}
+.sxt button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--brand)}
+.qis{display:flex;margin:12px;background:var(--card);border-radius:16px;padding:12px 4px}
+.qi{flex:1;min-width:0;background:none;border:0;font:inherit;font-size:.88em;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 0}
+.qc{width:52px;height:52px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center}
+.ban{display:flex;width:100%;justify-content:space-between;align-items:center;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;color:var(--ink);margin-bottom:10px}.ban .chev{font-size:1.3em}
+.hsc{display:flex;gap:8px;overflow-x:auto;margin-right:-14px;padding:0 14px 4px 0;scrollbar-width:none}
+.hsc .dc{flex:none;width:118px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;color:var(--ink)}.hsc .dc .muted{font-size:.8em}
+.rks{display:flex;flex-wrap:wrap;gap:6px}.rk{display:inline-flex;align-items:center;gap:4px;font-size:.88em;border:1px solid var(--line);border-radius:14px;padding:3px 8px 3px 4px}
+.rd{width:18px;height:18px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.stpr{display:flex;list-style:none;margin:8px 0 4px;padding:0 4px;counter-reset:none}
+.stpr li{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;min-width:0}
+.stpr li:not(:last-child):after{content:"";position:absolute;top:13px;left:calc(50% + 16px);right:calc(-50% + 16px);height:1px;background:var(--line)}
+.stpr .sn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#F1EFE8;color:#888780}
+.stpr li.done .sn{background:var(--brand-soft);color:var(--brand-ink)}.stpr li.on .sn{background:var(--brand);color:#fff}
+.stpr .sl{font-size:11px;color:var(--muted);white-space:nowrap}.stpr li.on .sl{color:var(--ink);font-weight:700}
+.stf+.stpr{background:var(--card);margin:0;padding:8px 4px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#C42D5A">
+<meta name="theme-color" content="#D4003C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="揪居家">
@@ -329,7 +357,7 @@ function EN(){return esc((S.ctx&&S.ctx.elder)||'長輩')}
 function ON(){return esc((S.ctx&&S.ctx.owner)||'家人')}
 function CN(r,d){const c=((S.ctx&&S.ctx.contacts)||[]).find(x=>String(x.r||'').includes(r));return esc(c?c.n:d)}
 function STORE(){return esc((S.hh&&S.hh.household.store)||(S.me&&S.me.store)||'綁定門市')}
-const ADV_V=['a1','a2','a3','a4','a5','a6','d3','acard','apm','aec'],TECH_V=['t1','t2','t3','t4','tc','tp','tdf','tacc'];
+const ADV_V=['acases','a1','a2','a3','a4','a5','a6','d3','acard','apm','aec'],TECH_V=['thist','tacct','t1','t2','t3','t4','tc','tp','tdf','tacc'];
 function setCtx(v){const blank={elder:'長輩',owner:'家人',contacts:[]};
  if((v==='apm'||v==='aec')&&S.board){S.ctx={elder:S.board.elder_name,owner:'家人',contacts:[]}}
  else if(ADV_V.includes(v)){const c=S.case;S.ctx=c?{elder:c.elder_name,owner:c.owner,contacts:[]}:blank}
@@ -337,7 +365,7 @@ function setCtx(v){const blank={elder:'長輩',owner:'家人',contacts:[]};
  else if(S.hh){const h=S.hh.household;S.ctx={elder:h.elder_name,owner:S.hh.owner,contacts:h.contacts||[]}}
  else S.ctx=blank}
 function DEV(p){return S.hh?S.hh.devices.filter(d=>d.home===(p?'parents':'mine')):[]}
-const LC={r:'#C42D5A',y:'#E0A030',g:'#138F3B',n:'#B9B7B0'},LT={r:'紅燈',y:'黃燈',g:'綠燈',n:'未量測'};
+const LC={r:'#E5484D',y:'#E0A030',g:'#138F3B',n:'#B9B7B0'},LT={r:'紅燈',y:'黃燈',g:'綠燈',n:'未量測'};
 function lightsCard(L){if(!L||!L.length)return '';const red=L.filter(x=>x[1]==='r').length,yel=L.filter(x=>x[1]==='y').length;
  return `<div class="card lights"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>居家安全檢核</b><span class="muted" style="font-size:.85em">紅燈 ${red}｜黃燈 ${yel}</span></div>${L.map(([n,c,t])=>`<div class="row"><span><span class="dot lt" style="background:${LC[c]||LC.n}" aria-hidden="true"></span>${esc(n)}<span class="sr">${LT[c]||''}</span></span><span class="muted" style="font-size:.88em;text-align:right">${esc(t)}</span></div>`).join('')}<div class="muted" style="font-size:.85em;margin-top:6px">依 AR 掃描（場勘）與問答自動標示，紅燈優先處理；不取代專業評估。</div>${lightBasis()}</div>`}
 function measRows(m){const R=[['corridor_cm','床邊到浴室走道寬','cm'],['threshold_cm','浴室門檻高度','cm'],['bed_bath_m','床邊到浴室門口','公尺'],['outlets','沿路可用插座','個']];
@@ -361,7 +389,7 @@ function clearDraft(){clearTimeout(draftT);api('/home/assessment-draft',{method:
 async function loadDraft(){try{const r=await api('/home/assessment-draft');const d=r.draft;if(d&&((d.meas&&Object.keys(d.meas).length)||(d.ans&&Object.keys(d.ans).length))){Object.assign(S.meas,d.meas||{});Object.assign(S.ans,d.ans||{});S.qi=Math.min(d.qi||0,Q.length-1);rr();toast('已帶回上次沒做完的量測與回答')}}catch(e){}}
 async function loadDrafts(){S.drafts=(await api('/advisor/drafts')).drafts}
 async function loadQuote(){S.quote=(await api('/home/quote')).quote}
-const LOAD={pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,wall:loadTopics,pre:loadTopics};
+const LOAD={pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,thist:loadOrders,acases:loadCases,wall:loadTopics,pre:loadTopics};
 async function savePrefs(o){if(S.me&&S.me.role==='family'){try{const d=await api('/home/prefs',{method:'PUT',body:o});S.hh.household.prefs=d.prefs}catch(e){toast(e.message)}}}
 async function sendReq(kind,note){try{const d=await api('/requests',{method:'POST',body:{kind,note}});toast(d.duplicate?'已送出過，門市處理中':'已送出「'+kind+'」，門市會與您聯絡')}catch(e){toast(e.message)}}
 addEventListener('jjjphase',()=>{if(S.me)render()});
@@ -383,7 +411,7 @@ async function logout(){try{await api('/auth/logout',{method:'POST',noAuthRedire
  Object.assign(S,{me:null,hh:null,ph:0,booked:null,saved:false,ans:{},meas:{},slots:null,cases:null,orders:null,todos:null,topics:null,case:null,order:null,adv:null,tech:null,obs:null,obsDone:false,big:false,invite:null,stack:['login']});render()}
 function demoBox(){const c=S.cfg;if(!c||!c.demo||!c.demo_accounts.length)return '';
  return `<div class="card demo-accounts"><b>示範帳號</b><div class="muted" style="font-size:.85em">示範環境才會顯示；密碼皆為 ${esc(c.demo_password)}，點一下自動帶入</div>${c.demo_accounts.map(a=>`<button type="button" data-fill="${esc(a.email)}"><b style="font-weight:500">${esc(a.label)}</b><span class="muted" style="display:block;font-size:.85em">${esc(a.email)}</span></button>`).join('')}</div>`}
-const AR_SVG=`<svg viewBox="0 0 320 124" width="100%" role="img" aria-label="量測位置示意：A 走道寬度、B 浴室門檻高度、C 床邊到浴室門口距離"><rect x="6" y="14" width="78" height="92" rx="6" fill="var(--bg)" stroke="#8A8983"/><text x="45" y="30" font-size="11" text-anchor="middle" fill="#6F6670">臥室</text><rect x="22" y="40" width="40" height="54" rx="4" fill="var(--card)" stroke="#8A8983"/><text x="42" y="71" font-size="10" text-anchor="middle" fill="#6F6670">床</text><rect x="84" y="42" width="152" height="44" fill="var(--note)" stroke="#8A8983"/><text x="160" y="58" font-size="11" text-anchor="middle" fill="#6F6670">走道</text><rect x="236" y="14" width="78" height="92" rx="6" fill="#E8F0F8" stroke="#8A8983"/><text x="276" y="30" font-size="11" text-anchor="middle" fill="#8E1E42">浴室</text><rect x="233" y="48" width="7" height="32" fill="#C42D5A"/><path d="M62 66 H234" stroke="#C42D5A" stroke-width="2" stroke-dasharray="5 4" fill="none"/><path d="M104 44 V84 M100 44 H108 M100 84 H108" stroke="#8E1E42" stroke-width="2"/><circle cx="118" cy="74" r="8" fill="#8E1E42"/><text x="118" y="78" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">A</text><circle cx="252" cy="92" r="8" fill="#C42D5A"/><text x="252" y="96" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">B</text><path d="M62 112 H234 M62 108 V116 M234 108 V116" stroke="#8E1E42" stroke-width="2"/><circle cx="148" cy="112" r="8" fill="#8E1E42"/><text x="148" y="116" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">C</text></svg>`;
+const AR_SVG=`<svg viewBox="0 0 320 124" width="100%" role="img" aria-label="量測位置示意：A 走道寬度、B 浴室門檻高度、C 床邊到浴室門口距離"><rect x="6" y="14" width="78" height="92" rx="6" fill="var(--bg)" stroke="#8A8983"/><text x="45" y="30" font-size="11" text-anchor="middle" fill="#6F6670">臥室</text><rect x="22" y="40" width="40" height="54" rx="4" fill="var(--card)" stroke="#8A8983"/><text x="42" y="71" font-size="10" text-anchor="middle" fill="#6F6670">床</text><rect x="84" y="42" width="152" height="44" fill="var(--note)" stroke="#8A8983"/><text x="160" y="58" font-size="11" text-anchor="middle" fill="#6F6670">走道</text><rect x="236" y="14" width="78" height="92" rx="6" fill="#E8F0F8" stroke="#8A8983"/><text x="276" y="30" font-size="11" text-anchor="middle" fill="#A3002E">浴室</text><rect x="233" y="48" width="7" height="32" fill="#D4003C"/><path d="M62 66 H234" stroke="#D4003C" stroke-width="2" stroke-dasharray="5 4" fill="none"/><path d="M104 44 V84 M100 44 H108 M100 84 H108" stroke="#A3002E" stroke-width="2"/><circle cx="118" cy="74" r="8" fill="#A3002E"/><text x="118" y="78" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">A</text><circle cx="252" cy="92" r="8" fill="#D4003C"/><text x="252" y="96" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">B</text><path d="M62 112 H234 M62 108 V116 M234 108 V116" stroke="#A3002E" stroke-width="2"/><circle cx="148" cy="112" r="8" fill="#A3002E"/><text x="148" y="116" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">C</text></svg>`;
 // AR 掃描（場勘）：模擬示範動畫（正式版改接手機 AR 掃描，結果同樣帶入手動輸入欄位）
 // 座標為走廊模型影像（780×1248）的百分比位置
 const ARP={wl:[28.33,74.52],wr:[71.28,74.76],wlab:[49.8,70.6],dl:[39.74,20.27],dr:[62.44,20.19],dbl:[40.64,55.21],dbr:[61.41,55.29],door:[51.0,35.5],th:[46.5,53.6],o1:[74.2,69.0],o2:[66.5,47.2]};
@@ -400,8 +428,8 @@ function arViewHTML(){const p=k=>`left:${ARP[k][0]}%;top:${ARP[k][1]}%`,t=S.arT|
  <span class="arlab" id="arLW" style="${p('wlab')}">寬 0 cm</span>
  <span class="arlab" id="arLD" style="${p('door')}"><i style="background:#FFD23F"></i>浴室門 80 cm</span>
  <span class="arlab" id="arLT" style="${p('th')}"><i style="background:#FF9F1C"></i>門檻 2 cm</span>
- <span class="arlab" id="arLF" style="left:30%;top:60%"><i style="background:#C42D5A"></i>浴室地板｜磁磚 93%</span>
- <span class="arlab" id="arLM" style="left:62%;top:30%;display:none"><i style="background:#C42D5A"></i>門框｜鋁框 88%</span>
+ <span class="arlab" id="arLF" style="left:30%;top:60%"><i style="background:#D4003C"></i>浴室地板｜磁磚 93%</span>
+ <span class="arlab" id="arLM" style="left:62%;top:30%;display:none"><i style="background:#D4003C"></i>門框｜鋁框 88%</span>
  <span class="arlab" id="arLO1" style="${p('o1')}"><i style="background:#FF7A9C"></i>插座</span>
  <span class="arlab" id="arLO2" style="${p('o2')}"><i style="background:#FF7A9C"></i>插座</span>
  <div class="reticle" id="arRet"></div></div>
@@ -450,7 +478,7 @@ const HPJ={O:[620, 194.8687947858078],EX:[53.19165665853666, 34.190937838807855]
 const HPV=[180.5,18.5,932.5,806.0];
 const HPR={bed:[0,0,4,3.5],bath:[4,0,6.2,3.5],ldy:[6.2,0,9,3.5],hall:[0,3.5,9,4.6],kit:[0,4.6,3.8,8],liv:[3.8,4.6,9,8],door:[7.2,8,9,9]};
 const HPN={'臥室':'bed','走道':'hall','浴室':'bath','廚房':'kit','客廳':'liv','門口':'door'};
-const HPC={r:'#C42D5A',y:'#E0A030',g:'#138F3B',n:'#9A9893'};
+const HPC={r:'#E5484D',y:'#E0A030',g:'#138F3B',n:'#9A9893'};
 const hpp=(x,y,z)=>[HPJ.O[0]+x*HPJ.EX[0]+y*HPJ.EY[0]+z*HPJ.EZ[0],HPJ.O[1]+x*HPJ.EX[1]+y*HPJ.EY[1]+z*HPJ.EZ[1]];
 const hps=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
 function homePlanCard(L,path){if(!L||!L.length)return '';const FT=HPJ.FT;let g='',lab='';
@@ -460,7 +488,7 @@ function homePlanCard(L,path){if(!L||!L.length)return '';const FT=HPJ.FT;let g='
   const at={hall:[1.4,4.05],bath:[5.1,1.2],bed:[1.8,1.6],door:[8.1,8.5]}[id]||[(x0+x1)/2,(z0+z1)/2];const [lx,ly]=hpp(at[0],FT+1.1,at[1]);const w=n.length*30+58;
   lab+=`<g transform="translate(${lx.toFixed(0)},${ly.toFixed(0)})"><rect x="${-w/2}" y="-22" width="${w}" height="44" rx="22" fill="#fff" stroke="rgba(0,0,0,.12)"/><circle cx="${-w/2+24}" cy="0" r="9" fill="${col}"/><text x="${-w/2+42}" y="10" font-size="28" font-weight="700" fill="#3D3A40">${n}</text></g>`}
  if(path){const pts=[[2.85,1.4],[3.05,2.6],[3.45,3.5],[3.6,4.05],[4.8,4.05],[5.0,3.5],[4.9,2.3],[4.75,1.3]].map(([x,z])=>hpp(x,FT+.02,z));
-  g+=`<polyline points="${hps(pts)}" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="1 16" stroke-linecap="round"/><polyline points="${hps(pts)}" fill="none" stroke="#8E1E42" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round"/>`;
+  g+=`<polyline points="${hps(pts)}" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="1 16" stroke-linecap="round"/><polyline points="${hps(pts)}" fill="none" stroke="#A3002E" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round"/>`;
   for(const [x,z] of [[3.08,1.0],[4.2,3.66],[5.3,3.25]]){const [px,py]=hpp(x,FT+.3,z);g+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="20" fill="#FFC24A" fill-opacity=".35"/><circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="8" fill="#FFC24A" stroke="#fff" stroke-width="3"/>`}}
  return `<div class="card hplan"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>居家安全地圖</b><span class="muted" style="font-size:.85em">${EN()}家｜平面為示意</span></div>
  <div class="hpw"><img src="home/plan.jpg" alt="${EN()}家的室內設計圖，依燈號標示各空間風險"><svg viewBox="${HPV.join(' ')}" aria-hidden="true">${g}${lab}</svg></div>
@@ -484,10 +512,29 @@ const icon={
 function go(v){if(v!=='c1'&&v!=='c2'&&v!=='c3')S.fromLog=false;if(v==='b4'){S.slots=null;S.slot=null}S.stack.push(v);render();if(LOAD[v])LOAD[v]().then(()=>{if(S.stack[S.stack.length-1]===v)render()}).catch(e=>toast(e.message))}
 function back(){if(S.stack.length>1){S.stack.pop();render()}}
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
-function hdr(t,{back:b=true,aplus=true}={}){return `<div class="top">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${aplus?`<button class="aplus" data-a="big" aria-pressed="${S.big}">大字</button>`:''}</div>`}
+// 編號步驟（借鏡購物車）：完成打勾、目前這步實心紅、未到灰色
+const FSTEP=['AR 掃描','五題','結果','預約','完成'],ASTEP=['了解需求','調整方案','報價','同意事項','長輩確認'],TSTEP=['施工','驗收','完工'];
+function stepper(L,cur){return `<ol class="stpr" aria-label="流程步驟">${L.map((l,i)=>`<li class="${i<cur?'done':i===cur?'on':''}" ${i===cur?'aria-current="step"':''}><span class="sn">${i<cur?'✓':i+1}</span><span class="sl">${l}</span></li>`).join('')}</ol>`}
+// 頂部（固定）：白底、頁名置中；第 2 層以後左邊「‹ 返回」，按了回上一頁（跟手機返回鍵一樣）
+function hdr(t,{back:b=true,aplus=true}={}){return `<div class="top">${b?'<button class="back" data-a="back" aria-label="返回上一頁">‹ 返回</button>':'<span class="tsp"></span>'}<h1>${t}</h1>${aplus?`<button class="aplus" data-a="big" aria-pressed="${S.big}">大字</button>`:'<span class="tsp"></span>'}</div>`}
 function homeNav(){const it=[['home','首頁'],['news','最新'],['pay','行動支付'],['cart','線上購物'],['m1','會員中心']];return `<nav class="nav" aria-label="主選單" style="padding:0;position:relative;display:block;border-top:0"><img src="home/nav.png" alt="" style="display:block;width:100%"><div style="position:absolute;inset:0;display:flex">${it.map(([k,l])=>`<button data-nav="${k}" aria-label="${l}" ${k==='home'?'aria-current="page"':''} style="flex:1;background:transparent;border:0"></button>`).join('')}</div></nav>`}
 function nav(cur){const it=[['home','首頁',icon.home],['news','最新',icon.news],['pay','行動支付',icon.pay],['cart','線上購物',icon.cart],['m1','會員中心',icon.user]];
  return `<nav class="nav" aria-label="主選單">${it.map(([k,l,i])=>`<button data-nav="${k}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`).join('')}</nav>`}
+function isToday(o){return (o.slot||'').slice(0,10)===S.today&&o.status!=='已完成'}
+// 工作包：一列一包（名稱／負責人／狀態），不用色塊長條
+function pkList(L,me){L=L||[];return L.length?`<div class="pkl">${L.map(k=>{const st=k.status||'',c=st==='已完成'?'ok':/進行|施工/.test(st)?'on':'';return `<div class="pkr"><span class="pkn">${esc(k.name.split('（')[0])}</span><span class="pka">${me?(k.mine?'我':esc(k.assignee||'')):esc(k.assignee||'')}</span><span class="pks ${c}">${c==='ok'?'✓ ':''}${esc(st)}</span></div>`}).join('')}</div>`:''}
+function ocard(o){return `<button class="card ${isToday(o)?'focus':''}" data-a="tOpen" data-id="${o.id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(o.label)}　${esc(o.household)}</b><span class="tag ${o.status==='已完成'?'ok':''}">${esc(o.status==='已指派'?'待出發':o.status)}</span></div><div class="muted">${esc(o.kind)}｜${esc((o.plan?CAT.filter(c=>o.plan.sel[c.id]&&c.g&&c.p).map(c=>c.n).join('、'):'')||'依工單')}｜${esc(o.address)}</div>${o.note?`<div class="onote">${esc(o.note)}</div>`:''}${pkList(o.packages,true)}</button>`}
+const SIC={
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+ cases:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
+ tool:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 005.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>',
+ hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>'};
+// 員工導覽列：生活顧問「今日行程／案件／帳號」；技師「今日工單／工單紀錄／帳號」
+const SNAV={advisor:[['a1','今日行程',SIC.cal],['acases','案件',SIC.cases],['amy','帳號',icon.user]],tech:[['t1','今日工單',SIC.tool],['thist','工單紀錄',SIC.hist],['tacct','帳號',icon.user]]};
+function snav(cur){const L=SNAV[S.me&&S.me.role]||[];return `<nav class="nav snav" aria-label="主選單">${L.map(([k,l,i])=>`<button data-snav="${k}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`).join('')}</nav>`}
+// 帳號頁：分組清單＋紅色外框登出（借鏡會員中心）
+function acctList(groups){return groups.map(([g,rows])=>`<div class="sec">${g}</div><div class="glist">${rows.map(([lab,sub,attr])=>`<button class="gi" ${attr}><span><b>${lab}</b>${sub?`<span class="muted" style="display:block;font-size:.88em">${sub}</span>`:''}</span><span class="chev">›</span></button>`).join('')}</div>`).join('')+`<div class="pad" style="margin-top:20px"><button class="btn logout" data-a="logout">登出</button></div>`}
+function meCard(){return `<div class="card" style="display:flex;gap:12px;align-items:center;margin-top:12px"><span class="av">${esc((S.me.name||'?').slice(0,1))}</span><div><b style="font-size:1.08em">${esc(S.me.name||'')}</b><div class="muted">${esc(S.me.role==='tech'?'全國電子技師':'生活顧問')}｜${esc(S.me.store||'全國電子')}</div></div></div>`}
 const V={
 boot:()=>`<div class="ld">載入中…</div>`,
 login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','高雄民族店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]]];let k=0;
@@ -535,7 +582,7 @@ b1:()=>`${hdr('揪居家｜居家安全評估')}<div class="scroll" style="paddi
  <div class="pad"><button class="btn" data-a="loginChild">幫長輩填（我是家人）</button><button class="btn ghost" data-a="loginSelf">我是長輩本人（自動大字模式）</button><p class="muted" style="text-align:center">資料只給您的家人與綁定門市；也可以直接到門市，由顧問陪同填寫</p></div></div>`,
 ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&S.cfg.measure_range)||{};const f=(k,l,u,ph,step)=>`<label class="mf"><span>${l}</span><span class="unit"><input class="fld" id="m_${k}" data-meas="${k}" type="number" inputmode="decimal" min="${(R[k]||[])[0]??''}" max="${(R[k]||[])[1]??''}" step="${step}" value="${esc(m[k]??'')}" placeholder="${ph}"><i>${u}</i></span></label>`;
  return `${hdr('AR 掃描（場勘）',{aplus:true})}<div class="scroll" style="padding-top:12px">
- <div class="pad"><div class="muted" style="margin-bottom:6px">步驟 1／2｜先量${EN()}家的夜間動線</div><div class="bar" aria-hidden="true"><i style="width:30%"></i></div></div>
+ <div class="pad">${stepper(FSTEP,0)}<div class="muted" style="margin-top:6px">先量${EN()}家的夜間動線</div></div>
  <div class="pad" style="margin-top:10px"><div class="seg armode" role="group" aria-label="量測方式"><button data-armode="ar" aria-pressed="false">AR 掃描</button><button data-armode="manual" aria-pressed="true">手動輸入</button></div></div>
  <div class="card" style="margin-top:12px">${AR_SVG}<div class="muted" style="font-size:.85em;margin-top:6px">從床邊走到浴室門口，量 A 走道寬度、B 浴室門檻高度、C 距離，也數一下沿路有幾個插座。</div></div>
  <div class="card"><div class="meas">${f('corridor_cm','A｜走道寬度','cm','例如 92','1')}${f('threshold_cm','B｜浴室門檻高度','cm','例如 2','0.5')}${f('bed_bath_m','C｜床邊到浴室門口','公尺','例如 5','0.5')}</div>
@@ -543,7 +590,7 @@ ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&
   <div class="okbox" style="background:var(--note);color:var(--muted)">AR 掃描目前為模擬示範；正式版接手機 AR 掃描，結果一樣帶入這裡，也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「長輩家」、「我家」或這次先不儲存。</div></div>
  <div class="pad"><button class="btn" data-a="arNext">下一步：全國電子 AI 顧問阿國問答</button><button class="btn ghost" data-a="arSkip">先略過，到門市再請顧問量</button></div></div>`},
 b2:()=>{const i=S.qi||0,q=Q[i],sel=S.ans[q.k],qt=S.self?QS[q.k]:q.q;return `${hdr('全國電子 AI 顧問阿國居家診斷',{aplus:true})}<div class="scroll" style="padding-top:14px"><div class="pad">
- <div class="muted" style="margin-bottom:6px">步驟 2／2｜第 ${i+1} 題，共 ${Q.length} 題</div><div class="bar" aria-hidden="true"><i style="width:${30+(i+1)/Q.length*70}%"></i></div>
+ ${stepper(FSTEP,1)}<div class="muted" style="margin:6px 0">第 ${i+1} 題，共 ${Q.length} 題</div>
  <div class="agline"><span class="agav">✦</span><span class="muted">全國電子 AI 顧問阿國問</span></div>
  <div class="big" style="margin:6px 0 14px">${qt}</div>
  ${q.o.map(o=>`<button class="opt" data-ans="${o}" aria-pressed="${sel===o}">${o}</button>`).join('')}
@@ -552,7 +599,7 @@ b2:()=>{const i=S.qi||0,q=Q[i],sel=S.ans[q.k],qt=S.self?QS[q.k]:q.q;return `${hd
  ${sel?'':'<p class="muted" style="text-align:center;margin-top:8px">請先選擇一個答案</p>'}
  </div></div>`},
 b3:()=>{const as=S.hh&&S.hh.assessment;if(!as)return V.b1();const r=as.rec,m=as.measures||{},dv=DEV(true).filter(d=>d.warn&&d.source==='購買紀錄');
- return `${hdr('全國電子 AI 顧問阿國推薦',{aplus:true})}<div class="scroll" style="padding-top:12px">
+ return `${hdr('全國電子 AI 顧問阿國推薦',{aplus:true})}<div class="scroll" style="padding-top:12px"><div class="pad">${stepper(FSTEP,2)}</div>
  <div class="pad"><div class="muted">${as.filled_by==='self'?'為您推薦':'為'+EN()+'推薦'}｜${esc(r.scene)}場域</div><div class="big">${esc(r.n)}</div></div>
  <div class="card" style="background:var(--brand-soft);color:var(--brand-ink)">${esc(r.why)}${(r.notes||[]).map(n=>`<div style="margin-top:6px;font-size:.92em">${esc(n)}</div>`).join('')}</div>
  ${lightsCard(as.lights)}
@@ -561,11 +608,11 @@ b3:()=>{const as=S.hh&&S.hh.assessment;if(!as)return V.b1();const r=as.rec,m=as.
  <div class="card">${r.items.map(([a,b])=>`<div class="row"><span>${esc(a)}</span><b style="font-weight:500;text-align:right">${esc(b)}</b></div>`).join('')}
   <div style="margin-top:10px"><span class="tag ok">預設不含鏡頭</span></div><div class="muted" style="font-size:.85em;margin-top:6px">可選影像確認版：平常只在本機錄影；異常且長輩沒回應時，LINE 通知家人、片段在 App 觀看，須長輩書面同意</div></div>
  ${Object.keys(m).length?`<div class="card"><b>AR 掃描（場勘）量測</b>${measRows(m)}</div>`:''}
- <div class="card" style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 90 90" width="78" height="78" role="img"><title>您的揪居家同心圓</title><circle cx="45" cy="45" r="43" fill="none" stroke="#8A8983" stroke-width="1"/><circle cx="45" cy="45" r="32" fill="#8E1E42" fill-opacity=".22" stroke="#8E1E42" stroke-width="1"/><circle cx="45" cy="45" r="21" fill="#8E1E42" fill-opacity=".22" stroke="#8E1E42" stroke-width="1"/><circle cx="45" cy="45" r="10" fill="#C42D5A" fill-opacity=".45" stroke="#C42D5A" stroke-width="1"/></svg><div class="muted" style="font-size:.88em;line-height:1.7"><div><b style="color:#C42D5A">●</b> 家電檔案（免費）</div><div><b style="color:#8E1E42">●</b> 家電保養：擴展期開放</div><div><b style="color:#8E1E42">●</b> 長輩關懷：${esc(r.n)}</div><div>○ 家電換新：擴展期開放</div></div></div>
+ <div class="card" style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 90 90" width="78" height="78" role="img"><title>您的揪居家同心圓</title><circle cx="45" cy="45" r="43" fill="none" stroke="#8A8983" stroke-width="1"/><circle cx="45" cy="45" r="32" fill="#A3002E" fill-opacity=".22" stroke="#A3002E" stroke-width="1"/><circle cx="45" cy="45" r="21" fill="#A3002E" fill-opacity=".22" stroke="#A3002E" stroke-width="1"/><circle cx="45" cy="45" r="10" fill="#D4003C" fill-opacity=".45" stroke="#D4003C" stroke-width="1"/></svg><div class="muted" style="font-size:.88em;line-height:1.7"><div><b style="color:#D4003C">●</b> 家電檔案（免費）</div><div><b style="color:#A3002E">●</b> 家電保養：擴展期開放</div><div><b style="color:#A3002E">●</b> 長輩關懷：${esc(r.n)}</div><div>○ 家電換新：擴展期開放</div></div></div>
  <div class="card" style="background:var(--note)"><b>下一步：交給門市，由生活顧問完成報價</b><div class="muted" style="margin-top:4px">診斷與 AR 掃描（場勘）結果會自動帶給生活顧問；生活顧問把夜間動線照明與關懷設備整合成一張報價，到店不用再講一次。</div></div>
  ${dv.length?`<div class="card"><b>順便看看家裡的家電</b>${dv.map(d=>`<div class="muted" style="margin-top:4px">${esc(d.name)}：${esc(d.status)}${d.years?'（使用 '+d.years+' 年）':''}</div>`).join('')}</div>`:''}
  <div class="pad">${S.ph>=2?'<button class="btn" data-go="m2">到「揪居家」看方案</button>':`<button class="btn" data-go="b4">${S.booked?'更改門市預約':'預約門市免費諮詢'}</button>`}<button class="btn ghost" data-go="optA">選改善方式（四類做法）</button><div class="card" style="margin:4px 0 8px;padding:12px"><b>分析成果要存在哪裡？</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">原始影像已在分析完清除；存入的成果與截圖保存六個月，期滿由新資料覆蓋。</div><button class="btn ghost" data-a="save">存入「長輩家」</button><button class="btn ghost" data-a="saveMine">存入「我家」</button><button class="btn ghost" data-a="saveNone">這次先不儲存，只查看結果</button></div><button class="btn ghost" data-go="share">分享摘要給家人（LINE）</button>${S.ph<2?'<button class="btn ghost" data-a="redo">重新做一次評估</button>':''}</div></div>`},
-b4:()=>{const stores=(S.cfg&&S.cfg.stores)||[],st=S.store||(S.hh&&S.hh.household.store)||(stores[0]&&stores[0].name),sl=S.slot,L=S.slots;return `${hdr('預約門市諮詢')}<div class="scroll" style="padding-top:12px">
+b4:()=>{const stores=(S.cfg&&S.cfg.stores)||[],st=S.store||(S.hh&&S.hh.household.store)||(stores[0]&&stores[0].name),sl=S.slot,L=S.slots;return `${hdr('預約門市諮詢')}<div class="scroll" style="padding-top:12px"><div class="pad">${stepper(FSTEP,3)}</div>
  <div class="sec">選擇門市</div>
  ${stores.map(s=>`<button class="card opt" style="width:calc(100% - 24px);margin:0 12px 10px" data-store="${esc(s.name)}" aria-pressed="${st===s.name}"><b>${esc(s.name)}</b><div class="muted">${esc(s.note)}${S.hh&&S.hh.household.store===s.name?'｜綁定門市':''}</div></button>`).join('')}
  <div class="sec">你的生活顧問</div>${advCard(st)}
@@ -573,7 +620,7 @@ b4:()=>{const stores=(S.cfg&&S.cfg.stores)||[],st=S.store||(S.hh&&S.hh.household
  ${L?(L.length?L.map(x=>`<button class="slot" data-slot="${x.slot}" aria-pressed="${sl===x.slot}" ${x.full?'disabled':''}>${esc(x.label)}${x.full?'<br>額滿':''}</button>`).join(''):'<div class="muted">近期沒有可預約的時段，請改選其他門市。</div>'):'<div class="muted">讀取可預約時段…</div>'}</div>
  <div class="card" style="margin-top:14px;background:var(--note)">您的 AR 掃描（場勘）與診斷結果會自動帶給生活顧問，到店不用再講一次。歡迎邀請長輩一同到店，親自確認設備不含鏡頭。</div>
  <div class="pad"><button class="btn" data-a="book" ${sl?'':'disabled'}>確認預約</button></div></div>`},
-b5:()=>`${hdr('預約完成',{back:false})}<div class="scroll" style="padding-top:20px">
+b5:()=>`${hdr('預約完成',{back:false})}<div class="scroll" style="padding-top:12px"><div class="pad">${stepper(FSTEP,4)}</div>
  <div class="pad" style="text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:30px">✓</div><div class="big">預約完成</div></div>
  <div class="card"><b>${S.booked?esc(S.booked.store)+'｜'+esc(S.booked.slot):'門市諮詢'}</b><div class="muted" style="margin-top:4px">預約已送到門市，生活顧問會依您的診斷結果先做準備；可以在「揪居家」查看或更改。</div></div>
  <div class="sec">你的生活顧問</div>${advCard(S.booked?S.booked.store:'',true)}<div class="pad"><button class="btn ghost" data-a="lineAdv">請生活顧問聯絡我</button></div>
@@ -591,10 +638,10 @@ m1:()=>{const g=J()?['關懷中','ok']:S.ph>=3?['安裝中','']:S.ph===2?['方�
  <div class="sec">一般設定</div><div class="card" style="padding:4px 14px">
   ${R('data-a="big"','大字模式','放大全部文字，方便長輩閱讀',T(S.big?'已開啟':'關閉',S.big?'ok':'mu'))}
   ${R('data-go="nset"','通知設定','異常通知、每月摘要','')}
-  ${R('data-go="pw"','變更密碼','','')}
-  ${R('data-a="logout"','登出','','')}</div>
+  ${R('data-go="pw"','變更密碼','','')}</div>
+ <div class="pad" style="margin:20px 0 8px"><button class="btn logout" data-a="logout">登出</button></div>
  </div>${nav('m1')}`},
-home:()=>{const I=(d)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#C42D5A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+home:()=>{const I=(d)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#D4003C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
  const G=[['減碳貢獻','<path d="M12 20v-7"/><path d="M12 13c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 13c0-3-2-5-6-5 0 3 2 5 6 5z"/>'],['店長推薦','<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 16v-5l3-4 1 1-1 3h4l-1 5H9z"/>'],['保固服務','<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>'],['門市查詢','<path d="M12 21s-6-6-6-11a6 6 0 0112 0c0 5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/>'],['影音專區','<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9l5 2-5 2z"/><path d="M6 20h6"/>'],['空調推薦','<rect x="3" y="6" width="18" height="7" rx="2"/><path d="M7 16v3M12 16v3M17 16v3"/>'],['電視推薦','<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 20h8"/>'],['線上報修','<path d="M14 7l3-3 3 3-3 3"/><path d="M17 4L8 13"/><path d="M4 20l5-5"/><path d="M6 9l9 9"/>']];
  const R=[['登錄活動','<path d="M4 9l8-4 8 4-8 4z"/><path d="M4 9v7l8 4 8-4V9"/>'],['當期活動','<path d="M4 12l8-8h6v6l-8 8z"/><path d="M9 11l4 4"/>'],['線上DM','<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],['活動報名','<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M9 15l2 2 4-4"/>']];
  const H=S.hh,dvc=H.devices.filter(d=>d.home==='parents'),wn=dvc.filter(d=>d.warn).length,ins=H.install;
@@ -605,25 +652,36 @@ home:()=>{const I=(d)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="no
  <img src="home/act.png" alt="活動專區" style="display:block;width:100%">
  <div class="sec">分享好生活</div>
  <button class="card" data-go="m2" style="display:block;width:calc(100% - 24px);text-align:left"><div style="background:var(--note);height:84px;border-radius:10px;margin-bottom:10px"></div><div style="color:var(--brand);font-size:12px">居家知識</div><b>長輩開始一個人住，家裡這 3 個地方要先注意</b><div class="muted" style="margin-top:6px">看揪居家 ›</div></button>
- <button class="card" data-go="m2" style="display:block;width:calc(100% - 24px);text-align:left"><div style="background:#8E1E42;color:#fff;height:84px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:13px">▶ 門市節氣共煮（示意）</div><div style="color:var(--brand);font-size:12px">門市人物圖鑑｜長輩的關懷者</div><b>節氣共煮：顧問順便教你夜間走廊這樣亮，長輩不摸黑</b><div class="muted" style="margin-top:6px">看揪居家 ›</div></button>
+ <button class="card" data-go="m2" style="display:block;width:calc(100% - 24px);text-align:left"><div style="background:#A3002E;color:#fff;height:84px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:13px">▶ 門市節氣共煮（示意）</div><div style="color:var(--brand);font-size:12px">門市人物圖鑑｜長輩的關懷者</div><b>節氣共煮：顧問順便教你夜間走廊這樣亮，長輩不摸黑</b><div class="muted" style="margin-top:6px">看揪居家 ›</div></button>
  </div>${homeNav()}`},
 m2:()=>{const p=S.home==='parents',H=S.hh,h=H.household,fm=S.famMine||{},dv=DEV(p),warn=dv.filter(d=>d.warn);
  const R=p?(H.reminders||[]).filter(r=>r.status==='待處理'):[],n=warn.length+R.length,my=(H.wishes||[]).length;
- const row=(at,t,st,hot)=>`<button class="row" ${at} style="width:100%"><span>${t}</span><span class="${hot?'tag':'muted'}">${st} <span class="chev">›</span></span></button>`;
  const care=J()?(H.plan?esc(planName(H.plan.plan).split('｜')[0])+'｜運作中':'運作中'):S.ph>=3?'安裝後開啟':S.ph===2?'方案待確認':'安裝後開啟';
+ // 版型：借鏡全國電子「最新」的區塊卡片＋區塊內分類軸、「會員中心」的常用按鈕
+ const sec=(k,t,more,body)=>`<section class="sx" data-sx="${k}"><div class="sxh"><b>${t}</b>${more?`<button class="sxm" ${more}>看更多 <span class="chev">›</span></button>`:''}</div>${body}</section>`;
+ const tb=(k,items)=>{const c=(S.sxTab||{})[k]||0;return `<div class="sxt" role="tablist">${items.map((x,i)=>`<button role="tab" data-sxt="${k}|${i}" aria-selected="${c===i}">${x}</button>`).join('')}</div>`};
+ const qi=(at,l,ic)=>`<button class="qi" ${at}><span class="qc" aria-hidden="true">${ic}</span>${l}</button>`;
+ const QI={care:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9.5A4 4 0 0112 8a4 4 0 017 2.5C19 15.6 12 20 12 20z"/></svg>',dev:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6.5v1.5M9 13v3"/></svg>',plan:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v18l-2.5-1.5L12 21l-2.5-1.5L7 21z"/><path d="M9.5 8h5M9.5 12h5"/></svg>',fam:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5M15 14.5c2.6 0 4.6 1.6 5.2 4.5"/></svg>',wish:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .6-4.5 4 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.5-4 6-.6z"/></svg>'};
+ // 長輩關懷：全部／需要注意／作息／設備
+ const ct=(S.sxTab||{}).care||0,CE=(H.care||[]).filter(e=>ct===0||(ct===1&&e.outcome==='通知家人')||(ct===2&&e.kind==='act')||(ct===3&&e.kind==='dev')).slice(0,2);
+ // 家電：全部／需保養／正常
+ const dt=(S.sxTab||{}).dev||0,DV=dv.filter(d=>dt===0||(dt===1&&d.warn)||(dt===2&&!d.warn));
+ const L=(H.assessment&&H.assessment.lights)||[];
+ const RK={r:['#E5484D','!','紅燈'],y:['#F5A524','!','黃燈'],g:['#2E9E5B','✓','綠燈'],n:['#B4B2A9','?','未量測']};
  return `${hdr('揪居家')}<div class="scroll">
  <div class="tabs" role="tablist"><button role="tab" aria-selected="${p}" data-home="parents">長輩家｜${EN()}</button><button role="tab" aria-selected="${!p}" data-home="mine">我家</button></div>
  ${p?topCard():''}
+ <div class="qis">${p?qi('data-go="ch"','長輩關懷',QI.care)+qi('data-go="hf"','家電檔案',QI.dev)+qi('data-go="pl"','方案與訂單',QI.plan)+qi('data-go="fam"','家人',QI.fam):qi('data-go="hf"','家電檔案',QI.dev)+qi('data-go="mw"','揪心願',QI.wish)}</div>
  ${n?`<div class="sec">要處理的事 <span class="tag">${n}</span></div><div class="card" style="padding:4px 14px">${warn.map(d=>{const q=devReq(d);return `<div class="row"><span>${esc(d.name)}<span class="muted" style="display:block;font-size:.85em">${esc(d.status)}${d.years?'｜使用 '+d.years+' 年':''}</span></span><button class="tag" data-req="${q[0]}">${q[1]}</button></div>`}).join('')}${R.map(remRow).join('')}</div>`:''}
- <div class="card m2rows" style="padding:4px 14px">
-  ${row('data-go="hf"','家電檔案',dv.length?dv.length+' 項'+(warn.length?'｜'+warn.length+' 項待處理':''):'尚無資料',warn.length)}
-  ${p?row('data-go="ch"','長輩關懷',care):`<div class="row"><span>家庭組成（選填）</span><span class="muted">${Object.keys(fm).filter(k=>fm[k]).join('、')||'未填'}</span></div><div style="padding:0 0 8px">${['學齡前孩子','國小以上孩子','寵物','以上皆無'].map(f=>`<button class="slot" style="margin:0 6px 6px 0" data-fam="${f}" aria-pressed="${!!fm[f]}">${f}</button>`).join('')}</div>`}
-  ${p?row('data-go="fam"','家人',(H.members.length+1)+' 人｜長輩'+(S.ph>=3?'已同意':'待門市確認')):''}
-  ${row('data-go="mw"','揪心願',my?my+' 個心願':'說說家裡還需要什麼')}
- </div>
+ ${p?sec('care','長輩關懷','data-go="ch"',tb('care',['全部','需要注意','作息','設備'])+`<div class="sxs">${care}</div>`+(CE.length?CE.map(e=>`<div class="row"><span>${esc(e.title)}<span class="muted" style="display:block;font-size:.85em">${esc(e.when||'')}｜${esc(e.outcome||'')}</span></span></div>`).join(''):'<div class="muted" style="padding:8px 0">這個分類目前沒有紀錄</div>')):''}
+ ${p?sec('safe','居家安全','data-go="x24"',`<button class="ban" data-go="b1"><span><span class="muted" style="display:block;font-size:.85em">約 5 分鐘｜家人或長輩都能做</span><b>${L.length?'重新做一次居家評估':'開始居家評估'}</b></span><span class="chev">›</span></button>${L.length?`<div class="rks">${L.map(([nm,c])=>{const r=RK[c]||RK.n;return `<span class="rk"><span class="rd" style="background:${r[0]}">${r[1]}</span>${esc(nm)}・${r[2]}</span>`}).join('')}</div>`:''}`):''}
+ ${sec('dev','家電檔案','data-go="hf"',tb('dev',['全部','需保養','正常'])+(DV.length?`<div class="hsc">${DV.map(d=>`<button class="dc" data-hc="${d.id}"><b>${esc(d.name)}</b><span class="muted">${d.years!=null?'使用 '+d.years+' 年':esc(d.source||'')}</span><span class="tag ${d.warn?'':'ok'}">${esc(d.status||'正常')}</span></button>`).join('')}</div>`:'<div class="muted" style="padding:8px 0">這個分類目前沒有家電</div>'))}
+ ${p?sec('plan','方案與訂單','data-go="pl"',`<button class="row" data-go="pl" style="width:100%"><span>${H.plan?esc(planName(H.plan.plan)):'專屬居家方案'}</span><span class="muted">${H.plan?esc(H.plan.status||''):'尚未建立'} <span class="chev">›</span></span></button>${H.install?`<button class="row" data-go="ip" style="width:100%"><span>安裝進度</span><span class="muted">${esc(H.install.label||'')} <span class="chev">›</span></span></button>`:''}`):`<section class="sx"><div class="sxh"><b>家庭組成（選填）</b><span class="muted">${Object.keys(fm).filter(k=>fm[k]).join('、')||'未填'}</span></div><div>${['學齡前孩子','國小以上孩子','寵物','以上皆無'].map(f=>`<button class="slot" style="margin:0 6px 6px 0" data-fam="${f}" aria-pressed="${!!fm[f]}">${f}</button>`).join('')}</div></section>`}
+ ${sec('wish','揪心願','data-go="wall"',`<div class="sxs">${my?'你有 '+my+' 個心願':'說說家裡還需要什麼'}</div><button class="btn ghost" data-go="mw" style="margin:8px 0 0">許一個心願</button>`)}
+ ${p?sec('fam','家人','data-go="fam"',`<button class="row" data-go="fam" style="width:100%"><span>${(H.members.length+1)} 人｜長輩${S.ph>=3?'已同意':'待門市確認'}</span><span class="muted">邀請家人 <span class="chev">›</span></span></button>`):''}
  ${window.JJJS2?JJJS2.entry('m2',p):''}
  ${p?`<div class="card"><b>綁定門市｜${esc(h.store)}</b><div class="row" style="margin-top:4px"><span>你的生活顧問｜${esc(H.plan&&H.plan.advisor?H.plan.advisor:(ADVS[h.store]||ADVS['Digital City 高雄民族店']).nick)}</span><button class="tag" data-a="lineAdv">請顧問聯絡我</button></div></div>`:''}
- </div>${nav('m1')}`},
+ </div>${nav('home')}`},
 hf:()=>{const p=S.home==='parents',H=S.hh,dv=DEV(p),eco=ecoEst(H.devices);
  return `${hdr('家電檔案')}<div class="scroll" style="padding-top:12px"><div class="card" style="padding:4px 14px">
  ${dv.length?dv.map(d=>`<button class="row" data-hc="${d.id}" style="width:100%"><span>${esc(d.name)}${d.qty>1?' ×'+d.qty:''}<span class="muted" style="display:block;font-size:.85em">${d.source==='到府安裝'?'關懷設備｜'+esc(d.warranty||''):(d.grade?d.grade+' 級能效・':'')+(d.years!=null?'使用 '+d.years+' 年':'')}</span></span>${d.warn?`<span class="tag">${esc(d.status)} <span class="chev">›</span></span>`:`<span class="muted">${esc(d.status||'')} <span class="chev">›</span></span>`}</button>`).join(''):'<div class="row"><span class="muted">尚無家電資料。於全國電子購買或請門市登錄後，會自動出現在這裡。</span></div>'}</div>
@@ -658,7 +716,7 @@ const CAT=[
  {ring:2,id:'cam',n:'影像確認（選配）',d:'走廊或門口攝影機，有動靜才在本機錄影，平常不上傳；錄下的影像與異常紀錄保存 6 個月、期滿由新資料覆蓋；異常且長輩沒回應時，LINE 官方帳號通知指定家人並附截圖預覽，片段在 App 觀看；須長輩書面同意，攝影機選配另計',p:0},
  {ring:3,id:'ac',n:'家電換新',d:'擴展期開放',p:0,exp:1}
 ];
-const RING=[['家電檔案｜免費','#C42D5A'],['家電保養｜單次或年繳','#8E1E42'],['長輩關懷｜設定費＋月付','#E0A030'],['家電換新｜擴展期','#888780']];
+const RING=[['家電檔案｜免費','#D4003C'],['家電保養｜單次或年繳','#A3002E'],['長輩關懷｜設定費＋月付','#E0A030'],['家電換新｜擴展期','#888780']];
 function RSNF(){const c=S.case||{},an=(c.assessment&&c.assessment.answers)||{},m=(c.assessment&&c.assessment.measures)||{};
  return {night:(an.night&&an.night!=='不會'?'夜間起床如廁':'夜間動線')+(an.light&&an.light!=='夠亮'?'、走廊偏暗':''),morning:'獨居且有固定晨間作息',alert:'關懷設備需搭配通知',strip:m.threshold_cm>0.5?'浴室門檻約 '+m.threshold_cm+' cm，夜間要看得到高低差':''}}
 function fmt(n){return 'NT$ '+n.toLocaleString('en-US')}
@@ -673,29 +731,30 @@ function hasGuard(){const a=A();return CAT.some(c=>c.g&&a.sel[c.id])}
 function totals(){const a=A();let one=0;CAT.forEach(c=>{if(a.sel[c.id])one+=c.p});const setup=hasGuard()?1200:0;const m=hasGuard()?({basic:299,two:449,adv:699}[a.plan]||299):0;return {one:one+setup,setup,m,y:m*10}}
 function planName(p){return {basic:'揪夜安｜基本方案',two:'揪夜安｜安心方案',adv:'揪全家｜全屋套餐'}[p||'basic']}
 function clock(){const a=A();if(!a||!a.t0)return '00:00';const t=Math.floor(((a.t1||Date.now())-a.t0)/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
-function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回">‹</button>':''}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
+function stf(t,b=true){const v=S.stack[S.stack.length-1],tm=A()&&A().t0&&!A().t1&&['a2','a3','a4','a5'].includes(v);return `<div class="stf">${b?'<button class="back" data-a="back" aria-label="返回上一頁">‹ 返回</button>':'<span class="tsp"></span>'}<h1>${t}</h1>${tm?`<span class="clk" title="規劃計時（試點目標 30 分鐘內）">⏱ <span id="clk">${clock()}</span></span>`:''}</div>`}
 function sumbar(label,act,dis,hint){const t=totals();return `<div class="hintbar" id="hintbar" style="display:${dis&&hint?'block':'none'}">${hint||''}</div><div class="sum"><div style="font-size:.9em"><div>一次性 ${fmt(t.one)}</div><div class="muted">${t.m?'＋每月 '+fmt(t.m):'無月費'}</div></div><button class="btn" data-a="${act}" ${dis?'disabled':''}>${label}</button></div>`}
 Object.assign(V,{
 a1:()=>{const L=S.cases,H=S.ahome;const K=H?H.kpi:null;const nx=L&&L[0],na=nx&&nx.assessment,nm=na?na.measures:{},nl=na?na.lights.filter(x=>x[1]==='r'||x[1]==='y'):[];
- return `${stf('揪居家｜生活顧問・今天',false).replace(/<\/div>$/,'<button class="amy" data-go="amy" aria-label="我的：角色卡、門市待辦、變更密碼、登出">我的</button></div>')}<div class="scroll">
+ return `${stf('今日行程',false)}<div class="scroll">
  <div class="step">${esc(S.me.store||'全部門市')}｜生活顧問 ${esc(S.me.name)}${H?'｜'+esc(H.today):''}</div>
  ${nx?`<div class="card nexttrip" style="border:2px solid var(--brand)"><div class="muted" style="font-size:.85em">下一個行程</div><b style="font-size:1.08em">${esc(nx.label)}　${esc(nx.household)}</b><div class="muted" style="font-size:.88em">${esc(nx.elder_note||'')}</div>
-  ${na?`<div style="margin:6px 0 2px;font-size:.92em">AR 掃描（場勘）：${nm.corridor_cm?'走道 '+nm.corridor_cm+' cm':''}${nm.threshold_cm!=null?'、門檻 '+nm.threshold_cm+' cm':''}</div><div style="font-size:.92em">${nl.length?nl.map(x=>`<span class="dot" style="background:${x[1]==='r'?'#D93A3A':'#E6A23C'}"></span> ${esc(x[0])}${x[1]==='r'?'紅燈':'黃燈'}`).join('　'):'居家安全檢核：全部綠燈'}</div>`:'<div class="rs">家人尚未完成線上診斷，現場陪同填寫與量測</div>'}
+  ${na?`<div style="margin:6px 0 2px;font-size:.92em">AR 掃描（場勘）：${nm.corridor_cm?'走道 '+nm.corridor_cm+' cm':''}${nm.threshold_cm!=null?'、門檻 '+nm.threshold_cm+' cm':''}</div><div style="font-size:.92em">${nl.length?nl.map(x=>`<span class="dot" style="background:${x[1]==='r'?'#E5484D':'#E6A23C'}"></span> ${esc(x[0])}${x[1]==='r'?'紅燈':'黃燈'}`).join('　'):'居家安全檢核：全部綠燈'}</div>`:'<div class="rs">家人尚未完成線上診斷，現場陪同填寫與量測</div>'}
   <button class="btn" data-a="advCase" data-id="${nx.id}" style="margin-top:10px">開始問診</button><button class="btn ghost" data-a="aHandElder">把手機轉給長輩確認（大字）</button></div>`:''}
- ${(()=>{const P=H?H.diffs.filter(d=>d.status==='待審核'):[];return P.length?`<div class="card" id="advD" style="border-left:4px solid var(--brand)"><b style="color:var(--brand-ink)">待審差異 ${P.length} 則</b><div style="margin:4px 0">${P.slice(0,2).map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.by||'技師')}｜${esc(d.household||'')}：${esc(d.text)}</div>`).join('')}</div><div class="rs">請到<b style="color:var(--brand)">電腦版</b>（企業管理端）核准，核准後更新圖面版本</div></div>`:''})()}
+ ${(()=>{const P=H?H.diffs.filter(d=>d.status==='待審核'):[];return P.length?`<div class="card" id="advD" ><b style="color:var(--brand-ink)">待審差異 ${P.length} 則</b><div style="margin:4px 0">${P.slice(0,2).map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.by||'技師')}｜${esc(d.household||'')}：${esc(d.text)}</div>`).join('')}</div><div class="rs">請到<b style="color:var(--brand)">電腦版</b>（企業管理端）核准，核准後更新圖面版本</div></div>`:''})()}
  ${(()=>{const D=S.drafts||[];return D.length?`<div class="card"><b>方案草稿 ${D.length} 份</b>${D.map(d=>`<div class="rs" style="color:var(--ink)">${esc(d.elder_name)}家・${esc(mdx(d.created_at))} 到店陪同</div>`).join('')}<div class="rs">待電腦版整合成正式報價（有版本號），長輩同意的是正式版本</div></div>`:''})()}
- ${H&&H.installs.length?`<div class="sec">今日到府</div>${H.installs.map(w=>`<button class="card" data-board="${w.household_id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(w.label)}　${esc(w.household)}</b><span class="tag">${esc(w.status)}</span></div><div>${w.packages.map(k=>`<span class="pk" style="background:${k.status==='已完成'?'var(--ok)':PKC[k.code]}">${esc(k.name.split('（')[0])}${k.assignee?'｜'+esc(k.assignee):''}｜${esc(k.status)}</span>`).join('')}</div></button>`).join('')}`:''}
+ ${H&&H.installs.length?`<div class="sec">今日到府</div>${H.installs.map(w=>`<button class="card" data-board="${w.household_id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(w.label)}　${esc(w.household)}</b><span class="tag">${esc(w.status)}</span></div>${pkList(w.packages)}</button>`).join('')}`:''}
  <span id="advC"></span>
  <div class="sec" style="display:flex;justify-content:space-between;align-items:center"><span>今天與近期行程</span><button class="tag" data-a="reload">重新整理</button></div>
  ${L?(L.length?L.map(caseCard).join(''):'<div class="card muted">目前沒有待諮詢的預約。家人在 App 預約後會出現在這裡。</div>'):'<div class="card muted">載入中…</div>'}
  ${window.JJJS2?JJJS2.entry('a1'):''}
  <div class="card okbox" style="margin-top:4px">報價、派工、差異核准請到門市電腦（生活顧問電腦版）${K?`｜目前待派工 ${K.dispatch}、方案待確認 ${K.waiting}`:''}</div></div>`},
-amy:()=>`${stf('我的')}<div class="scroll" style="padding-top:12px">
- <button class="card" data-go="acard" style="display:flex;justify-content:space-between;align-items:center;width:calc(100% - 24px)"><span><b>我的角色卡</b><span class="muted" style="display:block;font-size:.88em">主打技、認證與團隊服務品質</span></span><span class="chev">›</span></button>
- <button class="card" data-go="d3" style="display:flex;justify-content:space-between;align-items:center;width:calc(100% - 24px);border-left:4px solid var(--brand)"><span><b>門市待辦</b><span class="muted" style="display:block;font-size:.88em">事後關心、設備問題與家庭需求</span></span><span class="chev">›</span></button>
- <div class="pad"><button class="btn ghost" data-a="ntStart">關懷通知流程演練（向家人說明用）</button><button class="btn ghost" data-go="pw">變更密碼</button><button class="btn ghost" data-a="logout">登出</button></div></div>`,
+amy:()=>`${stf('帳號',false)}<div class="scroll">${meCard()}${acctList([['我的工作',[['我的角色卡','主打技、認證與團隊服務品質','data-go="acard"'],['門市待辦','事後關心、設備問題與家庭需求','data-go="d3"']]],['說明與演練',[['關懷通知流程演練','向家人說明通知怎麼送達','data-a="ntStart"']]],['帳號安全',[['變更密碼','','data-go="pw"']]]])}</div>`,
+acases:()=>{const L=S.cases,T=['全部','診斷未完成','診斷已完成'],k=(S.sxTab||{}).ac||0,F=L?L.filter(c=>k===0||(k===1?!c.assessment:!!c.assessment)):null;return `${stf('案件',false)}<div class="scroll">
+ <div class="step">${esc(S.me.store||'全部門市')}｜共 ${L?L.length:'—'} 件</div>
+ <div class="sxt" role="tablist" style="padding:0 12px 8px">${T.map((t,i)=>`<button role="tab" data-sxt="ac|${i}" aria-selected="${i===k}">${t}</button>`).join('')}</div>
+ ${F?(F.length?F.map(caseCard).join(''):'<div class="card muted">這個分類目前沒有案件。</div>'):'<div class="card muted">載入中…</div>'}</div>`},
 a2:()=>{const a=A(),c=S.case||{},as=c.assessment,an=as?as.answers:{},m=as?as.measures:{},Lr=as?as.lights.filter(x=>x[1]==='r'||x[1]==='y'):[];return `${stf('了解需求')}<div class="scroll">
- <div class="step">步驟 1／4｜${esc(c.household||'')}｜${esc(c.label||'')} ${a.escort?'<span class="tag" style="background:#F7E9EE;color:#8E1E42">陪同模式</span>':''}</div>
+ ${stepper(ASTEP,0)}<div class="step">${esc(c.household||'')}｜${esc(c.label||'')} ${a.escort?'<span class="tag" style="background:#FAE0E8;color:#A3002E">陪同模式</span>':''}</div>
  <div class="ly"><h3>這次最想解決什麼？（可複選）</h3>${['安心','安全','省事','省錢'].map(g=>`<button class="chip" data-goal="${g}" aria-pressed="${a.goals.includes(g)}">${g}</button>`).join('')}</div>
  <div class="ly"><h3>家庭條件｜全國電子 AI 顧問阿國診斷與 AR 掃描（場勘）</h3>
  <div class="row"><span>長輩</span><span style="text-align:right">${esc(c.elder_note||'—')}</span></div>
@@ -714,9 +773,9 @@ a2:()=>{const a=A(),c=S.case||{},as=c.assessment,an=as?as.answers:{},m=as?as.mea
  <div class="ly"><h3>到店的人</h3><button class="chip" data-a="escortT" aria-pressed="${!!a.escort}">長輩本人到店（陪同模式）</button><div class="rs">長輩不用手機時，由顧問代為說明與填寫</div></div>
  <div class="pad"><button class="btn" data-a="advRec" ${a.goals.length?'':'disabled'}>產生建議方案</button></div></div>`},
 a3:()=>{const a=A(),RS=RSNF();return `${stf('調整方案')}<div class="scroll">
- <div class="step">步驟 2／4｜目標：${a.goals.join('、')}｜${a.budget}</div>
- <div class="ly" style="border:1.5px dashed #8E1E42">
-  <button data-a="aiToggle" style="display:flex;justify-content:space-between;width:100%;align-items:center"><h3 style="margin:0;color:#8E1E42">AI 建議與說明話術</h3><span class="tag" style="background:#F7E9EE;color:#8E1E42">擴展期導入（示意）</span></button>
+ ${stepper(ASTEP,1)}<div class="step">目標：${a.goals.join('、')}｜${a.budget}</div>
+ <div class="ly" style="border:1.5px dashed #A3002E">
+  <button data-a="aiToggle" style="display:flex;justify-content:space-between;width:100%;align-items:center"><h3 style="margin:0;color:#A3002E">AI 建議與說明話術</h3><span class="tag" style="background:#FAE0E8;color:#A3002E">擴展期導入（示意）</span></button>
   ${S.aiOpen?`<div class="rs" style="margin:6px 0 8px">依診斷結果與家庭條件產生（不含姓名、地址等個資）；知識來源為總部情境模板。</div>
    <div class="row"><span><b>建議組合</b><span class="muted" style="display:block;font-size:.88em">夜間動線照明＋門檻提示燈條；床邊沒有插座時改用電池型夜燈</span></span></div>
    <div class="row"><span><b>推薦理由</b><span class="muted" style="display:block;font-size:.88em">長輩夜間起床如廁、走廊偏暗；感應夜燈與門窗感測可在不拍畫面的情況下照顧夜間動線</span></span></div>
@@ -732,7 +791,7 @@ a3:()=>{const a=A(),RS=RSNF();return `${stf('調整方案')}<div class="scroll">
  <p class="muted pad">點選項目可加入或移除；家電換新項目點選後標為「之後再評估」。發現規則有誤？<button style="text-decoration:underline" data-a="advReport">回報給總部</button></p>
  </div>${sumbar('下一步：報價','advQuote',a.sel.night&&!a.rep,'請先處理相容性提示')}`},
 a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scroll">
- <div class="step">步驟 3／4｜${EN()}家</div>
+ ${stepper(ASTEP,2)}<div class="step">${EN()}家</div>
  <div class="ly"><h3>一次性費用</h3>${CAT.filter(c=>a.sel[c.id]&&c.p).map(c=>`<div class="row"><span>${c.n}</span><span>${fmt(c.p)}</span></div>`).join('')}${t.setup?`<div class="row"><span>規劃與安裝設定費</span><span>${fmt(t.setup)}</span></div>`:''}<div class="row"><b>合計</b><b>${fmt(t.one)}</b></div><div class="rs">試點定價，實際依門市盤點</div><div class="rs" style="margin-top:4px">安裝時段由顧問統一排程、合併到府。</div>${a.remeas?'<div class="rs" style="margin-top:4px;color:var(--brand-ink)">已註記：安裝前先到府複量</div>':''}</div>
  <div class="ly"><h3>到府分工（統一排程、合併到府）</h3><div class="row"><span>夜間照明</span><span class="rs">全國電子技師｜夜燈、門檻提示燈條</span></div><div class="row"><span>關懷設備</span><span class="rs">全國電子技師｜閘道器、感測器、測試通知</span></div><div class="rs">同一天先裝照明、再裝關懷設備，${EN()}只要在家一次。</div></div>
  ${hasGuard()?`<div class="ly"><h3>長輩關懷</h3>
@@ -744,7 +803,7 @@ a4:()=>{const a=A(),t=totals();return `${stf('報價與方案')}<div class="scro
  <div class="ly"><h3>第二聯絡人（必填）</h3><label class="rs">姓名<input class="fld" id="c2n" value="${a.c2n}" placeholder="例如：${CN('第二聯絡人','第二聯絡人')}"></label><label class="rs" style="display:block;margin-top:8px">電話<input class="fld" id="c2p" inputmode="tel" value="${a.c2p}" placeholder="0912-345-678"></label><div class="rs" style="margin-top:6px">依序通知：長輩本人 → 主要聯絡人 → 第二聯絡人 → 就近聯絡人。</div></div>`:'<div class="ly"><h3>長輩關懷</h3><div class="rs">本次未選長輩關懷項目，無月費。</div></div>'}
  </div>${sumbar('下一步：確認','advConfirm',hasGuard()&&!a.c2n.trim(),'請填寫第二聯絡人姓名')}`},
 a5:()=>{const a=A(),L=[a.sel.cam?'已向長輩說明攝影機平常只在本機錄影，影像與異常紀錄保存 6 個月、期滿由新資料覆蓋；異常且沒回應時經 LINE 官方帳號通知家人，片段只在 App 內觀看；長輩可隨時暫停或要求刪除，並取得本人書面同意':'已向長輩說明設備會記錄活動、不拍攝影像，並取得本人同意','已說明本服務為生活關懷，非醫療照護；緊急請撥 119','付款人（家人或長輩本人）同意服務條款與資料使用說明'];return `${stf('確認方案')}<div class="scroll">
- <div class="step">步驟 4／4｜同意事項皆須勾選</div>
+ ${stepper(ASTEP,3)}<div class="step">同意事項皆須勾選</div>
  <div class="ly">${L.map((l,i)=>`<button class="it" data-cons="${i}"><span class="ck ${a.cons[i]?'on':''}">${a.cons[i]?'✓':''}</span><span style="flex:1">${l}</span></button>`).join('')}</div>
  <div class="ly"><h3>方案內容</h3>${CAT.filter(c=>a.sel[c.id]).map(c=>`<div class="rs">・${c.n}</div>`).join('')}${CAT.filter(c=>a.later[c.id]).map(c=>`<div class="rs">・${c.n}（之後再評估）</div>`).join('')}</div>
  </div>${sumbar('確認並傳送方案','advDone',a.cons.some(x=>!x),'請勾選全部同意事項')}`},
@@ -813,7 +872,7 @@ fam:()=>{const H=S.hh,h=H.household,f=S.fam||(S.fam={grand:true});return `${hdr(
   <div class="row"><div><b>${EN()}</b><div class="muted">長輩｜決定誰能看到作息</div></div><span class="tag ok">長輩</span></div>
   ${H.members.map(x=>`<div class="row"><div><b>${esc(x.name)}</b><div class="muted">${x.relation==='管理者'?'管理者｜異常通知、方案管理':'家人｜可查看關懷狀態與摘要'}</div></div><span class="tag">${esc(x.relation)}</span></div>`).join('')}
   ${(h.contacts||[]).map(c=>`<div class="row"><div><b>${esc(c.n)}</b><div class="muted">${esc(c.r)}｜${esc(c.d||'')}</div></div><span class="tag">${esc(String(c.r).split('（')[0])}</span></div>`).join('')}</div>
- <div class="sec">孫輩的校園大使任務</div><button class="card" data-go="obs" style="display:block;width:calc(100% - 24px);text-align:left;border-left:4px solid #8E1E42"><b>居家觀察｜15 分鐘</b><div class="muted" style="font-size:.9em">${S.obsDone?"已完成，查看居家安全檢核結果":"大學生孫輩和家人一起看看長輩家，產生居家安全檢核結果"}</div></button>
+ <div class="sec">孫輩的校園大使任務</div><button class="card" data-go="obs" style="display:block;width:calc(100% - 24px);text-align:left"><b>居家觀察｜15 分鐘</b><div class="muted" style="font-size:.9em">${S.obsDone?"已完成，查看居家安全檢核結果":"大學生孫輩和家人一起看看長輩家，產生居家安全檢核結果"}</div></button>
  <div class="sec">${EN()}的同意設定</div>
  <div class="card" style="padding:4px 14px">
   <div class="row"><span>家人可查看關懷狀態與摘要</span><span class="tag ${S.ph>=3?'ok':''}">${S.ph>=3?'已同意':'待門市確認'}</span></div>
@@ -845,7 +904,7 @@ plan:()=>{const H=S.hh,p=H&&H.plan;return `${hdr('長輩關懷')}<div class="scr
  :`<div class="card"><b>尚未啟用長輩關懷</b><div class="muted" style="margin:4px 0 10px">家電檔案已免費為您服務。需要關懷長輩的日常時，可以先做 AR 掃描（場勘）與居家診斷，或預約門市諮詢。</div><button class="btn" data-go="b1">開始居家安全評估</button></div>`}
  <div class="card" style="padding:4px 14px"><button class="row" data-a="ntStart" style="width:100%"><span>異常時會怎麼通知？看演練</span><span class="chev">›</span></button></div>
  <div class="card"><b>揪居家怎麼一步步長大</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">試點先做揪夜安，其他方案達標後依序開放；先登記，開放時優先通知</div>
- ${[['試點期','第 1–6 月','now','揪夜安（臥室到浴室）基本 299／安心 449；高雄三民區 民族店、澄清店、三民中華店'],['擴展期','約第 7–15 月','','揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699；保養、換新與以租代買；產險、居家清潔、租賃夥伴；長輩關懷 2.0'],['延伸期','單店約 194 戶以上','','育兒與寵物家庭；揪夥伴商用版（日照、住宿機構、租屋代管、民宿，不含長輩關懷通知）；新家與老宅翻修 AR 配置']].map(([n,t,c,d])=>`<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee)"><div style="flex:none;width:74px"><b style="color:${c?'#C42D5A':'inherit'}">${n}</b><div class="muted" style="font-size:.78em">${t}</div></div><div style="font-size:.88em;line-height:1.6">${c?'<span class="tag ok">目前</span> ':''}${d}</div></div>`).join('')}
+ ${[['試點期','第 1–6 月','now','揪夜安（臥室到浴室）基本 299／安心 449；高雄三民區 民族店、澄清店、三民中華店'],['擴展期','約第 7–15 月','','揪食光 +200、揪團聚 +150、揪清爽 +100、揪全家 699；保養、換新與以租代買；產險、居家清潔、租賃夥伴；長輩關懷 2.0'],['延伸期','單店約 194 戶以上','','育兒與寵物家庭；揪夥伴商用版（日照、住宿機構、租屋代管、民宿，不含長輩關懷通知）；新家與老宅翻修 AR 配置']].map(([n,t,c,d])=>`<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line,#eee)"><div style="flex:none;width:74px"><b style="color:${c?'#D4003C':'inherit'}">${n}</b><div class="muted" style="font-size:.78em">${t}</div></div><div style="font-size:.88em;line-height:1.6">${c?'<span class="tag ok">目前</span> ':''}${d}</div></div>`).join('')}
  <button class="row" data-go="x0" style="width:100%;margin-top:4px"><span>看擴展期與延伸期會開放什麼</span><span class="chev">›</span></button><button class="row" data-req="擴展期方案登記" style="width:100%;margin-top:4px"><span>登記擴展期方案</span><span class="chev">›</span></button></div></div>`}
 });
 
@@ -853,8 +912,8 @@ Object.assign(V,{
 d3:()=>{const D=S.todos;return `${stf('門市待辦')}<div class="scroll">
  <div class="step">${esc(S.me.store||'全部門市')}｜門市只負責事前設定與事後關心，不參與緊急處理</div>
  ${!D?'<div class="card muted">載入中…</div>':`
- <div class="ly"><h3><span class="dot" style="background:#8E1E42"></span>事後關心（${D.care.length}）</h3>${D.care.length?D.care.map(e=>`<div class="it" style="align-items:center"><span style="flex:1"><b style="font-weight:500">${esc(e.household)}｜${esc(e.when)} ${esc(e.title)}</b><div class="rs">結果：${esc(e.outcome)}；致電關心，並確認判斷時間是否合適</div></span><button class="tag" data-care="${e.id}" style="border:0">完成關心</button></div>`).join(''):'<div class="rs">目前沒有需要事後關心的事件</div>'}</div>
- <div class="ly"><h3><span class="dot" style="background:#8E1E42"></span>家庭需求與設備問題（${D.requests.length}）</h3>${D.requests.length?D.requests.map(r=>`<div class="it" style="align-items:center"><span style="flex:1"><b style="font-weight:500">${esc(r.household)}｜${esc(r.kind)}</b><div class="rs">${esc(r.note||'由家人在 App 送出')}｜${esc(r.when)}</div></span><button class="tag" data-rqdone="${r.id}" style="border:0">標記已處理</button></div>`).join(''):'<div class="rs">目前沒有待處理需求</div>'}</div>`}
+ <div class="ly"><h3><span class="dot" style="background:#A3002E"></span>事後關心（${D.care.length}）</h3>${D.care.length?D.care.map(e=>`<div class="it" style="align-items:center"><span style="flex:1"><b style="font-weight:500">${esc(e.household)}｜${esc(e.when)} ${esc(e.title)}</b><div class="rs">結果：${esc(e.outcome)}；致電關心，並確認判斷時間是否合適</div></span><button class="tag" data-care="${e.id}" style="border:0">完成關心</button></div>`).join(''):'<div class="rs">目前沒有需要事後關心的事件</div>'}</div>
+ <div class="ly"><h3><span class="dot" style="background:#A3002E"></span>家庭需求與設備問題（${D.requests.length}）</h3>${D.requests.length?D.requests.map(r=>`<div class="it" style="align-items:center"><span style="flex:1"><b style="font-weight:500">${esc(r.household)}｜${esc(r.kind)}</b><div class="rs">${esc(r.note||'由家人在 App 送出')}｜${esc(r.when)}</div></span><button class="tag" data-rqdone="${r.id}" style="border:0">標記已處理</button></div>`).join(''):'<div class="rs">目前沒有待處理需求</div>'}</div>`}
  <p class="muted pad">家庭的作息資料只在必要時呈現摘要；長輩可隨時調整誰能查看。年度健檢與派工排程請在企業營運資訊平台安排。</p>
  </div>`}
 });
@@ -892,11 +951,11 @@ pre:()=>{const PO=(S.topics&&S.topics.preorder)||{count:0,me:false},done=!!PO.me
  <div class="pad">${done?'<div class="okbox">已登記預購意向。達到成團戶數、正式開放付款時會通知您，再由綁定門市安排安裝。</div>':'<button class="btn" data-a="preBuy">登記預購意向（暫不收款）</button>'}</div></div>`}
 });
 
-const ADVS={'Digital City 高雄民族店':{nick:'小明顧問',ini:'明',color:'#C42D5A',skills:['夜間動線照明規劃','長輩陪同說明','關懷設備相容性'],stats:[['貼心 CARE',92],['安心 SAFE',88],['規劃 PLAN',85]]},
- 'Digital City 高雄澄清店':{nick:'阿芳顧問',ini:'芳',color:'#8E1E42',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]},
+const ADVS={'Digital City 高雄民族店':{nick:'小明顧問',ini:'明',color:'#D4003C',skills:['夜間動線照明規劃','長輩陪同說明','關懷設備相容性'],stats:[['貼心 CARE',92],['安心 SAFE',88],['規劃 PLAN',85]]},
+ 'Digital City 高雄澄清店':{nick:'阿芳顧問',ini:'芳',color:'#A3002E',skills:['夜間動線照明規劃','門檻與動線量測'],stats:[['貼心 CARE',90],['安心 SAFE',80],['規劃 PLAN',87]]},
  'Digital City 高雄三民中華店':{nick:'阿哲顧問',ini:'哲',color:'#E0577A',skills:['夜間動線照明規劃','校園大使觀察回饋'],stats:[['貼心 CARE',88],['安心 SAFE',84],['規劃 PLAN',86]]}};
-function advCard(store,compact){const a=ADVS[store]||ADVS['Digital City 高雄民族店'];const sk=(S.mySkills&&store==='Digital City 高雄民族店')?S.mySkills:a.skills;return `<div class="card acard" style="border-left:5px solid ${a.color}">
- <div style="display:flex;gap:12px;align-items:center"><div class="avt" style="background:${a.color}">${a.ini}</div><div style="flex:1"><div class="rs">人物圖鑑｜${store}</div><b style="font-size:1.08em">${a.nick}</b> <span class="tag ok">居安規劃認證</span> <span class="tag" style="background:#F7E9EE;color:#8E1E42">含進階課</span></div></div>
+function advCard(store,compact){const a=ADVS[store]||ADVS['Digital City 高雄民族店'];const sk=(S.mySkills&&store==='Digital City 高雄民族店')?S.mySkills:a.skills;return `<div class="card acard" >
+ <div style="display:flex;gap:12px;align-items:center"><div class="avt" style="background:${a.color}">${a.ini}</div><div style="flex:1"><div class="rs">人物圖鑑｜${store}</div><b style="font-size:1.08em">${a.nick}</b> <span class="tag ok">居安規劃認證</span> <span class="tag" style="background:#FAE0E8;color:#A3002E">含進階課</span></div></div>
  <div style="margin-top:8px">${sk.map(x=>`<span class="tag" style="margin:0 6px 6px 0;display:inline-block">主打技｜${x}</span>`).join('')}</div>
  ${compact?'':a.stats.map(([n,v])=>`<div style="display:flex;align-items:center;gap:8px;font-size:.85em;margin-top:4px"><span style="width:76px" class="muted">${n}</span><span class="pbar" style="flex:1"><i style="width:${v}%;background:${a.color}"></i></span></div>`).join('')}
  <div class="rs" style="margin-top:6px">示意角色，延續全國電子門市人物圖鑑形式</div></div>`}
@@ -940,11 +999,11 @@ obs:()=>{const o=S.obs||(S.obs={step:0});
   ${qs.map(q=>`<div style="margin-bottom:16px"><b>${q.t}</b><div style="margin-top:8px">${q.o.map(x=>`<button class="opt" data-ob="${q.k}|${x}" aria-pressed="${o[q.k]===x}">${x}</button>`).join('')}</div></div>`).join('')}
   <button class="btn" data-a="obsNext" ${done?'':'disabled'}>${o.step===tot?'產生居家安全檢核結果':'下一步'}</button></div></div>`},
 obsR:()=>{const o=S.obs,r=obsRisks(o).slice(0,3);return `${hdr('居家安全檢核')}<div class="scroll" style="padding-top:12px">
- <div class="card" style="border-left:4px solid var(--brand)"><b>校園大使專屬推薦碼</b><div style="font-size:1.4em;font-weight:700;letter-spacing:2px;color:var(--brand);margin:6px 0">AMB-FCU-0326</div><div class="muted" style="font-size:.88em">想進一步改善的家庭，用這個推薦碼預約生活顧問評估；企業管理端只記錄帶來的預約評估，不計成交。社區防跌健檢可認列服務學習時數。</div></div>
+ <div class="card" ><b>校園大使專屬推薦碼</b><div style="font-size:1.4em;font-weight:700;letter-spacing:2px;color:var(--brand);margin:6px 0">AMB-FCU-0326</div><div class="muted" style="font-size:.88em">想進一步改善的家庭，用這個推薦碼預約生活顧問評估；企業管理端只記錄帶來的預約評估，不計成交。社區防跌健檢可認列服務學習時數。</div></div>
  <div class="card"><div class="rs">長輩家｜${o.type||''}｜由校園大使與家人完成</div><b style="font-size:1.1em">最需要注意的 ${r.length} 件事</b>
   ${r.map(([a,b],i)=>`<div class="row"><span><b>${i+1}. ${a}</b><span class="muted" style="display:block;font-size:.88em">建議：${b}</span></span></div>`).join('')}</div>
- <div class="card"><b>各空間燈號</b><div class="rs" style="margin-bottom:4px">依勾選結果自動標示；紅燈優先處理</div>${obsLights(o).map(([n,c,t])=>`<div class="row"><span><span class="dot" style="width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px;background:${c==='r'?'#C42D5A':c==='y'?'#E0A030':'#138F3B'}"></span>${n}</span><span class="muted" style="font-size:.88em">${t}</span></div>`).join('')}<div class="muted" style="font-size:.85em;margin-top:6px">這是 ① 先評估的結果。預約後，生活顧問依檢核結果與 AR 掃描尺寸，把家電與無障礙改善整合成一張報價；尺寸不足時才安排技師到府複量。</div></div>
- ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" style="border-left:4px solid #8E1E42"><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#F7E9EE;color:#8E1E42">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；原始影像分析完即清除，存入的成果保存六個月。</div></div>`})()}
+ <div class="card"><b>各空間燈號</b><div class="rs" style="margin-bottom:4px">依勾選結果自動標示；紅燈優先處理</div>${obsLights(o).map(([n,c,t])=>`<div class="row"><span><span class="dot" style="width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px;background:${c==='r'?'#D4003C':c==='y'?'#E0A030':'#138F3B'}"></span>${n}</span><span class="muted" style="font-size:.88em">${t}</span></div>`).join('')}<div class="muted" style="font-size:.85em;margin-top:6px">這是 ① 先評估的結果。預約後，生活顧問依檢核結果與 AR 掃描尺寸，把家電與無障礙改善整合成一張報價；尺寸不足時才安排技師到府複量。</div></div>
+ ${(()=>{const m=(S.hh&&S.hh.assessment&&S.hh.assessment.measures)||{};return `<div class="card" ><div style="display:flex;justify-content:space-between;align-items:center"><b>AR 掃描（場勘）</b><span class="tag" style="background:#FAE0E8;color:#A3002E">手機量測</span></div>${Object.keys(m).length?measRows(m):'<div class="muted" style="margin-top:4px">尚未量測。做全國電子 AI 顧問阿國居家診斷時，第一步就是 AR 掃描（場勘）。</div>'}<div class="muted" style="font-size:.85em;margin-top:4px">量測數字附在檢核結果，顧問不必先到府丈量；原始影像分析完即清除，存入的成果保存六個月。</div></div>`})()}
  <div class="sec">推薦的生活顧問</div>${advCard('Digital City 高雄民族店',true)}
  <div class="pad"><button class="btn" data-go="b4">帶著檢核結果預約門市</button><button class="btn ghost" data-a="obsWish">把觀察到的需求送出為揪心願</button><button class="btn ghost" data-a="obsShare">分享檢核結果給家人（示意）</button>
  ${window.JJJS2?JJJS2.entry('obsR'):''}
@@ -972,11 +1031,15 @@ hc:()=>{const h=(S.hh?S.hh.devices:[]).find(d=>d.id===S.hc);if(!h)return V.m2();
 const TSTEPS=[['m','量測動線寬度與門檻','床邊到浴室門口的走道寬度、浴室門檻高度，寫入驗收清單'],['ph0','拍攝施工前照片','只拍設備位置，不拍人；浴室內部須長輩同意'],['g','安裝閘道器並連線','確認家中網路，並與先前裝好的夜燈配對'],['s','門窗感測器 ×2（浴室門、臥室門）','黏貼於門框，測試開關觸發'],['b','浴室緊急按鈕','安裝於馬桶旁，長輩伸手可及高度'],['scan','掃描設備序號','自動登錄家電檔案（各產品團隊共用）'],['fine','請長輩按一次「我很好」','確認長輩知道怎麼結束詢問'],['test','送出測試通知給家人','家人的 App 收到測試訊息'],['ph1','拍攝完工後照片','與施工前照片同角度，附在完工報告'],['rc','包材與廢電池帶回','紙箱、包材與替換下的舊電池帶回門市回收'],['teach','一對一教學與紙本說明','留下「我很好」與夜燈使用說明卡，貼在床邊']];
 function TS(){return S.tech||(S.tech={st:{},diff:'',done:false,insp:false})}
 Object.assign(V,{
-t1:()=>{const L=S.orders;return `${stf('揪居家｜技師端',false)}<div class="scroll">
- <div class="step">${esc(S.me.name)}｜${esc(S.me.store||'')}｜今日工作 ${L?L.filter(o=>(o.slot||'').slice(0,10)===S.today&&o.status!=='已完成').length:'—'} 張｜其他 ${L?L.filter(o=>!((o.slot||'').slice(0,10)===S.today&&o.status!=='已完成')).length:'—'} 張</div>
- <div class="sec" style="display:flex;justify-content:space-between;align-items:center"><span>我的工單</span><button class="tag" data-a="reload">重新整理</button></div>
- ${L?(L.length?L.map(o=>`<button class="card ${(o.slot||'').slice(0,10)===S.today&&o.status!=='已完成'?'focus':'dimmed'}" data-a="tOpen" data-id="${o.id}" style="display:block;width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(o.label)}　${esc(o.household)}</b><span class="tag ${o.status==='已完成'?'ok':''}">${esc(o.status==='已指派'?'待出發':o.status)}</span></div><div class="muted">${esc(o.kind)}｜${esc((o.plan?CAT.filter(c=>o.plan.sel[c.id]&&c.g&&c.p).map(c=>c.n).join('、'):'')||'依工單')}｜${esc(o.address)}</div>${o.note?`<div style="margin-top:6px"><span class="tag" style="background:#F7E9EE;color:#8E1E42">${esc(o.note)}</span></div>`:''}<div>${(o.packages||[]).map(k=>`<span class="pk" style="background:${k.status==='已完成'?'var(--ok)':k.mine?PKC[k.code]:'#9A9893'}">${esc(k.name.split('（')[0])}${k.mine?'｜我':''}｜${esc(k.status)}</span>`).join('')}</div></button>`).join(''):'<div class="card muted">目前沒有指派給您的工單。</div>'):'<div class="card muted">載入中…</div>'}
- <p class="muted pad">技師只看得到工單所需資訊；完整地址在出發當天顯示。</p><div class="pad"><button class="btn ghost" data-go="pw">變更密碼</button><button class="btn ghost" data-a="logout">登出</button></div></div>`},
+t1:()=>{const L=S.orders,T=L?L.filter(isToday):null;return `${stf('今日工單',false)}<div class="scroll">
+ <div class="step">${esc(S.me.name)}｜${esc(S.me.store||'')}｜今日 ${T?T.length:'—'} 張</div>
+ <div class="sec" style="display:flex;justify-content:space-between;align-items:center"><span>今天要做</span><button class="tag" data-a="reload">重新整理</button></div>
+ ${T?(T.length?T.map(ocard).join(''):'<div class="card muted">今天沒有工單。其他日期的工單在「工單紀錄」。</div>'):'<div class="card muted">載入中…</div>'}
+ <p class="muted pad">技師只看得到工單所需資訊；完整地址在出發當天顯示。</p></div>`},
+thist:()=>{const L=S.orders,T=['即將到來','已完成'],k=(S.sxTab||{}).th||0,F=L?L.filter(o=>!isToday(o)&&(k===1?o.status==='已完成':o.status!=='已完成')):null;return `${stf('工單紀錄',false)}<div class="scroll">
+ <div class="sxt" role="tablist" style="padding:12px 12px 8px">${T.map((t,i)=>`<button role="tab" data-sxt="th|${i}" aria-selected="${i===k}">${t}</button>`).join('')}</div>
+ ${F?(F.length?F.map(ocard).join(''):'<div class="card muted">這個分類目前沒有工單。</div>'):'<div class="card muted">載入中…</div>'}</div>`},
+tacct:()=>`${stf('帳號',false)}<div class="scroll">${meCard()}${acctList([['帳號安全',[['變更密碼','','data-go="pw"']]]])}</div>`,
 t2:()=>{const o=S.order;if(!o)return V.t1();const items=instItems(o),m=o.measures||{};return `${stf('工單詳情')}<div class="scroll">
  <div class="step">${esc(o.code)}${o.plan&&o.plan.advisor?'｜生活顧問 '+esc(o.plan.advisor)+' 規劃':''}｜統一排程</div>
  <div class="ly"><h3>到府資訊</h3>
@@ -997,7 +1060,7 @@ t3:()=>{const t=TS(),n=TSTEPS.filter(x=>t.st[x[0]]).length,all=n===TSTEPS.length
   ${['插座位置不同，改用電池型夜燈','浴室門為推拉門，改用不同固定方式','長輩希望夜燈亮度調低'].map(x=>`<button class="chip" data-td="${x}" aria-pressed="${t.diff===x}">${x}</button>`).join('')}
   <div class="rs" style="margin-top:6px">回報內容會送到總部，用來修正情境模板與房型預演。</div></div>
  </div>${all?'':'<div class="hintbar">請完成全部安裝步驟</div>'}<div class="sum"><div><b>${n}／${TSTEPS.length} 步驟</b><div class="rs">完工後自動通知家人與生活顧問</div></div><button class="btn" data-a="tDone" ${all?'':'disabled'} style="width:auto;padding:12px 18px;margin:0">完工並通知家人</button></div>`},
-t4:()=>{const o=S.order,t=TS(),m=(o&&o.measures)||{},items=instItems(o),n=items.reduce((s,x)=>s+x[1],0);return `${stf('已完工',false)}<div class="scroll">
+t4:()=>{const o=S.order,t=TS(),m=(o&&o.measures)||{},items=instItems(o),n=items.reduce((s,x)=>s+x[1],0);return `${stf('已完工',false)}<div class="scroll">${stepper(TSTEP,2)}
  <div class="okbox" style="margin:12px">${esc(o.household)}${o.status==='已完成'?'全部工作包完成':'關懷設備（A）安裝完成；其他工作包由其他人員接續'}，已通知${ON()}與生活顧問。</div>
  ${(o.packages||[]).length?`<div class="ly"><h3>工作包</h3>${o.packages.map(k=>`<div class="row"><span><span class="dot" style="background:${k.status==='已完成'?'var(--ok)':PKC[k.code]}"></span> ${esc(k.name)}<span class="rs" style="display:block">${esc(k.team)}${k.assignee?'｜'+esc(k.assignee):''}</span></span><span class="tag ${k.status==='已完成'?'ok':''}">${esc(k.status)}</span></div>`).join('')}${o.pv?`<div class="rs" style="margin-top:4px">施工依圖面 v${o.pv.ver}（${esc(o.pv.status)}）</div>`:''}</div>`:''}
  <div class="ly"><h3>完工紀錄</h3>
@@ -1061,15 +1124,15 @@ ip:()=>{const H=S.hh,o=H&&H.install,p=H&&H.plan,sel=p?p.sel:{},m=(H&&H.assessmen
   <div class="row" style="margin-top:4px"><span>技師</span><span>${o&&o.assignee?esc(o.assignee)+'｜關懷設備':'排定後顯示'}</span></div>${sel.night?'<div class="row"><span>同行</span><span style="text-align:right">技師｜夜間照明先裝</span></div>':''}</div>
  ${ipTL(H,o,p,d,steps)}
  ${o&&o.status==='待驗收'?`<div class="card" style="border:2px solid var(--brand)"><b>技師已完工，請確認</b><div class="muted" style="margin:4px 0 8px">${EN()}可以在現場跟技師一起驗收；你也可以在這裡確認。</div><textarea class="fld" id="famRej" rows="2" placeholder="有問題的話寫在這裡，例如：浴室門口夜燈太亮"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="margin:0" data-a="famAcc">驗收完成</button><button class="btn ghost" style="margin:0" data-a="famRej">有問題，退回</button></div></div>`:''}
- ${H.acceptance&&H.acceptance.result==='通過'?`<div class="card" style="border-left:4px solid var(--ok)"><b>已驗收</b><div class="muted">${esc(H.acceptance.by_name)}（${esc(H.acceptance.by_role)}）${esc(H.acceptance.when)} 驗收通過，長輩關懷已啟用</div></div>`:''}
+ ${H.acceptance&&H.acceptance.result==='通過'?`<div class="card" ><b>已驗收</b><div class="muted">${esc(H.acceptance.by_name)}（${esc(H.acceptance.by_role)}）${esc(H.acceptance.when)} 驗收通過，長輩關懷已啟用</div></div>`:''}
  ${(H.packages||[]).length?`<div class="sec">工作包｜統一排程、合併到府</div><div class="card" style="padding:4px 14px">${H.packages.map(k=>`<div class="row"><span><span class="dot" style="background:${k.status==='已完成'?'var(--ok)':PKC[k.code]}"></span> <b style="font-weight:500">${esc(k.name)}</b><span class="muted" style="display:block;font-size:.85em">${esc(k.team)}${k.assignee?'｜'+esc(k.assignee):''}</span></span><span class="tag ${k.status==='已完成'?'ok':''}">${k.status==='已完成'?'✓ 已完成':esc(k.status)}</span></div>`).join('')}</div>`:''}
- ${d===6?`<div class="card" style="border-left:4px solid var(--ok)"><b>完工報告</b>${m.corridor_cm||m.threshold_cm!=null?`<div class="row" style="margin-top:4px"><span>量測</span><span>${[m.corridor_cm?'走道 '+m.corridor_cm+' cm':'',m.threshold_cm!=null?'門檻 '+m.threshold_cm+' cm':''].filter(Boolean).join('、')}</span></div>`:''}<div class="row"><span>長輩實測</span><span>${EN()}已走一次夜間動線</span></div><div class="muted" style="font-size:.85em;margin-top:2px">技師依驗收清單完成，${esc((o.completed_at||'').slice(5,16).replace('-','/'))} 完工</div></div>`:''}
+ ${d===6?`<div class="card" ><b>完工報告</b>${m.corridor_cm||m.threshold_cm!=null?`<div class="row" style="margin-top:4px"><span>量測</span><span>${[m.corridor_cm?'走道 '+m.corridor_cm+' cm':'',m.threshold_cm!=null?'門檻 '+m.threshold_cm+' cm':''].filter(Boolean).join('、')}</span></div>`:''}<div class="row"><span>長輩實測</span><span>${EN()}已走一次夜間動線</span></div><div class="muted" style="font-size:.85em;margin-top:2px">技師依驗收清單完成，${esc((o.completed_at||'').slice(5,16).replace('-','/'))} 完工</div></div>`:''}
  ${o&&o.diff?`<div class="card"><b>現場調整</b><div style="margin-top:4px">${esc(o.diff)}</div><div class="muted" style="font-size:.85em;margin-top:2px">已回報總部，用來修正情境模板</div></div>`:''}
  <div class="pad"><button class="btn ghost" data-a="ipList">查看設備清單</button></div></div>`},
 gl:()=>{const E=(S.hh&&S.hh.care)||[];const asked=E.filter(e=>e.kind==='act').length,self=E.filter(e=>e.outcome==='長輩確認').length,fam=E.filter(e=>e.outcome==='通知家人').length;
  return `${hdr('關懷紀錄')}<div class="scroll" style="padding-top:12px">
  <div class="card"><div class="rs">近期｜長輩家</div><div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;margin-top:6px">${[['詢問長輩',asked],['長輩自行確認',self],['通知家人',fam]].map(([n,v])=>`<div><b style="font-size:1.3em">${v}</b><div class="muted" style="font-size:.85em">${n}</div></div>`).join('')}</div></div>
- ${E.length?E.map(e=>`<div class="card" style="border-left:4px solid ${e.outcome==='通知家人'?'#FF7A59':e.kind==='dev'?'#E0A030':'var(--ok)'}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${esc(e.when)} ${esc(e.title)}</b><span class="tag ${e.outcome==='長輩確認'?'ok':''}">${esc(e.outcome)}</span></div>${evTL((e.timeline||[]).map(([a,b])=>[esc(a),esc(b)]),false)}</div>`).join(''):'<div class="card"><b>目前平安</b><div class="muted" style="margin-top:2px">關懷設備正常運作，沒有需要詢問長輩的情況。</div></div>'}
+ ${E.length?E.map(e=>`<div class="card" ><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${esc(e.when)} ${esc(e.title)}</b><span class="tag ${e.outcome==='長輩確認'?'ok':''}">${esc(e.outcome)}</span></div>${evTL((e.timeline||[]).map(([a,b])=>[esc(a),esc(b)]),false)}</div>`).join(''):'<div class="card"><b>目前平安</b><div class="muted" style="margin-top:2px">關懷設備正常運作，沒有需要詢問長輩的情況。</div></div>'}
  <div class="sec">異常時的通知順序</div><div class="card"><div class="chain">${chainHTML()}</div>
   <div class="rs" style="margin-top:6px;color:var(--brand-ink)">確認可能有危險時，由家人撥打 119。</div></div>
  <div class="card" style="padding:4px 14px"><button class="row" data-go="nset" style="width:100%"><span>調整判斷時間與通知對象</span><span class="chev">›</span></button><button class="row" data-a="ntStart" style="width:100%"><span>看看異常時會怎麼通知（演練）</span><span class="chev">›</span></button></div>
@@ -1081,7 +1144,7 @@ function caseCard(c){const a=c.assessment,r=a&&a.rec,L=a?a.lights.filter(x=>x[1]
  <div class="muted">家人${esc(c.owner)}｜${esc(c.elder_note||'')}${r?'｜推薦：'+esc(r.n):''}</div>
  ${L.length?`<div class="rs" style="margin-top:4px">居家安全檢核：${esc(L.join('、'))}</div>`:''}
  ${m&&m.corridor_cm?`<div class="rs">AR 掃描（場勘）：走道 ${m.corridor_cm} cm${m.threshold_cm!=null?'、門檻 '+m.threshold_cm+' cm':''}</div>`:''}
- <div style="margin-top:6px">${c.status==='待指派'?'<span class="tag">待指派顧問</span>':`<span class="tag" style="background:#F7E9EE;color:#8E1E42">負責：${esc(c.assignee||'')}</span>`}</div></button>`}
+ <div style="margin-top:6px">${c.status==='待指派'?'<span class="tag">待指派顧問</span>':`<span class="tag" style="background:#FAE0E8;color:#A3002E">負責：${esc(c.assignee||'')}</span>`}</div></button>`}
 function ecoEst(devs){const k=(devs||[]).filter(d=>d.grade===1&&d.kwh&&d.source==='購買紀錄').reduce((s,d)=>s+d.kwh,0);return k?Math.round(k*0.5*0.47):0}
 function devReq(d){const n=String(d.name),s=String(d.status||'');if(s.includes('電量')||s.includes('電池'))return ['設備檢修','預約更換'];if(n.includes('夜燈'))return ['夜燈調整','預約調整'];return ['聯絡生活顧問','詢問']}
 function ipTL(H,o,p,d,steps){o=o||{};const st=o.status||'',pk=H.packages||[];
@@ -1098,9 +1161,9 @@ function chainHTML(){return `<div><b>1</b><span><b style="all:unset;font-weight:
   <div><b>4</b><span>就近聯絡人${CN('就近','（尚未設定）')}</span></div>`}
 // ===== 安裝前後對比、方案圖面、施工圖層（共用同一張居家安全地圖） =====
 // 圖面只存尺寸與標記座標（公尺），不存現場影像；同一張圖依角色顯示不同圖層
-const PKC={A:'#C42D5A',B:'#8E1E42',S:'#C42D5A'},PKN={A:'關懷設備',B:'夜間照明',S:'設備檢修'};
+const PKC={A:'#D4003C',B:'#A3002E',S:'#D4003C'},PKN={A:'關懷設備',B:'夜間照明',S:'設備檢修'};
 const PIC={light:'燈',door:'門',btn:'鈕',gw:'閘',motion:'感',strip:'條',outlet:'插',note:'!'};
-const STC={plan:'#C42D5A',done:'#8E1E42',diff:'#FF7A59',lock:'#BDBBB5'};
+const STC={plan:'#D4003C',done:'#A3002E',diff:'#FF7A59',lock:'#BDBBB5'};
 function hpInv(sx,sy){const a=HPJ.EX[0],b=HPJ.EZ[0],c=HPJ.EX[1],d=HPJ.EZ[1],u=sx-HPJ.O[0],v=sy-HPJ.O[1]-HPJ.FT*HPJ.EY[1],det=a*d-b*c;return [(u*d-b*v)/det,(a*v-c*u)/det]}
 function DPINS(sel,th){const P=[],add=(id,pkg,k,label,x,y,room)=>P.push({id,pkg,k,label,x,y,room,st:'plan'});
  if(sel.night){add('L1','B','light','感應小夜燈｜床邊',3.08,1.0,'臥室');add('L2','B','light','感應小夜燈｜走道',4.2,3.66,'走道');add('L3','B','light','感應小夜燈｜浴室門口',5.3,3.25,'浴室');add('D1','A','door','門窗感測器｜浴室門',4.75,3.5,'浴室');add('D2','A','door','門窗感測器｜大門',8.1,8.0,'玄關');add('BT','A','btn','浴室緊急按鈕',5.8,1.0,'浴室');add('GW','A','gw','閘道器｜客廳',6.5,6.0,'客廳')}
@@ -1115,7 +1178,7 @@ function hpRooms(L){const FT=HPJ.FT;let g='',lab='';
   lab+=`<g transform="translate(${lx.toFixed(0)},${ly.toFixed(0)})"><rect x="${-w/2}" y="-22" width="${w}" height="44" rx="22" fill="#fff" stroke="rgba(0,0,0,.12)"/><circle cx="${-w/2+24}" cy="0" r="9" fill="${col}"/><text x="${-w/2+42}" y="10" font-size="28" font-weight="700" fill="#3D3A40">${n}</text></g>`}
  return g+lab}
 function hpPath(){const FT=HPJ.FT,pts=[[2.85,1.4],[3.05,2.6],[3.45,3.5],[3.6,4.05],[4.8,4.05],[5.0,3.5],[4.9,2.3],[4.75,1.3]].map(([x,z])=>hpp(x,FT+.02,z));
- return `<polyline points="${hps(pts)}" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="1 16" stroke-linecap="round"/><polyline points="${hps(pts)}" fill="none" stroke="#8E1E42" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round"/>`}
+ return `<polyline points="${hps(pts)}" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="1 16" stroke-linecap="round"/><polyline points="${hps(pts)}" fill="none" stroke="#A3002E" stroke-width="8" stroke-dasharray="1 16" stroke-linecap="round"/>`}
 function hpLights(pins){return (pins||[]).filter(p=>p.k==='light').map(p=>hpp(p.x,HPJ.FT+.3,p.y))}
 // 夜間模式：整張圖變暗，安裝後的感應夜燈位置透出暖光
 function hpNight(id,pins,after){const L=after?hpLights(pins):[];
@@ -1123,7 +1186,7 @@ function hpNight(id,pins,after){const L=after?hpLights(pins):[];
  <rect x="${HPV[0]}" y="${HPV[1]}" width="${HPV[2]}" height="${HPV[3]}" fill="#0B1430" fill-opacity="${after?.62:.72}" mask="url(#${id}m)"/>${L.map(([x,y])=>`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="60" fill="#FFC24A" fill-opacity=".28"/>`).join('')}`}
 function pinColor(p,o){if(o&&o.lockPkg&&o.lockPkg[p.pkg])return STC.lock;if(o&&o.byStatus){if(p.st==='done')return STC.done;if(p.st==='diff')return STC.diff;if(o.mine&&!o.mine[p.pkg])return STC.lock;return STC.plan}return PKC[p.pkg]||PKC.A}
 function hpPins(pins,o={}){return (pins||[]).map(p=>{const [x,y]=hpp(p.x,HPJ.FT+.35,p.y),c=pinColor(p,o),on=o.sel===p.id,big=o.big?1.25:1,r=(p.k==='note'?17:21)*big;
- return `<g ${o.click?`data-pin="${esc(p.id)}" style="cursor:pointer"`:''} transform="translate(${x.toFixed(0)},${y.toFixed(0)})">${on?`<circle r="${r+14}" fill="none" stroke="#C42D5A" stroke-width="5"/>`:''}<path d="M0 ${r+16} L${-r*.55} ${r*.55} A${r} ${r} 0 1 1 ${r*.55} ${r*.55} Z" fill="${c}" stroke="#fff" stroke-width="4"/><text y="${r*.36}" font-size="${r*1.05}" font-weight="700" text-anchor="middle" fill="#fff">${p.k==='note'?'!':o.letters?p.pkg:(PIC[p.k]||'•')}</text>${p.st==='done'&&o.byStatus?`<circle cx="${r*.8}" cy="${-r*.8}" r="11" fill="#fff"/><path d="M${r*.8-6} ${-r*.8} l4 4 l8 -8" stroke="#8E1E42" stroke-width="3.5" fill="none"/>`:''}</g>`}).join('')}
+ return `<g ${o.click?`data-pin="${esc(p.id)}" style="cursor:pointer"`:''} transform="translate(${x.toFixed(0)},${y.toFixed(0)})">${on?`<circle r="${r+14}" fill="none" stroke="#D4003C" stroke-width="5"/>`:''}<path d="M0 ${r+16} L${-r*.55} ${r*.55} A${r} ${r} 0 1 1 ${r*.55} ${r*.55} Z" fill="${c}" stroke="#fff" stroke-width="4"/><text y="${r*.36}" font-size="${r*1.05}" font-weight="700" text-anchor="middle" fill="#fff">${p.k==='note'?'!':o.letters?p.pkg:(PIC[p.k]||'•')}</text>${p.st==='done'&&o.byStatus?`<circle cx="${r*.8}" cy="${-r*.8}" r="11" fill="#fff"/><path d="M${r*.8-6} ${-r*.8} l4 4 l8 -8" stroke="#A3002E" stroke-width="3.5" fill="none"/>`:''}</g>`}).join('')}
 const CMP={};
 // 安裝前後對比：左右拖曳中間的把手（同一張居家安全地圖）
 function cmpPlan(id,{L,pins,path=true,title='安裝前後對比',note,big}={}){const ni=CMP[id]&&CMP[id].night!==undefined?CMP[id].night:true,p=(CMP[id]&&CMP[id].p)||50;
@@ -1153,9 +1216,9 @@ function verTag(pv){if(!pv)return '';const ok=['長輩已確認','差異已核�
 function remRow(r){const st=r.status;return `<div class="row" style="align-items:flex-start"><span><b style="font-weight:500">${esc(r.device)}｜${esc(r.kind)}</b><span class="muted" style="display:block;font-size:.85em">${esc(r.reason||'')}${r.due?'｜建議 '+esc(r.due.slice(5).replace('-','/'))+' 前':''}</span>${r.booking&&r.booking.status==='已指派'?`<span class="muted" style="display:block;font-size:.85em;color:var(--ok)">已排定 ${esc(r.booking.label)}</span>`:''}</span>
  ${st==='待處理'?`<span style="display:flex;flex-direction:column;gap:6px;flex:none"><button class="tag" data-rbook="${r.id}" style="background:var(--brand);color:#fff">一鍵預約</button><button class="tag" data-rskip="${r.id}" style="background:var(--bg);color:var(--muted)">先略過</button></span>`:`<span class="tag ${st==='已派工'||st==='已完成'?'ok':''}" style="flex:none">${st==='家人已預約'?'門市確認時段中':st==='已建立工單'?'門市已建立工單':esc(st)}</span>`}</div>`}
 function shareCard(){const as=S.hh&&S.hh.assessment;if(!as)return '';const L=as.lights||[],r=L.filter(x=>x[1]==='r').length,y=L.filter(x=>x[1]==='y').length;
- return `<div class="bub" style="max-width:300px"><div style="background:#F7E9EE;padding:10px 12px"><div class="rs" style="color:#8E1E42">揪居家｜居家安全摘要</div><b style="font-size:1.05em">${EN()}家：${esc(as.rec.n)}</b></div>
+ return `<div class="bub" style="max-width:300px"><div style="background:#FAE0E8;padding:10px 12px"><div class="rs" style="color:#A3002E">揪居家｜居家安全摘要</div><b style="font-size:1.05em">${EN()}家：${esc(as.rec.n)}</b></div>
  <div class="hd"><div class="row" style="padding:4px 0"><span>紅燈</span><b>${r} 處</b></div><div class="row" style="padding:4px 0"><span>黃燈</span><b>${y} 處</b></div><div class="row" style="padding:4px 0"><span>下一步</span><span>交給門市，由生活顧問完成報價</span></div>
- <div class="rs" style="margin-top:6px">只分享摘要，不含地址、電話與作息資料</div><div style="margin-top:8px;text-align:center;color:#8E1E42;font-weight:700">開啟揪居家查看完整結果 ›</div></div></div>`}
+ <div class="rs" style="margin-top:6px">只分享摘要，不含地址、電話與作息資料</div><div style="margin-top:8px;text-align:center;color:#A3002E;font-weight:700">開啟揪居家查看完整結果 ›</div></div></div>`}
 Object.assign(V,{
 share:()=>`${lhead('家人群組（示意）')}<div class="chat"><div class="sysnote">${esc(S.me?S.me.name:'')}分享到家人群組｜示意畫面</div>
  <div style="display:flex;justify-content:flex-end">${shareCard()}</div><div class="ts">剛剛</div>
@@ -1175,7 +1238,7 @@ apm:()=>{const B=S.board;if(!B)return `${stf('方案圖面')}<div class="ld">載
  <div class="pad">${pv&&pv.status==='草稿'?'<button class="btn" data-go="aec">請長輩確認（安裝前後對比）</button>':''}<button class="btn ghost" data-a="advAgain">回到今天</button></div></div>`},
 // 顧問：長輩確認（大字、同一張對比圖）
 aec:()=>{const B=S.board;if(!B)return V.apm();const pv=B.pv,pins=pv?pv.pins:[],as=B.assessment;
- return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">
+ return `${stf('請長輩確認')}<div class="scroll" style="font-size:1.12em">${stepper(ASTEP,4)}
  <div class="step">把手機轉給${EN()}看｜大字顯示</div>
  ${(()=>{const L=S.quotes||[],v=L.reduce((a,b)=>!a||b.v>a.v?b:a,null);return `<div class="card" style="border:2px solid var(--brand);margin-bottom:8px"><b style="color:var(--brand-ink)">${v?'報價版本 v'+v.v+'（正式）':'報價：電腦版尚未送出正式版本'}</b><div class="rs">${v?'電腦版整合好的正式報價，長輩同意的是這一版':'生活顧問在門市電腦整合報價後，這裡會顯示正式版本'}</div></div>`})()}
  ${cmpPlan('aec',{L:as?as.lights:[],pins,big:true,title:EN()+'家｜安裝前後',note:'左右拖曳中間把手：左邊是現在，右邊是裝好以後。臥室與浴室不含鏡頭。'})}
@@ -1201,15 +1264,15 @@ tc:()=>{const o=S.order;if(!o)return V.t1();const tab=S.ttab==='info'?'info':'wo
     ${isSel?`<div class="tdet"><div class="muted" style="font-size:.9em">${esc(t.detail||'')}</div>
      ${!me?`<div class="rs" style="margin-top:6px">由${esc(k?(k.assignee||k.team):'其他人員')}（${esc(k?k.team:'')}）負責，只能查看</div>`:k&&k.locked?`<div class="warn">需等 ${k.prereq} 完成後才能施作</div>`:o.status==='待驗收'?'':`<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">${t.photo?`<button class="btn ghost" style="margin:0;flex:1" data-a="tPhoto">${S.photo&&S.photo[t.key]?'✓ 已拍照':'拍照'}</button>`:''}<button class="btn" style="margin:0;flex:1" data-tdone="${t.key}" ${t.done||(t.photo&&!(S.photo&&S.photo[t.key]))?'disabled':''}>${t.done?'已完成':'完成'}</button>${t.pin?`<button class="btn ghost" style="margin:0;flex:1" data-a="tDiffGo">回報差異</button>`:''}</div>${t.photo&&!(S.photo&&S.photo[t.key])&&!t.done?'<div class="rs" style="margin-top:4px">這一項要先拍照，才能按完成（只拍設備位置，不拍人）</div>':''}`}</div>`:''}</div>`}).join(''):''}</div>`}).join('')}
   ${(o.diffs||[]).length?`<div class="sec">差異回報</div><div class="card" style="padding:4px 14px">${o.diffs.map(d=>`<div class="row" style="align-items:flex-start"><span>${esc(d.text)}<span class="muted" style="display:block;font-size:.85em">${esc(d.when)}｜${esc(d.by_name||d.by||'')}${d.status==='已核准'?'｜已核准，圖面 v'+d.new_ver:''}</span></span><span class="tag ${d.status==='已核准'?'ok':''}">${d.level==='暫停'&&d.status==='待審核'?'暫停中':esc(d.status)}</span></div>`).join('')}</div>`:''}`;
-  const bar=techBar(o,T);body+='</div>'+bar;return `${stf(esc(o.household)+'｜'+esc(o.code))}<div class="scroll"><div class="step">${esc(o.label)}｜${esc(o.kind)}｜統一排程、合併到府</div>${tabs}${body}`}
+  const bar=techBar(o,T);body+='</div>'+bar;return `${stf(esc(o.household)+'｜'+esc(o.code))}${stepper(TSTEP,0)}<div class="scroll"><div class="step">${esc(o.label)}｜${esc(o.kind)}｜統一排程、合併到府</div>${tabs}${body}`}
  const items=instItems(o),m=o.measures||{};body=`<div class="ly"><h3>到府資訊</h3><div class="row"><span>時段</span><b>${esc(o.label)}</b></div><div class="row"><span>地點</span><span style="text-align:right">${esc(o.address)}</span></div><div class="row"><span>聯絡人</span><span style="text-align:right">${ON()}（家人）${o.phone?'<span class="muted" style="display:block">'+esc(o.phone)+'</span>':''}</span></div>${o.note?`<div class="row"><span>備註</span><span style="text-align:right">${esc(o.note)}</span></div>`:''}</div>
   <div class="ly"><h3>設備清單</h3>${items.length?items.map(([n,q])=>`<div class="row"><span>${esc(n)}</span><b>×${q}</b></div>`).join(''):'<div class="rs">依工單內容</div>'}</div>
   <div class="ly"><h3>AR 掃描（場勘）量測</h3>${Object.keys(m).length?measRows(m):'<div class="rs">尚無量測資料，請於現場量測</div>'}<div class="rs" style="margin-top:4px">長輩已同意安裝，不含任何鏡頭；不顯示長輩作息資料。</div></div>
   ${(o.log||[]).length?`<div class="ly"><h3>狀態紀錄</h3>${(()=>{const fin=o.status==='已完成',acc=fin||o.status==='待驗收',L=o.log.map((x,i)=>['dn',esc(x.when).replace(' ','<br>'),esc(x.action),esc(x.name||'')+(x.detail?'｜'+esc(x.detail):'')]);if(!acc)L.push(['cu','現在','安裝中','依施工清單逐項完成，拍照才能按完成'],['td','','完成安裝','通知家人與生活顧問']);if(!fin)L.push([acc?'cu':'td',acc?'現在':'','長輩驗收','技師陪長輩逐區確認']);return JT(L)})()}</div>`:''}`;
- return `${stf(esc(o.household)+'｜'+esc(o.code))}<div class="scroll"><div class="step">${esc(o.label)}｜${esc(o.kind)}｜統一排程、合併到府</div>${tabs}${body}</div>`},
+ return `${stf(esc(o.household)+'｜'+esc(o.code))}${stepper(TSTEP,0)}<div class="scroll"><div class="step">${esc(o.label)}｜${esc(o.kind)}｜統一排程、合併到府</div>${tabs}${body}</div>`},
 // 技師：請長輩驗收（大字，逐區確認）
 tacc:()=>{const o=S.order;if(!o)return V.t1();const T=taskList(o),areas=[...new Set(T.map(t=>t.group))].filter(g=>g!=='開工'),A=S.acc||(S.acc={}),all=areas.every(g=>A[g]===1),bad=areas.filter(g=>A[g]===0);
- return `${stf('請'+EN()+'驗收')}<div class="scroll tacc" style="font-size:1.1em">
+ return `${stf('請'+EN()+'驗收')}${stepper(TSTEP,1)}<div class="scroll tacc" style="font-size:1.1em">
  <div class="step">把手機轉給${EN()}看｜一起走一次夜間動線</div>
  ${areas.map((g,i)=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${i+1}. ${g}</b>${A[g]===1?'<span class="tag ok">沒問題</span>':A[g]===0?'<span class="tag">有問題</span>':''}</div><div style="margin:4px 0 8px">${ACHK[g]||'確認這一區都裝好了'}</div>
   <div style="display:flex;gap:8px"><button class="btn ${A[g]===1?'':'ghost'}" style="margin:0" data-acc="${g}|1">沒問題</button><button class="btn ghost" style="margin:0;${A[g]===0?'border-color:var(--brand);color:var(--brand)':''}" data-acc="${g}|0">有問題</button></div></div>`).join('')}
@@ -1241,7 +1304,7 @@ async function refreshOrder(){if(!S.order)return;S.order=await api('/tech/orders
 function cmpSet(id,p){CMP[id]=CMP[id]||{};CMP[id].p=p;const w=document.querySelector('#cmp_'+id+' .cmpw');if(w)w.style.setProperty('--p',p+'%')}
 
 // ===== 技師施工清單：依區域分組、依施工順序編號；圖上只標號碼 =====
-const TSC={todo:['#C42D5A','待施工'],done:['#8E1E42','已完成'],diff:['#FF7A59','差異／暫停'],other:['#BDBBB5','其他人員／未解鎖']};
+const TSC={todo:['#D4003C','待施工'],done:['#A3002E','已完成'],diff:['#FF7A59','差異／暫停'],other:['#BDBBB5','其他人員／未解鎖']};
 const ACHK={'臥室':'從床上起身，床邊夜燈會自己亮','走道':'走到走道，夜燈一路亮到浴室門口','浴室':'浴室門檻燈條看得到，緊急按鈕坐著也按得到','玄關':'開關一次大門，家人手機收到測試','客廳':'閘道器燈號正常','收尾':'按一次「我很好」，詢問就結束；說明卡貼在床邊'};
 const PIN_SPEC={light:'感應小夜燈｜離地約 30 cm、朝走道方向',door:'門窗感測器｜貼在門框上緣，磁條對齊',btn:'浴室緊急按鈕｜馬桶旁，坐著伸手按得到',gw:'閘道器｜客廳插座旁，離地 1 公尺以上',motion:'人體感測器｜牆角約 2 公尺高',strip:'門檻提示燈條｜貼在門檻前緣',outlet:'床邊插座｜由技師加裝'};
 function pkMine(o,c){const k=(o.packages||[]).find(x=>x.code===c);return !!(k&&k.mine)}
@@ -1300,12 +1363,15 @@ function rr(){const sc=document.querySelector('.scroll'),y=sc?sc.scrollTop:0;ren
 function render(){
  const v=S.stack[S.stack.length-1];setCtx(v);
  document.documentElement.style.setProperty('--fs',S.big?'18px':'15px');
- const view=document.getElementById('view');view.innerHTML=(V[v]||V.boot)();if(v==='ar'&&(S.armode||'ar')==='ar')arApply(S.arT||0);
+ const view=document.getElementById('view');view.innerHTML=(V[v]||V.boot)();
+ if(S.me&&!view.querySelector('nav.nav')){if(STAFF_TOP.includes(v))view.insertAdjacentHTML('beforeend',snav(v));else if(S.me.role==='family'&&!NO_NAV.includes(v)&&view.querySelector('.top'))view.insertAdjacentHTML('beforeend',nav('home'))}if(v==='ar'&&(S.armode||'ar')==='ar')arApply(S.arT||0);
  if(S.guide&&TIP[v])view.insertAdjacentHTML('afterbegin',`<div class="tip" role="note">導覽：${TIP[v]}</div>`);
  if(S.fromLog)document.querySelectorAll('#view .sim').forEach(x=>x.remove());
  const sc=document.querySelector('.scroll');if(sc)sc.scrollTop=0;
  if(v==='home')hbWire();
 }
+// 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
+const NO_NAV=['login','register','boot','c1','c2','c3','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct'];
 function toC3(){const i=S.stack.lastIndexOf('n0');S.stack=(i>=0?S.stack.slice(0,i+1):S.stack).concat('c3');render()}
 document.getElementById('view').addEventListener('submit',e=>{e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]'),er=f.querySelector('.err');if(er)er.textContent='';
  if(f.id==='loginForm')busy(b,async()=>{const d=await api('/auth/login',{method:'POST',body:{email:f.email.value.trim(),password:f.password.value},noAuthRedirect:true});if(!roleOK(d.user.role)){await silentOut();if(er)er.innerHTML=WRONG[d.user.role]||'這個帳號不能在這裡登入。';return}S.me=d.user;await enter()},er);
@@ -1346,6 +1412,7 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.fill){const f=document.getElementById('loginForm');if(f){f.email.value=t.dataset.fill;f.password.value=S.cfg.demo_password||''}return}
  if(t.dataset.go){go(t.dataset.go);return}
  if(t.dataset.hc!==undefined){S.hc=+t.dataset.hc;go('hc');return}
+ if(t.dataset.snav){const n=t.dataset.snav;S.stack=[n];render();if(LOAD[n])LOAD[n]().then(()=>{if(S.stack[S.stack.length-1]===n)render()}).catch(e=>toast(e.message));return}
  if(t.dataset.nav){const n=t.dataset.nav;if(n==='home'||n==='m1'){S.stack=[n];render()}else toast('此分頁維持原 App 功能');return}
  if(t.dataset.req){sendReq(t.dataset.req);return}
  if(t.dataset.ans){S.ans[Q[S.qi||0].k]=t.dataset.ans;saveDraft();render();return}
@@ -1364,6 +1431,7 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.ts){const st=TS().st;st[t.dataset.ts]=!st[t.dataset.ts];if(t.dataset.ts==='scan'&&st.scan)toast('已掃描設備序號，登錄到家電檔案');render();saveSteps();return}
  if(t.dataset.td){const x=TS();x.diff=x.diff===t.dataset.td?'':t.dataset.td;render();saveSteps();return}
  if(t.dataset.home){S.home=t.dataset.home;render();return}
+ if(t.dataset.sxt){const [k,i]=t.dataset.sxt.split('|');S.sxTab=Object.assign({},S.sxTab,{[k]:+i});rr();return}
  if(t.dataset.goal){const g=A().goals,i=g.indexOf(t.dataset.goal);i>=0?g.splice(i,1):g.push(t.dataset.goal);render();return}
  if(t.dataset.budget){A().budget=t.dataset.budget;render();return}
  if(t.dataset.item){const a=A(),c=CAT.find(x=>x.id===t.dataset.item);if(c.lock){toast('家電檔案是所有方案的基礎');return}if(c.exp){toast('試點只做揪夜安，這一項於擴展期開放');return}
@@ -1473,7 +1541,7 @@ async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach
 window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#C42D5A;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261124b"></script>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261124b"></script>
 <script>
 // 手機框：電腦上固定 393×852，視窗較矮時等比例縮小；右側留給導覽面板
 (function(){const sh=document.getElementById('app');const F=window.JJJFRAME={};
@@ -1487,6 +1555,6 @@ window.JJJ={openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApp
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261124a"></script>
-<script src="guide.js?v=20261124a"></script></body>
+<script src="stage2.js?v=20261125c"></script>
+<script src="guide.js?v=20261125b"></script></body>
 </html>
