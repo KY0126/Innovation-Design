@@ -1,6 +1,6 @@
 // 揪居家｜AR 量測（手機實測）
 // 三條路，量到的數字都寫回同一份 S.meas（走道寬、門檻高、床到浴室距離），後面的燈號、顧問圖面、技師工單不用改：
-//   1. Android（Chrome）：WebXR 偵測地面，點起點、終點量距離（約 ±1–2 cm）
+//   1. Android（Chrome）：WebXR 偵測地面，點起點、終點量距離（約 ±1～3 cm）
 //   2. iPhone 與其他手機：拍一張放了信用卡的照片，先點卡片長邊兩端定比例，再點要量的兩端（約 ±3–5 cm，僅供參考）
 //   3. 都不行：手動輸入（原本的畫面）
 (function () {
@@ -37,7 +37,7 @@
     // done
     const v = fmtVal(a.k, a.val);
     return `${top}<div class="scroll" style="padding-top:16px"><div class="card" style="text-align:center;padding:24px 16px"><div class="muted">${esc(f[1])}</div><div style="font-size:2.2em;font-weight:700;margin:6px 0">約 ${v} ${f[2]}</div>
-      <div class="rs">${a.mode === 'xr' ? 'AR 實測｜約 ±1–2 cm' : '照片比例尺｜約 ±3–5 cm，僅供參考；門市到府會再複量'}</div></div>
+      <div class="rs">${a.mode === 'xr' ? 'AR 實測｜約 ±1～3 cm｜不拍照、不存影像，只存這個數字' : '照片比例尺｜約 ±3–5 cm，僅供參考；門市到府會再複量'}</div></div>
       ${img && a.mode === 'photo' ? '<div class="armw" style="height:auto"><canvas id="armC"></canvas></div>' : ''}
       <div class="pad"><button class="btn" data-aruse="1">使用這個數字</button><button class="btn ghost" data-arback="pick">重新量</button></div></div>`;
   };
@@ -85,32 +85,72 @@
   }
 
   // ---------- WebXR（Android Chrome） ----------
+  // 畫面：白色準心貼在地面上、起點紅點、白線與即時距離；按下方紅色圓鈕或點畫面放點
+  // 只存兩點距離，不拍照、不存相機影像
   async function startXR() {
-    const a = A(); a.step = 'xr'; a.mode = 'xr'; render();
+    const a = A(), f = FIELDS.find(x => x[0] === a.k) || FIELDS[0], what = f[1].split('｜')[1];
+    a.step = 'xr'; a.mode = 'xr'; render();
+    let ov;
     try {
-      const ov = document.createElement('div'); ov.className = 'xrov'; ov.innerHTML = '<div class="xrh" id="xrh">找地面中…</div><button class="xrx" id="xrx">取消</button>'; document.body.appendChild(ov);
+      ov = document.createElement('div'); ov.className = 'xrov';
+      ov.innerHTML = `<canvas class="xrc" id="xrc"></canvas><div class="xrtop"><span>${esc(f[1])}</span><button class="xrb" id="xrx">取消</button></div><div class="xrh" id="xrh">慢慢移動手機，對著地面找平面…</div><div class="xrbot"><button class="xrgo" id="xrgo" aria-label="放點"></button><span id="xrsub">點畫面任何地方也可以放點</span></div>`;
+      document.body.appendChild(ov);
       const s = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: ov } });
       xr = { s, ov, pts: [], cur: null };
       const cv = document.createElement('canvas'), gl = cv.getContext('webgl', { xrCompatible: true });
       s.updateRenderState({ baseLayer: new XRWebGLLayer(s, gl) });
-      const ref = await s.requestReferenceSpace('local'), view = await s.requestReferenceSpace('viewer'), hts = await s.requestHitTestSource({ space: view });
-      const hint = t => { const h = document.getElementById('xrh'); if (h) h.textContent = t; };
-      document.getElementById('xrx').onclick = () => s.end();
-      s.addEventListener('select', () => {
-        if (!xr.cur) { hint('還沒找到地面，慢慢移動手機'); return; }
+      const ref = await s.requestReferenceSpace('local'), viewer = await s.requestReferenceSpace('viewer'), hts = await s.requestHitTestSource({ space: viewer });
+      const $ = id => document.getElementById(id), hint = t => { const h = $('xrh'); if (h) h.innerHTML = t; };
+      const oc = $('xrc'), g = oc.getContext('2d');
+      const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z) * 100;
+      const place = () => {
+        if (!xr || !xr.cur) { hint('還沒找到地面，慢慢移動手機'); return; }
         xr.pts.push(xr.cur);
-        if (xr.pts.length === 1) hint('已放起點，移到終點再點一下');
-        else { const [p, q] = xr.pts; a.val = Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z) * 100; a.step = 'done'; s.end(); }
-      });
+        if (xr.pts.length === 1) { hint(`已放起點。把準心移到${esc(what)}的<b>另一端</b>，數字會跟著變，再點一下放終點。`); const sb = $('xrsub'); if (sb) sb.textContent = '放錯了？按「取消」重來'; }
+        else { a.val = dist(xr.pts[0], xr.pts[1]); a.step = 'done'; s.end(); }
+      };
+      $('xrx').onclick = () => s.end();
+      $('xrgo').onclick = place;
+      // 點在按鈕上不要再觸發一次 select
+      ov.addEventListener('beforexrselect', e => { if (e.target.closest('button')) e.preventDefault(); });
+      s.addEventListener('select', place);
       s.addEventListener('end', () => { ov.remove(); xr = null; if (a.step === 'xr') a.step = 'pick'; render(); });
+      // 3D 座標投影到螢幕
+      const mul = (M, v) => [0, 1, 2, 3].map(r => M[r] * v[0] + M[4 + r] * v[1] + M[8 + r] * v[2] + M[12 + r] * v[3]);
       const onFrame = (t, fr) => {
-        s.requestAnimationFrame(onFrame);
+        if (!xr) return; s.requestAnimationFrame(onFrame);
         const L = s.renderState.baseLayer; gl.bindFramebuffer(gl.FRAMEBUFFER, L.framebuffer); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
         const R = fr.getHitTestResults(hts);
-        if (R.length) { const p = R[0].getPose(ref).transform.position; xr.cur = { x: p.x, y: p.y, z: p.z }; if (xr.pts.length === 1) { const q = xr.pts[0]; hint('目前約 ' + Math.round(Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z) * 100) + ' cm，點一下放終點'); } else hint('找到地面了，點一下放起點'); }
+        if (R.length) { const p = R[0].getPose(ref).transform.position; xr.cur = { x: p.x, y: p.y, z: p.z }; } else xr.cur = null;
+        const pose = fr.getViewerPose(ref);
+        const W = innerWidth, H = innerHeight, dpr = devicePixelRatio || 1;
+        if (oc.width !== Math.round(W * dpr)) { oc.width = Math.round(W * dpr); oc.height = Math.round(H * dpr); }
+        g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+        if (!pose) return;
+        const v = pose.views[0], P = v.projectionMatrix, Vi = v.transform.inverse.matrix;
+        const pr = q => { const c = mul(P, mul(Vi, [q.x, q.y, q.z, 1])); if (c[3] <= 0) return null; return [(c[0] / c[3] * 0.5 + 0.5) * W, (1 - (c[1] / c[3] * 0.5 + 0.5)) * H]; };
+        const dot = q => { const s2 = pr(q); if (!s2) return; g.beginPath(); g.arc(s2[0], s2[1], 8, 0, 7); g.fillStyle = '#D4003C'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#fff'; g.stroke(); };
+        const end = xr.pts.length === 1 ? xr.cur : null;
+        if (xr.pts.length === 1 && end) {
+          const A2 = pr(xr.pts[0]), B2 = pr(end);
+          if (A2 && B2) {
+            g.setLineDash([8, 6]); g.lineWidth = 3; g.strokeStyle = '#fff'; g.beginPath(); g.moveTo(...A2); g.lineTo(...B2); g.stroke(); g.setLineDash([]);
+            const d = Math.round(dist(xr.pts[0], end)), mx = (A2[0] + B2[0]) / 2, my = (A2[1] + B2[1]) / 2 - 26, tx = `約 ${d} cm`;
+            g.font = '700 16px "Noto Sans TC",sans-serif'; const tw = g.measureText(tx).width + 20;
+            g.fillStyle = 'rgba(20,18,22,.82)'; g.beginPath(); g.roundRect ? g.roundRect(mx - tw / 2, my - 15, tw, 30, 8) : g.rect(mx - tw / 2, my - 15, tw, 30); g.fill();
+            g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(tx, mx, my);
+          }
+        }
+        xr.pts.forEach(dot);
+        if (xr.cur) {
+          // 準心：地面上半徑 8 公分的圓，投影後自然成橢圓
+          const ring = []; for (let k = 0; k <= 32; k++) { const th = k / 32 * Math.PI * 2; ring.push(pr({ x: xr.cur.x + Math.cos(th) * 0.08, y: xr.cur.y, z: xr.cur.z + Math.sin(th) * 0.08 })); }
+          if (ring.every(Boolean)) { g.beginPath(); ring.forEach((q, k) => k ? g.lineTo(...q) : g.moveTo(...q)); g.closePath(); g.fillStyle = 'rgba(255,255,255,.15)'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#fff'; g.stroke(); const c0 = pr(xr.cur); g.beginPath(); g.arc(c0[0], c0[1], 3, 0, 7); g.fillStyle = '#fff'; g.fill(); }
+          if (!xr.pts.length) hint(`找到地面了。把白色準心對到${esc(what)}的<b>一端</b>，點一下放起點。`);
+        } else if (!xr.pts.length) hint('慢慢移動手機，對著地面找平面…');
       };
       s.requestAnimationFrame(onFrame);
-    } catch (e) { document.querySelectorAll('.xrov').forEach(x => x.remove()); a.step = 'pick'; render(); toast('無法啟動 AR，請改用拍照量'); }
+    } catch (e) { if (ov) ov.remove(); document.querySelectorAll('.xrov').forEach(x => x.remove()); xr = null; a.step = 'pick'; render(); toast('無法啟動 AR，請改用拍照量'); }
   }
 
   const view = document.getElementById('view');
