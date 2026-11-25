@@ -48,7 +48,7 @@ test('手機版：導覽抽屜不蓋住第 1 個編號框', async ({ page }, inf
   expect(bb.y + bb.height, '編號框在抽屜上方').toBeLessThanOrEqual(sb.y + 2);
 });
 
-// 「瀏覽器展示版」標籤固定在右下角：不可蓋住導覽面板按鈕、「開啟導覽」按鈕、App 底部選單
+// 「導覽與展示」按鈕固定在右下角：不可蓋住導覽面板按鈕、App 底部選單
 const rect = (page, sel) => page.evaluate(s => { const e = [...document.querySelectorAll(s)].find(x => x.getClientRects().length); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; }, sel);
 const hit = (a, b) => !!(a && b && a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b);
 for (const [name, url] of [['企業管理端', '/jiujujia/admin.html'], ['消費者端', '/consumer.html']]) {
@@ -61,9 +61,12 @@ for (const [name, url] of [['企業管理端', '/jiujujia/admin.html'], ['消費
     const demo = await rect(page, '#webDemo');
     expect(hit(demo, await rect(page, '#jg .ft')), '導覽面板按鈕').toBe(false);
     await page.click('#jg [data-t="stop"]'); await page.waitForTimeout(800);
-    const demo2 = await rect(page, '#webDemo'), open = await rect(page, '#jgOpen');
-    expect(open, '「開啟導覽」按鈕要看得到').not.toBeNull();
-    expect(hit(demo2, open), '「開啟導覽」按鈕').toBe(false);
+    // 「開啟導覽」與「重設資料」合成一顆「導覽與展示」按鈕：收合時只有一顆小按鈕，點開才看到兩個選項
+    // 電腦版外框（左側手機＋上方切換列）不顯示展示版標籤，「開啟導覽」直接浮在右下角
+    const demo2 = await rect(page, '#webDemo .wdm');
+    if (demo2) await page.click('#webDemo .wdm');
+    const open = await rect(page, '#jgOpen');
+    expect(open, '點開後看得到「開啟導覽」').not.toBeNull();
     const nav = await page.evaluate(() => { const v = document.getElementById('view'); if (!v || !v.closest('#app')) return null; const vb = v.getBoundingClientRect().bottom; const n = [...v.querySelectorAll('nav.nav')].find(x => { const r = x.getBoundingClientRect(); return r.height && Math.abs(r.bottom - vb) < 4; }); if (!n) return null; const r = n.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; });
     expect(hit(demo2, nav), 'App 底部選單').toBe(false);
     expect(hit(open, nav), '「開啟導覽」與 App 底部選單').toBe(false);
