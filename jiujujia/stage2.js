@@ -204,15 +204,101 @@
     },
   };
 
+  // ---------- 揪心願（參考 LEGO Ideas：寫作模板、推薦標籤、相似比對、三段門檻、每季審查） ----------
+  const W_FIELD = ['臥室到浴室', '廚房', '客廳', '洗衣陽台', '全屋'];
+  const W_NEED = ['防跌照明', '用火用電安全', '聯絡與陪伴', '省力家事', '節電與保養', '無障礙改善'];
+  const W_WHO = ['長輩', '育兒', '寵物'];
+  const W_PRICE = ['1,000 元以內', '1,000–3,000 元', '3,000 元以上'];
+  // 既有主題的標籤與期限（示意）
+  const W_META = {
+    dim: { f: '臥室到浴室', n: ['防跌照明'], left: 0, kw: ['夜燈', '亮', '刺眼', '光'] },
+    switch: { f: '臥室到浴室', n: ['防跌照明', '省力家事'], left: 45, kw: ['開關', '按鍵', '床邊', '按'] },
+    voice: { f: '全屋', n: ['聯絡與陪伴'], left: 21, kw: ['報平安', '語音', '電話', '聯絡'] },
+    mat: { f: '臥室到浴室', n: ['無障礙改善'], left: 63, kw: ['止滑', '地墊', '滑', '浴室'] },
+  };
+  const W_STAGES = [[20, '30 天內 20 戶'], [50, '90 天內 50 戶'], [100, '100 戶進入每季審查']];
+  const wf = () => L.s.wf || (L.s.wf = { who: '長輩', field: '臥室到浴室', need: [], obj: '長輩', price: '' });
+  const chip = (attr, v, on, dis) => `<button class="slot" style="margin:0 6px 8px 0${dis ? ';opacity:.5' : ''}" ${attr}="${esc(v)}" aria-pressed="${!!on}" ${dis ? 'disabled' : ''}>${esc(v)}</button>`;
+  const BAN = [[/治療|療效|醫療|復健效果|保證不跌|防止中風/, '不寫醫療效果'], [/飛利浦|Philips|小米|國際牌|Panasonic|Tapo|TP-Link|大金|日立|三星|LG/i, '不指名品牌'], [/臉|門牌|地址|住址/, '不放長輩可辨識影像或地址']];
+  function similar(f) {
+    const txt = [f.when, f.stuck, f.hope].join(' ');
+    const T = (J.S.topics && J.S.topics.topics) || Object.keys(W_META).map(id => ({ id, n: { dim: '可調光感應夜燈', switch: '床邊大按鍵開關', voice: '睡前語音報平安', mat: '浴室門口止滑地墊' }[id] }));
+    return T.filter(t => { const m = W_META[t.id]; if (!m) return false; return m.kw.some(k => txt.includes(k)) || (m.f === f.field && f.need.some(n => m.n.includes(n)) && txt.trim()); }).slice(0, 2);
+  }
+  Object.assign(V, {
+    wish: () => {
+      const f = wf(), sim = similar(f), warn = BAN.filter(([re]) => re.test([f.when, f.stuck, f.hope].join(' '))).map(x => x[1]);
+      const pilotOther = ph() < 1 && f.field !== '臥室到浴室';
+      const fld = (k, label, ph2) => `<label class="muted" style="display:block;margin-bottom:8px">${label}<input class="fld" data-wf="${k}" value="${esc(f[k] || '')}" placeholder="${ph2}" style="margin-top:4px"></label>`;
+      return page('許一個揪心願', `
+      <div class="card" style="background:var(--note)"><b>官方寫作模板</b><div class="rs">照著填，生活顧問與總部就能看懂、比對與審查。內容只有門市與總部看得到，心願牆只顯示整理過的主題。</div></div>
+      <div class="card">
+        <div class="muted">誰遇到</div><div>${['長輩', '孫輩', '我自己', '其他家人'].map(v => chip('data-wwho', v, f.who === v)).join('')}</div>
+        <div class="muted">在哪裡（場域，必選一）</div><div>${W_FIELD.map(v => chip('data-wfield', v, f.field === v)).join('')}</div>
+        ${fld('when', '什麼時候', '例：半夜起床上廁所')}
+        ${fld('stuck', '卡在哪', '例：感應夜燈太亮，很刺眼')}
+        ${fld('hope', '希望（一句話，必填）', '例：亮度可以調低的感應夜燈')}
+        <div class="muted">需求類型（選一到兩個）</div><div>${W_NEED.map(v => chip('data-wneed', v, f.need.includes(v), !f.need.includes(v) && f.need.length >= 2)).join('')}</div>
+        <div class="muted">對象</div><div>${W_WHO.map(v => chip('data-wobj', v, f.obj === v, v !== '長輩' && ph() < 2)).join('')}${ph() < 2 ? '<span class="muted" style="font-size:.8em">育兒、寵物於延伸期開放</span>' : ''}</div>
+        <div class="muted">希望價格帶</div><div>${W_PRICE.map(v => chip('data-wprice', v, f.price === v)).join('')}</div>
+        <div class="muted" style="font-size:.85em">照片（選填）：只拍空間，不拍人、不拍地址與門牌</div>
+      </div>
+      ${warn.length ? `<div class="card" style="border-left:4px solid #C42D5A"><b>全國電子 AI 顧問阿國提醒</b><div class="rs">內容可能違反「${warn.join('、')}」，請修改後再送出。</div></div>` : ''}
+      ${sim.length ? `<div class="card" style="border-left:4px solid #E0A030"><b>全國電子 AI 顧問阿國：找到相似心願</b><div class="rs" style="margin-bottom:6px">直接去按「我也需要」，比重新提案更快達到門檻。</div>${sim.map(t => `<button class="row" data-go="wall" style="width:100%"><span>${esc(t.n)}</span><span class="chev">去共鳴 ›</span></button>`).join('')}</div>` : ''}
+      ${pilotOther ? '<div class="card" style="background:var(--note)"><div class="rs">試點期只量產「臥室到浴室」的心願；這個場域的心願會累積起來，作為擴展期開放新場域的需求證據。</div></div>' : ''}
+      <textarea id="wishtxt" hidden></textarea>
+      <div class="pad"><button class="btn" data-a="wishSend" ${warn.length ? 'disabled style="opacity:.6"' : ''}>送出心願</button>
+      <p class="muted" style="font-size:.85em">我們會認真評估每一個心願，但無法保證都能實現；有進度時會通知您。</p></div>`);
+    },
+  });
+  const wallShow = t => { const m = W_META[t.id] || {}; const g = L.s.wtag; return !g || m.f === g || (m.n || []).includes(g); };
+  Object.assign(window.JJJS2 || (window.JJJS2 = {}), {
+    wallHead() {
+      const g = L.s.wtag || '';
+      return `<div class="pad" style="padding-top:0"><div class="muted" style="font-size:.85em;margin-bottom:4px">依標籤篩選</div>${['', '臥室到浴室', '全屋', '防跌照明', '聯絡與陪伴', '無障礙改善'].map(v => `<button class="slot" style="margin:0 6px 8px 0" data-wtag="${v}" aria-pressed="${g === v}">${v || '全部'}</button>`).join('')}</div>`;
+    },
+    wallShow,
+    wallCard(t) {
+      const m = W_META[t.id] || { f: '', n: [], left: 0 }, c = t.c;
+      const tags = `<div style="margin-top:6px">${[m.f, ...m.n].filter(Boolean).map(x => `<span class="tag" style="margin-right:4px">#${esc(x)}</span>`).join('')}</div>`;
+      const stage = W_STAGES.findIndex(([n]) => c < n);
+      const marks = W_STAGES.map(([n]) => `<span style="position:absolute;left:${n}%;top:-3px;width:2px;height:14px;background:#3D3A40;opacity:.35"></span>`).join('');
+      const bar = `<div style="position:relative;margin:12px 0 4px"><div class="pbar" style="margin:0"><i style="width:${Math.min(100, c)}%"></i></div>${marks}</div><div style="position:relative;height:1.3em;font-size:.75em" class="muted"><span style="position:absolute;left:0">0</span>${W_STAGES.map(([n]) => `<span style="position:absolute;white-space:nowrap;left:${n}%;transform:translateX(${n === 100 ? '-100%' : '-50%'})">${n}${n === 100 ? ' 戶' : ''}</span>`).join('')}</div>`;
+      const msg = t.st === 'pre' ? `${c} 個家庭也需要｜已通過每季審查，開放預購`
+        : stage < 0 ? `${c} 個家庭也需要｜已達 100 戶，進入下一次每季審查`
+        : `${c} 個家庭也需要｜第 ${stage + 1} 關：${W_STAGES[stage][1]}，還差 ${W_STAGES[stage][0] - c} 戶${m.left ? `、剩 ${m.left} 天` : ''}`;
+      return tags + bar + `<div class="muted" style="font-size:.88em">${msg}</div>`;
+    },
+    wallTail() {
+      return `<div class="card" style="border-style:dashed"><div style="display:flex;justify-content:space-between"><b>爐火忘關自動提醒</b><span class="tag">擴展期證據</span></div><div class="muted" style="font-size:.9em">#廚房 #用火用電安全｜23 個家庭提出</div><div class="rs" style="margin-top:6px">試點期只量產臥室到浴室；廚房的心願先累積，作為擴展期開放揪食光的需求證據。</div></div>`;
+    },
+  });
+
   // 本模組的點擊事件（在原 App 的事件處理之前攔截自己的屬性）
   document.addEventListener('click', e => {
-    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send]');
+    // 送出心願：把模板欄位組成文字，交給原本的送出流程
+    const ws = e.target.closest && e.target.closest('[data-a="wishSend"]');
+    if (ws && document.getElementById('wishtxt') && document.querySelector('[data-wf]')) {
+      const f = wf();
+      document.querySelectorAll('[data-wf]').forEach(i => { f[i.dataset.wf] = i.value.trim(); });
+      if (!f.hope) { e.stopPropagation(); toast('請寫下「希望」：一句話描述理想的樣子'); return; }
+      if (!f.need.length) { e.stopPropagation(); toast('請選一到兩個需求類型'); return; }
+      document.getElementById('wishtxt').value = `【${f.who}｜${f.field}】${f.when ? f.when + '，' : ''}${f.stuck ? f.stuck + '。' : ''}希望：${f.hope}（#${f.need.join(' #')}｜對象：${f.obj}${f.price ? '｜價格帶：' + f.price : ''}）`;
+      J.S.wcat = f.field; L.s.wf = null; return;
+    }
+    const t = e.target.closest && e.target.closest('[data-x24],[data-x29],[data-x31],[data-term],[data-f33],[data-f34],[data-x34],[data-u3],[data-u3t],[data-u3send],[data-wwho],[data-wfield],[data-wneed],[data-wobj],[data-wprice],[data-wtag]');
     if (!t || t.disabled) return;
     e.stopPropagation();
     const d = t.dataset;
     if (d.x24) { if (!open(1)) return; const s = L.s.f24; s[d.x24] = !s[d.x24]; }
     else if (d.x29) { if (!open(1)) return; const s = L.s.f29; s[d.x29] = !s[d.x29]; }
     else if (d.x31) { const s = L.s.f31; s[d.x31] = !s[d.x31]; }
+    else if (d.wwho !== undefined || d.wfield !== undefined || d.wneed !== undefined || d.wobj !== undefined || d.wprice !== undefined) {
+      const f = wf(); document.querySelectorAll('[data-wf]').forEach(i => { f[i.dataset.wf] = i.value.trim(); });
+      if (d.wwho) f.who = d.wwho; if (d.wfield) f.field = d.wfield; if (d.wobj) f.obj = d.wobj; if (d.wprice) f.price = d.wprice;
+      if (d.wneed) f.need = f.need.includes(d.wneed) ? f.need.filter(x => x !== d.wneed) : f.need.concat(d.wneed).slice(0, 2);
+    }
+    else if (d.wtag !== undefined) L.s.wtag = d.wtag;
     else if (d.u3) { const s = L.s.u3; s[d.u3] = !s[d.u3]; }
     else if (d.u3t) L.s.u3t = d.u3t;
     else if (d.u3send) { L.s.u3st = 'sent'; toast('已送審（示意）：生活顧問與總部審核後通知你'); }
@@ -222,4 +308,10 @@
     else if (d.x34) { toast(open(2) ? (d.x34 === 'dry' ? '已開啟除濕機（示意）' : '已開啟出門模式（示意）') : '延伸期開放'); return; }
     render();
   }, true);
+  let wt;
+  document.addEventListener('input', e => {
+    const k = e.target && e.target.dataset && e.target.dataset.wf; if (!k) return;
+    wf()[k] = e.target.value; clearTimeout(wt);
+    wt = setTimeout(() => { const pos = e.target.selectionStart; render(); const n = document.querySelector(`[data-wf="${k}"]`); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) {} } }, 600);
+  });
 })();
