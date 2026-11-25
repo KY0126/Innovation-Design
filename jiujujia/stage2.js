@@ -200,7 +200,7 @@
         ? `<div class="card"><b>老宅翻修</b><div class="rs" style="line-height:1.8;margin-top:4px">AR 掃描現況並對照家電檔案，翻修時一次換掉老舊家電，並一併做揪夜安的夜間動線改善；家電配合裝潢時程進場。</div></div>`
         : `<div class="card"><b>搬新家</b><div class="rs" style="line-height:1.8;margin-top:4px">AR 量好每個空間，直接配好全屋家電與揪全家；大型家電可用以租代買。新成屋可由合作建商在交屋時配好。</div></div>`}
       <div class="card" style="background:var(--note)"><div class="muted" style="font-size:.88em">泥作、水電等工程由協力工班施工。</div></div>
-      <div class="pad">${act(2, '開始 AR 掃描', `data-req="${t === 'old' ? '老宅翻修' : '搬新家'} AR 配置"`)}</div>`);
+      <div class="pad">${act(2, '預約到府 AR 全屋配置', 'data-co="reno"')}</div>`);
     },
 
     // F34 育兒與寵物模式
@@ -212,7 +212,8 @@
         ? `<div class="card"><b>嬰兒房</b><div style="display:flex;justify-content:space-between;margin-top:6px"><span>溫度／濕度</span><b>24°C／72%</b></div><div class="rs" style="color:#D4003C">濕度偏高（建議 50–60%）</div><button class="btn" data-x34="dry" style="margin-top:8px">一鍵開除濕機</button></div>
            <div class="card"><div class="rs">夜間餵奶沿用揪夜安的感應夜燈，起身就亮、不吵醒寶寶。</div></div>`
         : `<div class="card"><b>出門模式</b><div class="rs" style="line-height:1.8;margin-top:4px">出門後維持冷氣與除濕；室溫過高、門窗沒關好會提醒。</div><button class="btn" data-x34="away" style="margin-top:8px">開啟出門模式</button></div>
-           <div class="card"><div class="rs">預設不裝鏡頭。</div></div>`}`);
+           <div class="card"><div class="rs">預設不裝鏡頭。</div></div>`}
+      <div class="pad">${act(2, t === 'baby' ? '開啟育兒模式（每月 99 元）' : '開啟寵物模式（每月 99 元）', `data-co="${t}"`)}</div>`);
     },
   });
 
