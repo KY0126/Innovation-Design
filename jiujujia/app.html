@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125c"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125g"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -402,7 +402,7 @@ function clearDraft(){clearTimeout(draftT);api('/home/assessment-draft',{method:
 async function loadDraft(){try{const r=await api('/home/assessment-draft');const d=r.draft;if(d&&((d.meas&&Object.keys(d.meas).length)||(d.ans&&Object.keys(d.ans).length))){Object.assign(S.meas,d.meas||{});Object.assign(S.ans,d.ans||{});S.qi=Math.min(d.qi||0,Q.length-1);rr();toast('已帶回上次沒做完的量測與回答')}}catch(e){}}
 async function loadDrafts(){S.drafts=(await api('/advisor/drafts')).drafts}
 async function loadQuote(){S.quote=(await api('/home/quote')).quote}
-const LOAD={m2:loadUnread,gl:loadHome,pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,thist:loadOrders,acases:()=>Promise.all([loadACases(),loadTodos()]),inbox:loadInbox,msum:loadSum,wall:loadTopics,pre:loadTopics};
+const LOAD={nset:async()=>{S.rules=(await api('/care/rules')).rules},m2:loadUnread,gl:loadHome,pl:loadQuote,b4:loadSlots,a1:()=>Promise.all([loadCases(),loadAdvHome(),loadDrafts()]),d3:loadTodos,t1:loadOrders,thist:loadOrders,acases:()=>Promise.all([loadACases(),loadTodos()]),inbox:loadInbox,msum:loadSum,wall:loadTopics,pre:loadTopics};
 async function savePrefs(o){if(S.me&&S.me.role==='family'){try{const d=await api('/home/prefs',{method:'PUT',body:o});S.hh.household.prefs=d.prefs}catch(e){toast(e.message)}}}
 async function sendReq(kind,note){try{const d=await api('/requests',{method:'POST',body:{kind,note}});toast(d.duplicate?'已送出過，門市處理中':'已送出「'+kind+'」，門市會與您聯絡')}catch(e){toast(e.message)}}
 addEventListener('jjjphase',()=>{if(S.me)render()});
@@ -946,7 +946,7 @@ Object.assign(V,{
 nset:()=>{const n=S.ns||(S.ns={daily:false,monthly:true,kid:true});const row=(k,t,d,lock)=>`<button class="row" ${lock?'':`data-ns="${k}"`} style="width:100%"><span>${t}<span class="muted" style="display:block;font-size:.85em">${d}</span></span><span class="tag ${lock||n[k]?'ok':''}">${lock?'必要':(n[k]?'開啟':'關閉')}</span></button>`;
  return `${hdr('通知設定')}<div class="scroll" style="padding-top:12px">
  <div class="card" style="padding:4px 14px">${row('alert','異常通知','活動或設備異常時立即通知',1)}${row('daily','每日平安訊息','每天早上 9 點告知昨晚與今早狀況')}${row('monthly','每月整合摘要','關懷狀況與兩個家的家電提醒')}${row('kid','孫輩簡化摘要',''+CN('孫','孫輩')+'只收到簡化版每月摘要')}</div>
- <div class="sec">判斷規則</div><div class="card" style="padding:4px 14px"><div class="row"><span>浴室停留超過</span><b>30 分鐘</b></div><div class="row"><span>早上無活動超過</span><b>10:00</b></div><div class="row"><span>長輩未回應多久後通知家人</span><b>5 分鐘</b></div><div class="row"><span>家人未回應多久後通知下一位</span><b>5 分鐘</b></div><div class="muted" style="padding:8px 0">調整規則前，建議先與長輩討論；生活顧問也可以協助設定。</div></div>
+ <div class="sec">判斷規則</div><div class="card" style="padding:4px 14px">${(r=>`<div class="row"><span>浴室停留超過</span><b>${r.bath_min} 分鐘</b></div><div class="row"><span>早上無活動超過</span><b>${esc(r.morning)}</b></div><div class="row"><span>長輩未回應多久後通知家人</span><b>${r.elder_wait} 分鐘</b></div><div class="row"><span>家人未回應多久後通知下一位</span><b>${r.family_wait} 分鐘</b></div>`)(S.rules||{bath_min:30,morning:'10:00',elder_wait:5,family_wait:5})}<div class="muted" style="padding:8px 0">調整規則前，建議先與長輩討論；生活顧問也可以協助設定。</div></div>
  <div class="sec">通知順序</div><div class="card"><div class="muted">1. ${EN()}本人（燈光與語音詢問、家中電話）→ 2. ${ON()}（LINE＋語音電話）→ 3. ${CN('第二聯絡人','第二聯絡人')} → 4. ${CN('就近','就近聯絡人')}（就近聯絡人）。由家人判斷是否撥打 119；門市不參與緊急處理。未成年成員不接收異常通知。</div></div></div>`},
 plan:()=>{const H=S.hh,p=H&&H.plan;return `${hdr('長輩關懷')}<div class="scroll" style="padding-top:12px">
  ${J()&&p?`<div class="card"><div class="muted">目前方案</div><b style="font-size:1.1em">${esc(planName(p.plan))}</b><div class="muted">每月 ${fmt(p.monthly)}｜不綁約，可由兄弟姊妹分攤</div></div>

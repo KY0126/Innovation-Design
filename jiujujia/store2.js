@@ -250,5 +250,58 @@ CREATE TABLE IF NOT EXISTS video_tasks (
     run('INSERT INTO seed_devices_v1(done) VALUES(1)');
   });
   S.CATALOG = CATALOG;
+
+  // ===================== 工作包 6｜總部真資料 =====================
+  // 指標依「資料來源」登記：每個指標寫明讀哪張表、怎麼算；新身分（工作包 5）登記新來源，總部不用改畫面。
+  const n1 = (sql, a = []) => { try { return one(sql, a).n || 0; } catch (e) { return 0; } };
+  const pct = (a, b) => b ? Math.round(a * 1000 / b) / 10 : null;
+  const STW = st => st ? ' AND h.store=?' : '';
+  const SA = st => st ? [st] : [];
+  const METRICS = [];
+  function metric(d) { METRICS.push(d); }
+  S.metric = metric;
+  metric({ g: '試點漏斗', k: 'diag', l: '完成居家評估的家庭', u: '戶', src: 'assessments', f: st => n1('SELECT COUNT(DISTINCT a.household_id) AS n FROM assessments a JOIN households h ON h.id=a.household_id WHERE 1=1' + STW(st), SA(st)) });
+  metric({ g: '試點漏斗', k: 'book', l: '評估後預約門市', u: '%', t: 60, hi: 1, src: 'assessments、bookings', f: st => pct(n1("SELECT COUNT(DISTINCT b.household_id) AS n FROM bookings b JOIN households h ON h.id=b.household_id WHERE b.kind='門市諮詢' AND b.household_id IN (SELECT household_id FROM assessments)" + STW(st), SA(st)), n1('SELECT COUNT(DISTINCT a.household_id) AS n FROM assessments a JOIN households h ON h.id=a.household_id WHERE 1=1' + STW(st), SA(st))) });
+  metric({ g: '試點漏斗', k: 'conv', l: '問診後確認方案', u: '%', t: 20, hi: 1, src: 'bookings、plans', f: st => pct(n1("SELECT COUNT(DISTINCT p.household_id) AS n FROM plans p JOIN households h ON h.id=p.household_id WHERE p.status='已確認'" + STW(st), SA(st)), n1("SELECT COUNT(DISTINCT b.household_id) AS n FROM bookings b JOIN households h ON h.id=b.household_id WHERE b.kind='門市諮詢' AND b.status='已完成'" + STW(st), SA(st))) });
+  metric({ g: '試點漏斗', k: 'inst', l: '到府安裝完成', u: '戶', src: 'bookings', f: st => n1("SELECT COUNT(DISTINCT b.household_id) AS n FROM bookings b JOIN households h ON h.id=b.household_id WHERE b.kind='到府安裝' AND b.status='已完成'" + STW(st), SA(st)) });
+  metric({ g: '服務品質', k: 'plan_min', l: '單次規劃時間（平均）', u: '分', t: 30, hi: 0, src: 'metrics（生活顧問計時）', f: () => { const r = one("SELECT AVG(duration_s) AS v FROM metrics WHERE type='advisor'"); return r && r.v ? Math.round(r.v / 6) / 10 : null; } });
+  metric({ g: '服務品質', k: 'first_pass', l: '驗收一次通過率', u: '%', t: 90, hi: 1, src: 'acceptance_results', f: () => pct(n1('SELECT COUNT(*) AS n FROM acceptance_results WHERE first_pass=1'), n1('SELECT COUNT(*) AS n FROM acceptance_results')) });
+  metric({ g: '服務品質', k: 'diff', l: '技師現場差異（待核准）', u: '件', src: 'site_diffs', f: () => n1("SELECT COUNT(*) AS n FROM site_diffs WHERE status='待審核'") });
+  metric({ g: '長輩關懷', k: 'care', l: '關懷事件', u: '件', src: 'care_events', f: st => n1('SELECT COUNT(*) AS n FROM care_events e JOIN households h ON h.id=e.household_id WHERE 1=1' + STW(st), SA(st)) });
+  metric({ g: '長輩關懷', k: 'self', l: '長輩自己按「我很好」', u: '%', t: 60, hi: 1, src: 'care_events', f: st => pct(n1("SELECT COUNT(*) AS n FROM care_events e JOIN households h ON h.id=e.household_id WHERE e.outcome='長輩確認'" + STW(st), SA(st)), n1("SELECT COUNT(*) AS n FROM care_events e JOIN households h ON h.id=e.household_id WHERE e.kind='act'" + STW(st), SA(st))) });
+  metric({ g: '長輩關懷', k: 'follow', l: '事後關心完成率', u: '%', t: 90, hi: 1, src: 'care_events', f: st => pct(n1('SELECT COUNT(*) AS n FROM care_events e JOIN households h ON h.id=e.household_id WHERE e.followed_up=1' + STW(st), SA(st)), n1('SELECT COUNT(*) AS n FROM care_events e JOIN households h ON h.id=e.household_id WHERE 1=1' + STW(st), SA(st))) });
+  metric({ g: '長輩關懷', k: 'notify', l: '送出的通知', u: '則', src: 'notifications', f: st => n1('SELECT COUNT(*) AS n FROM notifications x JOIN households h ON h.id=x.household_id WHERE 1=1' + STW(st), SA(st)) });
+  metric({ g: '家庭與營收', k: 'req', l: '門市需求處理率', u: '%', t: 90, hi: 1, src: 'requests', f: st => pct(n1("SELECT COUNT(*) AS n FROM requests r JOIN households h ON h.id=r.household_id WHERE r.status<>'待處理'" + STW(st), SA(st)), n1('SELECT COUNT(*) AS n FROM requests r JOIN households h ON h.id=r.household_id WHERE 1=1' + STW(st), SA(st))) });
+  metric({ g: '家庭與營收', k: 'orders', l: '加購與訂閱訂單', u: '筆', src: 'orders', f: st => n1("SELECT COUNT(*) AS n FROM orders o JOIN households h ON h.id=o.household_id WHERE o.status<>'已取消'" + STW(st), SA(st)) });
+  metric({ g: '家庭與營收', k: 'mrr', l: '加購月費合計', u: '元', src: 'orders', f: st => n1("SELECT COALESCE(SUM(o.monthly),0) AS n FROM orders o JOIN households h ON h.id=o.household_id WHERE o.status<>'已取消'" + STW(st), SA(st)) });
+  metric({ g: '家庭與營收', k: 'wish', l: '揪心願', u: '件', src: 'wishes', f: st => n1('SELECT COUNT(*) AS n FROM wishes w WHERE 1=1' + (st ? ' AND w.store=?' : ''), SA(st)) });
+  metric({ g: '家庭與營收', k: 'wish_reply', l: '心願已回覆', u: '%', t: 80, hi: 1, src: 'wishes', f: st => pct(n1("SELECT COUNT(*) AS n FROM wishes w WHERE w.status='已回覆'" + (st ? ' AND w.store=?' : ''), SA(st)), n1('SELECT COUNT(*) AS n FROM wishes w WHERE 1=1' + (st ? ' AND w.store=?' : ''), SA(st))) });
+  metric({ g: '家庭與營收', k: 'video', l: '校園大使短影音送審', u: '支', src: 'video_tasks', f: () => n1('SELECT COUNT(*) AS n FROM video_tasks') });
+
+  S.add('settings_v1', `CREATE TABLE IF NOT EXISTS settings_v1 (done INTEGER);`, [
+    ['GET', /^\/api\/admin\/metrics$/, ['hq', 'advisor'], (u, m, b, q) => {
+      const st = u.role === 'advisor' ? u.store : (q && q.get('store')) || null;
+      const G = [];
+      for (const d of METRICS) { let v = null; try { v = d.f(st); } catch (e) { v = null; } let g = G.find(x => x.g === d.g); if (!g) G.push(g = { g: d.g, items: [] }); g.items.push({ k: d.k, l: d.l, u: d.u, v, t: d.t, ok: d.t == null || v == null ? null : (d.hi ? v >= d.t : v <= d.t), src: d.src }); }
+      return J({ groups: G, store: st, at: now() });
+    }],
+    ['GET', /^\/api\/admin\/wish-summary$/, ['hq', 'advisor'], () => {
+      const by = col => all(`SELECT COALESCE(${col},'未填') AS k, COUNT(*) AS n FROM wishes GROUP BY k ORDER BY n DESC`);
+      const topics = (() => { try { return all('SELECT t.id, t.name AS n, t.status, t.threshold, t.base + (SELECT COUNT(*) FROM wish_votes v WHERE v.topic_id=t.id) AS votes FROM wish_topics t ORDER BY votes DESC LIMIT 8'); } catch (e) { try { return all('SELECT * FROM wish_topics LIMIT 8'); } catch (e2) { return []; } } })();
+      return J({ total: n1('SELECT COUNT(*) AS n FROM wishes'), byStatus: by('status'), byCat: by('category'), byClass: by('class'), byStore: by('store'), bySource: by('source'), topics, recent: all('SELECT code,category,text,status,store,source,created_at FROM wishes ORDER BY id DESC LIMIT 6') });
+    }],
+    ['GET', /^\/api\/admin\/staff-stats$/, ['hq', 'advisor'], () => {
+      const U = all("SELECT id,name,role,store,disabled,last_login FROM users WHERE role IN ('advisor','tech','hq') ORDER BY role,id");
+      return J({ staff: U.map(x => x.role === 'advisor' ? { ...x, cases: n1('SELECT COUNT(*) AS n FROM bookings WHERE assignee_id=?', [x.id]), plans: n1('SELECT COUNT(*) AS n FROM plans WHERE advisor_id=?', [x.id]), quotes: n1('SELECT COUNT(*) AS n FROM quotes WHERE by_id=?', [x.id]) }
+        : x.role === 'tech' ? { ...x, pk: n1('SELECT COUNT(*) AS n FROM work_packages WHERE assignee_id=?', [x.id]), pkDone: n1("SELECT COUNT(*) AS n FROM work_packages WHERE assignee_id=? AND status='已完成'", [x.id]), acc: n1('SELECT COUNT(*) AS n FROM acceptance_results WHERE by_id=?', [x.id]) } : x) });
+    }],
+    ['GET', /^\/api\/care\/rules$/, 'any', () => { const r = one("SELECT value FROM config WHERE key='care_rules'"); return J({ rules: r ? parse(r.value) : { bath_min: 30, morning: '10:00', elder_wait: 5, family_wait: 5 } }); }],
+    ['GET', /^\/api\/admin\/settings$/, ['hq', 'advisor'], () => { const r = one("SELECT value FROM config WHERE key='care_rules'"); return J({ rules: r ? parse(r.value) : { bath_min: 30, morning: '10:00', elder_wait: 5, family_wait: 5 } }); }],
+    ['PUT', /^\/api\/admin\/settings$/, ['hq'], (u, m, b) => {
+      const r = b.rules || {}, v = { bath_min: Math.max(10, Math.min(90, r.bath_min | 0)), morning: /^\d\d:\d\d$/.test(r.morning) ? r.morning : '10:00', elder_wait: Math.max(1, Math.min(15, r.elder_wait | 0)), family_wait: Math.max(1, Math.min(15, r.family_wait | 0)) };
+      run("INSERT INTO config(key,value,updated_by,updated_at) VALUES('care_rules',?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=excluded.updated_at", [JSON.stringify(v), u.id, now()]);
+      persist(); return J({ rules: v });
+    }],
+  ]);
   S.cases = cases; S.summary = summary; S.now = now; S.lastId = lastId;
 })();
