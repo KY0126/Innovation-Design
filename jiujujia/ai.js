@@ -6,7 +6,7 @@
   const { V, S, api, esc, fmt, toast, render, go } = J;
   const IMG = 'home/staff.jpg';
   // 不顯示的畫面：登入、流程頁、通知直達頁、長輩裝置、技師
-  const HIDE = ['boot', 'login', 'register', 'pw', 'ai', 'ar', 'b1', 'b2', 'b3', 'b4', 'b5', 'co', 'x31e', 'e1', 'c1', 'c2', 'c3', 'ev', 'msum', 'n0', 'share', 'a2', 'a3', 'a4', 'a5', 'a6', 'aec', 'wish', 'obs'];
+  const HIDE = ['boot', 'login', 'register', 'pw', 'ai', 'ar', 'arm', 'uvisit', 'b1', 'b2', 'b3', 'b4', 'b5', 'co', 'x31e', 'e1', 'c1', 'c2', 'c3', 'ev', 'msum', 'n0', 'share', 'a2', 'a3', 'a4', 'a5', 'a6', 'aec', 'wish', 'obs'];
   const roleOK = () => S.me && (S.me.role === 'family' || S.me.role === 'advisor');
   let hidden = false;
   function after(v, view) {
