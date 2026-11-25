@@ -47,3 +47,14 @@
     try { await api('/amb/visits', { method: 'POST', body: { family: f.family, note: f.note, checks: f.ck } }); S.uv = null; S.stack = ['u1']; await J.LOAD.u1(); render(); toast('已送出，門市確認後加 50 點'); } catch (er) { toast(er.message); }
   }, true);
 })();
+
+// ---------- 會員中心「預約紀錄」「線上報修清單」：與揪居家同一份資料 ----------
+(function () {
+  const J = window.JJJ; if (!J) return;
+  const { V, S, api, esc } = J;
+  const st = s => `<span class="tag ${/完成|已處理|已回覆/.test(s) ? 'ok' : ''}">${esc(s)}</span>`;
+  V.bks = () => { const L = S.bks; return `${J.hdr('預約紀錄')}<div class="scroll" style="padding-top:12px">${!L ? '<div class="card muted">載入中…</div>' : L.length ? `<div class="glist">${L.map(b => `<div class="gi" style="cursor:default"><span><b>${esc(b.kind)}</b><span class="muted" style="display:block;font-size:.85em">${esc(String(b.slot_start).replace('T', ' ').slice(0, 16))}｜${esc(String(b.store).replace('Digital City ', ''))}｜${esc(b.code)}</span></span>${st(b.status)}</div>`).join('')}</div>` : '<div class="card muted">目前沒有預約。</div>'}<p class="muted pad" style="font-size:.85em">全國電子原有的門市預約與揪居家的門市諮詢、到府安裝、保養都列在這裡。</p></div>`; };
+  V.reqs = () => { const L = S.reqs; return `${J.hdr('線上報修清單')}<div class="scroll" style="padding-top:12px">${!L ? '<div class="card muted">載入中…</div>' : L.length ? `<div class="glist">${L.map(r => `<div class="gi" style="cursor:default"><span><b>${esc(r.kind)}</b><span class="muted" style="display:block;font-size:.85em">${esc(String(r.created_at).slice(0, 16))}${r.note ? '｜' + esc(r.note) : ''}</span></span>${st(r.status)}</div>`).join('')}</div>` : '<div class="card muted">目前沒有報修或保養需求。</div>'}<p class="muted pad" style="font-size:.85em">在揪居家按「詢問」「一鍵預約」送出的保養與設備問題，也在這裡追蹤。</p></div>`; };
+  J.LOAD.bks = async () => { S.bks = (await api('/home/bookings')).bookings; };
+  J.LOAD.reqs = async () => { S.reqs = (await api('/home/requests')).requests; };
+})();
