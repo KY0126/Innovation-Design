@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125g"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125h"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -358,7 +358,7 @@ async function busy(btn,fn,errEl){if(BUSY)return;BUSY=true;let txt='';if(btn){tx
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 // 一個揪居家 App：家庭、生活顧問、技師都從同一個登入頁進來，依帳號身分分流；總部改用企業管理端（電腦版）
 const END='app';try{localStorage.setItem('jjj_end','app')}catch(e){}
-const roleOK=r=>r==='family'||r==='advisor'||r==='tech';
+const roleOK=r=>r==='family'||r==='advisor'||r==='tech'||r==='ambassador'||r==='business';
 const WRONG={hq:'這是總部帳號，請改用 <a href="admin.html">企業管理端（電腦版）</a>。'};
 async function silentOut(){try{await api('/auth/logout',{method:'POST',noAuthRedirect:true})}catch(e){}}
 function EN(){return esc((S.ctx&&S.ctx.elder)||'長輩')}
@@ -418,6 +418,8 @@ async function boot(){
  try{await enter()}catch(e){S.stack=['login'];render();toast(e.message)}}
 async function enter(){const r=S.me.role;
  if(r==='hq'){location.href='admin.html';return}
+ if(r==='business'){location.href='business.html';return}
+ if(r==='ambassador'){S.stack=['u0'];render();if(LOAD.u0)LOAD.u0().then(render).catch(()=>{});return}
  if(r==='family'){await loadHome();S.stack=['home']}
  else if(r==='advisor'){await Promise.all([loadCases(),loadAdvHome()]);S.stack=['a1']}
  else if(r==='tech'){await loadOrders();S.stack=['t1']}
@@ -543,16 +545,18 @@ const SIC={
  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
  cases:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
  tool:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 005.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>',
+ task:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 11l2 2 4-4M9 17h6"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .6-4.5 4 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.5-4 6-.6z"/></svg>',
  hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>'};
 // 員工導覽列：生活顧問「今日行程／案件／帳號」；技師「今日工單／工單紀錄／帳號」
-const SNAV={advisor:[['a1','今日行程',SIC.cal],['acases','案件',SIC.cases],['amy','帳號',icon.user]],tech:[['t1','今日工單',SIC.tool],['thist','工單紀錄',SIC.hist],['tacct','帳號',icon.user]]};
+const SNAV={ambassador:[['u0','任務',SIC.task],['u1','成果',SIC.star],['uacct','帳號',icon.user]],advisor:[['a1','今日行程',SIC.cal],['acases','案件',SIC.cases],['amy','帳號',icon.user]],tech:[['t1','今日工單',SIC.tool],['thist','工單紀錄',SIC.hist],['tacct','帳號',icon.user]]};
 function snav(cur){const L=SNAV[S.me&&S.me.role]||[];return `<nav class="nav snav" aria-label="主選單">${L.map(([k,l,i])=>`<button data-snav="${k}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`).join('')}</nav>`}
 // 帳號頁：分組清單＋紅色外框登出（借鏡會員中心）
 function acctList(groups){return groups.map(([g,rows])=>`<div class="sec">${g}</div><div class="glist">${rows.map(([lab,sub,attr])=>`<button class="gi" ${attr}><span><b>${lab}</b>${sub?`<span class="muted" style="display:block;font-size:.88em">${sub}</span>`:''}</span><span class="chev">›</span></button>`).join('')}</div>`).join('')+`<div class="pad" style="margin-top:20px"><button class="btn logout" data-a="logout">登出</button></div>`}
-function meCard(){return `<div class="card" style="display:flex;gap:12px;align-items:center;margin-top:12px"><span class="av">${esc((S.me.name||'?').slice(0,1))}</span><div><b style="font-size:1.08em">${esc(S.me.name||'')}</b><div class="muted">${esc(S.me.role==='tech'?'全國電子技師':'生活顧問')}｜${esc(S.me.store||'全國電子')}</div></div></div>`}
+function meCard(){return `<div class="card" style="display:flex;gap:12px;align-items:center;margin-top:12px"><span class="av">${esc((S.me.name||'?').slice(0,1))}</span><div><b style="font-size:1.08em">${esc(S.me.name||'')}</b><div class="muted">${esc(S.me.role==='tech'?'全國電子技師':S.me.role==='ambassador'?'校園大使':'生活顧問')}｜${esc(S.me.store||'全國電子')}</div></div></div>`}
 const V={
 boot:()=>`<div class="ld">載入中…</div>`,
-login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','高雄民族店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]]];let k=0;
+login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','高雄民族店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]],['延伸期新身分',[['amb@example.com','林同學','校園大使｜文藻外語大學'],['biz@example.com','王主任','商用客戶｜樂齡日照中心']]]];let k=0;
  return `<div class="top"><h1 style="color:var(--brand)">全國電子</h1></div><div class="scroll" style="padding-top:16px"><div class="pad">
  <div class="lgh"><span class="eh">♥</span><div><div class="big" style="margin:0">登入揪居家</div><div class="muted">家庭、生活顧問、技師都從這裡登入</div></div></div>
  <form id="loginForm" class="card" style="margin:14px 0 10px" novalidate>
@@ -1429,7 +1433,7 @@ function render(){
  if(window.JJJHOOKS)JJJHOOKS.forEach(f=>{try{f(v,view)}catch(e){console.error(e)}});
 }
 // 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
-const NO_NAV=['login','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct'];
+const NO_NAV=['login','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct','u0','u1','uacct'];
 // 測試與導覽用：讀狀態、切畫面
 window.JJJAPP={get S(){return S},go:v=>go(v),render:()=>render(),LOAD};
 function toC3(){const i=S.stack.lastIndexOf('n0');S.stack=(i>=0?S.stack.slice(0,i+1):S.stack).concat('c3');render()}
@@ -1604,7 +1608,7 @@ async function tourFinish(){await tourOrder();let T=taskList(S.order);await tech
  S.order=await api('/tech/orders/'+S.order.id+'/complete',{method:'POST',body:{steps:all}});S.stack=['t1','tc'];S.ttab='work';S.topen='收尾';render()}
 async function tourAccept(){await tourOrder();S.acc={};taskList(S.order).forEach(t=>{if(t.group!=='開工')S.acc[t.group]=1});S.stack=['t1','tc','tacc'];render();await new Promise(r=>setTimeout(r,900));
  S.order=await api('/tech/orders/'+S.order.id+'/accept',{method:'POST',body:{items:Object.keys(S.acc)}});S.stack=['t1','t4'];render();toast(EN()+'驗收完成，摘要已同步給家人')}
-window.JJJ={planName,api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
+window.JJJ={meCard,acctList,stf,snav,planName,api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V,TIP,hdr,JT,JH,mdx,toast,cmpPlan,lightsCard,DPINS,arApply,arSheetInner,render,go,HPV,HPJ,hpp,hpPath,hpNight,tourDiag,tourDiff,tourFinish,tourAccept,tourGo:(st,home)=>{if(home)S.home=home;S.stack=st;render()}};
 })();
 </script>
 <div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="v5.js?v=20261124b"></script>
@@ -1621,6 +1625,6 @@ window.JJJ={planName,api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261125e"></script><script src="family.js?v=20261125e"></script><script src="ai.js?v=20261125f"></script><script src="ar.js?v=20261125g"></script>
+<script src="stage2.js?v=20261125h"></script><script src="family.js?v=20261125e"></script><script src="ai.js?v=20261125f"></script><script src="ar.js?v=20261125g"></script><script src="ext.js?v=20261125g"></script>
 <script src="guide.js?v=20261125c"></script></body>
 </html>

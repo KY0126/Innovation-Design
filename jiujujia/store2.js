@@ -303,5 +303,76 @@ CREATE TABLE IF NOT EXISTS video_tasks (
       persist(); return J({ rules: v });
     }],
   ]);
+
+  // ===================== 工作包 5｜延伸期與商用：新身分 =====================
+  // users 原本只允許 family／advisor／tech／hq；重建資料表把 ambassador（校園大使）、business（商用客戶）加進去
+  S.add('roles_v2', `CREATE TABLE IF NOT EXISTS roles_v2 (done INTEGER);
+CREATE TABLE IF NOT EXISTS amb_visits (
+  id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, family TEXT NOT NULL, store TEXT,
+  checks TEXT NOT NULL DEFAULT '{}', note TEXT, status TEXT NOT NULL DEFAULT '待門市確認', points INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL, reviewed_at TEXT
+);
+CREATE TABLE IF NOT EXISTS biz_sites (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, name TEXT NOT NULL, kind TEXT NOT NULL, store TEXT);
+CREATE TABLE IF NOT EXISTS biz_assets (id INTEGER PRIMARY KEY, site_id INTEGER NOT NULL, space TEXT NOT NULL, name TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'ok', note TEXT, due TEXT);
+CREATE TABLE IF NOT EXISTS biz_repairs (id INTEGER PRIMARY KEY, site_id INTEGER NOT NULL, asset_id INTEGER, kind TEXT NOT NULL, note TEXT, status TEXT NOT NULL DEFAULT '待派工', eta TEXT, created_at TEXT NOT NULL, done_at TEXT);`, [
+    // 校園大使
+    ['GET', /^\/api\/amb\/summary$/, ['ambassador'], (u) => {
+      const V = all('SELECT * FROM video_tasks WHERE user_id=? ORDER BY id DESC', [u.id]), O = all('SELECT * FROM amb_visits WHERE user_id=? ORDER BY id DESC', [u.id]);
+      const pts = O.reduce((a, x) => a + x.points, 0) + V.filter(v => v.status === '已上架').length * 100;
+      return J({ videos: V.map(v => ({ ...v, checks: parse(v.checks) || {} })), visits: O.map(v => ({ ...v, checks: parse(v.checks) || {} })), points: pts, code: 'WZU-' + String(u.id).padStart(4, '0') });
+    }],
+    ['POST', /^\/api\/amb\/visits$/, ['ambassador'], (u, m, b) => {
+      const ck = b.checks || {}; if (!['a', 'b', 'c'].every(k => ck[k])) return ERR('三項同意都要確認', 400);
+      if (!String(b.family || '').trim()) return ERR('請填寫家庭', 400);
+      run('INSERT INTO amb_visits(user_id,family,store,checks,note,created_at) VALUES(?,?,?,?,?,?)', [u.id, String(b.family).slice(0, 40), u.store, JSON.stringify(ck), String(b.note || '').slice(0, 200), now()]);
+      persist(); return J({ id: lastId() });
+    }],
+    ['GET', /^\/api\/admin\/amb-visits$/, ['hq', 'advisor'], () => J({ visits: all('SELECT v.*, u.name FROM amb_visits v JOIN users u ON u.id=v.user_id ORDER BY v.id DESC') })],
+    ['POST', /^\/api\/admin\/amb-visits\/(\d+)\/ok$/, ['hq', 'advisor'], (u, m) => { run("UPDATE amb_visits SET status='已確認', points=50, reviewed_at=? WHERE id=?", [now(), +m[1]]); persist(); return J({ ok: true }); }],
+    // 商用客戶
+    ['GET', /^\/api\/biz\/site$/, ['business'], (u) => {
+      const st = one('SELECT * FROM biz_sites WHERE user_id=?', [u.id]); if (!st) return ERR('找不到據點', 404);
+      return J({ site: st, assets: all('SELECT * FROM biz_assets WHERE site_id=? ORDER BY id', [st.id]), repairs: all('SELECT r.*, a.space, a.name FROM biz_repairs r LEFT JOIN biz_assets a ON a.id=r.asset_id WHERE r.site_id=? ORDER BY r.id DESC', [st.id]) });
+    }],
+    ['POST', /^\/api\/biz\/repairs$/, ['business'], (u, m, b) => {
+      const st = one('SELECT * FROM biz_sites WHERE user_id=?', [u.id]); if (!st) return ERR('找不到據點', 404);
+      const ids = (b.asset_ids || [b.asset_id]).filter(Boolean).map(Number), kind = b.kind === '保養' ? '保養' : b.kind === '合併到府' ? '合併到府' : '報修';
+      const A = ids.map(i => one('SELECT * FROM biz_assets WHERE id=? AND site_id=?', [i, st.id])).filter(Boolean); if (!A.length) return ERR('請選擇設備', 400);
+      const open = A.find(a => one("SELECT id FROM biz_repairs WHERE asset_id=? AND status<>'已完成'", [a.id])); if (open && A.length === 1) return J({ duplicate: true });
+      for (const a of A) run('INSERT INTO biz_repairs(site_id,asset_id,kind,note,created_at) VALUES(?,?,?,?,?)', [st.id, a.id, kind, String(b.note || a.note || ''), now()]);
+      persist(); return J({ ok: true, n: A.length });
+    }],
+    ['GET', /^\/api\/admin\/biz-repairs$/, ['hq', 'advisor'], () => J({ repairs: all('SELECT r.*, a.space, a.name, s.name AS site FROM biz_repairs r JOIN biz_sites s ON s.id=r.site_id LEFT JOIN biz_assets a ON a.id=r.asset_id ORDER BY r.id DESC') })],
+    ['POST', /^\/api\/admin\/biz-repairs\/(\d+)$/, ['hq', 'advisor'], (u, m, b) => {
+      const st = ['已派工', '已完成'].includes(b.status) ? b.status : '已派工';
+      run('UPDATE biz_repairs SET status=?, eta=COALESCE(?,eta), done_at=? WHERE id=?', [st, b.eta || null, st === '已完成' ? now() : null, +m[1]]);
+      if (st === '已完成') { const r = one('SELECT asset_id FROM biz_repairs WHERE id=?', [+m[1]]); if (r && r.asset_id) run("UPDATE biz_assets SET status='ok', note='正常', due=NULL WHERE id=?", [r.asset_id]); }
+      persist(); return J({ ok: true });
+    }],
+    ['GET', /^\/api\/admin\/partner-orders$/, ['hq', 'advisor'], () => J({ orders: all("SELECT o.*, h.elder_name FROM orders o JOIN households h ON h.id=o.household_id WHERE o.items LIKE '%異業加購%' ORDER BY o.id DESC").map(o => ({ ...o, items: parse(o.items) || [], household: o.elder_name + '家' })) })],
+  ], () => {
+    const cur = one("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'");
+    if (cur && !/ambassador/.test(cur.sql)) {
+      run('PRAGMA foreign_keys=OFF');
+      run(cur.sql.replace(/CREATE TABLE (IF NOT EXISTS )?"?users"?/, 'CREATE TABLE users_v2').replace("('family','advisor','tech','hq')", "('family','advisor','tech','hq','ambassador','business')"));
+      run('INSERT INTO users_v2 SELECT * FROM users'); run('DROP TABLE users'); run('ALTER TABLE users_v2 RENAME TO users');
+      run('PRAGMA foreign_keys=ON');
+    }
+    const pw = (one("SELECT pw_hash FROM users WHERE email='advisor@example.com'") || {}).pw_hash;
+    if (pw) {
+      run("INSERT OR IGNORE INTO users(email,name,role,store,pw_hash) VALUES('amb@example.com','林同學','ambassador','Digital City 高雄民族店',?)", [pw]);
+      run("INSERT OR IGNORE INTO users(email,name,role,store,pw_hash) VALUES('biz@example.com','王主任','business','Digital City 高雄民族店',?)", [pw]);
+    }
+    const bz = one("SELECT id FROM users WHERE email='biz@example.com'");
+    if (bz && !one('SELECT id FROM biz_sites WHERE user_id=?', [bz.id])) {
+      run("INSERT INTO biz_sites(user_id,name,kind,store) VALUES(?,'高雄樂齡日照中心（虛構）','日照據點','Digital City 高雄民族店')", [bz.id]);
+      const sid = lastId();
+      for (const [sp, n, st, note, due] of [['活動室', '冷氣 ×2', 'am', '保養到期', '12/05'], ['活動室', '空氣清淨機', 'ok', '正常', null], ['用餐區', '冰箱', 'ok', '正常', null], ['用餐區', '電鍋與飲水機', 'am', '濾心到期', '12/10'], ['浴室', '電熱水器', 'rd', '待修：溫度不穩', null], ['午休室', '除濕機', 'ok', '正常', null]])
+        run('INSERT INTO biz_assets(site_id,space,name,status,note,due) VALUES(?,?,?,?,?,?)', [sid, sp, n, st, note, due]);
+    }
+  });
+  metric({ g: '延伸期與商用', k: 'amb', l: '校園大使陪同居家觀察', u: '次', src: 'amb_visits', f: () => n1('SELECT COUNT(*) AS n FROM amb_visits') });
+  metric({ g: '延伸期與商用', k: 'biz_rep', l: '商用客戶報修與保養', u: '件', src: 'biz_repairs', f: () => n1('SELECT COUNT(*) AS n FROM biz_repairs') });
+  metric({ g: '延伸期與商用', k: 'biz_open', l: '商用待派工', u: '件', src: 'biz_repairs', f: () => n1("SELECT COUNT(*) AS n FROM biz_repairs WHERE status='待派工'") });
   S.cases = cases; S.summary = summary; S.now = now; S.lastId = lastId;
 })();
