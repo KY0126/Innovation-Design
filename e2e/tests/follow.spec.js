@@ -21,7 +21,7 @@ test('B 直接走到某一步專屬的畫面 → 卡片跟上', async ({ page })
   await startFamily(page);
   await page.evaluate(() => JJJ.go('ar'));
   await expect(h2(page)).toHaveText('AR 掃描（場勘）', { timeout: 10_000 });
-  await expect(note(page)).toContainText('第 1 步 → 第 2 步');
+  await expect(note(page)).toContainText('你從第 1 步跳到第 2 步');
 });
 test('C 走到導覽沒介紹的畫面 → 提示，不跳；按「帶我回」回到原畫面', async ({ page }) => {
   await startFamily(page);
@@ -67,7 +67,7 @@ test('企業管理端：點側欄跳到後面的分頁 → 卡片跟上；點導
   await page.click('#nav [data-tab="wl"]');
   await expect(h2(page)).toHaveText('揪心願', { timeout: 10_000 });
   const ad = await page.evaluate(() => JJJGUIDE.steps.filter(s => s.end === 'admin')), wl = ad.findIndex(s => s.nav && s.nav.tab === 'wl') + 1;
-  await expect(note(page)).toContainText(`第 1 步 → 第 ${wl} 步`);
+  await expect(note(page)).toContainText(`你從第 1 步跳到第 ${wl} 步`);
   await expect(page.locator('#jg [data-t="next"]')).toBeEnabled();
   const other = await page.evaluate(() => { const used = new Set(JJJGUIDE.steps.filter(s => s.end === 'admin' && s.nav).map(s => s.nav.tab)); return [...document.querySelectorAll('#nav [data-tab]')].map(b => b.dataset.tab).find(t => !used.has(t)); });
   await page.click(`#nav [data-tab="${other}"]`);
