@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS notifications (
       const N = all('SELECT audience,channel,title,created_at,read_at FROM notifications WHERE care_event_id=? ORDER BY id', [e.id]);
       return J({ event: { ...e, timeline: parse(e.timeline) || [] }, notifications: N });
     }],
+    ['GET', /^\/api\/home\/bookings$/, 'family', async (u) => { const hid = await myHousehold(u); return J({ bookings: hid ? all('SELECT id,code,kind,store,slot_start,status,note,created_at FROM bookings WHERE household_id=? ORDER BY slot_start DESC', [hid]) : [] }); }],
+    ['GET', /^\/api\/home\/requests$/, 'family', async (u) => { const hid = await myHousehold(u); return J({ requests: hid ? all('SELECT id,kind,note,status,created_at,handled_at FROM requests WHERE household_id=? ORDER BY id DESC', [hid]) : [] }); }],
     ['GET', /^\/api\/home\/notifications$/, 'family', async (u) => {
       const hid = await myHousehold(u); if (!hid) return J({ notifications: [], unread: 0 });
       const L = all("SELECT id,care_event_id,audience,channel,kind,title,body,link,created_at,read_at FROM notifications WHERE household_id=? AND audience IN ('owner','second','family') ORDER BY id DESC LIMIT 50", [hid]);
