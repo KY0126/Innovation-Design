@@ -44,6 +44,7 @@
 
   // ---------- F15D 家電詳情（分段：健康卡、保養、換新建議、以租代買、異業加購） ----------
   const SEG = ['健康卡', '保養', '換新建議', '以租代買', '異業加購'];
+  const BUY = n => /洗衣/.test(n) ? 'washer' : /冷氣/.test(n) ? 'ac' : /冰箱/.test(n) ? 'fridge' : '';
   V.hc = () => {
     const h = ((S.hh && S.hh.devices) || []).find(d => d.id === S.hc); if (!h) return V.m2();
     const k = S.hcSeg || 0, isCare = h.source === '到府安裝';
@@ -51,14 +52,14 @@
     const R = ((S.hh && S.hh.reminders) || []).filter(r => String(r.device || '').includes(h.name.split('｜')[0]) && r.status === '待處理');
     let body = '';
     if (k === 0) body = `<div class="card"><b style="font-size:1.1em">${esc(h.name)}${h.qty > 1 ? ' ×' + h.qty : ''}</b><div class="muted">${h.home === 'parents' ? '長輩家' : '我家'}・${isCare ? '到府安裝時登錄' : '購買紀錄自動帶入'}</div>
-      ${h.years != null ? `<div class="row"><span>使用年數</span><b>${h.years} 年</b></div>` : ''}${h.grade ? `<div class="row"><span>能源效率</span><b>${h.grade} 級</b></div>` : ''}${h.kwh ? `<div class="row"><span>年耗電（估算）</span><b>約 ${h.kwh} 度</b></div>` : ''}<div class="row"><span>保固</span><span>${esc(h.warranty || '—')}</span></div><div class="row"><span>狀態</span><span class="tag ${h.warn ? '' : 'ok'}">${esc(h.status || '正常')}</span></div></div>`;
+      ${h.years != null ? `<div class="row"><span>使用年數</span><b>${h.years} 年</b></div>` : ''}${h.grade ? `<div class="row"><span>能源效率</span><b>${h.grade} 級</b></div>` : ''}${h.kwh ? `<div class="row"><span>年耗電（估算）</span><b>約 ${h.kwh} 度</b></div>` : ''}<div class="row"><span>保固</span><span>${esc(h.warranty || '—')}</span></div><div class="row"><span>狀態</span><span class="tag ${h.warn ? '' : 'ok'}">${esc(h.status || '正常')}</span></div>${isCare ? '<div class="rs" style="margin-top:6px">揪夜安方案設備：保固與故障由綁定門市負責，不走一般報修</div>' : '<button class="row" data-go="wty" style="width:100%"><span>看保固清單</span><span class="chev">›</span></button>'}</div>`;
     else if (k === 1) body = `<div class="card"><b>保養提醒</b>${R.length ? R.map(r => `<div class="row"><span>${esc(r.kind)}<span class="muted" style="display:block;font-size:.85em">${esc(r.reason || '')}</span></span><span class="muted">${esc(r.due || '')}</span></div>`).join('') : '<div class="muted" style="margin-top:4px">目前沒有待處理的保養。年度健檢時間到了會提醒。</div>'}</div>
-      <div class="pad"><button class="btn" data-req="${esc(h.name)}保養預約">預約保養</button></div>`;
+      <div class="pad"><button class="btn" data-req="${esc(h.name)}保養預約">預約保養</button>${isCare ? `<button class="btn ghost" data-req="${esc(h.name)}設備問題">請生活顧問處理故障</button>` : `<button class="btn ghost" data-repair="${h.id}">線上報修</button>`}</div>`;
     else if (k === 2) {
       const yr = h.years || 0, bad = yr >= 10 || h.warn, save = h.kwh ? Math.round(h.kwh * 0.5 * 3.2) : null;
       body = `<div class="card"><b>${bad ? '建議換新（含舊機回收）' : '先保養延壽'}</b><div class="rs" style="margin-top:4px">${bad ? `已用 ${yr} 年${h.warn ? '，且' + esc(h.status || '') : ''}；換成 1 級能效機種較划算。` : `使用 ${yr} 年，先清洗保養，再觀察一季用電。`}</div>
         ${save ? `<div class="row"><span>換 1 級能效每年約省</span><b>${fmt(save)}</b></div>` : ''}<div class="muted" style="font-size:.85em;margin-top:6px">依家電檔案的使用年限與用電估算；舊機由技師回收。</div></div>
-        <div class="pad">${bad ? `<button class="btn" data-hcseg="${h.id}|3">看以租代買</button><button class="btn ghost" data-req="${esc(h.name)}換新報價">請生活顧問報價</button>` : `<button class="btn" data-hcseg="${h.id}|1">預約保養</button>`}</div>`;
+        <div class="pad">${bad ? `<button class="btn" data-hcseg="${h.id}|3">看以租代買</button>${BUY(h.name) ? `<button class="btn ghost" data-addcart="${BUY(h.name)}|換新建議">一次買斷：加入購物車</button>` : ''}<button class="btn ghost" data-req="${esc(h.name)}換新報價">請生活顧問報價</button>` : `<button class="btn" data-hcseg="${h.id}|1">預約保養</button>`}</div>`;
     } else if (k === 3) {
       const t = S.rentT || 36, it = C('rent_washer_' + t);
       body = `<div class="card"><b>${esc(h.name)}｜以租代買</b><div class="seg" role="group" aria-label="期數" style="margin-top:8px"><button data-rent="36" aria-pressed="${t === 36}">36 期</button><button data-rent="60" aria-pressed="${t === 60}">60 期</button></div>
@@ -73,34 +74,58 @@
       <div class="sxt" role="tablist" style="padding:0 12px 10px;overflow-x:auto;white-space:nowrap">${segs.map((x, i) => `<button role="tab" data-hcs="${i}" aria-selected="${k === i}">${x}</button>`).join('')}</div>${S.cat || k < 3 ? body : '<div class="card muted">載入中…</div>'}</div>`;
   };
 
-  // ---------- F37 加購與訂閱（4 步：選方案、確認內容、付款方式、完成） ----------
-  const STEPS = ['選方案', '確認內容', '付款方式', '完成'];
-  function startCo(ids, src) { S.co = { ids: ids.slice(), on: Object.fromEntries(ids.map(i => [i, true])), src, step: 0, pay: null, agree: false, res: null, leave: false }; go('co'); cat().then(render); }
+  // ---------- F37 加購與訂閱（4 步，名稱對齊現有購物車：確認方案、到府資訊、選擇支付方式、訂單結果） ----------
+  const STEPS = ['確認方案', '到府資訊', '選擇支付方式', '訂單結果'];
+  const SLOTP = ['平日上午', '平日下午', '假日上午', '假日下午'];
+  function startCo(ids, src) { const h = (S.hh && S.hh.household) || {}; S.co = { ids: ids.slice(), on: Object.fromEntries(ids.map(i => [i, true])), src, step: 0, pay: null, agree: false, res: null, leave: false, visit: { address: h.address || '', phone: h.phone || '', slot: '' } }; go('co'); cat().then(render); }
   V.co = () => {
     const c = S.co; if (!c) return V.m2();
-    const sel = c.ids.filter(i => c.on[i]).map(C).filter(Boolean), mo = sel.reduce((a, x) => a + x.monthly, 0), on = sel.reduce((a, x) => a + x.one, 0), free = !mo && !on;
+    const sel = c.ids.filter(i => c.on[i]).map(C).filter(Boolean), mo = sel.reduce((a, x) => a + x.monthly, 0), on = sel.reduce((a, x) => a + x.one, 0), free = !mo && !on, cam = sel.some(x => x.id === 'cam');
     const top = `<div class="top"><button class="back" data-a="back" aria-label="返回上一頁">‹ 返回</button><h1>加購與訂閱</h1><button class="back" data-co-leave="1" style="text-align:right">離開</button></div>`;
     const leave = c.leave ? `<div class="sheet-bg"><div class="sheet"><b>確定要離開嗎？</b><div class="muted" style="margin:6px 0 12px">這次的選擇不會送出。</div><button class="btn" data-co-leave="go">離開</button><button class="btn ghost" data-co-leave="stay">繼續選</button></div></div>` : '';
     if (!S.cat) return `${top}<div class="scroll"><div class="card muted" style="margin-top:12px">載入中…</div></div>`;
     let body = '', foot = '';
+    const v = c.visit, vOK = v.address.trim() && v.phone.trim() && v.slot;
     if (c.step === 0) {
-      body = `<div class="pad muted" style="margin-bottom:8px">從「${esc(c.src)}」加入</div>` + c.ids.map(C).filter(Boolean).map(x => `<button class="card opt" data-coi="${x.id}" aria-pressed="${!!c.on[x.id]}" style="width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${c.on[x.id] ? '☑' : '☐'} ${esc(x.n)}</b><b>${money(x.monthly, x.one)}</b></div>${x.note ? `<div class="rs">${esc(x.note)}</div>` : ''}${x.phase > ph() ? `<div class="rs" style="color:var(--brand-ink)">${PH[x.phase]}才開放</div>` : ''}</button>`).join('');
-      foot = `<button class="btn" data-co-next="1" ${sel.length && sel.every(x => x.phase <= ph()) ? '' : 'disabled'}>下一步：確認內容</button>`;
+      body = `<div class="pad muted" style="margin-bottom:8px">從「${esc(c.src)}」加入</div>` + c.ids.map(C).filter(Boolean).map(x => `<button class="card opt" data-coi="${x.id}" aria-pressed="${!!c.on[x.id]}" style="width:calc(100% - 24px);text-align:left"><div style="display:flex;justify-content:space-between;gap:8px"><b>${c.on[x.id] ? '☑' : '☐'} ${esc(x.n)}</b><b>${money(x.monthly, x.one)}</b></div>${x.note ? `<div class="rs">${esc(x.note)}</div>` : ''}${x.phase > ph() ? `<div class="rs" style="color:var(--brand-ink)">${PH[x.phase]}才開放</div>` : ''}</button>`).join('')
+        + `<div class="card"><div class="row"><b>合計</b><b>${money(mo, on)}</b></div><div class="rs">${mo ? '月付不綁約，可隨時變更或取消' : '費用於到府完成後付款'}</div></div>`;
+      foot = `<button class="btn" data-co-next="1" ${sel.length && sel.every(x => x.phase <= ph()) ? '' : 'disabled'}>下一步：到府資訊</button>`;
     } else if (c.step === 1) {
-      body = `<div class="card">${sel.map(x => `<div class="row"><span>${esc(x.n)}</span><span>${money(x.monthly, x.one)}</span></div>`).join('')}<div class="row"><b>合計</b><b>${money(mo, on)}</b></div></div>
-        <div class="card" style="background:var(--note)"><div class="rs" style="line-height:1.8">・生活顧問 1 個工作天內打電話確認，再排到府時間<br>・沿用已完成的 AR 掃描與家電檔案，只補掃新空間<br>${mo ? '・月付不綁約，可隨時變更或取消' : '・費用於到府完成後付款'}</div></div>
+      body = `<div class="card"><label class="muted">到府地址<input class="fld" data-cov="address" value="${esc(v.address)}" placeholder="高雄市三民區建工路 1 號"></label>
+        <label class="muted" style="display:block;margin-top:10px">聯絡電話<input class="fld" data-cov="phone" inputmode="tel" value="${esc(v.phone)}" placeholder="0912-345-678"></label>
+        <div class="muted" style="margin-top:10px">方便的時段</div><div>${SLOTP.map(x => `<button class="slot" style="margin:6px 6px 0 0" data-coslot="${x}" aria-pressed="${v.slot === x}">${x}</button>`).join('')}</div></div>
+        <div class="card" style="background:var(--note)"><div class="rs" style="line-height:1.8">・生活顧問 1 個工作天內打電話確認，再排到府時間<br>・沿用已完成的 AR 掃描與家電檔案，只補掃新空間${cam ? '<br>・進階影像版：長輩本人同意後才生效' : ''}</div></div>
         <button class="row" data-co-agree="1" style="width:calc(100% - 24px);margin:0 12px;background:var(--card);border-radius:12px;padding:12px 14px"><span>${c.agree ? '☑' : '☐'} 我已了解以上內容</span></button>`;
-      foot = `<button class="btn" data-co-next="${free ? 3 : 2}" ${c.agree ? '' : 'disabled'}>${free ? '送出' : '下一步：付款方式'}</button>`;
+      foot = `<button class="btn" data-co-next="${free ? 3 : 2}" ${c.agree && vOK ? '' : 'disabled'}>${free ? '送出' : '下一步：選擇支付方式'}</button>`;
     } else if (c.step === 2) {
-      body = `<div class="card">${S.cat.pay.map(p => `<button class="row" data-copay="${esc(p)}" style="width:100%"><span>${c.pay === p ? '◉' : '○'} ${esc(p)}</span></button>`).join('')}</div><div class="pad muted" style="font-size:.88em">送出後由生活顧問確認才會開始扣款；確認前都可以取消。</div>`;
+      body = `<div class="card">${S.cat.pay.map(p => `<button class="row" data-copay="${esc(p)}" style="width:100%"><span>${c.pay === p ? '◉' : '○'} ${esc(p)}</span></button>`).join('')}</div><div class="card"><div class="row"><span>${esc(sel.map(x => x.n.split('｜')[0]).join('、'))}</span><b>${money(mo, on)}</b></div></div><div class="pad muted" style="font-size:.88em">生活顧問確認後才開始扣款；確認前都可以取消。</div>`;
       foot = `<button class="btn" data-co-next="3" ${c.pay ? '' : 'disabled'}>送出訂單</button>`;
     } else {
       const r = c.res;
-      body = r ? `<div class="card" style="text-align:center;padding:24px 16px"><div style="font-size:2em;color:var(--ok)">✓</div><b style="font-size:1.2em">已送出</b><div class="muted" style="margin-top:4px">訂單編號 ${esc(r.code)}</div><div style="margin-top:10px">${money(r.monthly, r.one_time)}</div><div class="rs" style="margin-top:8px">生活顧問 1 個工作天內與您聯絡</div></div>` : '<div class="card muted">送出中…</div>';
-      foot = `<button class="btn" data-co-done="ords">查看全部訂單</button><button class="btn ghost" data-co-done="m2">回到揪居家</button>`;
+      body = r ? `<div class="card" style="text-align:center;padding:24px 16px"><div style="font-size:2em;color:var(--ok)">✓</div><b style="font-size:1.2em">已送出</b><div class="muted" style="margin-top:4px">訂單編號 ${esc(r.code)}</div><div style="margin-top:10px">${money(r.monthly, r.one_time)}</div><div class="rs" style="margin-top:8px">生活顧問 1 個工作天內聯絡您｜${esc(v.slot)}</div>${cam ? '<div class="rs">進階影像版：長輩本人同意後才生效</div>' : ''}</div>` : '<div class="card muted">送出中…</div>';
+      foot = `<button class="btn" data-co-done="ords">查看購買紀錄</button><button class="btn ghost" data-co-done="m2">回到揪居家</button>`;
     }
     return `${top}<div class="scroll">${stepper(STEPS, c.step)}${body}</div><div class="pad" style="padding-bottom:12px;background:var(--bg)">${foot}</div>${leave}`;
   };
+
+  // ---------- 線上購物（模擬全國電子線上購物的購物車：購物車、收件填寫、選擇支付方式、訂單結果） ----------
+  const SPAY = ['信用卡一次付清', '信用卡分期', '行動支付', '會員點數折抵'];
+  async function addCart(items, src) { try { await api('/cart', { method: 'POST', body: { items: items.map(x => ({ ...x, src })) } }); S.shop = { step: 0 }; S.stack.push('shop'); await J.LOAD.shop(); render(); toast('已加入購物車'); } catch (e) { toast(e.message); } }
+  V.shop = () => {
+    const st = S.shop || (S.shop = { step: 0 }), L = S.cartL, tot = (L || []).reduce((a, x) => a + x.price * x.qty, 0);
+    const h = (S.hh && S.hh.household) || {}, f = st.f || (st.f = { name: S.me.name || '', phone: h.phone || '', address: h.address || '' });
+    const steps = `<div class="shst">${['購物車', '收件填寫', '選擇支付方式', '訂單結果'].map((x, i) => `<div class="${i === st.step ? 'on' : i < st.step ? 'ok' : ''}"><span>${i + 1}</span>${x}</div>`).join('')}</div>`;
+    let body = '';
+    if (!L) body = '<div class="card muted">載入中…</div>';
+    else if (st.step === 0) body = L.length ? L.map(x => `<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(x.name)}</b><b>NT$ ${(x.price * x.qty).toLocaleString('en-US')}</b></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><button class="tag" data-cq="${x.sku}|${x.qty - 1}">−</button><span>${x.qty}</span><button class="tag" data-cq="${x.sku}|${x.qty + 1}">＋</button>${x.src ? `<span class="muted" style="margin-left:auto;font-size:.82em">來自${esc(x.src)}</span>` : ''}</div></div>`).join('') + `<div class="card"><div class="row"><b>合計</b><b>NT$ ${tot.toLocaleString('en-US')}</b></div></div><div class="pad"><button class="btn" data-shnext="1">去結帳</button></div>`
+      : `<div style="text-align:center;padding:40px 16px"><div style="font-size:3em;color:var(--muted)">🛒</div><div style="margin:10px 0 18px">您的購物車裡還沒有任何商品。</div><button class="btn" data-orig="線上購物商店" style="width:auto;padding:10px 26px">回到商店</button></div>`;
+    else if (st.step === 1) body = `<div class="card">${[['name', '收件人'], ['phone', '手機'], ['address', '收件地址']].map(([k, l]) => `<label class="muted" style="display:block;margin-bottom:10px">${l}<input class="fld" data-shf="${k}" value="${esc(f[k])}"></label>`).join('')}<div class="rs">大型家電由技師到府安裝，並免費回收舊機。</div></div><div class="pad"><button class="btn" data-shnext="2">下一步</button></div>`;
+    else if (st.step === 2) body = `<div class="card">${SPAY.map(p => `<button class="row" data-shpay="${p}" style="width:100%"><span>${st.pay === p ? '◉' : '○'} ${p}</span></button>`).join('')}</div><div class="card"><div class="row"><b>合計</b><b>NT$ ${tot.toLocaleString('en-US')}</b></div></div><div class="pad"><button class="btn" data-shnext="3" ${st.pay ? '' : 'disabled'}>確認付款</button></div>`;
+    else body = st.res ? `<div class="card" style="text-align:center;padding:24px 16px"><div style="font-size:2em;color:var(--ok)">✓</div><b style="font-size:1.2em">訂單已成立</b><div class="muted">訂單編號 ${esc(st.res.code)}｜NT$ ${st.res.total.toLocaleString('en-US')}</div><div class="rs" style="margin-top:8px">訂單也會出現在會員中心「購買紀錄」</div></div><div class="pad"><button class="btn ghost" data-shdone="1">查看購買紀錄</button></div>` : '<div class="card muted">送出中…</div>';
+    return `<div class="shtop"><span>‹</span><span>›</span><b>線上購物</b><span>✕</span></div><div class="shurl">https://www.elifemall.com.tw/…</div><div class="scroll" style="padding-top:8px"><div class="pad muted" style="font-size:.85em;margin-bottom:6px">首頁 › 購物車（原型模擬全國電子線上購物）</div>${steps}${body}</div>${J.nav('cart')}`;
+  };
+  J.LOAD.shop = async () => { S.cartL = (await api('/cart')).items; };
+  window.JJJCART = { addCart };
 
   // ---------- F36 全部訂單 ----------
   V.ords = () => {
@@ -132,7 +157,7 @@
   J.LOAD.x32 = J.LOAD.ords; J.LOAD.u3 = async () => { S.vids = (await api('/videos')).videos; };
 
   document.getElementById('view').addEventListener('click', async e => {
-    const t = e.target.closest('[data-co],[data-coi],[data-co-next],[data-co-agree],[data-copay],[data-co-done],[data-co-leave],[data-hcs],[data-hcseg],[data-rent],[data-ptn],[data-ocancel],[data-x31e],[data-crev],[data-x30save],[data-cook],[data-u3send]');
+    const t = e.target.closest('[data-coslot],[data-cq],[data-shnext],[data-shpay],[data-shdone],[data-addcart],[data-co],[data-coi],[data-co-next],[data-co-agree],[data-copay],[data-co-done],[data-co-leave],[data-hcs],[data-hcseg],[data-rent],[data-ptn],[data-ocancel],[data-x31e],[data-crev],[data-x30save],[data-cook],[data-u3send]');
     if (!t || t.disabled) return; e.stopPropagation();
     const d = t.dataset, s = L2().s;
     if (d.co !== undefined) {
@@ -146,6 +171,12 @@
       return;
     }
     const c = S.co;
+    if (d.coslot) { c.visit.slot = d.coslot; render(); return; }
+    if (d.cq) { const [k, q] = d.cq.split('|'); await api('/cart/' + k, { method: 'PUT', body: { qty: +q } }); await J.LOAD.shop(); render(); return; }
+    if (d.shnext) { const st = S.shop, n = +d.shnext; if (n === 2) { const f = st.f; if (!f.name.trim() || !f.phone.trim() || !f.address.trim()) { toast('請填寫收件人、手機與地址'); return; } } if (n === 3) { st.step = 3; st.res = null; render(); try { st.res = await api('/cart/checkout', { method: 'POST', body: { ...st.f, pay: st.pay } }); S.ords = null; } catch (er) { st.step = 2; toast(er.message); } render(); return; } st.step = n; render(); return; }
+    if (d.shpay) { S.shop.pay = d.shpay; render(); return; }
+    if (d.shdone) { S.shop = { step: 0 }; S.stack = ['m1', 'ords']; render(); reload('ords', J.LOAD.ords); return; }
+    if (d.addcart) { const [sku, src] = d.addcart.split('|'); addCart(sku.split(',').map(x => ({ sku: x, qty: 1 })), src || ''); return; }
     if (d.coi) { c.on[d.coi] = !c.on[d.coi]; render(); return; }
     if (d.coAgree) { c.agree = !c.agree; render(); return; }
     if (d.copay) { c.pay = d.copay; render(); return; }
@@ -154,7 +185,7 @@
       const n = +d.coNext;
       if (n === 3) {
         c.step = 3; c.res = null; render();
-        try { c.res = await api('/home/orders', { method: 'POST', body: { items: c.ids.filter(i => c.on[i]), pay: c.pay } }); S.ords = null; } catch (er) { c.step = 2; toast(er.message); }
+        try { c.res = await api('/home/orders', { method: 'POST', body: { items: c.ids.filter(i => c.on[i]), pay: c.pay, note: JSON.stringify({ visit: c.visit }) } }); S.ords = null; } catch (er) { c.step = 2; toast(er.message); }
         render(); return;
       }
       c.step = n; render(); return;
@@ -171,5 +202,6 @@
     if (d.cook) { try { await api('/home/orders', { method: 'POST', body: { items: ['cook'] } }); await J.LOAD.ords(); render(); toast('已報名節氣共煮'); } catch (er) { toast(er.message); } return; }
     if (d.u3send) { try { await api('/videos', { method: 'POST', body: { topic: s.u3t, checks: s.u3 || {} } }); s.u3st = 'sent'; render(); toast('已送審'); } catch (er) { toast(er.message); } return; }
   }, true);
+  document.getElementById('view').addEventListener('input', e => { const t = e.target; if (t.dataset && t.dataset.cov && S.co) { S.co.visit[t.dataset.cov] = t.value; const b = document.querySelector('[data-co-next]'); if (b) b.disabled = !(S.co.agree && S.co.visit.address.trim() && S.co.visit.phone.trim() && S.co.visit.slot); } if (t.dataset && t.dataset.shf && S.shop) S.shop.f[t.dataset.shf] = t.value; }, true);
   window.JJJFAM = { startCo, cat };
 })();

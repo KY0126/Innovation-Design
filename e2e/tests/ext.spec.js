@@ -57,7 +57,7 @@ test('育兒與寵物模式：延伸期可走加購與訂閱下單', async ({ pa
   await page.evaluate(() => { JJJAPP.S.stack = ['home', 'm2']; JJJAPP.go('x34'); }); await page.waitForTimeout(400);
   await page.click('[data-co="baby"]');
   await expect(page.locator('#view')).toContainText('育兒模式');
-  await page.click('[data-co-next="1"]'); await page.click('[data-co-agree]'); await page.click('[data-co-next="2"]');
+  await page.click('[data-co-next="1"]'); await page.fill('[data-cov="address"]', '高雄市三民區建工路 1 號'); await page.fill('[data-cov="phone"]', '0912345678'); await page.click('[data-coslot="平日上午"]'); await page.click('[data-co-agree]'); await page.click('[data-co-next="2"]');
   await page.locator('[data-copay]').first().click(); await page.click('[data-co-next="3"]');
   await expect(page.locator('#view')).toContainText('已送出');
   expect(errs).toEqual([]);

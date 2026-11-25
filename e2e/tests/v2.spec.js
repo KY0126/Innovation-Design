@@ -1,0 +1,126 @@
+// 2026/11/25 待實作 5 項：結帳兩條路、客服入口收斂、常見問題集、家電分工、揪心願樂高式補強
+const { test } = require('playwright/test');
+const { fresh, expect } = require('./helpers');
+const J = (page, path, o) => page.evaluate(async ([p, o]) => { const r = await fetch('/api' + p, Object.assign({ headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' } }, o || {})); return Object.assign({ _s: r.status }, await r.json()); }, [path, o ? Object.assign({}, o, { body: o.body ? JSON.stringify(o.body) : undefined }) : o]);
+const app = (page, f) => page.evaluate(new Function('return (' + f + ')(window.JJJAPP)'));
+const login = async (page, email) => { await page.goto('/jiujujia/app.html'); await page.click(`[data-demo="${email}"]`); await page.waitForTimeout(1500); };
+const logout = page => J(page, '/auth/logout', { method: 'POST' });
+
+test('① 結帳兩條路：訂閱要填到府資訊；換新家電加入購物車走線上購物，兩邊都在購買紀錄', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page); await login(page, 'li@example.com');
+  await app(page, "A=>{A.S.stack=['home','m2'];A.go('x24')}");
+  await page.click('[data-x24="food"]'); await page.click('[data-co="fields"]');
+  await page.click('[data-co-next="1"]');
+  await expect(page.locator('.stpr li.on')).toContainText('到府資訊');
+  await page.click('[data-co-agree]');
+  await expect(page.locator('[data-co-next="2"]')).toBeDisabled();
+  await page.fill('[data-cov="address"]', '高雄市三民區建工路 1 號'); await page.fill('[data-cov="phone"]', '0912345678'); await page.click('[data-coslot="假日下午"]');
+  await page.click('[data-co-next="2"]'); await page.locator('[data-copay]').first().click(); await page.click('[data-co-next="3"]');
+  await expect(page.locator('#view')).toContainText('假日下午');
+  const o1 = (await J(page, '/home/orders')).orders[0];
+  expect(JSON.parse(o1.note).visit.slot).toBe('假日下午');
+  await app(page, "A=>{const S=A.S;const d=S.hh.devices.find(x=>x.name==='洗衣機');S.hc=d.id;S.hcSeg=2;A.go('hc')}");
+  await page.click('[data-addcart^="washer"]');
+  await expect(page.locator('.shst .on')).toContainText('購物車');
+  await expect(page.locator('#view')).toContainText('洗脫烘洗衣機');
+  await expect(page.locator('nav.nav [data-nav="cart"]')).toHaveAttribute('aria-current', 'page');
+  await page.click('[data-shnext="1"]'); await page.click('[data-shnext="2"]'); await page.locator('[data-shpay]').first().click(); await page.click('[data-shnext="3"]');
+  await expect(page.locator('#view')).toContainText('訂單已成立');
+  const O = (await J(page, '/home/orders')).orders;
+  expect(O[0].items[0].g).toBe('商品');
+  expect(O.some(o => o.code === o1.code)).toBe(true);
+  expect(errs).toEqual([]);
+});
+
+test('② 客服入口收斂＋③ 常見問題：會員中心不放浮動按鈕；答案標出處；找不到依據轉真人並記入待補清單', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page); await login(page, 'li@example.com');
+  await app(page, "A=>{A.S.stack=['m1'];A.render()}");
+  await expect(page.locator('.aifab')).toHaveCount(0);
+  await page.locator('[data-aigo]', { hasText: '聯絡客服（揪問 AI）' }).click();
+  await expect(page.locator('.top h1')).toHaveText('揪問 AI｜客服');
+  await page.click('[data-faqcat="會員與點數"]');
+  await page.locator('[data-faqid]', { hasText: '1 點可以抵多少錢' }).click();
+  await expect(page.locator('.aim').last()).toContainText('1 點可折抵 1 元');
+  await expect(page.locator('.aim').last().locator('.aisrc')).toContainText('全國電子官網');
+  await page.locator('.aim').last().locator('[data-aihelp$="|1"]').click();
+  await page.fill('#aiQ', '可以幫我修水管嗎'); await page.press('#aiQ', 'Enter');
+  await expect(page.locator('.aim').last()).toContainText('找不到依據');
+  await page.locator('.aim').last().locator('[data-aihand]').click();
+  await expect(page.locator('.aim').last()).toContainText('已轉給');
+  await logout(page);
+  await page.goto('/jiujujia/admin.html'); await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.JJJA.go('faq')); await page.waitForTimeout(1000);
+  await expect(page.locator('#view')).toContainText('可以幫我修水管嗎');
+  await expect(page.locator('#view')).toContainText('全國電子客服');
+  await page.locator('[data-faqnew="可以幫我修水管嗎"]').click();
+  await page.fill('#fqC', '家電保固與報修'); await page.fill('#fqA', '水電工程不在全國電子服務範圍；家電報修請用線上報修。');
+  await page.click('[data-faqsave]'); await page.waitForTimeout(600);
+  const m = await J(page, '/faq/match?q=' + encodeURIComponent('可以幫我修水管嗎'));
+  expect(m.best && m.best.cat).toBe('家電保固與報修');
+  expect(errs).toEqual([]);
+});
+
+test('④ 家電分工：會員中心保固清單分兩區；線上報修進線上報修清單；關懷設備不走一般報修', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page); await login(page, 'li@example.com');
+  await app(page, "A=>{A.S.stack=['m1'];A.render()}");
+  await page.click('[data-go="wty"]');
+  await expect(page.locator('#view')).toContainText('我的購買');
+  await expect(page.locator('#view')).toContainText('揪居家｜長輩家');
+  await expect(page.locator('#view')).toContainText('由綁定門市負責');
+  await expect(page.locator('nav.nav [data-nav="m1"]')).toHaveAttribute('aria-current', 'page');
+  await page.locator('[data-repair]').first().click();
+  await expect(page.locator('#view .tag', { hasText: '報修中' })).toHaveCount(1);
+  const R = (await J(page, '/home/requests')).requests;
+  expect(R[0].kind).toBe('線上報修');
+  const care = await page.evaluate(() => JJJAPP.S.hh.devices.find(d => d.source === '到府安裝').id);
+  expect((await J(page, '/home/repair', { method: 'POST', body: { device_id: care } }))._s).toBe(400);
+  expect(errs).toEqual([]);
+});
+
+test('⑤ 揪心願：創作 4 步（含自訂零件）、我也需要只限訂閱戶、100 戶進審查、總部審查通知、點數入帳', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page); await login(page, 'li@example.com');
+  await app(page, "A=>{A.S.stack=['home','m2'];A.render()}");
+  await page.click('[data-wcreate]');
+  await page.fill('[data-wst="when"]', '晚上起床'); await page.fill('[data-wst="hope"]', '會發光的門檻條');
+  await page.click('[data-wnext="1"]');
+  await page.click('[data-wsel="strip"]'); await page.click('[data-wslot="3"]');
+  await page.click('[data-wcnew]'); await page.fill('[data-wcf="name"]', '可調光床底燈條'); await page.fill('[data-wcf="purpose"]', '光從床底照地面'); await page.click('[data-wcsave]'); await page.click('[data-wslot="0"]');
+  await page.click('[data-wnext="2"]');
+  await expect(page.locator('#view')).toContainText('自訂｜待評估');
+  await page.click('[data-wnext="3"]');
+  await expect(page.locator('[data-wsend]')).toBeDisabled();
+  await page.click('[data-wterm="rules"]'); await page.click('[data-wterm="license"]'); await page.click('[data-wsend]');
+  await expect(page.locator('.top h1')).toHaveText('作品');
+  await expect(page.locator('#view')).toContainText('會發光的門檻條');
+  // 全屋作品要訂閱揪全家：不符資格只能追蹤
+  const L = (await J(page, '/wish/works?tab=all')).works;
+  const whole = L.find(w => w.field === '全屋'), dim = L.find(w => w.title === '可調光感應夜燈');
+  expect((await J(page, `/wish/works/${whole.id}/support`, { method: 'POST', body: { buy: '會', price: '500 元內' } }))._s).toBe(403);
+  // 可調光感應夜燈：補到 99 戶，李小姐按下去達 100 戶進入審查
+  await page.evaluate(id => { __DBW.prepare('UPDATE wish_works SET base=99 WHERE id=?').run(id); }, dim.id);
+  await page.evaluate(id => window.JJJWISH.openWk(id), dim.id);
+  await page.click('[data-wsup]'); await page.click('[data-wbuy="會"]'); await page.click('[data-wprice2="500–1,000 元"]'); await page.click('[data-wsupgo]');
+  await expect(page.locator('#view')).toContainText('100 戶也需要');
+  await expect(page.locator('#view')).toContainText('待審查');
+  await logout(page);
+  await page.goto('/jiujujia/admin.html'); await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.JJJA.go('wboard')); await page.waitForTimeout(1000);
+  await expect(page.locator('#view')).toContainText('可調光床底燈條');
+  await page.click(`[data-wst2="${dim.id}|審查中"]`); await page.waitForTimeout(500);
+  await page.click(`[data-wst2="${dim.id}|評估中"]`); await page.waitForTimeout(500);
+  await page.click(`[data-wst2="${dim.id}|不通過"]`); await page.waitForTimeout(500);
+  await expect(page.locator('#toast')).toContainText('理由');
+  await page.click(`[data-wst2="${dim.id}|通過"]`); await page.waitForTimeout(600);
+  await page.locator('[data-wpt$="|1"]').first().click(); await page.waitForTimeout(600);
+  await logout(page);
+  await login(page, 'li@example.com');
+  const N = (await J(page, '/home/notifications')).notifications;
+  expect(N.some(n => n.title.includes('可調光感應夜燈') && n.title.includes('通過'))).toBe(true);
+  const P = await J(page, '/points');
+  expect(P.items.some(x => x.status === '已入帳') || P.pending > 0).toBe(true);
+  expect(errs).toEqual([]);
+});

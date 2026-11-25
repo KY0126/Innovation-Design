@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     { id: 'baby', n: '育兒模式｜嬰兒房溫濕度', monthly: 99, one: 0, phase: 2, g: '新客群' },
     { id: 'pet', n: '寵物模式｜出門模式', monthly: 99, one: 0, phase: 2, g: '新客群' },
   ];
-  const PAY = ['信用卡每月扣款', '門市付款', '全國電子點數折抵＋信用卡'];
+  const PAY = ['信用卡每月扣款', '行動支付', '會員點數折抵＋信用卡'];
   const phaseNow = () => { const r = one("SELECT value FROM config WHERE key='phase'"); return r ? +r.value : 2; };
   const code = p => p + Date.now().toString(36).slice(-5).toUpperCase();
   S.add('orders', `
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS video_tasks (
     ['POST', /^\/api\/home\/consents$/, 'family', async (u, m, b) => {
       const hid = await myHousehold(u); if (!hid) return ERR('找不到家庭', 404);
       run('INSERT INTO consents(household_id,kind,items,agreed,by_name,created_at) VALUES(?,?,?,?,?,?)', [hid, String(b.kind || ''), JSON.stringify(b.items || []), b.agreed ? 1 : 0, String(b.by || '長輩本人'), now()]);
-      persist(); return J({ id: lastId() });
+      const _id = lastId(); persist(); return J({ id: _id });
     }],
     ['POST', /^\/api\/home\/consents\/(\d+)\/revoke$/, 'family', async (u, m) => { const hid = await myHousehold(u); run('UPDATE consents SET revoked_at=? WHERE id=? AND household_id=?', [now(), +m[1], hid]); persist(); return J({ ok: true }); }],
     ['GET', /^\/api\/home\/device-links$/, 'family', async (u) => { const hid = await myHousehold(u); return J({ links: hid ? all('SELECT name,linked FROM device_links WHERE household_id=?', [hid]) : [] }); }],
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS video_tasks (
       if (!u) return ERR('請先登入', 401);
       const ck = b.checks || {}; if (!['a', 'b', 'c', 'd'].every(k => ck[k])) return ERR('四項隱私確認都要勾選', 400);
       run('INSERT INTO video_tasks(user_id,household_id,topic,checks,created_at) VALUES(?,?,?,?,?)', [u.id, u.role === 'family' ? await myHousehold(u) : null, String(b.topic || ''), JSON.stringify(ck), now()]);
-      persist(); return J({ id: lastId() });
+      const _id = lastId(); persist(); return J({ id: _id });
     }],
     ['GET', /^\/api\/admin\/videos$/, ['hq', 'advisor'], () => J({ videos: all('SELECT v.*, u.name FROM video_tasks v JOIN users u ON u.id=v.user_id ORDER BY v.id DESC') })],
     ['POST', /^\/api\/admin\/videos\/(\d+)\/review$/, ['hq', 'advisor'], (u, m, b) => { run('UPDATE video_tasks SET status=?, review_note=?, reviewed_at=? WHERE id=?', [b.ok ? '已上架' : '需修改', String(b.note || ''), now(), +m[1]]); persist(); return J({ ok: true }); }],
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS biz_repairs (id INTEGER PRIMARY KEY, site_id INTEGER 
       const ck = b.checks || {}; if (!['a', 'b', 'c'].every(k => ck[k])) return ERR('三項同意都要確認', 400);
       if (!String(b.family || '').trim()) return ERR('請填寫家庭', 400);
       run('INSERT INTO amb_visits(user_id,family,store,checks,note,created_at) VALUES(?,?,?,?,?,?)', [u.id, String(b.family).slice(0, 40), u.store, JSON.stringify(ck), String(b.note || '').slice(0, 200), now()]);
-      persist(); return J({ id: lastId() });
+      const _id = lastId(); persist(); return J({ id: _id });
     }],
     ['GET', /^\/api\/admin\/amb-visits$/, ['hq', 'advisor'], () => J({ visits: all('SELECT v.*, u.name FROM amb_visits v JOIN users u ON u.id=v.user_id ORDER BY v.id DESC') })],
     ['POST', /^\/api\/admin\/amb-visits\/(\d+)\/ok$/, ['hq', 'advisor'], (u, m) => { run("UPDATE amb_visits SET status='已確認', points=50, reviewed_at=? WHERE id=?", [now(), +m[1]]); persist(); return J({ ok: true }); }],

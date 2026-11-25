@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125j"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261125m"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -607,10 +607,10 @@ function storeRows(){return STORES.map(([code,m,sm])=>{const vv={...v};if(m.diag
 const nt=n=>(n<0?'−':'')+'NT$ '+Math.abs(Math.round(n)).toLocaleString('en-US');
 function hqRefresh(){try{alerts();if(['dispatch','kpi','wish','content','amb','vc','sys','kb'].includes(cur)){document.getElementById('view').innerHTML=V[cur]();notesToInfo()}}catch(e){}}
 
-const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0],['phase','營運階段',0],['biz','異業夥伴',0]];
+const TABS=[['live','即時總覽',0],['bk','預約與派工',0],['wo','工單',0],['hh','家庭與家電檔案',0],['care','關懷紀錄',0],['wl','揪心願回覆',0],['wish','揪心願彙整',0],['kb','情境模板與規則',0],['wboard','揪心願審查',0],['faq','常見問題與客服',0],['ops','服務地圖',0],['acct','帳號管理',0],['content','生活顧問與內容',0],['amb','校園大使與居家現況',0],['dispatch','派工排程（模擬）',0],['partner','協力工班',0],['kpi','試點指標',0],['optstat','改善選項統計',0],['vc','投資效益',0],['vendor','供應商端（示意）',0],['sys','資料流與系統狀態',0],['about','關於系統（說明）',0],['phase','營運階段',0],['biz','異業夥伴',0]];
 const GROUPS=[['今日工作',['live','bk','ops']],['服務家庭',['hh','wl']],['門市與人員',['partner']],['試點分析',['kpi']],['系統',['sys']]];
 const NAVN={bk:'派工與工單',hh:'家庭',wl:'揪心願',partner:'人員與夥伴',kpi:'試點分析',sys:'設定'};
-const SUB={bk:['wo','dispatch'],hh:['care'],wl:['wish'],partner:['biz','content','acct','amb'],kpi:['optstat','vc','vendor'],sys:['kb','phase','about']};
+const SUB={bk:['wo','dispatch'],hh:['care'],wl:['wish','wboard'],partner:['biz','content','acct','amb'],kpi:['optstat','vc','vendor'],sys:['faq','kb','phase','about']};
 const PARENT={};Object.entries(SUB).forEach(([p,L])=>L.forEach(c=>PARENT[c]=p));
 let cur=(location.hash||'').slice(1)||DEFAULT_TAB,selW=0,cls={};
 const W=[
@@ -956,10 +956,33 @@ V.partner=()=>{const P=LD.sst;return BZR()+PO()+`<div class="panel">${LIVEH('人
 V.sys=()=>{const r=LD.rules;return `<div class="panel">${LIVEH('關懷判斷規則','存在 config 表；家庭 App「通知設定」顯示同一份')}<div class="pb">${!r?'<span class="c-mu">載入中…</span>':`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
  <label>浴室停留超過（分）<input class="in" id="rB" type="number" value="${r.bath_min}"></label><label>早上無活動超過<input class="in" id="rM" value="${esc(r.morning)}"></label><label>長輩未回應多久通知家人（分）<input class="in" id="rE" type="number" value="${r.elder_wait}"></label><label>家人未回應多久通知下一位（分）<input class="in" id="rF" type="number" value="${r.family_wait}"></label></div>
  ${ME&&ME.role==='hq'?'<button class="b pri" data-la="rulesSave" style="margin-top:10px">儲存規則</button>':'<div class="c-mu" style="margin-top:8px">只有總部可以修改</div>'}`}</div></div>`+SIMH('以下為資料流與系統串接示意（模擬）')+_V0.sys()};
+// ===== 揪心願審查：審查看板、選品評估、出題管理、點數檢核、留言審核 =====
+const WFLOW={'待審查':['審查中'],'審查中':['評估中'],'評估中':['通過','不通過'],'通過':['預購'],'預購':['量產']};
+V.wboard=()=>{const B=LD.wb;if(!B)return LOADING;const G=['共鳴中','待審查','審查中','評估中','通過','預購','量產','不通過'];const P=LD.wparts||[],PT=LD.wpts||[],CM=LD.wcm||[];
+ const wc=w=>`<div class="item" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(w.title)}</b><span class="c-mu">${w.count} 戶</span></div><div class="s">${esc(w.designer)}｜${esc(w.field)}${w.parent_id?'｜衍生版':''}</div>
+  <div class="s">會買 ${w.buy['會']}｜看價格 ${w.buy['看價格']}｜不會 ${w.buy['不會']}${Object.keys(w.price).length?'｜價格：'+Object.entries(w.price).map(([k,v])=>esc(k)+' '+v).join('、'):''}</div>${w.review_note?`<div class="s">理由：${esc(w.review_note)}</div>`:''}
+  ${(WFLOW[w.status]||(w.status==='共鳴中'&&w.count>=100?['審查中']:[])).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${w.status==='評估中'?`<input class="fld" id="wn${w.id}" placeholder="不通過理由（必填）" style="flex:1;min-width:140px;margin:0">`:''}${(WFLOW[w.status]||['審查中']).map(x=>`<button class="b ${x==='不通過'?'':'pri'}" data-wst2="${w.id}|${x}">${x}</button>`).join('')}</div>`:''}</div>`;
+ return `<div class="panel">${LIVEH('審查看板','100 戶進入每季審查；狀態變更會通知設計者與所有支持者')}<div class="pb"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">${G.map(g=>{const L=B.works.filter(w=>w.status===g);return `<div><b>${g}｜${L.length}</b>${L.map(wc).join('')||'<div class="c-mu" style="font-size:13px">目前沒有</div>'}</div>`}).join('')}</div></div></div>
+ <div class="panel">${LIVEH('選品評估｜自訂零件','同一零件被 5 件以上作品用到，或所在作品達 100 戶，標示「可評估」')}<div class="pb">${P.length?`<table><tr><th>零件</th><th>用途</th><th>作品</th><th>用到</th><th>最高共鳴</th><th>狀態</th><th></th></tr>${P.map(x=>`<tr><td>${esc(x.name)}${x.photo?'｜附照片':''}</td><td>${esc(x.purpose||'')}</td><td>${esc(x.work||'')}</td><td>${x.used} 件</td><td>${x.maxc} 戶</td><td>${x.ready?'<span class="badge c-ok">可評估</span> ':''}${esc(x.status)}</td><td>${['選品評估中','通過','不採用'].map(k=>`<button class="b" data-cps="${x.id}|${k}">${k}</button>`).join(' ')}</td></tr>`).join('')}</table>`:'<span class="c-mu">目前沒有自訂零件</span>'}</div></div>
+ <div class="panel">${LIVEH('全國出題','家庭用題目投稿，獎勵點數加倍')}<div class="pb">${B.themes.map(t=>`<div class="item"><span class="t"><b>${esc(t.title)}</b><div class="s">${esc(t.by_name)}｜${esc(t.reward)}｜截止 ${esc(t.deadline||'')}</div></span></div>`).join('')}
+  <div style="display:grid;grid-template-columns:2fr 2fr 1fr auto;gap:8px;margin-top:8px"><input class="fld" id="thT" placeholder="題目：例如 500 元內讓浴室更好走"><input class="fld" id="thR" placeholder="獎勵：點數加倍"><input class="fld" id="thD" placeholder="2027-01-31"><button class="b pri" data-thadd="1">新增題目</button></div></div></div>
+ <div class="panel">${LIVEH('點數檢核','送出作品、衍生版、共鳴達 20 戶、量產回饋；檢核後併入會員點數')}<div class="pb">${PT.length?`<table><tr><th>會員</th><th>原因</th><th>作品</th><th>點數</th><th>狀態</th><th></th></tr>${PT.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.reason)}</td><td>${esc(x.title||'')}</td><td>${x.points}</td><td>${esc(x.status)}</td><td>${x.status==='待檢核'?`<button class="b pri" data-wpt="${x.id}|1">入帳</button> <button class="b" data-wpt="${x.id}|0">退回</button>`:''}</td></tr>`).join('')}</table>`:'<span class="c-mu">目前沒有</span>'}</div></div>
+ <div class="panel">${LIVEH('留言審核','通過才顯示在作品頁')}<div class="pb">${CM.length?CM.map(c=>`<div class="item"><span class="t"><b>${esc(c.text)}</b><div class="s">${esc(c.name||'')}｜${esc(c.title)}</div></span><span><button class="b pri" data-wcm="${c.id}|1">顯示</button> <button class="b" data-wcm="${c.id}|0">隱藏</button></span></div>`).join(''):'<span class="c-mu">目前沒有待審核的留言</span>'}</div></div>`};
+// ===== 常見問題與客服：揪問 AI 依這裡的條目回答並標出處 =====
+V.faq=()=>{const F=LD.faq;if(!F)return LOADING;const T=LD.tk||[],ed=LD.fed||{},st=F.stats;
+ return `<div class="kpis"><div class="kpi panel"><div class="l">揪問 AI 被問</div><div class="v">${st.asked}</div></div><div class="kpi panel"><div class="l">對到常見問題</div><div class="v">${st.matched}</div></div><div class="kpi panel"><div class="l">轉真人</div><div class="v">${st.handed}</div></div><div class="kpi panel"><div class="l">條目數</div><div class="v">${F.faq.length}</div></div></div>
+ <div class="panel">${LIVEH('待補常見問題','AI 找不到依據的問題，依次數排序；按「補一條」直接帶入表單')}<div class="pb">${F.gaps.length?F.gaps.map(g=>`<div class="item"><span class="t"><b>${esc(g.q)}</b><div class="s">${g.n} 次｜最近 ${esc(String(g.last).slice(5,16))}</div></span><button class="b" data-faqnew="${esc(g.q)}">補一條</button></div>`).join(''):'<span class="c-mu">目前沒有</span>'}</div></div>
+ <div class="panel">${LIVEH(ed.id?'修改條目':'新增條目','上架後揪問 AI 立即使用')}<div class="pb"><div style="display:grid;grid-template-columns:1fr 2fr;gap:8px">
+  <input class="fld" id="fqC" placeholder="分類" value="${esc(ed.cat||'')}"><input class="fld" id="fqQ" placeholder="問題" value="${esc(ed.q||'')}">
+  <input class="fld" id="fqAl" placeholder="同義問法（用頓號分隔）" value="${esc(ed.alias||'')}"><input class="fld" id="fqS" placeholder="來源（例：全國電子官網｜常見問題）" value="${esc(ed.source||'')}"></div>
+  <textarea class="fld" id="fqA" rows="3" placeholder="答案" style="margin-top:8px;width:100%">${esc(ed.a||'')}</textarea>
+  <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input class="fld" id="fqU" placeholder="來源連結（選填）" value="${esc(ed.url||'')}" style="flex:1;margin:0"><select class="fld" id="fqR" style="width:auto;margin:0">${[['all','家庭與顧問'],['family','家庭'],['advisor','生活顧問']].map(([k,l])=>`<option value="${k}" ${ed.roles===k?'selected':''}>${l}</option>`).join('')}</select><select class="fld" id="fqSt" style="width:auto;margin:0"><option ${ed.status!=='草稿'?'selected':''}>上架</option><option ${ed.status==='草稿'?'selected':''}>草稿</option></select><button class="b pri" data-faqsave="1">儲存</button>${ed.id||ed.q?'<button class="b" data-faqclr="1">清除</button>':''}</div></div></div>
+ <div class="panel">${LIVEH('常見問題','被用到的次數與「有沒有幫助」')}<div class="pb"><table><tr><th>分類</th><th>問題</th><th>來源</th><th>用到</th><th>有幫助</th><th>狀態</th><th></th></tr>${F.faq.map(f=>`<tr><td>${esc(f.cat)}</td><td>${esc(f.q)}</td><td>${esc(f.source||'')}</td><td>${f.hits}</td><td>${f.up}／${f.up+f.down}</td><td>${esc(f.status)}</td><td><button class="b" data-faqedit="${f.id}">修改</button></td></tr>`).join('')}</table></div></div>
+ <div class="panel">${LIVEH('揪問 AI 轉真人','揪居家相關轉門市生活顧問、購物會員相關轉全國電子客服；對話一併交接')}<div class="pb">${T.length?T.map(x=>`<div class="item" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(x.topic)}</b><span>${stBadge(x.status==='待回覆'?'待確認':'已完成')}</span></div><div class="s">${esc(x.name)}｜轉給 ${esc(x.target)}｜${esc(String(x.created_at).slice(5,16))}</div><details><summary class="s">看對話（${x.transcript.length} 句）</summary><div class="s">${x.transcript.map(esc).join('<br>')}</div></details>${x.status==='待回覆'?`<button class="b" data-tkclose="${x.id}" style="margin-top:6px">標記已回覆</button>`:''}</div>`).join(''):'<span class="c-mu">目前沒有轉接</span>'}</div></div>`};
 function hqRender(){nav();const t=TABS.find(x=>x[0]===cur)||TABS[0];cur=t[0];document.getElementById('title').textContent=t[1];const isLive=LIVE.includes(cur),isOps=cur==='ops';const pv=document.getElementById('pv');pv.textContent=isOps?'公開＋即時＋模擬':MIXED.includes(cur)?'即時＋模擬':isLive?'即時資料':'模擬資料';pv.classList.toggle('live',isLive||isOps);document.getElementById('opsView').hidden=true;document.getElementById('mapView').hidden=!isOps;document.getElementById('view').hidden=isOps;if(isOps)mountMap();else{document.getElementById('view').innerHTML=subTabs()+V[cur]();if(!isLive||MIXED.includes(cur))notesToInfo()}if(isLive||isOps)document.getElementById('alerts').innerHTML='';else alerts()}
 let MAPM=null;function mountMap(){if(MAPM)return;const el=document.getElementById('mapView');el.innerHTML='<div class="panel pb c-mu">服務地圖載入中…</div>';const ld=src=>new Promise((ok,no)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const x=document.createElement('script');x.src=src;x.onload=ok;x.onerror=()=>no(new Error(src));document.head.appendChild(x)});Promise.all([ld('map/geo.js'),ld('map/stores.js')]).then(()=>import('./map/servicemap.js')).then(m=>{MAPM=m.mountServiceMap(el,{api,toast})}).catch(e=>{el.innerHTML='<div class="panel pb">服務地圖載入失敗：'+esc(e.message)+'</div>'})}
 // ===== 即時營運（連接 API 的真實資料）=====
-const LIVE=['live','bk','wo','hh','care','wl','acct','optstat','kpi','wish','partner','sys','amb'],MIXED=['kpi','wish','partner','sys','amb'];
+const LIVE=['live','bk','wo','hh','care','wl','acct','optstat','kpi','wish','partner','sys','amb','wboard','faq'],MIXED=['kpi','wish','partner','sys','amb'];
 const LD={wsel:null,wcls:null,seli:{},notice:''};let ME=null,CFG=null,LBUSY=false;
 const ESC_RE=new RegExp('[&<>'+String.fromCharCode(34,39)+']','g'),ESC_MAP={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
 const esc=s=>String(s==null?'':s).replace(ESC_RE,c=>ESC_MAP[c]);
@@ -992,6 +1015,8 @@ async function loadLive(tab){
  else if(tab==='kpi')LD.met=await api('/admin/metrics'+(LD.mst?'?store='+encodeURIComponent(LD.mst):''));
  else if(tab==='wish')LD.ws=await api('/admin/wish-summary');
  else if(tab==='partner'){const [a,b,c]=await Promise.all([api('/admin/staff-stats'),api('/admin/biz-repairs'),api('/admin/partner-orders')]);LD.sst=a.staff;LD.bzr=b.repairs;LD.po=c.orders}
+ else if(tab==='wboard'){const [a,b,c,d]=await Promise.all([api('/admin/wish/board'),api('/admin/wish/parts'),api('/admin/wish/points'),api('/admin/wish/comments')]);LD.wb=a;LD.wparts=b.parts;LD.wpts=c.points;LD.wcm=d.comments}
+ else if(tab==='faq'){const [a,b]=await Promise.all([api('/admin/faq'),api('/admin/support')]);LD.faq=a;LD.tk=b.tickets}
  else if(tab==='amb'){const [a,b]=await Promise.all([api('/admin/amb-visits'),api('/admin/videos')]);LD.av=a.visits;LD.vid=b.videos}
  else if(tab==='sys')LD.rules=(await api('/admin/settings')).rules;
  if(tab!=='live'){try{LD.ov=await api('/admin/overview')}catch(e){}}
@@ -1098,6 +1123,16 @@ document.addEventListener('change',e=>{const f=e.target.dataset&&e.target.datase
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.closest('#gate'))return;
  if(b.dataset.la==='rulesSave'){lbusy(b,async()=>{const g=id=>document.getElementById(id).value;LD.rules=(await api('/admin/settings',{method:'PUT',body:{rules:{bath_min:+g('rB'),morning:g('rM'),elder_wait:+g('rE'),family_wait:+g('rF')}}})).rules;hqRender();toast('已儲存，家庭 App 的通知設定同步顯示')});return}
+ if(b.dataset.wst2){const [id,st]=b.dataset.wst2.split('|');const n=document.getElementById('wn'+id);lbusy(b,async()=>{const d=await api('/admin/wish/works/'+id+'/status',{method:'POST',body:{status:st,note:n?n.value:''}});await loadLive('wboard');hqRender();toast('已更新，通知 '+d.notified+' 個家庭')});return}
+ if(b.dataset.cps){const [id,st]=b.dataset.cps.split('|');lbusy(b,async()=>{await api('/admin/wish/parts/'+id,{method:'POST',body:{status:st}});await loadLive('wboard');hqRender()});return}
+ if(b.dataset.thadd){const g=i=>document.getElementById(i).value;lbusy(b,async()=>{await api('/admin/wish/themes',{method:'POST',body:{title:g('thT'),reward:g('thR'),deadline:g('thD')}});await loadLive('wboard');hqRender();toast('已新增題目')});return}
+ if(b.dataset.wpt){const [id,ok]=b.dataset.wpt.split('|');lbusy(b,async()=>{await api('/admin/wish/points/'+id,{method:'POST',body:{ok:ok==='1'}});await loadLive('wboard');hqRender()});return}
+ if(b.dataset.wcm){const [id,sh]=b.dataset.wcm.split('|');lbusy(b,async()=>{await api('/admin/wish/comments/'+id,{method:'POST',body:{show:sh==='1'}});await loadLive('wboard');hqRender()});return}
+ if(b.dataset.faqnew!==undefined){LD.fed={q:b.dataset.faqnew,cat:'',a:'',alias:b.dataset.faqnew};hqRender();return}
+ if(b.dataset.faqedit){LD.fed=Object.assign({},LD.faq.faq.find(f=>f.id===+b.dataset.faqedit));hqRender();return}
+ if(b.dataset.faqclr){LD.fed=null;hqRender();return}
+ if(b.dataset.faqsave){const g=i=>document.getElementById(i).value;lbusy(b,async()=>{await api('/admin/faq',{method:'POST',body:{id:(LD.fed||{}).id,cat:g('fqC'),q:g('fqQ'),a:g('fqA'),alias:g('fqAl'),source:g('fqS'),url:g('fqU'),roles:g('fqR'),status:g('fqSt')}});LD.fed=null;await loadLive('faq');hqRender();toast('已儲存')});return}
+ if(b.dataset.tkclose){lbusy(b,async()=>{await api('/admin/support/'+b.dataset.tkclose+'/close',{method:'POST'});await loadLive('faq');hqRender()});return}
  if(b.dataset.mst!==undefined){LD.mst=b.dataset.mst||null;liveRender();return}
  if(b.dataset.bzr){lbusy(b,async()=>{await api('/admin/biz-repairs/'+b.dataset.bzr,{method:'POST',body:{status:b.dataset.st,eta:b.dataset.st==='已派工'?nextSlots()[0][1]:null}});await loadLive('partner');hqRender();toast(b.dataset.st==='已派工'?'已派工，客戶端同步顯示':'已完成')});return}
  if(b.dataset.avok){lbusy(b,async()=>{await api('/admin/amb-visits/'+b.dataset.avok+'/ok',{method:'POST'});await loadLive('amb');hqRender();toast('已確認，校園大使加 50 點')});return}
