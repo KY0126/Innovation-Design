@@ -326,6 +326,7 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
 .stpr li.done .sn{background:var(--brand-soft);color:var(--brand-ink)}.stpr li.on .sn{background:var(--brand);color:#fff}
 .stpr .sl{font-size:11px;color:var(--muted);white-space:nowrap}.stpr li.on .sl{color:var(--ink);font-weight:700}
 .stf+.stpr{background:var(--card);margin:0;padding:8px 4px}
+.tlhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:2px 0 4px}.tlbtn{flex:none;height:30px;min-height:0;width:auto;padding:0 10px;border-radius:8px;border:1px solid #DAD6D3;background:#fff;color:var(--ink);font-size:13px}.tlbtn[aria-expanded=true]{background:#2B2B2E;border-color:#2B2B2E;color:#fff}.tlpan{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 10px;margin-bottom:6px;border:1px solid var(--line);border-radius:8px;background:#FBFAF9}.tlpan button{display:flex;align-items:center;gap:6px;background:none;border:0;padding:4px 0;min-height:0;width:auto;font-size:13.5px;color:var(--ink)}.tlck{width:16px;height:16px;border:1.5px solid #8C8389;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#fff}.tlpan button[aria-pressed=true] .tlck{background:#D4003C;border-color:#D4003C}.tcad svg{border-radius:6px}.tlsub{width:100%;font-size:12px;font-weight:700;color:var(--muted);margin-top:2px}.tlfix{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted)}.tlck.on{background:#8C8389;border-color:#8C8389}.tlseg{display:flex;gap:0}.tlseg button{border:1px solid #DAD6D3;padding:4px 12px!important;font-size:13px}.tlseg button:first-child{border-radius:8px 0 0 8px}.tlseg button:last-child{border-radius:0 8px 8px 0;border-left:0}.tlseg button[aria-pressed=true]{background:#2B2B2E;color:#fff;border-color:#2B2B2E}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#D4003C">
@@ -1411,7 +1412,26 @@ function taskList(o){const pins=(o.pv?o.pv.pins:[]).filter(p=>p.k!=='note'),pk=o
  if(!A&&!B&&pk[0])(pk[0].step_names||[]).forEach((n,i)=>add('檢修',pk[0].code,pk[0].code+':'+i,n,'',!!(pk[0].steps||{})[i]));
  const GO=['開工',...RO,'收尾','檢修'];T.sort((a,b)=>GO.indexOf(a.group)-GO.indexOf(b.group));T.forEach((t,i)=>t.no=i+1);return T}
 // 施工圖：只畫號碼，顏色＝狀態；展開某區時其他號碼淡化
-function numMap(T,{sel,open}={}){let g='';for(const t of T){if(!t.pin)continue;const p=t.pin,[x,y]=hpp(p.x,HPJ.FT+.35,p.y),c=TSC[tState(t)][0],on=sel===t.key,dim=open&&t.group!==open&&!on,r=on?30:23;
+// 業界施工圖畫法（cad.js）：黑色是原有燈、插座、開關；數字是施工順序，顏色＝狀態，旁邊寫安裝高度
+const TKS={light:[140,140,260,'wall','H=300','pir'],strip:[900,120,40,'floor','門檻前緣','strip'],btn:[160,160,120,'wall','H=600','btn'],door:[160,160,60,'wall','門框上緣','det'],gw:[200,200,260,'wall','H≥1000','box'],motion:[140,140,140,'wall','H=2000','det'],outlet:[120,120,120,'wall','H=300','plug']};
+// 施工圖圖層（依系統／工種分）：建築底圖固定；家具與衛浴、照明、插座與電源、弱電與感測、安全輔具、標註可開關
+// 原有設備黑色、本次新增紅色編號；顯示範圍「我負責的｜全部」另外切換（非我負責的變淡）；驗收時才顯示動線
+const TLAY=[['furn','家具與衛浴'],['lite','照明'],['powr','插座與電源'],['weak','弱電與感測'],['safe','安全輔具'],['anno','標註（安裝高度）']];
+const TKL={light:'lite',strip:'lite',outlet:'powr',gw:'weak',btn:'weak',door:'weak',motion:'weak',rail:'safe',mat:'safe'};
+const PKL={A:['weak'],B:['lite','powr'],S:['lite','powr','weak','safe']};
+const TZOOM={'臥室':['bed'],'走道':['hall'],'浴室':['bath'],'玄關':['door','liv'],'客廳':['liv']};
+function tLayers(O){if(S.tlay&&S.tlay._id===O.id)return S.tlay;const L={_id:O.id,furn:1,anno:1,scope:'mine'};(O.packages||[]).filter(k=>k.mine).forEach(k=>(PKL[k.code]||PKL.S).forEach(x=>L[x]=1));if(!['lite','powr','weak','safe'].some(x=>L[x]))PKL.S.forEach(x=>L[x]=1);return S.tlay=L}
+function numMap(T,o={}){if(!window.JJJCAD)return numMapOld(T,o);const {sel,open}=o,O=S.order,L=tLayers(O);
+ const on=t=>!!L[TKL[t.pin.k]||'weak'];
+ const its=T.filter(t=>t.pin&&on(t)).map(t=>({idx:t.key,tag:t.done?'✓':String(t.no),x:Math.round(t.pin.x*1000),y:Math.round(t.pin.y*1000),spec:TKS[t.pin.k]||TKS.gw,col:TSC[tState(t)][0],dim:!!((L.scope==='mine'&&!pkMine(O,t.pkg))||(open&&!TZOOM[open]&&T.some(x=>x.group===open&&x.pin)&&t.group!==open&&sel!==t.key)),attr:`data-tpin="${t.key}" style="cursor:pointer"`}));
+ let box=null;const zk=TZOOM[open];if(zk&&S.tzoom!==false){const R=JJJCAD.ROOMS;box=[1e9,1e9,-1e9,-1e9];zk.forEach(k=>{const r=R[k];box=[Math.min(box[0],r[1]),Math.min(box[1],r[2]),Math.max(box[2],r[1]+r[3]),Math.max(box[3],r[2]+r[4])]});box=[box[0]-300,box[1]-300,box[2]+300,box[3]+300]}
+ const hidden=T.filter(t=>t.pin&&!on(t)).length,eo=[...(L.lite?['ceil','sw']:[]),...(L.powr?['out']:[])],acc=O.status==='待驗收';
+ const ln=TLAY.filter(([k])=>L[k]&&k!=='anno'&&k!=='furn').map(x=>x[1]).join('、')||'只有建築底圖';
+ return `<div class="tlhead"><span class="muted" style="font-size:.82em">${box?'放大：'+esc(open)+'｜<button class="lnk" data-tzoom="0">看全屋</button>｜':S.tzoom===false&&zk?'<button class="lnk" data-tzoom="1">放大到'+esc(open)+'</button>｜':''}${box?'':esc(ln)}${hidden?(box?'':'｜')+'另有 '+hidden+' 項未開圖層':''}</span><button class="tlbtn" data-tlayo="1" aria-expanded="${!!S.tlayOpen}">圖層</button></div>
+ ${S.tlayOpen?`<div class="tlpan" role="group" aria-label="圖層"><span class="tlsub">圖層</span><span class="tlfix"><span class="tlck on">✓</span>建築底圖（牆、門窗、尺寸，固定）</span>${TLAY.map(([k,n])=>`<button data-tlay="${k}" aria-pressed="${!!L[k]}"><span class="tlck">${L[k]?'✓':''}</span>${n}</button>`).join('')}
+  <span class="tlsub">顯示範圍</span><span class="tlseg">${[['mine','我負責的'],['all','全部']].map(([k,n])=>`<button data-tscope="${k}" aria-pressed="${L.scope===k}">${n}</button>`).join('')}</span><span class="muted" style="font-size:.78em;width:100%">原有設備為黑色、本次新增為紅色編號；不是你負責的項目會變淡</span></div>`:''}
+ <div class="tcad">${JJJCAD.plan('全屋',its,{elec:1,elecOnly:eo,noElec:!eo.length,noFurn:!L.furn,noH:!L.anno,box,sel,tagK:box?1.6:1.7,route:acc?'臥室到浴室':null,alt:EN()+'家施工圖'})}</div>${acc?'<div class="muted" style="font-size:.8em;margin-top:4px">驗收：點點線是床邊到浴室的夜間動線，請長輩跟著走一次</div>':''}`}
+function numMapOld(T,{sel,open}={}){let g='';for(const t of T){if(!t.pin)continue;const p=t.pin,[x,y]=hpp(p.x,HPJ.FT+.35,p.y),c=TSC[tState(t)][0],on=sel===t.key,dim=open&&t.group!==open&&!on,r=on?30:23;
   g+=`<g data-tpin="${t.key}" style="cursor:pointer;opacity:${dim?.28:1}" transform="translate(${x.toFixed(0)},${y.toFixed(0)})">${on?`<circle r="${r+12}" fill="none" stroke="${c}" stroke-width="5"/>`:''}<circle r="${r}" fill="${c}" stroke="#fff" stroke-width="5"/><text y="${r*.36}" font-size="${r*1.05}" font-weight="700" text-anchor="middle" fill="#fff">${t.done?'✓':t.no}</text></g>`}
  return `<div class="hpw pm"><img src="home/plan.jpg" alt="${EN()}家施工圖"><svg viewBox="${HPV.join(' ')}">${hpPath()}${g}</svg></div>`}
 function homeBanners(){const B=[['j0','揪居家｜揪夜安：長輩開始一個人住？先做 5 分鐘居家診斷','b1'],['j1','揪食光｜廚房安心方案（擴展期）','x24'],['j2','揪團聚｜客廳陪伴方案（擴展期）','x24'],['j3','揪清爽｜陽台洗衣方案（擴展期）','x24'],['j4','揪全家｜全屋方案（擴展期）','x24'],['n1','全國電子活動'],['n2','全國電子活動'],['n3','全國電子活動'],['n4','全國電子活動'],['n5','全國電子活動'],['n6','防詐騙公告']];
@@ -1489,6 +1509,10 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.dfok||t.dataset.dfno){const id=t.dataset.dfok||t.dataset.dfno,ok=!!t.dataset.dfok;busy(t,async()=>{const d=await api('/advisor/diffs/'+id,{method:'POST',body:{action:ok?'approve':'reject'}});if(S.stack[S.stack.length-1]==='apm'){S.board=d;S.pmPins=null}else await loadAdvHome();toast(ok?'已核准，圖面更新為 v'+d.pv.ver:'已退回差異回報');rr()});return}
  if(t.dataset.rdraft){busy(t,async()=>{const d=await api('/advisor/reminders/'+t.dataset.rdraft+'/draft',{method:'POST'});await loadAdvHome();toast('已建立維護工單草稿 '+d.code);rr()});return}
  if(t.dataset.ddisp){busy(t,async()=>{const x=new Date();x.setDate(x.getDate()+1);const ymd=x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');const d=await api('/admin/installs/'+t.dataset.ddisp+'/schedule',{method:'POST',body:{date:ymd,time:'14:00',tech_id:+t.dataset.tid}});await loadAdvHome();toast('已派工：'+d.label);rr()});return}
+ if(t.dataset.tlayo){S.tlayOpen=!S.tlayOpen;rr();return}
+ if(t.dataset.tlay){const L=tLayers(S.order);L[t.dataset.tlay]=L[t.dataset.tlay]?0:1;rr();return}
+ if(t.dataset.tscope){tLayers(S.order).scope=t.dataset.tscope;rr();return}
+ if(t.dataset.tzoom){S.tzoom=t.dataset.tzoom==='1'?null:false;rr();return}
  if(t.dataset.ttab){S.ttab=t.dataset.ttab;S.tpin=null;rr();return}
  if(t.dataset.tgrp){S.topen=S.topen===t.dataset.tgrp?'__none':t.dataset.tgrp;S.tsel=null;rr();return}
  if(t.dataset.tsel){S.tsel=S.tsel===t.dataset.tsel?null:t.dataset.tsel;rr();return}
@@ -1657,6 +1681,6 @@ window.JJJ={measSeg,nav,meCard,acctList,stf,snav,planName,api,esc,stepper,chd,fm
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261125h"></script><script src="family.js?v=20261125k"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261125i"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125b"></script><script src="wish.js?v=20261125n"></script>
+<script src="stage2.js?v=20261125h"></script><script src="family.js?v=20261125k"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261125i"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125c"></script><script src="wish.js?v=20261125n"></script>
 <script src="guide.js?v=20261125q"></script></body>
 </html>
