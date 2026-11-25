@@ -118,6 +118,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offs
 .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;z-index:50}.sheet{background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px))}
 .aifab{position:absolute;right:12px;width:96px;height:96px;z-index:30}.aib{position:relative;width:96px;height:96px;border-radius:50%;border:3px solid #fff;background:#FAE0E8;padding:0;box-shadow:0 4px 14px rgba(61,58,64,.28);display:block}.aib img{display:block;width:90px;height:90px;border-radius:50%;object-fit:cover}.ail{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:#3D3A40;color:#fff;font-size:13px;font-weight:700;border:2px solid #fff;border-radius:12px;padding:2px 10px;white-space:nowrap}.aix{position:absolute;top:-6px;right:-6px;width:28px;height:28px;border-radius:50%;background:#fff;color:#3D3A40;border:1px solid #D9D4DA;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:0}
 .aichat{padding:12px 12px 16px}.aim{display:flex;gap:8px;margin:0 0 12px;align-items:flex-start}.aim img{width:36px;height:36px;border-radius:50%;flex:none;object-fit:cover}.aim>div{background:var(--card);border-radius:4px 14px 14px 14px;padding:10px 12px;max-width:80%;line-height:1.6}.aim.me{justify-content:flex-end}.aim.me>div{background:#FAE0E8;border-radius:14px 4px 14px 14px}.aia{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ais{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}.aif{display:flex;gap:8px;padding:8px 12px 56px;background:var(--card);border-top:1px solid var(--line)}.aif .fld{flex:1;margin:0}
+.armw{position:relative;background:#111;flex:1;min-height:0;overflow:auto}.armw video{display:block;width:100%;height:100%;object-fit:cover}.armw canvas{display:block;width:100%;height:auto;touch-action:manipulation;cursor:crosshair}.armh{position:sticky;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;padding:10px 14px;font-size:.95em;text-align:center}
+.xrov{position:fixed;inset:0;pointer-events:none;z-index:99}.xrh{position:absolute;left:12px;right:12px;top:24px;background:rgba(0,0,0,.6);color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:16px}.xrx{position:absolute;right:16px;bottom:32px;pointer-events:auto;background:#fff;color:#3D3A40;border-radius:20px;padding:10px 18px;font-size:15px}
 .glist{background:var(--card);border-radius:14px;margin:0 12px 4px;overflow:hidden}.glist .gi{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:14px;border-bottom:1px solid var(--line);min-height:52px}.glist .gi:last-child{border-bottom:0}
 .btn.logout{background:#fff;color:#D4003C;border:1.5px solid #D4003C}
 .av{width:48px;height:48px;border-radius:50%;background:#FAE0E8;color:#A3002E;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2em;flex:none}
@@ -593,14 +595,14 @@ b1:()=>`${hdr('揪居家｜居家安全評估')}<div class="scroll" style="paddi
  <div class="muted" style="font-size:.88em;margin:0 16px 12px;line-height:1.5">試點先做揪夜安：臥室到浴室的夜間動線；想要的其他東西，可以用揪心願說出來。</div>
  <div class="sec">這次由誰填寫？</div>
  <div class="pad"><button class="btn" data-a="loginChild">幫長輩填（我是家人）</button><button class="btn ghost" data-a="loginSelf">我是長輩本人（自動大字模式）</button><p class="muted" style="text-align:center">資料只給您的家人與綁定門市；也可以直接到門市，由顧問陪同填寫</p></div></div>`,
-ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&S.cfg.measure_range)||{};const f=(k,l,u,ph,step)=>`<label class="mf"><span>${l}</span><span class="unit"><input class="fld" id="m_${k}" data-meas="${k}" type="number" inputmode="decimal" min="${(R[k]||[])[0]??''}" max="${(R[k]||[])[1]??''}" step="${step}" value="${esc(m[k]??'')}" placeholder="${ph}"><i>${u}</i></span></label>`;
+ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&S.cfg.measure_range)||{};const SRC={xr:'AR 實測',photo:'照片比例尺｜僅供參考'},f=(k,l,u,ph,step)=>`<label class="mf"><span>${l}${(S.measSrc||{})[k]?` <span class="tag ok">${SRC[S.measSrc[k]]}</span>`:''}</span><span class="unit"><input class="fld" id="m_${k}" data-meas="${k}" type="number" inputmode="decimal" min="${(R[k]||[])[0]??''}" max="${(R[k]||[])[1]??''}" step="${step}" value="${esc(m[k]??'')}" placeholder="${ph}"><i>${u}</i></span></label>`;
  return `${hdr('AR 掃描（場勘）',{aplus:true})}<div class="scroll" style="padding-top:12px">
  <div class="pad">${stepper(FSTEP,0)}<div class="muted" style="margin-top:6px">先量${EN()}家的夜間動線</div></div>
- <div class="pad" style="margin-top:10px"><div class="seg armode" role="group" aria-label="量測方式"><button data-armode="ar" aria-pressed="false">AR 掃描</button><button data-armode="manual" aria-pressed="true">手動輸入</button></div></div>
+ <div class="pad" style="margin-top:10px"><div class="seg armode" role="group" aria-label="量測方式"><button data-armode="ar" aria-pressed="false">AR 示範</button><button data-go="arm" aria-pressed="false">手機實測</button><button data-armode="manual" aria-pressed="true">手動輸入</button></div></div>
  <div class="card" style="margin-top:12px">${AR_SVG}<div class="muted" style="font-size:.85em;margin-top:6px">從床邊走到浴室門口，量 A 走道寬度、B 浴室門檻高度、C 距離，也數一下沿路有幾個插座。</div></div>
  <div class="card"><div class="meas">${f('corridor_cm','A｜走道寬度','cm','例如 92','1')}${f('threshold_cm','B｜浴室門檻高度','cm','例如 2','0.5')}${f('bed_bath_m','C｜床邊到浴室門口','公尺','例如 5','0.5')}</div>
   <div class="mf" style="margin-top:12px"><span>沿路可用的插座</span><div style="margin-top:6px">${[['0','沒有'],['1','1 個'],['2','2 個以上']].map(([v,l])=>`<button class="chip" data-outlet="${v}" aria-pressed="${String(m.outlets??'')===v}">${l}</button>`).join('')}</div></div>
-  <div class="okbox" style="background:var(--note);color:var(--muted)">AR 掃描目前為模擬示範；正式版接手機 AR 掃描，結果一樣帶入這裡，也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「長輩家」、「我家」或這次先不儲存。</div></div>
+  <div class="okbox" style="background:var(--note);color:var(--muted)">「手機實測」：Android 手機用 AR 點兩點量距離；iPhone 與其他手機拍一張放了信用卡的照片換算長度（約 ±3–5 cm，門市到府會再複量）。也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「長輩家」、「我家」或這次先不儲存。</div></div>
  <div class="pad"><button class="btn" data-a="arNext">下一步：全國電子 AI 顧問阿國問答</button><button class="btn ghost" data-a="arSkip">先略過，到門市再請顧問量</button></div></div>`},
 b2:()=>{const i=S.qi||0,q=Q[i],sel=S.ans[q.k],qt=S.self?QS[q.k]:q.q;return `${hdr('全國電子 AI 顧問阿國居家診斷',{aplus:true})}<div class="scroll" style="padding-top:14px"><div class="pad">
  ${stepper(FSTEP,1)}<div class="muted" style="margin:6px 0">第 ${i+1} 題，共 ${Q.length} 題</div>
@@ -1424,6 +1426,7 @@ function render(){
  const sc=document.querySelector('.scroll');if(sc)sc.scrollTop=0;
  if(v==='home')hbWire();
  if(window.JJJAI)JJJAI.after(v,view);
+ if(window.JJJHOOKS)JJJHOOKS.forEach(f=>{try{f(v,view)}catch(e){console.error(e)}});
 }
 // 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
 const NO_NAV=['login','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct'];
@@ -1618,6 +1621,6 @@ window.JJJ={planName,api,esc,stepper,chd,fmt,NO_NAV,LOAD,shareText,openBoard,S,V
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261125e"></script><script src="family.js?v=20261125e"></script><script src="ai.js?v=20261125f"></script>
+<script src="stage2.js?v=20261125e"></script><script src="family.js?v=20261125e"></script><script src="ai.js?v=20261125f"></script><script src="ar.js?v=20261125g"></script>
 <script src="guide.js?v=20261125c"></script></body>
 </html>
