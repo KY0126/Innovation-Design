@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125a"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125c"></script>
 <script src="planmap.js?v=20261125a"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
@@ -88,6 +88,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;p
  main{padding:12px}.proto{margin-left:0}}
 .certs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.cert{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line,#E7E2E4);border-radius:10px;padding:10px 12px}.cert b{font-size:14px}.cert .mu{font-size:12px}.cert.adv{background:#FBEFF3}@media (max-width:1100px){.certs{grid-template-columns:repeat(2,minmax(0,1fr))}}.tips{margin:0;padding-left:18px;display:grid;gap:8px}.tips b{margin-right:8px;color:var(--brand,#D4003C)}
 .b[aria-pressed="true"]{background:#FAE0E8;border-color:#D4003C;color:#A3002E}
+.actbl{width:100%;border-collapse:collapse;font-size:14px}.actbl th{text-align:left;color:var(--mu,#6B6B6B);font-weight:600;padding:8px;border-bottom:1px solid var(--line)}.actbl td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 </style>
 <style>
 #cGate{position:fixed;inset:0;z-index:9000;background:#ECE7E3;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -127,7 +128,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const api=async(p,o={})=>{const r=await fetch('/api'+p,{method:o.method||'GET',headers:{'Content-Type':'application/json','X-JJJ':'1'},body:o.body?JSON.stringify(o.body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'操作失敗');return d};
 const LC={r:['紅燈','var(--r)'],y:['黃燈','var(--y)'],g:['綠燈','var(--g)']};
-const NAV=[['wb','今日案件'],['sched','排程與派工'],['after','售後與待辦'],['prod','商品與方案模板']];
+const NAV=[['wb','今日案件'],['cases','案件'],['sched','排程與派工'],['after','售後與待辦'],['prod','商品與方案模板']];
 const NAVG={wb:'今日工作',after:'售後',prod:'工具'};
 const TABS=['案件摘要','AI 分析','空間與成果','改善方案','商品與款式','報價','確認與同意','工單與排程','驗收與售後'];
 const ST={view:'wb',hid:3,tab:0,me:null,home:null,todos:null,plans:{}};
@@ -182,7 +183,7 @@ function stage(p){if(!p)return ['—','gray'];if(p.phase>=9)return ['關懷中�
 function nav(){const cnt={wb:cases().filter(p=>p.phase===1).length+handoffs().length};
  const h=NAV.map(([k,n])=>`${NAVG[k]?`<div class="grp">${NAVG[k]}</div>`:''}<button data-v="${k}" ${ST.view===k?'aria-current="page"':''}><span>${n}</span>${cnt[k]?`<span class="n">${cnt[k]}</span>`:''}</button>`).join('');
  document.getElementById('nav').innerHTML=h;document.getElementById('mtabs').innerHTML=NAV.map(([k,n])=>`<button data-v="${k}" ${ST.view===k?'aria-current="page"':''}>${n}</button>`).join('')}
-function render(){nav();{const c=document.getElementById('phaseChip');if(c){const p=window.JJJPHASE?JJJPHASE():0;c.textContent='營運階段：'+['試點期｜只賣揪夜安','擴展期｜全家場域可訂','延伸期｜新客群開放'][p]}}const T={wb:'今日案件',cases:'案件管理',prod:'商品與方案模板',quote:'整合報價',sched:'排程與派工',after:'售後與待辦',case:'案件詳細'};
+function render(){nav();{const c=document.getElementById('phaseChip');if(c){const p=window.JJJPHASE?JJJPHASE():0;c.textContent='營運階段：'+['試點期｜只賣揪夜安','擴展期｜全家場域可訂','延伸期｜新客群開放'][p]}}const T={wb:'今日案件',cases:'案件',prod:'商品與方案模板',quote:'整合報價',sched:'排程與派工',after:'售後與待辦',case:'案件詳細'};
  document.getElementById('title').textContent=T[ST.view]||'';const v=document.getElementById('view');
  v.innerHTML=ST.view==='case'?vCase():ST.view==='wb'?vWb():ST.view==='cases'?vCases():ST.view==='prod'?vProd():ST.view==='quote'?vQuoteList():ST.view==='sched'?vSched():vAfter()}
 function row(p,sub,tag){return `<button class="item" data-case="${p.household_id}"><span class="t"><b>${esc(p.household)}</b>｜${esc(p.elder_name)}　<span class="s">${esc(sub||'')}</span></span>${tag||''}<span class="mu">›</span></button>`}
@@ -212,7 +213,13 @@ function vWb(){const h=ST.home,ho=handoffs(),P=cases(),stg=ST.stg||'all';
  <div class="wb2"><div>${left}</div>
  <div><div class="panel"><div class="ph">今天 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc((c.label.split('）')[1]||c.label))}</b>｜${esc(c.household)}<div class="s">${esc(c.kind)}</div></span><span class="mu">›</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>
  <div class="panel decide"><div class="ph">需要你決定 <small>技師現場差異</small></div><div class="pb">${diffs.length?diffs.map(d=>`<button class="item" data-case="${d.household_id||3}" data-tabgo="8"><span class="t"><b>${esc(d.household||'')}</b>｜${esc(d.text)}<div class="s">${esc(d.by||'技師')}｜${esc(d.level||'')}</div></span><span class="tag am">待核准</span></button>`).join(''):'<span class="mu">目前沒有待核准的差異</span>'}</div></div></div></div>`}
-function vCases(){return `<div class="panel"><div class="ph">已授權案件 <small>只顯示消費者授權分享、與本門市服務相關的案件</small></div><div class="pb">${cases().map(p=>row(p,(p.elder_note||'')+'｜'+stage(p)[0])).join('')}</div></div>`}
+function vCases(){if(!ST.acases){if(!ST.acLoading){ST.acLoading=1;api('/advisor/cases').then(d=>{ST.acases=d.cases;ST.acLoading=0;render()}).catch(()=>{ST.acLoading=0})}return '<div class="panel"><div class="pb mu">載入中…</div></div>'}
+ const SG=['全部','待問診','待報價','待長輩確認','施工中','售後'],f=ST.acf||'全部',q=(ST.acq||'').trim(),L=ST.acases.filter(c=>(f==='全部'||c.stage===f)&&(!q||(c.household+c.owner+(c.elder_note||'')).includes(q)));
+ return `<div class="panel"><div class="ph">案件 <small>與手機版「案件」同一份資料；只顯示消費者授權分享、本門市服務的家庭</small></div><div class="pb">
+ <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">${SG.map(x=>`<button class="b" data-acf="${x}" aria-pressed="${f===x}">${x}｜${x==='全部'?ST.acases.length:ST.acases.filter(c=>c.stage===x).length}</button>`).join('')}<input id="acq" placeholder="搜尋家庭、家人" value="${esc(q)}" style="margin-left:auto;padding:6px 10px;border:1px solid var(--line);border-radius:8px;min-width:180px"></div>
+ <table class="actbl"><thead><tr><th>家庭</th><th>家人</th><th>進度</th><th>下一步</th><th>待辦</th><th></th></tr></thead><tbody>
+ ${L.map(c=>`<tr><td><b>${esc(c.household)}</b><div class="mu" style="font-size:12.5px">${esc(c.elder_note||'')}</div></td><td>${esc(c.owner)}</td><td><span class="tag">${esc(c.stage)}</span></td><td>${esc(c.next)}</td><td>${c.care+c.req?c.care+c.req+' 件':'—'}</td><td>${ST.plans[c.hid]?`<button class="b" data-case="${c.hid}">打開</button>`:'<span class="mu" style="font-size:12.5px">問診後建立</span>'}</td></tr>`).join('')||'<tr><td colspan="6" class="mu">沒有符合條件的案件</td></tr>'}
+ </tbody></table></div></div>`}
 function sel(hid){return SEL[hid]||(SEL[hid]={'走道':[1],'浴室':[0],'浴室門':[]})}
 function chosen(hid){const s=sel(hid);return Object.keys(OPTS).flatMap(sp=>(s[sp]||[]).map(i=>Object.assign({sp},OPTS[sp].items[i])))}
 function vCase(){const p=ST.plans[ST.hid];if(!p)return '找不到案件';const [sg,cl]=stage(p);
@@ -328,6 +335,8 @@ function vAfter(){return cases().map(p=>`<div style="margin-bottom:12px"><h3 sty
 
 document.addEventListener('click',e=>{const k=e.target.closest('[data-pk]');if(k){const O=ST.pkOpen||(ST.pkOpen={});O[k.dataset.pk]=!O[k.dataset.pk];render();return}});
 document.addEventListener('click',e=>{const w=e.target.closest('[data-stg],[data-wsel]');if(w){if(w.dataset.stg){ST.stg=w.dataset.stg;ST.wsel=null}else ST.wsel=+w.dataset.wsel;render();return}});
+document.addEventListener('click',e=>{const af=e.target.closest('[data-acf]');if(af){ST.acf=af.dataset.acf;render();return}});
+document.addEventListener('change',e=>{if(e.target.id==='acq'){ST.acq=e.target.value;render()}});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-v],[data-case],[data-tab],[data-q]');if(!t)return;
  if(t.dataset.v){ST.view=t.dataset.v}else if(t.dataset.case){ST.hid=+t.dataset.case;ST.tab=t.dataset.tabgo?+t.dataset.tabgo:0;ST.view='case'}
  else if(t.dataset.tab){ST.tab=+t.dataset.tab}

@@ -73,7 +73,11 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
     return ready;
   }
   // 其他分頁改了資料庫時，backend.js 會整個換掉資料庫；每次處理前確認這幾張表都在
-  function ensure() { if (!one0("SELECT 1 AS x FROM sqlite_master WHERE type='table' AND name='assessment_drafts'")) W().exec(SCHEMA); }
+  const EXT = []; // 其他工作包登記的資料表：[檢查用表名, 建表 SQL, 種子資料函式]
+  function ensure() {
+    if (!one0("SELECT 1 AS x FROM sqlite_master WHERE type='table' AND name='assessment_drafts'")) W().exec(SCHEMA);
+    for (const [t, sql, seed] of EXT) if (!one0("SELECT 1 AS x FROM sqlite_master WHERE type='table' AND name='" + t + "'")) { W().exec(sql); if (seed) seed(); persist(); }
+  }
   function one0(sql) { try { return W().prepare(sql).get(); } catch (e) { return null; } }
   function all(sql, args = []) { return W().prepare(sql).all(...args); }
   function one(sql, args = []) { return W().prepare(sql).get(...args); }
@@ -161,7 +165,7 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
     ['POST', /^\/api\/tech\/acceptance-result$/, 'tech', (u, m, b) => { run('INSERT OR REPLACE INTO acceptance_results(booking_code,first_pass,by_id) VALUES(?,?,?)', [String(b.code || ''), b.first_pass ? 1 : 0, u.id]); persist(); return J({ ok: true }); }],
   ];
 
-  async function handle(method, path, body) {
+  async function handle(method, path, body, query) {
     await start(); ensure();
     for (const [mth, re, need, fn] of R) {
       if (mth !== method) continue; const m = path.match(re); if (!m) continue;
@@ -173,9 +177,10 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
           if (need === 'staff' && !staff(u)) return ERR('沒有權限', 403);
           if (need === 'family' && u.role !== 'family') return ERR('沒有權限', 403);
           if (need === 'tech' && u.role !== 'tech') return ERR('沒有權限', 403);
+          if (Array.isArray(need) && !need.includes(u.role)) return ERR('沒有權限', 403);
         }
       }
-      return fn(u, m, body || {});
+      return fn(u, m, body || {}, query);
     }
     return null;
   }
@@ -184,11 +189,13 @@ CREATE TABLE IF NOT EXISTS acceptance_results (
     if (/\/api\//.test(url)) {
       const path = new URL(url, location.href).pathname.replace(/^.*(\/api\/)/, '$1');
       const method = (o.method || 'GET').toUpperCase();
-      const r = await handle(method, path, o.body ? parse(o.body) : null);
+      const r = await handle(method, path, o.body ? parse(o.body) : null, new URL(url, location.href).searchParams);
       if (r) return r;
     }
     return inner(u, o);
   };
-  window.JJJSTORE = { start, persist, PHN };
+  // 給 store2.js 等擴充檔登記資料表與路由
+  function add(table, sql, routes, seed) { EXT.push([table, sql, seed]); R.push(...routes); if (ready) ready.then(ensure); }
+  window.JJJSTORE = { start, persist, PHN, add, all, one, run, me, myHousehold, J, ERR, parse, staff, inner };
   start();
 })();
