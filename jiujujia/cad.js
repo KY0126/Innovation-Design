@@ -53,8 +53,8 @@
   const inBox = (x, y, B, m = 0) => x >= B[0] - m && x <= B[2] + m && y >= B[1] - m && y <= B[3] + m;
 
   function plan(field, items, o = {}) {
-    const B = bbox(field), M = o.sheet ? 1500 : 900, vx = B[0] - M, vy = B[1] - M * (o.sheet ? 1.4 : 1), vw = B[2] - B[0] + M * 2, vh = B[3] - B[1] + M * (o.sheet ? 2.35 : 1.6);
-    const k = vw / (o.px || 360), g = [], add = s => g.push(s), lightE = o.sheet === 'E';
+    const B = o.box ? o.box.slice() : bbox(field), M = o.sheet ? 1500 : 900, vx = B[0] - M, vy = B[1] - M * (o.sheet ? 1.4 : 1), vw = B[2] - B[0] + M * 2, vh = B[3] - B[1] + M * (o.sheet ? 2.35 : 1.6);
+    const k = vw / (o.px || 360), g = [], add = s => g.push(s), lightE = o.sheet === 'E' || !!o.elec;
     const tile = 300, wood = 150;
     add(`<defs><pattern id="cbrk" patternUnits="userSpaceOnUse" width="${f(3 * k)}" height="${f(3 * k)}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${f(3 * k)}" stroke="${INK}" stroke-width="${(0.45 * k).toFixed(1)}"/></pattern>
       <pattern id="ctile" patternUnits="userSpaceOnUse" width="${tile}" height="${tile}"><path d="M${tile} 0V${tile}H0" fill="none" stroke="${LT}" stroke-width="${(0.3 * k).toFixed(1)}"/></pattern>
@@ -68,7 +68,7 @@
     // 家具
     const fc = lightE ? '#BDB8B4' : MID, sw = (lightE ? .55 : .75) * k, st = `fill="#fff" stroke="${fc}" stroke-width="${sw.toFixed(1)}"`, th = `fill="none" stroke="${fc}" stroke-width="${(sw * .7).toFixed(1)}"`;
     const R = (a, b, w, d, r = 0, s = st) => add(`<rect x="${f(a)}" y="${f(b)}" width="${f(w)}" height="${f(d)}" rx="${f(r)}" ${s}/>`);
-    FURN.forEach(([kd, x, y, w, d]) => {
+    if (!o.noFurn) FURN.forEach(([kd, x, y, w, d]) => {
       if (kd === 'bed') { R(x, y, w, d); R(x, y, w, 70); R(x + 90, y + 120, 600, 330, 60); R(x + w - 690, y + 120, 600, 330, 60); add(`<path d="M${x} ${y + 720}H${x + w}M${x} ${y + 720}L${x + 260} ${y + 980}H${x + w}" ${th}/>`); }
       else if (kd === 'stand') { R(x, y, w, d); const cx = x + w / 2, cy = y + d / 2; add(`<circle cx="${cx}" cy="${cy}" r="120" ${th}/><path d="M${cx - 85} ${cy - 85}L${cx + 85} ${cy + 85}M${cx + 85} ${cy - 85}L${cx - 85} ${cy + 85}" ${th}/>`); }
       else if (kd === 'ward') { R(x, y, w, d); add(`<path d="M${x + 40} ${y + d / 2}H${x + w - 40}" ${th} stroke-dasharray="${f(3 * k)} ${f(2 * k)}"/>`); for (let i = 1; i < 3; i++) add(`<path d="M${f(x + w * i / 3)} ${y}V${y + d}" ${th}/>`); for (let i = 0; i < 9; i++) { const hx = x + 160 + i * 210; add(`<path d="M${hx - 70} ${y + d / 2 - 150}L${hx + 70} ${y + d / 2 + 150}" ${th}/>`); } }
@@ -100,6 +100,7 @@
       add(`<path d="M${hx} ${hy}L${ex} ${ey}L${ex + nx} ${ey + ny}L${hx + nx} ${hy + ny}Z" fill="#fff" stroke="${INK}" stroke-width="${(.9 * k).toFixed(1)}"/><path d="M${sx} ${sy}A${w} ${w} 0 0 ${sweep} ${ex} ${ey}" fill="none" stroke="${INK}" stroke-width="${(.45 * k).toFixed(1)}"/>`);
       if (o.tags !== false && inBox(hx, hy, B)) add(tg(hx + cx * w / 2 + ox * 200, hy + cy * w / 2 + oy * 200, id, 0));
     });
+    if (o.route) { const R = ROUTE[o.route] || []; if (R.length) add(`<polyline points="${R.map(p => p.join(',')).join(' ')}" fill="none" stroke="#A3002E" stroke-width="${(1.6 * k).toFixed(1)}" stroke-dasharray="${f(1 * k)} ${f(4 * k)}" stroke-linecap="round" opacity=".7"/>`); }
     add('</g>');
     // 尺寸線（斜短線端點）與軸線
     const tk = (x, y) => `<path d="M${f(x - 3 * k)} ${f(y + 3 * k)}L${f(x + 3 * k)} ${f(y - 3 * k)}" stroke="${INK}" stroke-width="${(.9 * k).toFixed(1)}"/>`, dl = (.45 * k).toFixed(1);
@@ -107,7 +108,7 @@
       if (side === 'top' || side === 'bottom') { const y = side === 'top' ? B[1] - off * k : B[3] + off * k; add(`<path d="M${f(pts[0] - 6 * k)} ${f(y)}H${f(pts[pts.length - 1] + 6 * k)}" stroke="${INK}" stroke-width="${dl}"/>`); pts.forEach(p => add(`<path d="M${p} ${f(y - 5 * k)}V${f(y + 5 * k)}" stroke="${INK}" stroke-width="${dl}"/>` + tk(p, y))); pts.slice(1).forEach((b, i) => { const a = pts[i]; if ((b - a) / k > 22) add(`<text x="${f((a + b) / 2)}" y="${f(y - 3 * k)}" font-size="${f(7.5 * k)}" text-anchor="middle" fill="${INK}" style="${F}">${b - a}</text>`); }); }
       else { const x = side === 'left' ? B[0] - off * k : B[2] + off * k; add(`<path d="M${f(x)} ${f(pts[0] - 6 * k)}V${f(pts[pts.length - 1] + 6 * k)}" stroke="${INK}" stroke-width="${dl}"/>`); pts.forEach(p => add(`<path d="M${f(x - 5 * k)} ${p}H${f(x + 5 * k)}" stroke="${INK}" stroke-width="${dl}"/>` + tk(x, p))); pts.slice(1).forEach((b, i) => { const a = pts[i], cy = (a + b) / 2; if ((b - a) / k > 22) add(`<text x="${f(x - 3 * k)}" y="${f(cy)}" font-size="${f(7.5 * k)}" text-anchor="middle" fill="${INK}" transform="rotate(-90 ${f(x - 3 * k)} ${f(cy)})" style="${F}">${b - a}</text>`); }); }
     };
-    const ks = FR[field] || FR['全屋'], xs = [...new Set(ks.flatMap(r => [ROOMS[r][1], ROOMS[r][1] + ROOMS[r][3]]).concat([B[0], B[2]]))].filter(v => v >= B[0] && v <= B[2]).sort((a, b) => a - b), ys = [...new Set(ks.flatMap(r => [ROOMS[r][2], ROOMS[r][2] + ROOMS[r][4]]).concat([B[1], B[3]]))].filter(v => v >= B[1] && v <= B[3]).sort((a, b) => a - b);
+    const ks = o.box ? Object.keys(ROOMS).filter(r => { const R = ROOMS[r]; return R[1] < B[2] && R[1] + R[3] > B[0] && R[2] < B[3] && R[2] + R[4] > B[1]; }) : FR[field] || FR['全屋'], xs = [...new Set(ks.flatMap(r => [ROOMS[r][1], ROOMS[r][1] + ROOMS[r][3]]).concat([B[0], B[2]]))].filter(v => v >= B[0] && v <= B[2]).sort((a, b) => a - b), ys = [...new Set(ks.flatMap(r => [ROOMS[r][2], ROOMS[r][2] + ROOMS[r][4]]).concat([B[1], B[3]]))].filter(v => v >= B[1] && v <= B[3]).sort((a, b) => a - b);
     const ax = o.sheet ? 62 : 44, ay = o.sheet ? 62 : 40;
     xs.forEach((gx, i) => add(`<path d="M${gx} ${f(B[1] - ax * k)}V${f(B[3] + 14 * k)}" stroke="${LT}" stroke-width="${(.4 * k).toFixed(1)}" stroke-dasharray="${f(10 * k)} ${f(2 * k)} ${f(2 * k)} ${f(2 * k)}"/><circle cx="${gx}" cy="${f(B[1] - (ax + 8) * k)}" r="${f(8 * k)}" fill="#fff" stroke="${INK}" stroke-width="${(.7 * k).toFixed(1)}"/><text x="${gx}" y="${f(B[1] - (ax + 5) * k)}" font-size="${f(8.5 * k)}" text-anchor="middle" fill="${INK}" style="${F}">${i + 1}</text>`));
     ys.forEach((gy, i) => add(`<path d="M${f(B[0] - ay * k)} ${gy}H${f(B[2] + 14 * k)}" stroke="${LT}" stroke-width="${(.4 * k).toFixed(1)}" stroke-dasharray="${f(10 * k)} ${f(2 * k)} ${f(2 * k)} ${f(2 * k)}"/><circle cx="${f(B[0] - (ay + 8) * k)}" cy="${gy}" r="${f(8 * k)}" fill="#fff" stroke="${INK}" stroke-width="${(.7 * k).toFixed(1)}"/><text x="${f(B[0] - (ay + 8) * k)}" y="${f(gy + 3 * k)}" font-size="${f(8.5 * k)}" text-anchor="middle" fill="${INK}" style="${F}">${'ABCDEFG'[i]}</text>`));
@@ -121,30 +122,36 @@
       if (lt) add(`<circle cx="${f(cx - (n.length * 6 + 26) * k)}" cy="${f(cy - 3.5 * k)}" r="${f(3.6 * k)}" fill="${{ r: '#E5484D', y: '#F5A524', g: '#2E9E5B' }[lt]}"/>`);
     });
     // 既有電器（設備施工圖）
-    if (lightE) ELEC.forEach(([t, x, y]) => { if (!inBox(x, y, B)) return; const r = 5 * k, s = (.7 * k).toFixed(1);
+    if (lightE && !o.noElec) ELEC.forEach(([t, x, y]) => { if (!inBox(x, y, B) || (o.elecOnly && !o.elecOnly.includes(t))) return; const r = 5 * k, s = (.7 * k).toFixed(1);
       if (t === 'ceil') add(`<circle cx="${x}" cy="${y}" r="${f(r)}" fill="#fff" stroke="${INK}" stroke-width="${s}"/><path d="M${f(x - r * .7)} ${f(y - r * .7)}L${f(x + r * .7)} ${f(y + r * .7)}M${f(x + r * .7)} ${f(y - r * .7)}L${f(x - r * .7)} ${f(y + r * .7)}" stroke="${INK}" stroke-width="${s}"/>`);
       else if (t === 'out') add(`<circle cx="${x}" cy="${y}" r="${f(r * .8)}" fill="#fff" stroke="${INK}" stroke-width="${s}"/><path d="M${f(x - 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}M${f(x + 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}" stroke="${INK}" stroke-width="${s}"/>`);
       else add(`<circle cx="${x}" cy="${y}" r="${f(2.2 * k)}" fill="${INK}"/><path d="M${x} ${y}L${f(x + 6 * k)} ${f(y - 6 * k)}H${f(x + 8.5 * k)}" fill="none" stroke="${INK}" stroke-width="${s}"/>`); });
-    // 心願新增的零件：紅色符號＋六角編號
+    // 心願新增的零件：紅色符號＋六角編號（tagK 放大標籤）
+    const K0 = k, TAKEN = [];
     (items || []).forEach((it, i) => {
-      const id = it.idx != null ? it.idx : i, [w, d, , , H, sym] = it.spec || spec(it.part), x = it.x, y = it.y, on = o.sel === id, nw = nearWall(x, y), vert = sym === 'rail' && nw[1] === 'v';
+      const k = K0 * (o.tagK || 1);
+      const id = it.idx != null ? it.idx : i, [w, d, , , H0, sym] = it.spec || spec(it.part), H = it.H || H0, RC = it.col || RED, x = it.x, y = it.y, on = o.sel === id, nw = nearWall(x, y), vert = sym === 'rail' && nw[1] === 'v';
       const s = (1 * k).toFixed(1), body = [];
       const W2 = vert ? d : w, D2 = vert ? w : d;
-      if (sym === 'strip') body.push(`<path d="M${f(x - W2 / 2)} ${y}H${f(x + W2 / 2)}" stroke="${RED}" stroke-width="${f(2.4 * k)}" stroke-dasharray="${f(5 * k)} ${f(2 * k)}"/>`);
-      else if (sym === 'mat') body.push(`<rect x="${f(x - w / 2)}" y="${f(y - d / 2)}" width="${w}" height="${d}" fill="rgba(212,0,60,.07)" stroke="${RED}" stroke-width="${s}" stroke-dasharray="${f(3 * k)} ${f(1.5 * k)}"/>`);
-      else if (sym === 'rail') body.push(vert ? `<path d="M${x} ${f(y - w / 2)}V${f(y + w / 2)}" stroke="${RED}" stroke-width="${f(2.6 * k)}" stroke-linecap="round"/>` : `<path d="M${f(x - w / 2)} ${y}H${f(x + w / 2)}" stroke="${RED}" stroke-width="${f(2.6 * k)}" stroke-linecap="round"/>`);
-      else if (sym === 'pir') body.push(`<circle cx="${x}" cy="${y}" r="${f(5 * k)}" fill="#fff" stroke="${RED}" stroke-width="${s}"/><path d="M${f(x - 3.5 * k)} ${f(y - 3.5 * k)}L${f(x + 3.5 * k)} ${f(y + 3.5 * k)}M${f(x + 3.5 * k)} ${f(y - 3.5 * k)}L${f(x - 3.5 * k)} ${f(y + 3.5 * k)}" stroke="${RED}" stroke-width="${(.8 * k).toFixed(1)}"/>`);
-      else if (sym === 'btn') body.push(`<rect x="${f(x - 4.5 * k)}" y="${f(y - 4.5 * k)}" width="${f(9 * k)}" height="${f(9 * k)}" fill="#fff" stroke="${RED}" stroke-width="${s}"/><circle cx="${x}" cy="${y}" r="${f(2.2 * k)}" fill="${RED}"/>`);
-      else if (sym === 'plug') body.push(`<circle cx="${x}" cy="${y}" r="${f(4.5 * k)}" fill="#fff" stroke="${RED}" stroke-width="${s}"/><path d="M${f(x - 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}M${f(x + 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}" stroke="${RED}" stroke-width="${s}"/>`);
-      else if (sym === 'det') body.push(`<circle cx="${x}" cy="${y}" r="${f(5 * k)}" fill="#fff" stroke="${RED}" stroke-width="${s}"/><circle cx="${x}" cy="${y}" r="${f(2 * k)}" fill="none" stroke="${RED}" stroke-width="${s}"/>`);
+      if (sym === 'strip') body.push(`<path d="M${f(x - W2 / 2)} ${y}H${f(x + W2 / 2)}" stroke="${RC}" stroke-width="${f(2.4 * k)}" stroke-dasharray="${f(5 * k)} ${f(2 * k)}"/>`);
+      else if (sym === 'mat') body.push(`<rect x="${f(x - w / 2)}" y="${f(y - d / 2)}" width="${w}" height="${d}" fill="rgba(212,0,60,.07)" stroke="${RC}" stroke-width="${s}" stroke-dasharray="${f(3 * k)} ${f(1.5 * k)}"/>`);
+      else if (sym === 'rail') body.push(vert ? `<path d="M${x} ${f(y - w / 2)}V${f(y + w / 2)}" stroke="${RC}" stroke-width="${f(2.6 * k)}" stroke-linecap="round"/>` : `<path d="M${f(x - w / 2)} ${y}H${f(x + w / 2)}" stroke="${RC}" stroke-width="${f(2.6 * k)}" stroke-linecap="round"/>`);
+      else if (sym === 'pir') body.push(`<circle cx="${x}" cy="${y}" r="${f(5 * k)}" fill="#fff" stroke="${RC}" stroke-width="${s}"/><path d="M${f(x - 3.5 * k)} ${f(y - 3.5 * k)}L${f(x + 3.5 * k)} ${f(y + 3.5 * k)}M${f(x + 3.5 * k)} ${f(y - 3.5 * k)}L${f(x - 3.5 * k)} ${f(y + 3.5 * k)}" stroke="${RC}" stroke-width="${(.8 * k).toFixed(1)}"/>`);
+      else if (sym === 'btn') body.push(`<rect x="${f(x - 4.5 * k)}" y="${f(y - 4.5 * k)}" width="${f(9 * k)}" height="${f(9 * k)}" fill="#fff" stroke="${RC}" stroke-width="${s}"/><circle cx="${x}" cy="${y}" r="${f(2.2 * k)}" fill="${RC}"/>`);
+      else if (sym === 'plug') body.push(`<circle cx="${x}" cy="${y}" r="${f(4.5 * k)}" fill="#fff" stroke="${RC}" stroke-width="${s}"/><path d="M${f(x - 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}M${f(x + 1.5 * k)} ${f(y - 2 * k)}V${f(y + 2 * k)}" stroke="${RC}" stroke-width="${s}"/>`);
+      else if (sym === 'det') body.push(`<circle cx="${x}" cy="${y}" r="${f(5 * k)}" fill="#fff" stroke="${RC}" stroke-width="${s}"/><circle cx="${x}" cy="${y}" r="${f(2 * k)}" fill="none" stroke="${RC}" stroke-width="${s}"/>`);
       else if (sym === 'new') body.push(`<rect x="${f(x - w / 2)}" y="${f(y - d / 2)}" width="${w}" height="${d}" fill="#FAEEDA" stroke="#BA7517" stroke-width="${s}" stroke-dasharray="${f(3 * k)} ${f(2 * k)}"/>`);
-      else body.push(`<rect x="${f(x - Math.max(w, 6 * k) / 2)}" y="${f(y - Math.max(d, 6 * k) / 2)}" width="${f(Math.max(w, 6 * k))}" height="${f(Math.max(d, 6 * k))}" fill="#fff" stroke="${RED}" stroke-width="${s}"/>`);
+      else body.push(`<rect x="${f(x - Math.max(w, 6 * k) / 2)}" y="${f(y - Math.max(d, 6 * k) / 2)}" width="${f(Math.max(w, 6 * k))}" height="${f(Math.max(d, 6 * k))}" fill="#fff" stroke="${RC}" stroke-width="${s}"/>`);
       // 六角標籤放在零件右上
-      const lx = x + 12 * k, ly = y - 12 * k, hx = 9 * k, hy = 7.5 * k, col = sym === 'new' ? '#BA7517' : RED;
+      const hx = 9 * k, hy = 7.5 * k, OFF = [[12, -12], [12, 12], [-12, -12], [-12, 12], [12, -28], [-12, -28], [12, 28], [-12, 28], [30, -12], [-30, -12], [30, 12], [-30, 12]];
+      let lx = x + 12 * k, ly = y - 12 * k;
+      for (const [ox, oy] of OFF) { const cx = x + ox * k, cy = y + oy * k; if (!TAKEN.some(([tx, ty]) => Math.abs(tx - cx) < hx * 2.1 && Math.abs(ty - cy) < hy * 2.2)) { lx = cx; ly = cy; break; } }
+      TAKEN.push([lx, ly]);
+      const lead = Math.hypot(lx - x, ly - y) > 20 * k ? `<path d="M${f(x)} ${f(y)}L${f(lx)} ${f(ly)}" stroke="${RC}" stroke-width="${(.6 * k).toFixed(1)}"/>` : '', col = sym === 'new' && !it.col ? '#BA7517' : RC;
       const hex = `<path d="M${f(lx - hx)} ${f(ly)}L${f(lx - hx / 2)} ${f(ly - hy)}H${f(lx + hx / 2)}L${f(lx + hx)} ${f(ly)}L${f(lx + hx / 2)} ${f(ly + hy)}H${f(lx - hx / 2)}Z" fill="${on ? col : '#fff'}" stroke="${col}" stroke-width="${(.9 * k).toFixed(1)}"/><text x="${f(lx)}" y="${f(ly + 3 * k)}" font-size="${f(7.5 * k)}" font-weight="700" text-anchor="middle" fill="${on ? '#fff' : col}" style="${F}">${esc(it.tag)}</text>`;
-      const hl = lightE ? `<text x="${f(lx)}" y="${f(ly + 17 * k)}" font-size="${f(6.5 * k)}" text-anchor="middle" fill="${col}" paint-order="stroke" stroke="#fff" stroke-width="${f(2.5 * k)}" style="${F}">${esc(H)}</text>` : '';
+      const hl = lightE && !o.noH ? `<text x="${f(lx)}" y="${f(ly + 17 * k)}" font-size="${f(6.5 * k)}" text-anchor="middle" fill="${col}" paint-order="stroke" stroke="#fff" stroke-width="${f(2.5 * k)}" style="${F}">${esc(H)}</text>` : '';
       const hit = o.edit ? `<rect x="${f(x - 16 * k)}" y="${f(y - 24 * k)}" width="${f(40 * k)}" height="${f(40 * k)}" fill="transparent"/>` : '';
-      add(`<g ${o.edit ? `data-wpin="${id}" style="cursor:grab"` : ''} ${on ? 'class="on"' : ''}>${hit}${on ? `<circle cx="${x}" cy="${y}" r="${f(13 * k)}" fill="none" stroke="${col}" stroke-width="${(1.2 * k).toFixed(1)}" stroke-dasharray="${f(3 * k)} ${f(2 * k)}"/>` : ''}${body.join('')}${hex}${hl}</g>`);
+      add(`<g ${o.edit ? `data-wpin="${id}" style="cursor:grab"` : ''} ${it.attr || ''} ${it.dim ? 'opacity=".28"' : ''} ${on ? 'class="on"' : ''}>${hit}${on ? `<circle cx="${x}" cy="${y}" r="${f(13 * k)}" fill="none" stroke="${col}" stroke-width="${(1.2 * k).toFixed(1)}" stroke-dasharray="${f(3 * k)} ${f(2 * k)}"/>` : ''}${body.join('')}${lead}${hex}${hl}</g>`);
     });
     // 圖名
     if (o.sheet) add(`<text x="${f(B[0])}" y="${f(B[3] + 46 * k)}" font-size="${f(11 * k)}" font-weight="700" fill="${INK}" style="${F}">${o.sheet === 'E' ? '設備施工圖' : '平面配置圖'}<tspan font-weight="400" font-size="${f(7.5 * k)}" fill="${MID}">　${o.sheet === 'E' ? 'E-01' : 'A-01'}｜SCALE 1:50｜單位 mm</tspan></text><path d="M${f(B[0])} ${f(B[3] + 51 * k)}H${f(B[2])}" stroke="${INK}" stroke-width="${(1.4 * k).toFixed(1)}"/>`);

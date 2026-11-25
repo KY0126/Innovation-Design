@@ -107,3 +107,23 @@ test('作品沒有會發光的零件時，作品頁不放關燈看看', async ({
   await expect(page.locator('[data-wkn]')).toHaveCount(0);
   expect(errs).toEqual([]);
 });
+
+test('技師施工圖：業界畫法、依工種自動開圖層、顯示範圍、展開某區放大', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop');
+  const errs = await fresh(page); await page.goto('/jiujujia/app.html'); await page.click('[data-demo="tech@example.com"]'); await page.waitForTimeout(1500);
+  await page.locator('[data-a="tOpen"]').first().click();
+  await expect(page.locator('.tcad svg.cad')).toBeVisible();
+  // 吳技師負責關懷設備：預設只開弱電與感測
+  await expect(page.locator('.tlhead')).toContainText('弱電與感測');
+  await expect(page.locator('.tlhead')).toContainText('未開圖層');
+  const n0 = await page.locator('.tcad [data-tpin]').count();
+  await page.click('[data-tlayo]');
+  await page.click('[data-tlay="lite"]');
+  expect(await page.locator('.tcad [data-tpin]').count()).toBeGreaterThan(n0);
+  await page.click('[data-tscope="all"]'); await expect(page.locator('[data-tscope="all"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.click('[data-tlayo]');
+  await page.click('[data-tgrp="浴室"]');
+  await expect(page.locator('.tlhead')).toContainText('放大：浴室');
+  await page.click('[data-tzoom="0"]'); await expect(page.locator('.tlhead')).not.toContainText('放大：浴室');
+  expect(errs).toEqual([]);
+});
