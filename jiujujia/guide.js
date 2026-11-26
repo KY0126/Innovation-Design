@@ -367,7 +367,7 @@ body.jgSheet #webDemo{display:none!important}
         const W1 = PAGE === 'app' ? '一個 App 依帳號身分分流；總部帳號會提示改用企業管理端（電腦版）。' : '手機用揪居家 App，電腦用企業管理端；帳號放錯入口會提示改用哪一邊，資料即時串接。';
         body = `${tlHtml(s.ch)}<span class="who">${ENDS[s.end].n}｜${WHO[s.as]}</span><h2>${PLACE[PAGE]}登入</h2><div class="sec">看畫面上的編號</div><div class="li"><i>1</i><span>${L1}</span></div><div class="li"><i>2</i><span>示範帳號<b>一鍵登入｜${WHO[s.as]}</b></span></div><div class="sec">為什麼這樣設計</div><div class="why">${W1}</div>`;
         foot = `${i && (FULL || track(i).pos > 1) ? '<button data-t="prev">上一步</button>' : ''}<button class="p" data-t="login">幫我登入 ②</button>`;
-        s._items = [[PAGE === 'app' ? '#loginForm' : PAGE === 'con' ? '#cLogin' : '#gForm'], [demoSel]];
+        s._items = [[PAGE === 'app' ? '#loginForm' : PAGE === 'con' ? '#cLogin' : '#gForm'], [PAGE === 'app' ? '.demo-strip' : PAGE === 'con' ? demoSel : '#gDemoT']];
         setBoxes(s._items);
       }
     } else {

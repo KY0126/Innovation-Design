@@ -1,12 +1,12 @@
 // 決選對齊：企業管理端「投資效益」財務模擬與 App 階段路線
 const { test } = require('@playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 
 test('投資效益：基準情境與計畫書一致（194 戶、第 11 月轉正、第 27 月回本），拖動參數會重算', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/admin.html');
-  await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await tapDemo(page, '#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
   await page.evaluate(() => window.JJJA.go('vc')); await page.waitForTimeout(500);
   const v = page.locator('#view');
   await expect(v).toContainText('194 戶（加顧問後 310 戶）');
@@ -33,7 +33,7 @@ test('營運階段開關：企業管理端切到擴展期後，App 揪全家可�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/admin.html');
-  await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await tapDemo(page, '#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
   await page.evaluate(() => window.JJJA.go('phase')); await page.waitForTimeout(400);
   const v = page.locator('#view');
   await expect(v).toContainText('營運階段開關');
@@ -46,7 +46,7 @@ test('營運階段開關：企業管理端切到擴展期後，App 揪全家可�
 
   const app = await context.newPage(); const aerr = []; app.on('pageerror', e => aerr.push(e.message));
   await app.goto('/jiujujia/app.html');
-  await app.click('[data-demo="chen@example.com"]'); await app.waitForTimeout(3000);
+  await tapDemo(app, '[data-demo="chen@example.com"]'); await app.waitForTimeout(3000);
   for (const x of ['x0', 'x24', 'x25', 'x26', 'x27', 'x28', 'x29', 'x30', 'x31', 'x32', 'x33', 'x34']) {
     await app.evaluate(x => window.JJJ.go(x), x); await app.waitForTimeout(150);
     await expect(app.locator('#view h1').last()).not.toBeEmpty();
@@ -77,7 +77,7 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   // 企業管理端營運階段頁有分享連結
   const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
   await adm.goto('/jiujujia/admin.html');
-  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await tapDemo(adm, '#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('phase')); await adm.waitForTimeout(300);
   // 營運階段存在資料庫，預設全部開放（延伸期）
   await expect(adm.locator('[data-plink="business.html"]')).toHaveAttribute('href', /phase=ext/);
@@ -86,7 +86,7 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   // 網址參數帶入擴展期
   await page.goto('/jiujujia/app.html?phase=exp');
   expect(await page.evaluate(async () => { await window.JJJPHASE_READY; return window.JJJPHASE(); })).toBe(1);
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   // F01／F02 → 揪居家主頁（長輩家）有其他場域入口；切到我家有育兒與寵物
   await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
   await expect(page.locator('#view')).toContainText('全部服務');
@@ -103,7 +103,7 @@ test('分享連結 ?phase= 帶入階段；顧問端與 App 既有畫面入口依
   // 生活顧問（電腦版）顯示目前階段與擴展期加購提示
   const con = await context.newPage(); const cerr = []; con.on('pageerror', e => cerr.push(e.message));
   await con.goto('/jiujujia/consultant.html');
-  await con.click('#cLogin [data-demo]'); await con.waitForTimeout(2500);
+  await tapDemo(con, '#cLogin [data-demo]'); await con.waitForTimeout(2500);
   await expect(con.locator('#phaseChip')).toContainText('擴展期');
   // 網址參數切回試點期
   await con.goto('/jiujujia/consultant.html?phase=pilot'); await con.waitForTimeout(2000);
@@ -115,7 +115,7 @@ test('U3 校園大使短影音：試點期不可上傳；擴展期勾滿四項�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html?phase=pilot');
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   await page.evaluate(() => window.JJJ.go('u3')); await page.waitForTimeout(300);
   await expect(page.locator('#view')).toContainText('擴展期開放後即可上傳');
   await page.goto('/jiujujia/app.html?phase=exp'); await page.waitForTimeout(2500);
@@ -128,7 +128,7 @@ test('U3 校園大使短影音：試點期不可上傳；擴展期勾滿四項�
   await expect(page.locator('#view')).toContainText('已送審');
   const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
   await adm.goto('/jiujujia/admin.html');
-  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await tapDemo(adm, '#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('amb')); await adm.waitForTimeout(400);
   await expect(adm.locator('#view')).toContainText('短影音審核');
   expect([...errs, ...aerr]).toEqual([]);
@@ -139,7 +139,7 @@ test('右下角浮動元件不蓋住主要按鈕（捲到底後）', async ({ pa
   await page.setViewportSize({ width: 390, height: 844 });
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   for (const v of ['b4', 'm2', 'pl', 'x24', 'u3']) {
     await page.evaluate(v => { window.JJJ.S.stack = ['home']; window.JJJ.go(v); }, v); await page.waitForTimeout(300);
     const hit = await page.evaluate(() => {
@@ -156,7 +156,7 @@ test('揪心願（參考 LEGO Ideas）：寫作模板＋標籤、阿國比對相
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html?phase=pilot');
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   await page.evaluate(() => window.JJJ.go('wish')); await page.waitForTimeout(300);
   const v = page.locator('#view');
   await expect(v).toContainText('官方寫作模板');
@@ -189,7 +189,7 @@ test('揪心願（參考 LEGO Ideas）：寫作模板＋標籤、阿國比對相
   // 企業管理端
   const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
   await adm.goto('/jiujujia/admin.html');
-  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await tapDemo(adm, '#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('wish')); await adm.waitForTimeout(500);
   await expect(adm.locator('#view')).toContainText('每季審查');
   await expect(adm.locator('#view')).toContainText('標籤統計');
@@ -200,7 +200,7 @@ test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html?phase=pilot');
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(3000);
   const v = page.locator('#view');
   // 標語
   await page.evaluate(() => window.JJJ.go('m2')); await page.waitForTimeout(300);
@@ -254,7 +254,7 @@ test('揪心願完整版：拼預覽圖→做法卡→照做／改版闖關→�
   // 企業管理端
   const adm = await context.newPage(); const aerr = []; adm.on('pageerror', e => aerr.push(e.message));
   await adm.goto('/jiujujia/admin.html');
-  await adm.click('#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
+  await tapDemo(adm, '#gate [data-demo="manager@example.com"]'); await adm.waitForTimeout(2500);
   await adm.evaluate(() => window.JJJA.go('wish')); await adm.waitForTimeout(500);
   await expect(adm.locator('#view')).toContainText('全國出題');
   await expect(adm.locator('#view')).toContainText('做過／改版');

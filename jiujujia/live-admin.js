@@ -1,4 +1,4 @@
-// 實用版企業管理端（/live/admin/）：員工 Email 登入、門市家庭清單、送出正式報價（P1）、記錄夜間關懷（P3）、試點指標
+// 實用版企業管理端（/live/admin/）：員工編號登入、門市家庭清單、送出正式報價（P1）、記錄夜間關懷（P3）、試點指標
 // 只在 ?mode=live 載入。生活顧問只看得到自己門市的家庭；總部看全部（列級權限把關）。
 (function () {
   if (!window.JJJ_LIVE) return;
@@ -27,7 +27,7 @@
   async function login(email, pw, er) {
     if (er) er.textContent = '';
     const { error } = await sb.auth.signInWithPassword({ email, password: pw });
-    if (error) { if (er) er.textContent = 'Email 或密碼不正確'; return; }
+    if (error) { if (er) er.textContent = '員工編號或密碼不正確'; return; }
     if (!(await loadMe())) { await sb.auth.signOut(); if (er) er.textContent = '這個帳號不是員工帳號；家庭請用揪居家 App（手機）。'; return; }
     render();
   }

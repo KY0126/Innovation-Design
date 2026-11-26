@@ -1,9 +1,9 @@
 // 2026/11/25 待實作 5 項：結帳兩條路、客服入口收斂、常見問題集、家電分工、揪心願樂高式補強
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const J = (page, path, o) => page.evaluate(async ([p, o]) => { const r = await fetch('/api' + p, Object.assign({ headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' } }, o || {})); return Object.assign({ _s: r.status }, await r.json()); }, [path, o ? Object.assign({}, o, { body: o.body ? JSON.stringify(o.body) : undefined }) : o]);
 const app = (page, f) => page.evaluate(new Function('return (' + f + ')(window.JJJAPP)'));
-const login = async (page, email) => { await page.goto('/jiujujia/app.html'); await page.click(`[data-demo="${email}"]`); await page.waitForTimeout(1500); };
+const login = async (page, email) => { await page.goto('/jiujujia/app.html'); await tapDemo(page, `[data-demo="${email}"]`); await page.waitForTimeout(1500); };
 const logout = page => J(page, '/auth/logout', { method: 'POST' });
 
 test('① 結帳兩條路：訂閱要填到府資訊；換新家電加入購物車走線上購物，兩邊都在購買紀錄', async ({ page }, info) => {
@@ -50,7 +50,7 @@ test('② 客服入口收斂＋③ 常見問題：會員中心不放浮動按鈕
   await page.locator('.aim').last().locator('[data-aihand]').click();
   await expect(page.locator('.aim').last()).toContainText('已轉給');
   await logout(page);
-  await page.goto('/jiujujia/admin.html'); await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await page.goto('/jiujujia/admin.html'); await tapDemo(page, '#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
   await expect(page.locator('#nav [data-tab="cs"] .n')).toHaveText('1');
   await page.click('#nav [data-tab="cs"]');
   await expect(page.locator('#view')).toContainText('可以幫我修水管嗎');
@@ -115,7 +115,7 @@ test('⑤ 揪心願：創作 4 步（含自訂零件）、我也需要只限訂�
   await expect(page.locator('#view')).toContainText('100 戶也需要');
   await expect(page.locator('#view')).toContainText('待審查');
   await logout(page);
-  await page.goto('/jiujujia/admin.html'); await page.click('#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
+  await page.goto('/jiujujia/admin.html'); await tapDemo(page, '#gate [data-demo="manager@example.com"]'); await page.waitForTimeout(2500);
   await page.evaluate(() => window.JJJA.go('wpick')); await page.waitForTimeout(1000);
   await expect(page.locator('#view')).toContainText('可調光床底燈條');
   await page.click('.subt [data-tab="wl"]'); await page.waitForTimeout(800);

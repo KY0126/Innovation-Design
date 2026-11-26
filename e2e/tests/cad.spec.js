@@ -1,7 +1,7 @@
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const app = (page, f) => page.evaluate(new Function('return (' + f + ')(window.JJJAPP)'));
-const login = async (page, email) => { await page.goto('/jiujujia/app.html'); await page.click(`[data-demo="${email}"]`); await page.waitForTimeout(1500); };
+const login = async (page, email) => { await page.goto('/jiujujia/app.html'); await tapDemo(page, `[data-demo="${email}"]`); await page.waitForTimeout(1500); };
 
 test('揪心願白板：業界平面圖、拖曳零件、移動、復原、離牆提示、3D、關燈看看、作品頁施工圖', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
@@ -110,7 +110,7 @@ test('作品沒有會發光的零件時，作品頁不放關燈看看', async ({
 
 test('技師施工圖：業界畫法、依工種自動開圖層、顯示範圍、展開某區放大', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
-  const errs = await fresh(page); await page.goto('/jiujujia/app.html'); await page.click('[data-demo="tech@example.com"]'); await page.waitForTimeout(1500);
+  const errs = await fresh(page); await page.goto('/jiujujia/app.html'); await tapDemo(page, '[data-demo="tech@example.com"]'); await page.waitForTimeout(1500);
   await page.locator('[data-a="tOpen"]').first().click();
   await expect(page.locator('.tcad svg.cad')).toBeVisible();
   // 吳技師負責關懷設備：預設只開弱電與感測

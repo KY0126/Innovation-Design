@@ -71,7 +71,7 @@ test('Demo 版不受影響：/app 仍是登入頁與示範帳號，沒有實用�
   await fresh(page);
   await page.goto('/jiujujia/app.html');
   await expect(page.locator('#loginForm')).toBeVisible();
-  await expect(page.locator('[data-demo]').first()).toBeVisible();
+  await expect(page.locator('.demo-strip')).toBeVisible();
   await expect(page.locator('.lv-tag, .lv-ban')).toHaveCount(0);
   expect(await page.evaluate(() => window.JJJ_LIVE)).toBe(false);
 });

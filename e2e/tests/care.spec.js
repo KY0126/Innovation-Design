@@ -1,6 +1,6 @@
 // 工作包 2：通知與關懷。事件模擬器寫進 care_events／notifications，家庭、門市看到同一份
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const J = (page, path, o) => page.evaluate(async ([p, o]) => (await (await fetch('/api' + p, Object.assign({ headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' } }, o || {}))).json()), [path, o]);
 const app = (page, fn, arg) => page.evaluate(([f, a]) => new Function('A', 'a', f)(window.JJJAPP, a), [fn, arg]);
 
@@ -8,7 +8,7 @@ test('演練：長輩未回應 → 家人確認平安；事件、通知、每月
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   const before = (await J(page, '/home/summary')).asked;
   await app(page, "A.S.stack=['home','m2'];A.render();A.go('n0')");
   await page.click('[data-sc="night"]');
@@ -39,7 +39,7 @@ test('演練：長輩未回應 → 家人確認平安；事件、通知、每月
   await expect(page.locator('#view')).toContainText('平安的天數');
   // 生活顧問：門市待辦與案件看到同一筆
   await J(page, '/auth/logout', { method: 'POST' });
-  const adv = page; await adv.goto('/jiujujia/app.html'); await adv.click('[data-demo="advisor@example.com"]'); await adv.waitForTimeout(1500);
+  const adv = page; await adv.goto('/jiujujia/app.html'); await tapDemo(adv, '[data-demo="advisor@example.com"]'); await adv.waitForTimeout(1500);
   const td = await J(adv, '/advisor/todos');
   expect(td.care.some(c => c.household === '李先生家')).toBe(true);
   await adv.click('[data-snav="acases"]');
@@ -54,7 +54,7 @@ test('設備離線：只通知主要聯絡人與門市，不打擾長輩', async
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   await app(page, "A.S.stack=['home','m2'];A.render();A.go('n0')");
   await page.click('[data-sc="offline"]'); await page.waitForTimeout(800);
   const e = (await J(page, '/home')).care[0];
@@ -68,7 +68,7 @@ test('生活顧問電腦版「案件」：與手機同一份資料，可依進�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/consultant.html');
-  await page.click('#cLogin [data-demo]'); await page.waitForTimeout(2500);
+  await tapDemo(page, '#cLogin [data-demo]'); await page.waitForTimeout(2500);
   await page.click('#nav [data-v="cases"]');
   await expect(page.locator('.actbl tbody tr').first()).toBeVisible();
   const all = await page.locator('.actbl tbody tr').count();

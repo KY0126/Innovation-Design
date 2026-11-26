@@ -1,5 +1,5 @@
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const PW = 'demo1234';
 async function appLogin(page, email) {
   await page.goto('/jiujujia/app.html');
@@ -47,26 +47,30 @@ test.describe('一鍵示範登入', () => {
   for (const [who, email, text] of [['家庭｜陳小姐', 'chen@example.com', '居家知識'], ['生活顧問｜王小明（手機）', 'advisor@example.com', '今日行程'], ['技師｜吳技師', 'tech@example.com', '今日工單']]) {
     test(`揪居家 App：${who}`, async ({ page }) => {
       const errs = await fresh(page); await page.goto('/jiujujia/app.html');
-      await page.click(`[data-demo="${email}"]`);
+      await tapDemo(page, `[data-demo="${email}"]`);
       await expect(page.locator('#view')).toContainText(text);
       expect(errs).toEqual([]);
     });
   }
-  test('揪居家 App 登入頁列出三種身分的示範帳號', async ({ page }) => {
+  test('揪居家 App 登入頁：示範帳號收在「展示用」，員工登入頁指向企業管理端', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
+    await expect(page.locator('.demo-sheet')).toBeHidden();
+    await page.click('.demo-strip');
     for (const e of ['chen@example.com', 'li@example.com', 'advisor@example.com', 'tech@example.com']) await expect(page.locator(`[data-demo="${e}"]`)).toBeVisible();
+    await page.click('.demo-sheet [data-a="demoSheet"]');
+    await page.click('[data-go="staffLogin"]');
     await expect(page.locator('#view')).toContainText('企業管理端（電腦版）');
   });
   test('企業管理端：總部／門市主管｜張經理', async ({ page }) => {
     const errs = await fresh(page); await page.goto('/jiujujia/admin.html');
-    await page.click('#gate [data-demo="manager@example.com"]');
+    await tapDemo(page, '#gate [data-demo="manager@example.com"]');
     await expect(page.locator('#gate')).toBeHidden();
     await expect(page.locator('#title')).toHaveText('即時總覽');
     expect(errs).toEqual([]);
   });
   test('企業管理端：生活顧問（門市電腦）｜王小明 → 生活顧問電腦版', async ({ page }) => {
     const errs = await fresh(page); await page.goto('/jiujujia/admin.html');
-    await page.click('#gate [data-demo="advisor@example.com"]');
+    await tapDemo(page, '#gate [data-demo="advisor@example.com"]');
     await expect(page).toHaveURL(/consultant\.html/);
     await expect(page.locator('.panel', { hasText: '目前案件' })).toBeVisible();
     await expect(page.locator('#who')).toHaveText('王小明');
@@ -74,13 +78,13 @@ test.describe('一鍵示範登入', () => {
   });
   test('生活顧問電腦版直接登入｜王小明', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/consultant.html');
-    await page.click('#cLogin [data-demo]');
+    await tapDemo(page, '#cLogin [data-demo]');
     await expect(page.locator('#cGate')).toBeHidden();
     await expect(page.locator('#who')).toHaveText('王小明');
   });
   test('家庭登入 App 後打開企業管理端，不會沿用家庭登入', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
-    await page.click('[data-demo="chen@example.com"]');
+    await tapDemo(page, '[data-demo="chen@example.com"]');
     await expect(page.locator('#view .hg1')).toContainText('揪居家');
     await page.goto('/jiujujia/admin.html');
     await expect(page.locator('#gate')).toBeVisible();
@@ -99,7 +103,7 @@ test.describe('生活顧問：手機版與電腦版分工', () => {
       await fetch('/api/auth/logout', { method: 'POST', headers: H });
     }, H);
     await page.reload();
-    await page.click('[data-demo="advisor@example.com"]');
+    await tapDemo(page, '[data-demo="advisor@example.com"]');
     const card = page.locator('#advD');
     await expect(card).toContainText('待審差異 1 則');
     await expect(card).toContainText('電腦版');
@@ -107,7 +111,7 @@ test.describe('生活顧問：手機版與電腦版分工', () => {
   });
   test('把手機轉給長輩：顯示電腦版整合好的正式版本，按「同意這一版」', async ({ page }) => {
     await fresh(page); await page.goto('/jiujujia/app.html');
-    await page.click('[data-demo="advisor@example.com"]');
+    await tapDemo(page, '[data-demo="advisor@example.com"]');
     await expect(page.locator('#view')).toContainText('今日行程');
     // 正式報價存在資料庫（quotes 表），由電腦版送出；這裡用 API 先送兩個版本
     await page.evaluate(async () => {
