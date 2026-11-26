@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="live.js?v=20261126a"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261125m"></script>
 <script src="phase.js?v=20261124a"></script>
@@ -1122,6 +1123,7 @@ async function enterHQ(u){ME=u;
  await liveRender()}
 async function liveRender(){if(ALIAS[cur])cur=ALIAS[cur];hqRender();if(LIVE.includes(cur)){try{await loadLive(cur)}catch(e){toast(e.message)}if(LIVE.includes(cur))hqRender()}}
 async function authStart(){
+ if(window.JJJ_LIVE){showGate();return} // 實用版：打開先登入（live.js）
  try{CFG=await api('/config',{noGate:true})}catch(e){}
  if(CFG&&CFG.demo)document.getElementById('envBadge').hidden=false;
  let u=null;try{u=(await api('/me',{noGate:true})).user}catch(e){}
@@ -1212,5 +1214,5 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('.gb');if(g){const r=g.getBoundingClientRect();show(g,r.left,r.bottom)}});
 document.addEventListener('focusout',()=>{if(!pinned)hide()});
 addEventListener('scroll',()=>{if(!pinned)hide()},true)})();</script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261125q"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261126a"></script></body>
 </html>

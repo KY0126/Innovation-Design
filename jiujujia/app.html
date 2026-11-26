@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="live.js?v=20261126a"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261125n"></script>
 <script src="phase.js?v=20261124a"></script>
@@ -415,6 +416,7 @@ async function savePrefs(o){if(S.me&&S.me.role==='family'){try{const d=await api
 async function sendReq(kind,note){try{const d=await api('/requests',{method:'POST',body:{kind,note}});toast(d.duplicate?'已送出過，門市處理中':'已送出「'+kind+'」，門市會與您聯絡')}catch(e){toast(e.message)}}
 addEventListener('jjjphase',()=>{if(S.me)render()});
 async function boot(){
+ if(window.JJJ_LIVE){S.me=null;S.cfg={};S.stack=['home'];render();return} // 實用版第一階段：不設登入頁，未登入看首頁（live.js）
  try{S.cfg=await api('/config',{noAuthRedirect:true})}catch(e){document.getElementById('view').innerHTML='<div class="ld">無法連線到伺服器，請稍後重新整理。</div>';return}
  if(S.cfg.catalog)CAT.splice(0,CAT.length,...S.cfg.catalog);
  if(S.cfg.demo){const b=document.getElementById('envBadge');if(b)b.hidden=false}
@@ -688,7 +690,7 @@ m1:()=>{const g=J()?['關懷中','ok']:S.ph>=3?['安裝中','']:S.ph===2?['方�
 home:()=>{const I=(d)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#D4003C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
  const G=[['減碳貢獻','<path d="M12 20v-7"/><path d="M12 13c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 13c0-3-2-5-6-5 0 3 2 5 6 5z"/>'],['店長推薦','<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 16v-5l3-4 1 1-1 3h4l-1 5H9z"/>'],['保固服務','<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>'],['門市查詢','<path d="M12 21s-6-6-6-11a6 6 0 0112 0c0 5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/>'],['影音專區','<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9l5 2-5 2z"/><path d="M6 20h6"/>'],['空調推薦','<rect x="3" y="6" width="18" height="7" rx="2"/><path d="M7 16v3M12 16v3M17 16v3"/>'],['電視推薦','<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 20h8"/>'],['線上報修','<path d="M14 7l3-3 3 3-3 3"/><path d="M17 4L8 13"/><path d="M4 20l5-5"/><path d="M6 9l9 9"/>']];
  const R=[['登錄活動','<path d="M4 9l8-4 8 4-8 4z"/><path d="M4 9v7l8 4 8-4V9"/>'],['當期活動','<path d="M4 12l8-8h6v6l-8 8z"/><path d="M9 11l4 4"/>'],['線上DM','<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],['活動報名','<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M9 15l2 2 4-4"/>']];
- const H=S.hh,dvc=H.devices.filter(d=>d.home==='parents'),wn=dvc.filter(d=>d.warn).length,ins=H.install;
+ const H=S.hh||(window.JJJ_LIVE?{devices:[]}:S.hh),dvc=H.devices.filter(d=>d.home==='parents'),wn=dvc.filter(d=>d.warn).length,ins=H.install;
  const att=J()?wn>0:(S.ph===2||!!(ins&&ins.status==='待驗收'));const st=J()?['關懷中','長輩家：'+dvc.length+' 項家電與設備'+(wn?'，'+wn+' 項待處理':''),'m2']:S.ph>=3?['安裝中',ins&&ins.slot?'長輩家：'+ins.label+' 到府安裝':'長輩家：等待門市排定到府時間','m2']:S.ph===2?['方案待確認','生活顧問已傳送專屬方案','m2']:S.booked?['已預約','長輩家：'+S.booked.slot+' 門市諮詢','m2']:S.saved?['已評估','全國電子 AI 顧問阿國推薦：'+H.assessment.rec.n,'b3']:['','從居家安全開始，陪一家三代顧好一個家','b1'];
  return `<div style="position:relative;flex:none;background:#fff"><img src="home/header.png" alt="全國電子" style="display:block;width:100%"><button class="hbell" data-go="inbox" aria-label="通知${S.unread?'，'+S.unread+' 則未讀':''}">${S.unread?'<i class="hgdot" aria-hidden="true"></i>':''}</button><button class="aplus" data-a="big" aria-pressed="${S.big}" style="position:absolute;top:50%;transform:translateY(-50%);left:54.4%;border:1px solid #DCDCDC;border-radius:13px;background:#fff;color:#4C5058;font-size:13px;padding:2px 10px;min-height:0">大字</button></div><div class="scroll">
  ${homeBanners()}
@@ -1479,7 +1481,7 @@ function render(){
  if(S.fromLog)document.querySelectorAll('#view .sim').forEach(x=>x.remove());
  const sc=document.querySelector('.scroll');if(sc)sc.scrollTop=0;
  if(v==='home')hbWire();
- if(window.JJJAI)JJJAI.after(v,view);
+ if(window.JJJAI&&!window.JJJ_LIVE)JJJAI.after(v,view);
  if(window.JJJHOOKS)JJJHOOKS.forEach(f=>{try{f(v,view)}catch(e){console.error(e)}});
 }
 // 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
@@ -1682,5 +1684,5 @@ window.JJJ={measSeg,nav,meCard,acctList,stf,snav,planName,api,esc,stepper,chd,fm
 })();
 </script>
 <script src="stage2.js?v=20261125h"></script><script src="family.js?v=20261125k"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261125i"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125c"></script><script src="wish.js?v=20261126a"></script>
-<script src="guide.js?v=20261125q"></script></body>
+<script src="guide.js?v=20261126a"></script></body>
 </html>
