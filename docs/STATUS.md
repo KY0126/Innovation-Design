@@ -22,6 +22,7 @@
 | 第 6 步 ⑥ 手機實測 | ①～⑤ 已完成（11/26 21:00）：LINE Login「五子登科｜揪居家」Channel ID 2012816604、綁定 @071iyyoa、Callback 已設；Supabase 4 個 secrets 已存；Exposed schemas 已加 `jjj`；生活顧問測試帳號 `e100001@staff.jiujujia.example`（高雄民族店，密碼 K.Y. 自設）。PR #55 合併後用手機測 |
 | 用語規範列出的 15 處禁用詞（基準線 9 組） | 決定要不要修 |
 | LINE 分頁選單與 12 個拼圖按鈕 | 用手機實測 |
+| 11/1 草稿 PR #11、#12、#13、#22（jiujujia-app）、#23（jiujujia-agent） | 先不合併；要用到時再整理（11/26 決定） |
 | 17 個 issue、標籤、里程碑（`docs/prd/issues.md`） | 同意後才建立（目前都還沒建） |
 
 ## 待更新進 zip（說「更新」時照這張清單做）
