@@ -1,0 +1,8 @@
+# gitleaks 設定：沿用預設規則，只允許 Supabase publishable key（設計上就是放在網頁裡的公開值，資料由列級權限保護）
+# service role key、LINE Channel secret 等真正的密鑰一律不進 repo（CLAUDE.md C7），仍會被擋下
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Supabase publishable key（公開值）"
+regexes = ['''sb_publishable_[A-Za-z0-9_-]+''']

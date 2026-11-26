@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>揪居家｜我很好</title>
+<style>
+body{margin:0;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;background:#fff;color:#1F2328}
+main{max-width:420px;margin:0 auto;padding:32px 22px;text-align:center;display:flex;flex-direction:column;gap:16px}
+h1{font-size:26px;margin:8px 0 0}p{font-size:17px;line-height:1.7;color:#555;margin:0}
+button{font:inherit;font-size:20px;font-weight:700;border-radius:12px;min-height:56px;cursor:pointer}
+.ok{background:#C8003A;color:#fff;border:0}.help{background:#fff;color:#C8003A;border:2px solid #C8003A}
+.ck{width:72px;height:72px;margin:0 auto;border-radius:50%;background:#E7F6EA;color:#1A7F37;font-size:38px;display:flex;align-items:center;justify-content:center}
+.ft{font-size:13px;color:#8C959F}
+</style></head>
+<body><main id="m" aria-live="polite"><p>載入中…</p></main>
+<script src="../../jiujujia/vendor/supabase-2.119.2.js"></script>
+<script src="../../jiujujia/live-config.js?v=20261126b"></script>
+<script>
+// 「我很好」回覆頁：長輩從 LINE 推播的按鈕打開；不用登入，連結只能用一次（P3）
+(function(){
+  var C=window.JJJ_LIVE_CFG, m=document.getElementById('m'), q=new URLSearchParams(location.search), t=q.get('t'), a=q.get('a');
+  function show(h){m.innerHTML=h+'<p class="ft">揪居家｜五子登科</p>';}
+  function ask(){show('<h1>昨晚還好嗎？</h1><p>走道的燈亮了比較久，按一下讓家人放心。</p><button class="ok" data-a="ok">我很好</button><button class="help" data-a="help">需要幫忙</button>');}
+  async function send(ans){
+    show('<p>傳送中…</p>');
+    try{
+      var r=await fetch(C.supabaseUrl+'/functions/v1/line-push',{method:'POST',headers:{'Content-Type':'application/json',apikey:C.supabaseKey},body:JSON.stringify({action:'reply',t:t,a:ans})});
+      var d=await r.json().catch(function(){return{};});
+      if(!r.ok){show('<h1>這個連結已經用過了</h1><p>'+(d.error||'請稍後再試')+'</p>');return;}
+      if(ans==='ok')show('<div class="ck" aria-hidden="true">✓</div><h1>已告訴家人：您很好</h1><p>謝謝您回覆，家人會收到通知。</p>');
+      else show('<h1>已通知家人</h1><p>家人會盡快和您聯絡。</p>');
+    }catch(e){show('<h1>沒有傳送成功</h1><p>請檢查網路後再試一次。</p><button class="ok" data-a="'+ans+'">再試一次</button>');}
+  }
+  m.addEventListener('click',function(e){var b=e.target.closest('[data-a]');if(b)send(b.dataset.a);});
+  if(!t){show('<h1>連結不完整</h1><p>請從 LINE 訊息裡的按鈕打開。</p>');return;}
+  // 從按鈕帶 a=ok／help：先讓長輩看到並確認一次，避免誤觸就送出
+  if(a==='help')send('help'); else ask();
+})();
+</script></body></html>

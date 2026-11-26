@@ -1,0 +1,18 @@
+# 實用版 P4：問過長輩 30 分鐘沒回覆「我很好」，才通知子女。每 10 分鐘呼叫一次 Edge Function（重複呼叫不會重複通知）。
+# 只用公開的 publishable key；推播金鑰在 Supabase secrets，不在這裡（C7）。
+name: live-escalate
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+jobs:
+  escalate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Call line-push escalate
+        run: |
+          curl -sS -m 60 -X POST "https://mmownoqzrhvgguxpukgl.supabase.co/functions/v1/line-push" \
+            -H "apikey: sb_publishable_k-ePRVf5164vA9hp76YlLA_HgHclwY_" \
+            -H "Content-Type: application/json" \
+            -d '{"action":"escalate"}'

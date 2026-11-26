@@ -2,6 +2,7 @@
 // 對應 docs/prd/PRD.md US-14、docs/context/領域鐵律.md R15
 const { test } = require('playwright/test');
 const { fresh, expect } = require('./helpers');
+const { createMock } = require('./live-mock');
 
 test('實用版 App：打開就是首頁，標實用版，沒有示範帳號、導覽、揪問 AI，會員欄是註冊誘因', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
@@ -21,7 +22,7 @@ test('實用版 App：打開就是首頁，標實用版，沒有示範帳號、�
   expect(errs).toEqual([]);
 });
 
-test('實用版 App：點揪居家、免費診斷、會員欄、會員中心都跳登入提示；返回關閉、確認提示下一階段', async ({ page }, info) => {
+test('實用版 App：點揪居家、免費診斷、會員欄、會員中心都跳登入提示；返回關閉；登入設定未完成時確認後提示', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page, false);
   await page.goto('/live/app/');
@@ -42,13 +43,14 @@ test('實用版 App：點揪居家、免費診斷、會員欄、會員中心都�
   await expect(page.locator('.lv-dlg')).toHaveCount(0);
   await page.click('.hg1');
   await page.click('[data-lv="ok"]');
-  await expect(page.locator('.lv-toast')).toContainText('LINE 登入將在下一階段接上');
+  await expect(page.locator('.lv-toast')).toContainText('LINE 登入設定尚未完成');
   expect(errs).toEqual([]);
 });
 
-test('實用版後台：打開先登入，沒有示範帳號與導覽，登入提示下一階段接上', async ({ page }, info) => {
+test('實用版後台：打開先登入，沒有示範帳號與導覽，帳號錯誤不能進入', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page, false);
+  await createMock().install(page);
   await page.goto('/live/admin/');
   await expect(page).toHaveURL(/jiujujia\/admin\.html\?.*mode=live/);
   await expect(page.locator('#gate')).toBeVisible();
@@ -58,7 +60,7 @@ test('實用版後台：打開先登入，沒有示範帳號與導覽，登入�
   await page.fill('#gEmail', 'someone@example.com');
   await page.fill('#gPw', 'password123');
   await page.click('#gBtn');
-  await expect(page.locator('#gate .gerr')).toContainText('下一階段');
+  await expect(page.locator('#gate .gerr')).not.toBeEmpty();
   await expect(page.locator('#gate')).toBeVisible();
   expect(errs).toEqual([]);
 });

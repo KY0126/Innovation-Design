@@ -17,7 +17,7 @@
 | C4 | 改任何正式檔前：先文字說明，再到 Design 畫布做改之前／改之後示意，使用者回「照這樣改」才動 |
 | C5 | 原檔一律封存到「舊版/vN」或標時間的舊版資料夾，不覆蓋 |
 | C6 | 改動幅度最小，沿用現有用語與圖表；計畫書只在使用者的初版上優化，不重寫 |
-| C7 | 金鑰（LINE Channel secret、access token、Supabase 金鑰）不貼進聊天、不進 GitHub，只存 Supabase secrets |
+| C7 | 金鑰（LINE Channel secret、access token、Supabase service role）不貼進聊天、不進 GitHub，只存 Supabase secrets；Supabase publishable key 與 LINE Channel ID 是公開值，可放網頁（`jiujujia/live-config.js`） |
 | C8 | 五子登科 LINE 官方帳號的畫面不出現「全國電子」字樣，不用全國電子實際廣告圖與代言人照 |
 | C9 | 接受條款、建立帳號、對外發訊、建立 issue 等公開動作，先問使用者 |
 | C10 | 新檔要放進最終版 zip 前，先列清單問使用者；zip 用 UTF-8 檔名打包（Windows 才看得到中文檔名） |
