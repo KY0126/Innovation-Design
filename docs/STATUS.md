@@ -19,7 +19,7 @@
 
 | 項目 | 你要做的事 |
 |---|---|
-| 第 6 步（回家做，約 15 分鐘） | ① LINE Developers 五子登科 Provider 新增 LINE Login（名稱「五子登科｜揪居家」、台灣、Web app、綁定現有五子登科官方帳號、Callback `https://ky0126.github.io/Innovation-Design/live/app/`、先維持開發中），送出前再確認一次；② Supabase secrets 由 K.Y. 自己貼：`LINE_LOGIN_CHANNEL_ID`、`LINE_LOGIN_CHANNEL_SECRET`、`LINE_OA_CHANNEL_ID`、`LINE_OA_CHANNEL_SECRET`；③ Supabase 設定 › Data API › Exposed schemas 加入 `jjj`；④ `live-config.js` 填 Channel ID；⑤ 建 1 個生活顧問測試帳號；⑥ 手機實測 |
+| 第 6 步 ⑥ 手機實測 | ①～⑤ 已完成（11/26 21:00）：LINE Login「五子登科｜揪居家」Channel ID 2012816604、綁定 @071iyyoa、Callback 已設；Supabase 4 個 secrets 已存；Exposed schemas 已加 `jjj`；生活顧問測試帳號 `e100001@staff.jiujujia.example`（高雄民族店，密碼 K.Y. 自設）。PR #55 合併後用手機測 |
 | 用語規範列出的 15 處禁用詞（基準線 9 組） | 決定要不要修 |
 | LINE 分頁選單與 12 個拼圖按鈕 | 用手機實測 |
 | 17 個 issue、標籤、里程碑（`docs/prd/issues.md`） | 同意後才建立（目前都還沒建） |
@@ -37,7 +37,7 @@
 
 | 任務 | 步驟 | 狀態 | 時間 |
 |---|---|---|---|
-| 實用版拆分 | 1～5 ✅／6 LINE Login 設定 ⏸（K.Y. 回家做）／7 程式與測試 ✅，PR 等「合併」 | 等確認 | 11/26 13:20 |
+| 實用版拆分 | 1～5 ✅／6 LINE Login 設定 ①～⑤ ✅、⑥ 手機實測 ⏸／7 程式與測試 ✅，PR 等「合併」 | 等確認 | 11/26 13:20 |
 
 ## 之後要做
 
