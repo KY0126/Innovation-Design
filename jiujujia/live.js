@@ -9,7 +9,7 @@
   document.documentElement.classList.add('jjj-live');
 
   // 實用版才載入：Supabase、設定、登入後畫面（保持載入順序）
-  const V = '20261126f';
+  const V = '20261126g';
   ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, ...(PAGE === 'app' ? ['live-measure.js?v=' + V, 'live-app.js?v=' + V] : ['live-admin.js?v=' + V])].forEach((src) => {
     const s = document.createElement('script'); s.src = src; s.async = false; document.head.appendChild(s);
   });
