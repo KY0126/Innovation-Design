@@ -258,3 +258,7 @@ grant usage, select on all sequences in schema jjj to authenticated;
 -- 生活顧問可以把格局改回範本（刪掉這一家的真實格局）
 create policy fp_delete on jjj.floorplans for delete using (jjj.is_store_staff(household_id));
 grant delete on jjj.floorplans, jjj.quote_selections, jjj.subsidies to authenticated;
+
+-- is_staff 只給登入的人用
+revoke execute on function jjj.is_staff() from anon, public;
+grant execute on function jjj.is_staff() to authenticated;
