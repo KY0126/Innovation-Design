@@ -6,7 +6,7 @@
   window.JJJ_LIVE_CFG = Object.assign({
     supabaseUrl: 'https://mmownoqzrhvgguxpukgl.supabase.co',
     supabaseKey: 'sb_publishable_k-ePRVf5164vA9hp76YlLA_HgHclwY_',
-    lineLoginChannelId: '',            // 第 6 步建好 LINE Login 設定後填入（Channel ID 是公開值）
+    lineLoginChannelId: '2012816604',  // LINE Login「五子登科｜揪居家」（Channel ID 是公開值）
     callback: base + 'app/',           // LINE Login 設定的 Callback URL 要填這個
     base,
     stores: ['Digital City 高雄民族店'],
