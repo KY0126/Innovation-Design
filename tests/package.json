@@ -1,0 +1,17 @@
+{
+  "name": "jiujujia-tests",
+  "private": true,
+  "description": "揪居家原型｜Lint、用語檢查、單元測試（系統測試在 ../e2e，其餘各層經 ../e2e 的 Playwright 跑）",
+  "scripts": {
+    "lint": "node lint/eslint-baseline.mjs",
+    "lint:update": "node lint/eslint-baseline.mjs --update",
+    "terms": "node lint/terms.mjs",
+    "terms:update": "node lint/terms.mjs --update",
+    "unit": "node --test \"unit/*.test.mjs\"",
+    "check": "npm run lint && npm run terms && npm run unit"
+  },
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "globals": "16.5.0"
+  }
+}

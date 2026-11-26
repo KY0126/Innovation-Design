@@ -4,6 +4,8 @@
   "description": "揪居家原型端到端測試（Playwright）",
   "scripts": {
     "test": "playwright test",
+    "smoke": "playwright test --project=desktop tests/auth.spec.js tests/entry.spec.js tests/cad.spec.js tests/v2.spec.js",
+    "layers": "playwright test --project=integration --project=security --project=recovery --project=performance --project=stress",
     "report": "playwright show-report report"
   },
   "devDependencies": {

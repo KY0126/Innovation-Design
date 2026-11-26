@@ -1,5 +1,5 @@
-# 揪居家原型｜端到端測試：每次推送或開 PR 都自動跑 e2e/ 的 Playwright 測試
-name: e2e 端到端測試
+# 揪居家原型｜每次推送或開 PR：先跑 Lint、用語、單元、安全掃描，再跑 Playwright（系統＋各層）
+name: 測試（Lint、單元、E2E 與各層）
 
 on:
   push:
@@ -12,7 +12,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 第一段：Lint（程式＋用語）、單元測試、金鑰與套件漏洞掃描；沒過就不跑後面的瀏覽器測試
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tests
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: 安裝 Lint 工具
+        run: npm install --no-audit --no-fund
+      - name: ESLint（只看新增的問題）
+        run: npm run lint
+      - name: 用語檢查（只看新增的禁用詞）
+        run: npm run terms
+      - name: 單元測試
+        run: npm run unit
+      - name: 套件漏洞（高風險以上才算失敗）
+        run: |
+          npm audit --audit-level=high
+          cd ../e2e && npm install --no-fund --package-lock-only >/dev/null 2>&1; npm audit --audit-level=high
+      - name: 掃描金鑰外洩
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 第二段：系統（E2E）與 tests/ 底下的整合、安全、回復、效能、壓力（前端）
   test:
+    needs: checks
     # 固定版本：Playwright 1.56 尚未支援 Ubuntu 26（ubuntu-latest 自 2026/10 起逐步切換）
     runs-on: ubuntu-24.04
     timeout-minutes: 25
