@@ -4,7 +4,7 @@
 // 金鑰只從 Supabase secrets 讀：LINE_OA_CHANNEL_ID、LINE_OA_CHANNEL_SECRET（驗簽、換短效存取權杖）。
 // LINE 訊息一律寫「揪居家／五子登科」，不寫全國電子；不放地址、平面圖、作息細節（R15）。
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { FAQ, norm } from "./faq.ts";
+import { FAQ, match } from "./faq.ts";
 
 const BASE = "https://ky0126.github.io/Innovation-Design/live/app/";
 const RED = "#C8003A";
@@ -140,6 +140,11 @@ const ALIAS: [RegExp, string][] = [
   [/^(診斷|評估|免費評估|居家評估|ar|AR|量測|開始)$/, "居家診斷"], [/^(關懷|長輩|爸媽|昨晚)$/, "長輩關懷"], [/^(進度|安裝|施工進度|我的進度|查進度)$/, "安裝進度"],
   [/^(心願|拼圖|作品)$/, "揪心願"], [/^(預約|諮詢|約時間)$/, "預約門市"], [/^(AI|ai|問問題|小幫手|揪問)$/, "揪問 AI"], [/^(型錄|方案|方案介紹)$/, "門市型錄"],
   [/^(門市|門市地址|地點|分店)$/, "查詢門市"], [/^(購物|買東西|商城)$/, "線上購物"], [/^(優惠|優惠券|折扣)$/, "折價券"], [/^(下載|app|APP)$/, "App 下載"], [/^(綁定|登入|會員)$/, "會員綁定"],
+  // 已綁定的家庭最常問「我家現在怎樣」：直接回真實資料
+  [/(什麼時候來|何時來|哪天來|到哪了|進度如何|進度到哪|裝好了沒|排到了嗎|報價單在哪|方案確認了嗎)/, "安裝進度"],
+  [/(改預約|取消預約|預約.*(改|取消|換時間)|我預約的)/, "預約門市"],
+  [/(昨晚|昨天晚上|今天早上).*(還好|怎樣|有沒有事|平安)|爸媽還好嗎|媽還好嗎|爸還好嗎|有沒有異常/, "長輩關懷"],
+  [/(我家|爸媽家|我媽家|我爸家).*(診斷|評估|紅燈|結果)|診斷結果|評估結果/, "居家診斷"],
 ];
 
 // ── 自由提問：常見問題比對（同義詞加權）＋小對話 ──
@@ -147,19 +152,10 @@ function smalltalk(t: string): unknown[] | null {
   if (/^(嗨|hi|hello|哈囉|你好|您好|安安|早安|午安|晚安)[!！~～。]*$/i.test(t)) return [text("您好，我是揪居家小幫手。想了解什麼呢？可以點下面的按鈕，或直接打字問我。")];
   if (/^(謝謝|感謝|謝啦|thanks|thank you|3q|好的|好|ok|OK|了解|知道了)[!！~～。]*$/i.test(t)) return [text("不客氣，有問題隨時問我 😊")];
   if (/^(我很好|長輩很好|平安)$/.test(t)) return [text("收到，家人會很放心。昨晚的確認請按通知裡的「我很好」按鈕，才會記錄到揪居家。", ["長輩關懷", "找真人"])];
+  if (/(笨|爛|沒用|聽不懂|答非所問|白痴)/.test(t)) return [text("抱歉沒幫上忙 🙏 換個說法再問一次，或輸入「找真人」，我轉給生活顧問。", ["找真人", "揪問 AI", "居家診斷"])];
+  if (/(天氣|股票|新聞|彩券|樂透|笑話|唱歌)/.test(t)) return [text("這題我幫不上忙，我只會回答揪居家、長輩居家安全和家電服務的問題喔。", ["揪居家是什麼？", "揪夜安月費多少？", "會不會裝鏡頭？", "找真人"])];
   return null;
 }
-function match(t: string) {
-  const q = norm(t); let best: (typeof FAQ)[number] | null = null, bs = 0;
-  for (const f of FAQ) {
-    let s = 0;
-    for (const k of f.k) if (k && q.includes(k)) s += k.length;
-    const head = norm(f.q).slice(0, 6); if (head.length >= 4 && q.includes(head)) s += 3;
-    if (s > bs) { bs = s; best = f; }
-  }
-  return bs >= 2 ? { f: best!, s: bs } : null;
-}
-
 async function handoff(sb: ReturnType<typeof db>, u: Who, q: string) {
   if (!u || !u.hid) return [card("找真人", "轉給生活顧問", ["這題我還答不好。用 LINE 綁定揪居家後，我可以直接幫您轉給綁定門市的生活顧問，1 個工作天內回覆。", "也可以到試辦門市找生活顧問。"], [{ label: "用 LINE 綁定揪居家", uri: app("jjj") }, { label: "查詢門市", text: "查詢門市", primary: false }])];
   const { data: dup } = await sb.from("requests").select("id").eq("household_id", u.hid).eq("kind", "聯絡生活顧問").eq("status", "待處理").limit(1);
@@ -175,11 +171,12 @@ async function answer(sb: ReturnType<typeof db>, lineId: string, raw: string): P
   if (k) { const m = await tile(sb, k, u); if (m) return { msgs: m, intent: "tile:" + k, ok: true }; }
   const st = smalltalk(t); if (st) return { msgs: st, intent: "smalltalk", ok: true };
   const m = match(t === "費用" ? "月費多少" : t);
-  if (m) {
+  if (m.f) {
     const f = m.f, btns: Btn[] = f.link ? [{ label: f.linkLabel || "去看看", uri: f.link.startsWith("#") ? app(f.link.slice(1)) : f.link }] : [];
     const more = FAQ.filter((x) => x.cat === f.cat && x !== f).slice(0, 3).map((x) => x.q);
     return { msgs: [btns.length ? card(f.q, f.q, f.a, btns, [...more, "找真人"]) : text(`${f.q}\n${f.a}`, [...more, "找真人"])], intent: "faq:" + f.q, ok: true };
   }
+  if (m.near.length) return { msgs: [text("這題我不太確定，您是不是想問：\n" + m.near.map((x) => "・" + x).join("\n") + "\n點下面的問題看答案；都不是的話，輸入「找真人」我幫您轉給生活顧問。", [...m.near, "找真人"])], intent: "near", ok: false };
   return { msgs: [text("這題我還不太確定怎麼回答 🙏\n可以換個說法，或點下面的常見問題；要的話我幫您轉給生活顧問。", ["揪夜安月費多少？", "會不會裝鏡頭？", "安裝要多久？", "家電壞了怎麼報修？", "找真人"])], intent: "unknown", ok: false };
 }
 
