@@ -51,3 +51,13 @@
 | `docs/context/領域鐵律.md` | 業務上不能錯的規則（R1–R15） |
 | `docs/context/測試規範.md` | 八層測試、修正流程（Q1–Q10、L1–L8） |
 | `docs/context/用語規範.md` | 用／不用對照（G1–G19） |
+
+## Agent、skill 與產品文件
+
+| 類別 | 位置 | 內容 |
+|---|---|---|
+| Agent | `.claude/agents/` | prototype-engineer、proposal-editor、visual-mockup、line-ops、test-engineer、independent-reviewer、product-manager |
+| skill | `.claude/skills/` | prototype-change、proposal-figure-swap、line-richmenu、handoff-zip、test-fix |
+| 產品需求文件 | `docs/prd/PRD.md` | 問題、Persona、User Stories（US-01～US-14）與驗收條件、成功指標、MVP 範圍 |
+| issue 清單 | `docs/prd/issues.md` | issue、標籤、里程碑 |
+| 範本 | `.github/ISSUE_TEMPLATE/`、`.github/pull_request_template.md` | 使用者故事、錯誤回報、PR 檢查清單 |

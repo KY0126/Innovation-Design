@@ -1,0 +1,35 @@
+name: 錯誤回報
+description: 畫面或功能不如預期
+labels: ["類型:bug"]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: 在哪裡（網址或畫面）
+      placeholder: /app 揪心願作品頁 3D
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟
+      value: |
+        1.
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: expect
+    attributes:
+      label: 預期／實際
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: 裝置
+      options: [電腦, Android, iPhone, LINE]
+  - type: textarea
+    id: shot
+    attributes:
+      label: 截圖
