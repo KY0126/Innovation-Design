@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>揪居家｜揪心願</title>
+<style>
+body{margin:0;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;background:#F6F4F2;color:#1F2328}
+main{max-width:440px;margin:0 auto;padding:24px 18px;display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border-radius:14px;padding:18px}
+h1{font-size:22px;margin:4px 0}.mu{color:#6F6670;font-size:14px}
+.bar{height:8px;border-radius:4px;background:#F1D3DC;margin:12px 0 6px}.bar i{display:block;height:8px;border-radius:4px;background:#C8003A}
+a.btn,button{display:block;width:100%;box-sizing:border-box;text-align:center;font:inherit;font-size:17px;font-weight:700;border-radius:10px;min-height:48px;line-height:48px;border:0;background:#C8003A;color:#fff;text-decoration:none;cursor:pointer}
+.ft{font-size:12px;color:#8C959F;text-align:center}
+</style></head>
+<body><main id="m"><p class="mu">載入中…</p></main>
+<script src="../../jiujujia/vendor/supabase-2.119.2.js"></script>
+<script src="../../jiujujia/live-config.js?v=20261126b"></script>
+<script>
+// 揪心願公開頁（S3 分享卡點進來）：不登入可以看作品與人數；按「我也需要」才登入（P6 門檻通知在第三階段）
+(function(){
+  var C=window.JJJ_LIVE_CFG, m=document.getElementById('m'), id=Number(new URLSearchParams(location.search).get('id'));
+  var sb=window.supabase.createClient(C.supabaseUrl,C.supabaseKey,{db:{schema:'jjj'},auth:{persistSession:true,detectSessionInUrl:false,storageKey:'jjj-live-auth'}});
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  (async function(){
+    if(!id){m.innerHTML='<div class="card"><h1>找不到這個心願</h1></div>';return;}
+    var w=await sb.from('wish_works').select('id,title,scene').eq('id',id).maybeSingle();
+    if(!w.data){m.innerHTML='<div class="card"><h1>找不到這個心願</h1><p class="mu">可能還沒公開或已下架。</p></div>';return;}
+    var n=(await sb.rpc('wish_count',{p_work:id})).data||0, S=C.wishStages, next=S.find(function(x){return x>n;})||S[S.length-1], pct=Math.min(100,Math.round(n/next*100));
+    var s=await sb.auth.getSession(), mine=false;
+    if(s.data.session){var r=await sb.from('wish_supports').select('work_id').eq('work_id',id).maybeSingle();mine=!!r.data;}
+    m.innerHTML='<div class="card"><div class="mu">揪心願｜'+esc(w.data.scene)+'</div><h1>'+esc(w.data.title)+'</h1><div class="bar"><i style="width:'+pct+'%"></i></div><div class="mu">'+n+' 人也需要'+(n<next?'｜還差 '+(next-n)+' 人到下一個門檻':'')+'</div></div>'
+      +(mine?'<div class="card mu" style="text-align:center">你已經按過「我也需要」，到門檻時會用 LINE 通知你。</div>':'<a class="btn" href="'+C.base+'app/?wish='+id+'">我也需要</a>')
+      +'<p class="ft">揪居家｜五子登科</p>';
+  })().catch(function(){m.innerHTML='<div class="card"><h1>讀取失敗</h1><p class="mu">請稍後再試。</p></div>';});
+})();
+</script></body></html>
