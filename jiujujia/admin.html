@@ -372,7 +372,7 @@ td.nw{white-space:nowrap}
   <tr><td><span class="badge c-ok">事後關心</span></td><td>黃先生家</td><td>昨晚通知家人、就近聯絡人到場；建議檢查浴室門口夜燈亮度</td><td><span class="badge c-am">今日待撥</span></td></tr>
   <tr><td><span class="badge c-am">設備問題</span></td><td>林媽媽家</td><td>浴室門感測器電量 12%，下次到府更換</td><td><span class="badge c-bl">已排程</span></td></tr>
   <tr><td><span class="badge c-bl">年度健檢</span></td><td>林媽媽家</td><td>到期 11/15，順便校正夜燈感應距離</td><td><span class="badge c-bl">已排入</span></td></tr>
-  <tr><td><span class="badge c-bl">居安規劃</span></td><td>林媽媽家</td><td>居家安全檢核：走道紅燈（夜間偏暗）、浴室黃燈（門檻約 2 cm），AR 掃描（場勘）量得走道約 92 cm；建議夜間動線照明＋門檻提示燈條</td><td><span class="badge c-am">等待補助核定</span></td></tr>
+  <tr><td><span class="badge c-bl">居安規劃</span></td><td>林媽媽家</td><td>居家安全檢核：走道紅燈（夜間偏暗）、浴室黃燈（門檻約 2 cm），AR 量測量得走道約 92 cm；建議夜間動線照明＋門檻提示燈條</td><td><span class="badge c-am">等待補助核定</span></td></tr>
   <tr><td><span class="badge c-ok">語音電話</span></td><td>本週 42 戶</td><td>每週語音電話，長輩接聽按鍵即可；40 戶已回覆，2 戶重撥未接已通知家人</td><td><span class="badge c-ok">已回報家人</span></td></tr></tbody></table></div></section>
 </div></main>
   <p class="ft">揪居家｜團隊 五子登科｜InnoConnect+ 2026 全國電子提案。「即時營運」為系統中的真實資料；「模擬與分析」為依假設參數的試算與示意畫面，非門市實際營運資料。示範門市「Digital City 高雄民族店」取自公開資訊；其餘門市代號、人名、地址皆為示意，家庭資料以去識別化摘要呈現。</p>
@@ -510,7 +510,7 @@ let R=run(),month=1,timer=null,clock=14*60;
 const money=n=>'NT$ '+Math.round(n).toLocaleString('en-US');
 const wan=n=>(n<0?'−':'')+Math.abs(n/1e4).toFixed(1)+' 萬';
 const pad=n=>String(n).padStart(2,'0');
-const STEPS=[['線上評估','家人經全國電子 AI 顧問阿國進入居家診斷，完成 AR 掃描與安全檢核，預約門市諮詢','① 先評估'],['門市體驗','林媽媽於情境角確認設備不含鏡頭','① 先評估'],['確認方案','生活顧問把夜間動線照明與關懷設備整合成一張報價，設定聯絡人','② 再改善'],['到府安裝','技師先裝夜燈與門檻燈條、再裝關懷設備，同一天合併到府','② 再改善'],['教學啟用','技師一對一教學，測試「我很好」按鈕','③ 後關心'],['售後追蹤','平常安靜關懷，每週語音電話、每月一則整合摘要','③ 後關心']];
+const STEPS=[['線上評估','家人經全國電子 AI 顧問阿國進入居家診斷，完成 AR 量測與安全檢核，預約門市諮詢','① 先評估'],['門市體驗','林媽媽於情境角確認設備不含鏡頭','① 先評估'],['確認方案','生活顧問把夜間動線照明與關懷設備整合成一張報價，設定聯絡人','② 再改善'],['到府安裝','技師先裝夜燈與門檻燈條、再裝關懷設備，同一天合併到府','② 再改善'],['教學啟用','技師一對一教學，測試「我很好」按鈕','③ 後關心'],['售後追蹤','平常安靜關懷，每週語音電話、每月一則整合摘要','③ 後關心']];
 const AREAS=['三民區○○路','三民區○○街','鼓山區○○路','左營區○○街','苓雅區○○路'];
 function wos(o){const list=[];const n1=Math.max(1,Math.round(o.inst/22)),n2=Math.max(1,Math.round(o.subs/12/22));const tech=['吳技師','陳技師','林技師','黃技師'];
  let s=9;for(let i=0;i<Math.min(n1,3);i++){list.push([`${pad(s)}:00–${pad(s+2)}:00`,'安裝｜夜間動線照明',i]);s+=2}
@@ -723,7 +723,7 @@ dispatch:()=>{const rows=storeRowsF();const techs=[['吳技師','民族店',[[9,
  const col={i:'#D4003C',c:'#A3002E',p:'#A3002E',d:'#E0A030',r:'#A3002E',f:'#E8577A',s:'#9A9893'};const X=h=>130+(h-9)*70;
  const gantt=`<svg viewBox="0 0 780 ${30+techs.length*34}" width="100%" role="img" aria-label="技師一日時間軸" class="gantt">${Array.from({length:10},(_,k)=>`<line x1="${X(9+k)}" x2="${X(9+k)}" y1="18" y2="${18+techs.length*34}" stroke="var(--line)"/><text x="${X(9+k)}" y="12" font-size="11.5" text-anchor="middle" fill="var(--muted)">${9+k}:00</text>`).join('')}
   <line x1="${X(10.5)}" x2="${X(10.5)}" y1="46" y2="58" stroke="#A3002E" stroke-dasharray="2 2"/>${techs.map(([n,st,js],r)=>`<text x="4" y="${38+r*34}" font-size="12.5" fill="var(--ink)">${n}</text><text x="4" y="${50+r*34}" font-size="11" fill="var(--muted)">${st}</text>${js.map(([a,b,t,k])=>`<g class="gb" tabindex="0" data-tip="${t}<br><small>${n}｜${st}｜${String(Math.floor(a)).padStart(2,'0')}:${a%1?'30':'00'}–${String(Math.floor(b)).padStart(2,'0')}:${b%1?'30':'00'}</small>"><rect x="${X(a)}" y="${24+r*34}" width="${(b-a)*70-3}" height="22" rx="3" fill="${col[k]}" opacity=".9"/><text x="${X(a)+4}" y="${39+r*34}" font-size="10" fill="#fff">${(()=>{const w=(b-a)*70-10,f=9.5;return t.length*f>w?t.slice(0,Math.max(2,Math.floor(w/f)-1))+'…':t})()}</text></g>`).join('')}`).join('')}</svg>`;
- const pend=[['林媽媽家（民族店）','夜間動線照明＋門檻提示燈條','兩位技師同日上午合併到府','m1'],['李先生家（民族店）','晨起平安確認','可排入林技師週四下午','m2'],['周女士家（澄清店）','夜間動線照明','澄清店技師負荷高，建議由民族店支援','m3'],['王先生家（民族店）','更換電池｜浴室門感測器','電量 12%，家人已在 App 一鍵預約','m4'],['趙女士家（三民中華店）','設備問題｜閘道器離線','已帶入家電檔案的序號與保固；由原生活顧問接手','m5'],['黃先生家（民族店）','到府複量｜床邊插座','AR 掃描（場勘）看不到床後插座；複量結果寫回方案圖面','m6']];
+ const pend=[['林媽媽家（民族店）','夜間動線照明＋門檻提示燈條','兩位技師同日上午合併到府','m1'],['李先生家（民族店）','晨起平安確認','可排入林技師週四下午','m2'],['周女士家（澄清店）','夜間動線照明','澄清店技師負荷高，建議由民族店支援','m3'],['王先生家（民族店）','更換電池｜浴室門感測器','電量 12%，家人已在 App 一鍵預約','m4'],['趙女士家（三民中華店）','設備問題｜閘道器離線','已帶入家電檔案的序號與保固；由原生活顧問接手','m5'],['黃先生家（民族店）','到府複量｜床邊插座','AR 量測看不到床後插座；複量結果寫回方案圖面','m6']];
  return `${fbar()}<div class="grid4">
  <div class="panel pb kpi"><div class="l">待派工方案</div><div class="n">${pend.filter(p=>!asg[p[3]]).length} 件</div><div class="d">今日新增 2</div></div>
  <div class="panel pb kpi"><div class="l">本週工單</div><div class="n">${Math.round(rows.reduce((a,r)=>a+r.o.inst+r.o.subs/12+r.o.subs*0.02,0)/4.3)} 張</div><div class="d">合併到府約 20%</div></div>
@@ -766,7 +766,7 @@ content:()=>{const m=month;const V1=[['節氣共煮｜夜間走廊這樣亮','�
  <div class="panel"><div class="ph">校園大使搭檔卡 ${info('延續「這家電 人物圖鑑」：每位校園大使和一位生活顧問組成搭檔，大使拍居家觀察短影音（經長輩同意、不露臉與地址），帶來的評估預約交給顧問。示意角色。')}</div><div style="overflow-x:auto"><table><thead><tr><th>搭檔</th><th>校園大使</th><th>生活顧問</th><th>主打技</th><th>本月短影音</th></tr></thead><tbody>
   <tr><td>民族店</td><td>小安（大學生）</td><td>小明顧問</td><td>陪外婆做居家觀察</td><td>2</td></tr>
   <tr><td>澄清店</td><td>示範大使 B</td><td>阿芳顧問</td><td>夜間防跌健檢日</td><td>1</td></tr>
-  <tr><td>三民中華店</td><td>示範大使 C</td><td>示範顧問 C</td><td>協助完成 AR 掃描</td><td>1</td></tr>
+  <tr><td>三民中華店</td><td>示範大使 C</td><td>示範顧問 C</td><td>協助完成 AR 量測</td><td>1</td></tr>
  </tbody></table></div></div></div>`},
 amb:()=>{const m=month;const n=24+m*14;const pct=x=>Math.round(x*100)+'%';
  const risks=[['夜間走廊偏暗',.58],['浴室門口濕滑或床邊沒有開關',.47],['夜間起床兩次以上',.36],['動線有高低差或樓梯',.31],['家中沒有 Wi-Fi',.22]];
@@ -904,7 +904,7 @@ kpi:()=>{const rows=storeRowsF();const m=month;const ser=f=>Array.from({length:m
    <div class="sbox new"><span class="ftg">核</span><b>情境模板與相容性規則</b><div class="c-mu">提案工具與居家場景預演共用</div></div>
    <div class="sbox new"><span class="ftg">購</span><b>家庭設備檔案與服務紀錄</b><div class="c-mu">由購買紀錄與保固資料延伸，三代共用</div></div>
    <div class="sbox new"><span class="ftg">購</span><b>關懷異常紀錄與依序通知</b><div class="c-mu">先問長輩、再找家人；門市只做事後關心；每週語音電話</div></div>
-   <div class="sbox new"><span class="ftg">核</span><b>居家安全檢核與完工驗收</b><div class="c-mu">先評估：依空間紅黃綠燈、AR 掃描量動線與門檻；再改善：完工量測、前後照片與長輩實測，完工報告傳給家人</div></div>
+   <div class="sbox new"><span class="ftg">核</span><b>居家安全檢核與完工驗收</b><div class="c-mu">先評估：依空間紅黃綠燈、AR 量測量動線與門檻；再改善：完工量測、前後照片與長輩實測，完工報告傳給家人</div></div>
    <div class="sbox new"><span class="ftg">創</span><b>揪心願</b><div class="c-mu">彙整需求，轉為模板、選品或合作服務</div></div>
    <div class="sbox new"><b>試點營運模擬與指標</b><div class="c-mu">損益、人力負荷、六項成效指標</div></div></div>
   <div class="col"><h4>既有後勤系統</h4>
@@ -918,7 +918,7 @@ kpi:()=>{const rows=storeRowsF();const m=month;const ser=f=>Array.from({length:m
  </div>
  <div class="sbox" style="border-style:dashed;margin:4px 0 0"><b>內部協作：Google Workspace</b><span class="org p">公開資訊</span><div class="c-mu">員工帳號與內部文件協作（例如情境模板文件、排班表）；不存放家庭資料，也不與揪居家交換資料</div></div></div></div>
  <div class="panel"><div class="ph">服務項目與負責團隊 <small>待企業確認</small></div><div style="overflow-x:auto"><table class="wide"><thead><tr><th>服務項目</th><th>負責團隊</th><th>派工方式</th><th>到府安排</th></tr></thead><tbody>
-  <tr><td>到府場勘</td><td>生活顧問＋技師</td><td>AR 掃描無法判斷時才派</td><td>結果寫回居家安全檢核</td></tr>
+  <tr><td>到府場勘</td><td>生活顧問＋技師</td><td>AR 量測無法判斷時才派</td><td>結果寫回居家安全檢核</td></tr>
   <tr><td>關懷設備安裝與健檢</td><td>指定團隊（內部或外部，待確認）</td><td>外部團隊經由廠商作業後台</td><td>由生活顧問統一排程</td></tr>
   <tr><td>夜燈、門檻燈條、床邊插座</td><td>全國電子技師</td><td>既有派工流程</td><td>與關懷設備同日合併到府，先照明後設備</td></tr>
   <tr><td>大型家電換機</td><td>各產品團隊</td><td>既有派工流程</td><td>由設備檔案觸發評估</td></tr>
@@ -1085,7 +1085,7 @@ live:()=>{const o=LD.ov;if(!o)return LOADING;const k=o.kpi;const mm=s=>s==null?'
  const ACT=o.activity||[],showAll=!!LD.actAll;
  return `<section class="lk today3" aria-label="今天要處理">${[['bk','待指派',k.consult_unassigned+k.install_unscheduled,'門市諮詢 '+k.consult_unassigned+'｜到府安裝待排程 '+k.install_unscheduled,'c-rd','k-con'],['wl','待回覆揪心願',k.wishes_open,'門市待辦 '+k.requests_open+' 項','c-am','k-wsh'],['care','關懷異常',k.care_7d,'近 7 天關懷事件｜關懷中 '+k.caring+' 戶','','k-car']].map(([tab,l,n,d,c,id])=>`<button class="panel kpi" id="${id}" data-tab="${tab}" style="text-align:left;cursor:pointer"><div class="l">${l}</div><div class="n ${n?c:''}">${n}</div><div class="d">${d}</div></button>`).join('')}</section>
  <div class="grid2"><div class="panel"><div class="ph">服務漏斗 <small>${esc(SHORT(o.store))}｜累計</small></div><div class="pb">${o.funnel.map(([l,n])=>`<div class="lbl"><span>${l}</span><b>${n} 戶</b></div><div class="bar"><i style="width:${Math.round(n/fmax*100)}%;background:var(--brand)"></i></div>`).join('')}</div></div>
- <div class="panel"><div class="ph">試點指標（實測） <small>來自 App 使用紀錄</small></div><div class="pb"><div class="kv"><span>家人完成 AR 掃描（場勘）＋診斷平均</span><b>${mm(k.diag.avg)}</b></div><div class="kv"><span>樣本數</span><b>${k.diag.n} 筆</b></div><div class="kv"><span>生活顧問完成規劃平均</span><b>${mm(k.advisor.avg)}</b></div><div class="kv"><span>樣本數</span><b>${k.advisor.n} 筆</b></div><div class="kv"><span>長輩驗收一次通過率</span><b>${fin.length?Math.round(fp/fin.length*100)+'%':'—'}</b></div><div class="kv"><span>樣本數（已完工）</span><b>${fin.length} 張</b></div><div class="c-mu" style="margin-top:6px;font-size:12.5px">試點門檻：診斷 10 分鐘內、規劃 30 分鐘內；驗收一次通過率由技師 App 驗收紀錄計算（被退回再通過即不算一次通過）</div></div></div></div>
+ <div class="panel"><div class="ph">試點指標（實測） <small>來自 App 使用紀錄</small></div><div class="pb"><div class="kv"><span>家人完成 AR 量測＋診斷平均</span><b>${mm(k.diag.avg)}</b></div><div class="kv"><span>樣本數</span><b>${k.diag.n} 筆</b></div><div class="kv"><span>生活顧問完成規劃平均</span><b>${mm(k.advisor.avg)}</b></div><div class="kv"><span>樣本數</span><b>${k.advisor.n} 筆</b></div><div class="kv"><span>長輩驗收一次通過率</span><b>${fin.length?Math.round(fp/fin.length*100)+'%':'—'}</b></div><div class="kv"><span>樣本數（已完工）</span><b>${fin.length} 張</b></div><div class="c-mu" style="margin-top:6px;font-size:12.5px">試點門檻：診斷 10 分鐘內、規劃 30 分鐘內；驗收一次通過率由技師 App 驗收紀錄計算（被退回再通過即不算一次通過）</div></div></div></div>
  <div class="panel" id="actPanel"><div class="ph">最近動態 <small>家庭、門市與技師的操作紀錄${ACT.length>10?'｜'+(showAll?'全部 '+ACT.length+' 筆':'最近 10 筆'):''}</small></div><div class="pb log2">${ACT.length?(showAll?ACT:ACT.slice(0,10)).map(a=>`<div><b>${esc(a.when)}</b><span><span class="badge c-mu">${esc(ROLE[a.role]||'系統')}</span> ${esc(a.name||'')}｜${esc(a.action)}${a.target?'｜'+esc(a.target):''}${a.detail?'<span class="c-mu">（'+esc(a.detail)+'）</span>':''}</span></div>`).join(''):'<div class="c-mu">尚無紀錄</div>'}${ACT.length>10?`<button class="b" data-la="actAll" style="margin-top:8px">${showAll?'只看最近 10 筆':'顯示全部'}</button>`:''}</div></div>`},
 bk:()=>{const B=LD.bk,St=LD.staff;if(!B||!St)return LOADING;const advs=s=>St.advisors.filter(a=>a.store===s),techs=s=>St.techs.filter(a=>a.store===s),SL=nextSlots();const open=s=>s==='待指派'||s==='已指派';
  return `<div class="panel" id="consultPanel"><div class="ph">門市諮詢預約 <small>家人在 App 預約；指派後顧問的手機會看到這筆預約</small></div><div style="overflow-x:auto"><table><thead><tr><th>時段</th><th>家庭</th><th>門市</th><th>全國電子 AI 顧問阿國推薦／檢核</th><th>狀態</th><th>生活顧問</th><th></th></tr></thead><tbody>
@@ -1214,5 +1214,5 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('.gb');if(g){const r=g.getBoundingClientRect();show(g,r.left,r.bottom)}});
 document.addEventListener('focusout',()=>{if(!pinned)hide()});
 addEventListener('scroll',()=>{if(!pinned)hide()},true)})();</script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261126a"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261126b"></script></body>
 </html>
