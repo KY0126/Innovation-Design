@@ -83,13 +83,13 @@ test('實用版：LINE 登入設定還沒填 Channel ID 時，確認後提示設
   await expect(page.locator('.lv-toast')).toContainText('LINE 登入設定尚未完成');
 });
 
-test('實用版後台：生活顧問登入、看到本門市家庭、送出正式報價並通知家人（P1）', async ({ page }, info) => {
+test('實用版後台：總部登入（第 4 批前用簡化後台）、看到家庭、送出正式報價並通知家人（P1）', async ({ page }, info) => {
   desktopOnly(info);
   const errs = await fresh(page, false);
   const M = createMock({
     staff: [{ id: 'u-adv', email: 'advisor@store.example', password: 'pass12345' }],
     db: {
-      profiles: [{ id: 'u-adv', display_name: '王顧問', role: 'advisor', store: 'Digital City 高雄民族店' }],
+      profiles: [{ id: 'u-adv', display_name: '張經理', role: 'hq', store: null }],
       households: [{ id: 7, elder_name: '林媽媽', store: 'Digital City 高雄民族店', stage: 0, created_at: new Date().toISOString() }],
       members: [{ household_id: 7, user_id: 'a' }, { household_id: 7, user_id: 'b' }],
       assessments: [{ household_id: 7, result: { lights: [{ c: 'r' }, { c: 'y' }, { c: 'g' }] }, created_at: new Date().toISOString() }],
@@ -101,7 +101,7 @@ test('實用版後台：生活顧問登入、看到本門市家庭、送出正�
   await page.fill('#gEmail', 'advisor@store.example');
   await page.fill('#gPw', 'pass12345');
   await page.click('#gBtn');
-  await expect(page.locator('#lvAdm')).toContainText('本門市家庭');
+  await expect(page.locator('#lvAdm')).toContainText('全部家庭');
   await expect(page.locator('#lvAdm')).toContainText('林媽媽家');
   await expect(page.locator('#lvAdm')).toContainText('1 紅 1 黃');
   await page.click('[data-la="quote"]');

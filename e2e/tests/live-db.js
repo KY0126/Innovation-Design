@@ -70,9 +70,9 @@ async function loginToApp(page, M, { expectApp = true } = {}) {
   await M.install(page);
   await page.goto('/live/app/');
   await page.click('.hg1'); await page.click('[data-lv="ok"]');
-  if (expectApp) await page.waitForFunction(() => window.JJJLIVEAPI && window.JJJLIVEAPI.active() && window.JJJAPP.S.me, null, { timeout: 15000 });
+  if (expectApp) await page.waitForFunction(() => window.JJJLIVEAPI && window.JJJLIVEAPI.active() && !window.JJJLIVEAPI.busy() && window.JJJAPP.S.me, null, { timeout: 15000 });
 }
 // 在頁面裡呼叫 /api（走 live-api.js 攔截）
 const api = (page, path, opt = {}) => page.evaluate(async ([p, o]) => { const r = await fetch('/api' + p, { method: o.method || 'GET', headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' }, body: o.body ? JSON.stringify(o.body) : undefined }); return { status: r.status, body: await r.json().catch(() => null) }; }, [path, opt]);
 
-module.exports = { familyDB, loginToApp, api, ME };
+module.exports = { familyDB, loginToApp, api, ME, rpcs };

@@ -211,6 +211,7 @@
   const toApp = (key) => window.JJJLIVEAPI.enter(key);
   async function open(key) {
     if (!LV.user) { if (window.JJJLIVE) window.JJJLIVE.needLogin(key); return; }
+    if (LV.me && LV.me.role !== 'family' && window.JJJLIVEAPI) return toApp('staff');
     if (window.JJJLIVEAPI) { await loadHouseholds(); if (LV.hh) return toApp(key); return jjj(); }
     try {
       if (key === 'me') return me();
@@ -346,6 +347,8 @@
     await loadMe();
     LV.ready = true;
     if (window.JJJAPP) window.JJJAPP.render();
+    // 員工（生活顧問、技師）在後台用員工編號登入後回到 App：直接進員工畫面（顧問 a1、技師 t1）
+    if (LV.user && LV.me && LV.me.role !== 'family' && window.JJJLIVEAPI) return toApp('staff');
     if (saved && LV.user) return afterLogin(saved);
     if (invite || wishId) {
       history.replaceState(null, '', location.pathname + '?mode=live');

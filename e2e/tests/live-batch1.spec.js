@@ -76,7 +76,7 @@ test('實用版第 1 批：首頁資料、偏好、長輩資料、邀請碼、�
   expect(errs).toEqual([]);
 });
 
-test('實用版第 1 批：方案確認、驗收、提醒在沒有資料時回 Demo 同樣的訊息；顧問與技師 API 尚未開放', async ({ page }, info) => {
+test('實用版第 1 批：方案確認、驗收、提醒在沒有資料時回 Demo 同樣的訊息；家庭帳號不能用員工 API', async ({ page }, info) => {
   desktopOnly(info);
   await fresh(page, false);
   const M = familyDB({ extra: { plans: [], reminders: [{ id: 31, household_id: 7, device: '感應小夜燈', kind: '換電池', reason: '電量 15%', due: '12/10', status: '待處理' }] } });
@@ -93,7 +93,8 @@ test('實用版第 1 批：方案確認、驗收、提醒在沒有資料時回 D
   expect(ok.body.plan.status).toBe('已確認');
   expect(ok.body.install).toMatchObject({ kind: '到府安裝', status: '待排程' });
   for (const p of ['/advisor/cases', '/tech/orders', '/admin/overview']) expect((await api(page, p)).status).toBe(403);
-  expect((await api(page, '/auth/login', { method: 'POST', body: {} })).body.error).toBe('實用版請用 LINE 登入');
+  expect((await api(page, '/auth/register', { method: 'POST', body: {} })).body.error).toBe('實用版請用 LINE 登入');
+  expect((await api(page, '/auth/login', { method: 'POST', body: {} })).body.error).toBe('請輸入員工編號和密碼');
 });
 
 test('實用版第 1 批：訂單（目錄價格以 Demo 目錄為準）、取消、同意書、購物車結帳、家電連結、保固、影片任務', async ({ page }, info) => {

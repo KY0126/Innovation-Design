@@ -116,7 +116,7 @@
     if (o.sheet) { chain([B[0], B[2]], 'top', 36); chain([B[1], B[3]], 'left', 36); }
     // 房名、坪數、地坪、天花
     ks.forEach(key => {
-      const [n, x, y, w, h, fin, ch] = ROOMS[key], [cx, cy] = key === 'hall' ? [(Math.max(B[0], 0) + Math.min(B[2], 9000)) / 2 - 700, 4050] : TAGAT[key], ar = (w * h / 1e6).toFixed(1), lt = o.lights && o.lights[key];
+      const [n, x, y, w, h, fin, ch] = ROOMS[key], [cx, cy] = key === 'hall' ? [(Math.max(B[0], 0) + Math.min(B[2], ROOMS.hall[1] + ROOMS.hall[3])) / 2 - 700, ROOMS.hall[2] + ROOMS.hall[4] / 2] : TAGAT[key], ar = (w * h / 1e6).toFixed(1), lt = o.lights && o.lights[key];
       add(`<text x="${cx}" y="${cy}" font-size="${f(9.5 * k)}" font-weight="700" text-anchor="middle" fill="${INK}" paint-order="stroke" stroke="#fff" stroke-width="${f(3 * k)}" style="${F}">${n}<tspan font-weight="400" font-size="${f(7.5 * k)}"> ${ar} m²</tspan></text>`);
       if (o.sheet || o.full) add(`<text x="${cx}" y="${f(cy + 11 * k)}" font-size="${f(6.5 * k)}" text-anchor="middle" fill="${MID}" paint-order="stroke" stroke="#fff" stroke-width="${f(2.5 * k)}" style="${F}">${FIN[fin]}｜CH ${ch}</text>`);
       if (lt) add(`<circle cx="${f(cx - (n.length * 6 + 26) * k)}" cy="${f(cy - 3.5 * k)}" r="${f(3.6 * k)}" fill="${{ r: '#E5484D', y: '#F5A524', g: '#2E9E5B' }[lt]}"/>`);
@@ -177,5 +177,5 @@
   // 螢幕座標轉成 mm
   function toMM(e, svg) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round(q.x), Math.round(q.y)]; }
   function clampTo(field, x, y) { const B = bbox(field); return [Math.max(B[0] + 60, Math.min(B[2] - 60, x)), Math.max(B[1] + 60, Math.min(B[3] - 60, y))]; }
-  window.JJJCAD = { night, coverage, isLight, ROOMS, WALLS, WINS, DOORS, FURN, ELEC, FR, SPEC, spec, FIN, plan, toMM, nearWall, bbox, clampTo, inBox };
+  window.JJJCAD = { night, coverage, isLight, ROOMS, WALLS, WINS, DOORS, FURN, ELEC, FR, SPEC, spec, FIN, plan, toMM, nearWall, bbox, clampTo, inBox, CROP, ROUTE, TAGAT };
 })();
