@@ -1,6 +1,7 @@
 // 揪居家導覽：右側說明面板＋畫面上的編號框（和 Demo 影片同一套呈現方式）
 // 不加遮罩、不跳視窗；一個揪居家 App（家庭／生活顧問／技師）＋企業管理端（電腦版），換身分時真的登出再登入
 (function () {
+  if (window.JJJ_LIVE) return; // 實用版不顯示導覽
   const PAGE = /admin\.html/.test(location.pathname) ? 'adm' : /consultant\.html/.test(location.pathname) ? 'con' : 'app';
   const LS = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
   const K = 'jjj_g_step', OFF = 'jjj_g_off';
