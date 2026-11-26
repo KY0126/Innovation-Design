@@ -109,13 +109,15 @@
       <div class="err" role="alert"></div><button class="btn" type="submit" style="margin-top:12px">加入</button></form>`, { key: 'join' });
   }
 
-  // ── 居家評估（手動輸入；AR 量測在第三階段接上） ──
+  // ── 居家評估：每一格都可以「用手機量」（live-measure.js），也可以用捲尺量好手動填 ──
+  const MEAS = { corridor: ['走道寬度', 'cm', 1], threshold: ['浴室門檻高度', 'cm', 0], dist: ['床邊到浴室門口的距離', '公尺', 1] };
+  const measBtn = (k) => `<button type="button" class="btn ghost lv-meas" data-lvm="${k}" style="margin-top:6px">用手機量${MEAS[k][0]}</button><span class="muted lv-msrc" data-msrc="${k}" style="display:block;font-size:.85em"></span>`;
   function assessForm() {
     page('居家評估', `<form class="card" id="lvAs" novalidate>
-      <p class="muted" style="margin:0 0 8px">用捲尺量好再填；量不準的地方，生活顧問到府時會再確認。</p>
-      <label class="muted">床邊到浴室的走道寬度（公分）<input class="fld" name="corridor" type="number" inputmode="decimal" min="30" max="300" step="0.5" required></label>
-      <label class="muted" style="display:block;margin-top:10px">浴室門檻高度（公分，沒有門檻填 0）<input class="fld" name="threshold" type="number" inputmode="decimal" min="0" max="30" step="0.1" required></label>
-      <label class="muted" style="display:block;margin-top:10px">床邊到浴室門口的距離（公尺）<input class="fld" name="dist" type="number" inputmode="decimal" min="0.5" max="30" step="0.1" required></label>
+      <p class="muted" style="margin:0 0 8px">每一格都可以按「用手機量」：Android 用 AR，iPhone 拍一張旁邊放了尺的照片；也可以用捲尺量好直接填。量不準的地方，生活顧問到府時會再確認。</p>
+      <label class="muted">床邊到浴室的走道寬度（公分）<input class="fld" name="corridor" type="number" inputmode="decimal" min="30" max="300" step="0.5" required></label>${measBtn('corridor')}
+      <label class="muted" style="display:block;margin-top:10px">浴室門檻高度（公分，沒有門檻填 0）<input class="fld" name="threshold" type="number" inputmode="decimal" min="0" max="30" step="0.1" required></label>${measBtn('threshold')}
+      <label class="muted" style="display:block;margin-top:10px">床邊到浴室門口的距離（公尺）<input class="fld" name="dist" type="number" inputmode="decimal" min="0.5" max="30" step="0.1" required></label>${measBtn('dist')}
       <fieldset style="border:0;padding:0;margin:12px 0 0"><legend class="muted">半夜關燈後，走道看得清楚嗎？</legend>
         <label style="margin-right:16px"><input type="radio" name="dark" value="0" checked> 看得清楚</label><label><input type="radio" name="dark" value="1"> 偏暗</label></fieldset>
       <div class="err" role="alert"></div><button class="btn" type="submit" style="margin-top:12px">看燈號結果</button></form>`, { key: 'assess' });
@@ -277,7 +279,10 @@
         if (!(d.corridor_cm >= 30 && d.corridor_cm <= 300) || !(d.threshold_cm >= 0 && d.threshold_cm <= 30) || !(d.bed_bath_m > 0)) return fail('請確認三個數字都填了，單位是公分／公尺');
         const L = lights(d);
         const dims = { corridor_mm: Math.round(d.corridor_cm * 10), threshold_mm: Math.round(d.threshold_cm * 10), bed_bath_mm: Math.round(d.bed_bath_m * 1000), dark: d.dark };
-        const { error } = await sb.from('assessments').insert({ household_id: LV.hh.id, source: 'manual', dims, result: { lights: L }, created_by: LV.user.id });
+        const methods = {}; ['corridor', 'threshold', 'dist'].forEach((k) => { methods[k] = f[k].dataset.src || 'manual'; });
+        dims.methods = methods;
+        const source = Object.values(methods).some((m) => m !== 'manual') ? 'ar' : 'manual';
+        const { error } = await sb.from('assessments').insert({ household_id: LV.hh.id, source, dims, result: { lights: L }, created_by: LV.user.id });
         if (error) return fail('儲存失敗，請再試一次');
         return jjj();
       }
@@ -288,6 +293,21 @@
         return wish();
       }
     } catch (err) { fail(err.message || '沒有成功，請再試一次'); }
+  });
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-lvm]'); if (!t || !window.JJJMeasure) return;
+    const k = t.dataset.lvm, [label, unit, xrFit] = MEAS[k], f = t.closest('form');
+    window.JJJMeasure.open({ key: k, label, unit, xrFit: !!xrFit, onDone: (v, mode) => {
+      const inp = f && f[k]; if (!inp) return;
+      inp.value = String(v); inp.dataset.src = mode;
+      const m = f.querySelector(`[data-msrc="${k}"]`); if (m) m.textContent = mode === 'xr' ? '已用 AR 量（約 ±1～3 cm）；可直接改' : '已用照片量（約 ±3–5 cm，僅供參考）；可直接改';
+      toast('已帶入：' + label + ' ' + v + ' ' + unit);
+    } });
+  });
+  document.addEventListener('input', (e) => {
+    const inp = e.target; if (!inp.closest || !inp.closest('#lvAs') || !inp.dataset.src) return;
+    delete inp.dataset.src; const m = inp.form.querySelector(`[data-msrc="${inp.name}"]`); if (m) m.textContent = '已改成手動填寫';
   });
 
   // ── 啟動 ──

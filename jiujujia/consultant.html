@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261125m"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="planmap.js?v=20261125a"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
@@ -203,7 +203,7 @@ function vWb(){const h=ST.home,ho=handoffs(),P=cases(),stg=ST.stg||'all';
  const act=p=>{const [sg]=stage(p);return sg.startsWith('新進')?['看 AI 分析',1]:sg.startsWith('待長輩')?['看長輩確認狀態',6]:sg.startsWith('待施工')||sg.startsWith('施工中')?['打開工作包與排程',7]:sg.startsWith('關懷')?['看驗收與售後',8]:['打開報價草稿',5]};
  const diffs=(h.diffs||[]).filter(d=>d.status==='待審核');
  let left='';
- if(stg==='today')left=`<div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 掃描與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>`;
+ if(stg==='today')left=`<div class="panel"><div class="ph">今日預約 <small>${esc(h.today)}</small></div><div class="pb">${(h.consults||[]).map(c=>`<button class="item" data-case="${c.household_id}"><span class="t"><b>${esc(c.label)}</b>｜${esc(c.household)} <div class="s">${esc(c.kind)}｜${esc(c.status)}｜帶著 AR 量測與 AI 分析結果</div></span><span class="tag">待指派</span></button>`).join('')||'<span class="mu">今天沒有預約</span>'}</div></div>`;
  else if(stg==='quote')left=`<div class="panel"><div class="ph">待整合報價 <small>家庭從 App 交付的改善選擇</small></div><div class="pb">${ho.length?ho.map(x=>`<button class="item" data-case="3" data-tabgo="5"><span class="t"><b>${esc(x.household)}</b>｜${esc(x.from)}交付 <div class="s">${esc(x.at)}｜${x.items.map(it=>esc(it.space+'：'+it.name)).join('、')}</div></span><span class="tag">待報價</span></button>`).join(''):'<div class="mu">目前沒有新的交付。家人在 App「選改善方式」後按「交給生活顧問整合報價」就會出現在這裡。</div><button class="item" data-case="3" data-tabgo="5"><span class="t"><b>林媽媽家</b>｜示範案件 <div class="s">走道感應夜燈＋止滑卡扣地板；浴室斜坡墊</div></span><span class="tag gray">示範資料</span></button>'}</div></div>`;
  else if(stg==='after')left=`<div class="panel"><div class="ph">售後與待補充現場資訊</div><div class="pb">${(ST.todos.requests||[]).map(r=>`<div class="item"><span class="t"><b>${esc(r.household)}</b>｜${esc(r.kind)}<div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')}${(ST.todos.care||[]).map(c=>`<div class="item"><span class="t"><b>${esc(c.household)}</b>｜${esc(c.title)}<div class="s">${esc(c.when)}｜${esc(c.outcome)}</div></span><span class="tag ok">事後關心</span></div>`).join('')}</div></div>`;
  else left=`${cur?`<div class="panel curcase" style="border:2px solid var(--brand,#D4003C)"><div class="ph">目前案件 <small>${esc(stage(cur)[0])}</small></div><div class="pb"><div style="font-size:16px"><b>${esc(cur.household)}</b>｜${esc(cur.elder_name)}　<span class="mu">${esc(cur.elder_note||'')}</span></div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="b pri" data-case="${cur.household_id}" data-tabgo="${act(cur)[1]}">${act(cur)[0]}</button><button class="b" data-case="${cur.household_id}" data-tabgo="5">打開報價草稿</button><button class="b" data-case="${cur.household_id}">案件摘要</button></div></div></div>`:''}
@@ -233,18 +233,18 @@ function tSum(p){const pl=p.plan||{};return `<div class="grid"><div class="panel
  <tr><th>方案</th><td>${pl.monthly?`月付 ${pl.monthly} 元｜設定費 ${pl.one_time.toLocaleString()} 元（示範資料）`:'尚未建立'}</td></tr></table></div></div>
  <div class="panel"><div class="ph">接手方式</div><div class="pb">${(()=>{const k=p.phase>=9?10:p.phase>=3?8:p.phase>=2?7:p.phase>=1?2:0,pl=p.plan||{},D={6:mdx(pl.created_at),7:mdx(pl.confirmed_at)};return JT(['分享規劃成果','確認權限','討論需求','解讀 AI 分析','必要時現場核對','商品與改善方式','整合報價','長輩本人確認','協調施工','驗收與售後'].map((t,i)=>i<k?['dn',D[i]||'',(i+1)+' '+t]:i===k?['cu','現在',(i+1)+' '+t+'｜進行中',i===8?'協力工班先施工，全國電子技師再安裝':'']:['td','',(i+1)+' '+t]))})()}
  <p class="mu sm" style="margin:10px 0 0">消費者未存入「長輩家」或「我家」的成果，顧問不能自行加入家庭履歷；需保存時須明確告知並取得授權。</p></div></div></div>`}
-function tAI(p){const a=p.assessment;if(!a)return '<div class="note">家庭尚未完成 AR 掃描與 AI 分析。</div>';const m=a.measures||{},A=a.answers||{};
+function tAI(p){const a=p.assessment;if(!a)return '<div class="note">家庭尚未完成 AR 量測與 AI 分析。</div>';const m=a.measures||{},A=a.answers||{};
  return `<div class="grid"><div class="panel"><div class="ph">AI 智慧分析與改善建議 <small>依明確規則判斷燈號</small></div><div class="pb"><table><tr><th>空間</th><th>燈號</th><th>分析理由</th></tr>
  ${a.lights.map(([n,l,w])=>`<tr><td>${esc(n)}</td><td><span class="dot" style="background:${LC[l][1]}"></span>${LC[l][0]}</td><td>${esc(w)}</td></tr>`).join('')}</table>
  <p class="mu sm">規則：門檻高差 ≤ 0.5 cm 綠燈、0.5–3 cm 黃燈、＞ 3 cm 紅燈；走道昏暗合併門檻或寬度小於 80 cm 判為紅燈。燈號只協助排序，不取代專業評估。</p></div></div>
- <div class="panel"><div class="ph">AR 掃描（場勘）與問卷</div><div class="pb"><table><tr><th>走道寬</th><td>${m.corridor_cm} cm</td></tr><tr><th>浴室門檻</th><td>${m.threshold_cm} cm</td></tr><tr><th>床邊到浴室</th><td>約 ${m.bed_bath_m} 公尺</td></tr><tr><th>沿路插座</th><td>${m.outlets} 個</td></tr>
+ <div class="panel"><div class="ph">AR 量測與問卷</div><div class="pb"><table><tr><th>走道寬</th><td>${m.corridor_cm} cm</td></tr><tr><th>浴室門檻</th><td>${m.threshold_cm} cm</td></tr><tr><th>床邊到浴室</th><td>約 ${m.bed_bath_m} 公尺</td></tr><tr><th>沿路插座</th><td>${m.outlets} 個</td></tr>
  ${Object.entries(A).map(([k,v])=>`<tr><th>${({live:'獨居時間',night:'夜間起床',light:'走道照明',phone:'手機能力',worry:'最擔心'})[k]||k}</th><td>${esc(v)}</td></tr>`).join('')}</table></div></div>
  <div class="panel"><div class="ph">待現場確認</div><div class="pb"><div class="item"><span class="t">門檻實際高度與門框材質</span><span class="tag am">技師核對</span></div><div class="item"><span class="t">插座是否被家具擋住</span><span class="tag am">技師核對</span></div><div class="item"><span class="t">地面材質與止滑係數</span><span class="tag am">AI 無法可靠判定</span></div>
  <p class="mu sm">AI 初始分析、使用者修正與技師現場核對分開保存，用來計算「AI 分析結果與現場核對一致率」。</p></div></div></div>`}
 function tSpace(p){const created=(p.assessment||{}).created_at||'2026-10-17 21:10:00';
  return `<div class="grid"><div class="panel"><div class="ph">空間成果 <small>2D 平面圖｜示意，不是施工圖</small></div><div class="pb"><img src="home/plan.jpg" alt="${esc(p.household)}平面圖示意" style="width:100%;border-radius:8px"></div></div>
  <div class="panel"><div class="ph">資料保存狀態</div><div class="pb"><table><tr><th>資料類型</th><th>狀態</th></tr>
- <tr><td>AR 掃描原始影像</td><td><span class="tag ok">分析完已清除</span><div class="sm mu">只為產生平面圖與 AI 分析暫存</div></td></tr>
+ <tr><td>AR 量測原始影像</td><td><span class="tag ok">分析完已清除</span><div class="sm mu">只為產生平面圖與 AI 分析暫存</div></td></tr>
  <tr><td>成果與截圖</td><td><span class="tag">已存入「長輩家」</span><div class="sm mu">保存六個月，至 ${addM(created,6)}；期滿由新資料覆蓋</div></td></tr>
  <tr><td>影像確認版錄影與異常紀錄</td><td>${(p.plan&&p.plan.sel&&p.plan.sel.cam)?'<span class="tag">保存六個月</span>':'<span class="tag gray">未加裝（無鏡頭版）</span>'}</td></tr>
  <tr><td>2D／3D 模型、尺寸、風險紀錄</td><td><span class="tag gray">依住宅履歷規則管理</span></td></tr></table>
@@ -367,6 +367,6 @@ window.JCON={ST,render};
 boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
 })();
 </script>
-<script src="guide.js?v=20261125q"></script>
+<script src="guide.js?v=20261126b"></script>
 </body>
 </html>

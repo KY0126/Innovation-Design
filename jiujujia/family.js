@@ -25,7 +25,7 @@
         ${card('data-go="pl"', '揪夜安', '臥室到浴室的夜間照明與關懷', 0)}
         ${card('data-go="x24"', '全家場域方案', '廚房、客廳、洗衣陽台加購', 1)}
         ${card('data-go="x26"', '揪全家', '四個場域每月 699 元', 1)}
-        ${card('data-go="x25"', '揪食光｜廚房診斷', '依 AR 掃描看用火用電風險', 1)}
+        ${card('data-go="x25"', '揪食光｜廚房診斷', '依 AR 量測看用火用電風險', 1)}
         ${card('data-go="x30"', '長輩關懷 2.0', '家裡現有的家電也能接入', 1)}
         ${card('data-go="x31"', '進階影像版', '長輩本人同意才裝', 1)}</div>
       <div class="sec">家電</div><div class="svcg">
@@ -94,7 +94,7 @@
       body = `<div class="card"><label class="muted">到府地址<input class="fld" data-cov="address" value="${esc(v.address)}" placeholder="高雄市三民區建工路 1 號"></label>
         <label class="muted" style="display:block;margin-top:10px">聯絡電話<input class="fld" data-cov="phone" inputmode="tel" value="${esc(v.phone)}" placeholder="0912-345-678"></label>
         <div class="muted" style="margin-top:10px">方便的時段</div><div>${SLOTP.map(x => `<button class="slot" style="margin:6px 6px 0 0" data-coslot="${x}" aria-pressed="${v.slot === x}">${x}</button>`).join('')}</div></div>
-        <div class="card" style="background:var(--note)"><div class="rs" style="line-height:1.8">・生活顧問 1 個工作天內打電話確認，再排到府時間<br>・沿用已完成的 AR 掃描與家電檔案，只補掃新空間${cam ? '<br>・進階影像版：長輩本人同意後才生效' : ''}</div></div>
+        <div class="card" style="background:var(--note)"><div class="rs" style="line-height:1.8">・生活顧問 1 個工作天內打電話確認，再排到府時間<br>・沿用已完成的 AR 量測與家電檔案，只補掃新空間${cam ? '<br>・進階影像版：長輩本人同意後才生效' : ''}</div></div>
         <button class="row" data-co-agree="1" style="width:calc(100% - 24px);margin:0 12px;background:var(--card);border-radius:12px;padding:12px 14px"><span>${c.agree ? '☑' : '☐'} 我已了解以上內容</span></button>`;
       foot = `<button class="btn" data-co-next="${free ? 3 : 2}" ${c.agree && vOK ? '' : 'disabled'}>${free ? '送出' : '下一步：選擇支付方式'}</button>`;
     } else if (c.step === 2) {

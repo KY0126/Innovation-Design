@@ -94,7 +94,7 @@
       const all = add.length === 3;
       return page('全家場域方案', `${bar(1)}
       ${zoneMap()}
-      <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 掃描與家電檔案，只補掃新空間。月費依風險分級。</div></div>
+      <div class="card"><div class="muted" style="font-size:.85em">加購沿用已完成的 AR 量測與家電檔案，只補量新空間。月費依風險分級。</div></div>
       ${FIELDS.map(([k, n, w, p, d]) => k === 'night'
         ? `<div class="card" ><b>${n}｜${w}</b> <span class="tag ok">已訂閱</span><div class="rs">${d}｜安心方案 449 元／月</div></div>`
         : `<button class="card opt" data-x24="${k}" aria-pressed="${!!sel[k]}" ${open(1) ? '' : 'disabled style="opacity:.6"'} style="width:calc(100% - 24px);margin:0 12px 10px;text-align:left"><b>${n}｜${w}　+${p} 元／月</b><div class="rs">${d}</div></button>`).join('')}
@@ -106,7 +106,7 @@
 
     // F25 揪食光：廚房診斷
     x25: () => page('揪食光｜廚房診斷結果', `${bar(1)}
-      <div class="card"><b>林媽媽家廚房（示意）</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">依 AR 掃描與家電檔案判斷</div>
+      <div class="card"><b>林媽媽家廚房（示意）</b><div class="muted" style="font-size:.85em;margin:2px 0 8px">依 AR 量測與家電檔案判斷</div>
       ${[['r', '爐具', '傳統瓦斯爐、無熄火保護'], ['r', '偵測器', '沒有煙霧與瓦斯偵測器'], ['y', '插座', '電鍋與微波爐共用一個插座'], ['g', '照明', '流理台亮度足夠']].map(([c, n, d]) => `<div style="padding:6px 0;border-top:1px solid var(--line,#eee)">${light(c)}<b>${n}</b><div class="rs" style="margin-left:18px">${d}</div></div>`).join('')}</div>
       <div class="card"><b>建議組合</b><div class="rs" style="line-height:1.8">IH 爐或熄火保護瓦斯爐、煙霧與瓦斯偵測器、排油煙機（商品不指名品牌）</div>
       <div class="muted" style="font-size:.85em;margin-top:6px">瓦斯管線與插座迴路由協力工班施工；全國電子技師負責設備安裝與教學。</div></div>

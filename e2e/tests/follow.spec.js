@@ -14,13 +14,13 @@ test('A 自己點了「幫我點」要點的按鈕 → 自動前往下一步', a
   await startFamily(page);
   const sel = await page.evaluate(() => JJJGUIDE.steps[0].act.click);
   await page.locator(sel).filter({ visible: true }).first().click();
-  await expect(h2(page)).toHaveText('AR 掃描（場勘）', { timeout: 10_000 });
+  await expect(h2(page)).toHaveText('AR 量測', { timeout: 10_000 });
   await expect(note(page)).toContainText('已完成第 1 步，自動前往第 2 步');
 });
 test('B 直接走到某一步專屬的畫面 → 卡片跟上', async ({ page }) => {
   await startFamily(page);
   await page.evaluate(() => JJJ.go('ar'));
-  await expect(h2(page)).toHaveText('AR 掃描（場勘）', { timeout: 10_000 });
+  await expect(h2(page)).toHaveText('AR 量測', { timeout: 10_000 });
   await expect(note(page)).toContainText('你從第 1 步跳到第 2 步');
 });
 test('C 走到導覽沒介紹的畫面 → 提示，不跳；按「帶我回」回到原畫面', async ({ page }) => {
@@ -50,11 +50,11 @@ test('C 「先收合導覽」→ 面板收起，按「繼續導覽」接著同�
 test('D 按返回回到前一步的畫面 → 卡片不倒退，提示按「上一步」', async ({ page }) => {
   await startFamily(page);
   await page.click('#jg [data-t="next"]');
-  await expect(h2(page)).toHaveText('AR 掃描（場勘）', { timeout: 10_000 });
+  await expect(h2(page)).toHaveText('AR 量測', { timeout: 10_000 });
   await expect(page.locator('#jg [data-t="next"]')).toBeEnabled();
   await page.locator('#view [data-a="back"]').filter({ visible: true }).first().click();
   await expect(page.locator('#jg')).toContainText('你回到上一個畫面', { timeout: 10_000 });
-  await expect(h2(page)).toHaveText('AR 掃描（場勘）');
+  await expect(h2(page)).toHaveText('AR 量測');
   await expect(page.locator('#jg')).toHaveClass(/nd/);
 });
 test('企業管理端：點側欄跳到後面的分頁 → 卡片跟上；點導覽沒介紹的分頁 → 提示', async ({ page }) => {

@@ -1,4 +1,4 @@
-// AR 量測：手機實測。照片＋信用卡比例尺換算；結果帶回 AR 掃描頁同一份量測值
+// AR 量測：手機實測。照片＋尺的刻度當比例尺換算；結果帶回 AR 掃描頁同一份量測值
 const { test } = require('playwright/test');
 const { fresh, expect } = require('./helpers');
 test.use({ launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] } });
@@ -16,7 +16,7 @@ async function tapPx(page, x, y) {
   await page.mouse.click(b.x + x * b.width / w, b.y + y * b.height / h);
 }
 
-test('拍照量：開相機拍照 → 點卡片長邊 → 點走道兩端 → 換算並帶回量測欄位', async ({ page }, info) => {
+test('拍照量：開相機拍照 → 點尺上兩個刻度、輸入相差公分 → 點走道兩端 → 換算並帶回量測欄位', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
   await page.setViewportSize({ width: 390, height: 844 });
   const errs = await fresh(page);
@@ -26,16 +26,19 @@ test('拍照量：開相機拍照 → 點卡片長邊 → 點走道兩端 → �
   await expect(page.locator('#armV')).toBeVisible();
   await page.waitForFunction(() => { const v = document.getElementById('armV'); return v && v.videoWidth > 0; });
   await page.click('[data-arshot]');
-  await expect(page.locator('#view')).toContainText('點信用卡');
+  await expect(page.locator('#view')).toContainText('點尺上');
   const [w] = await page.locator('#armC').evaluate(el => [el.width]);
-  // 卡片長邊佔 w/10 像素；走道佔 w*0.9 → 8.56 × 9 ≈ 77 cm
+  // 尺上兩個刻度相差 10 cm、佔 w/10 像素；走道佔 w*0.9 → 90 cm
   await tapPx(page, w * 0.1, 100); await tapPx(page, w * 0.2, 100);
+  await expect(page.locator('#view')).toContainText('相差幾公分');
+  await expect(page.locator('#armRef')).toHaveValue('10');
+  await page.click('[data-arref]');
   await expect(page.locator('#view')).toContainText('點要量的走道寬度兩端');
   await tapPx(page, w * 0.05, 200); await tapPx(page, w * 0.95, 200);
-  await expect(page.locator('#view')).toContainText('約 77 cm');
+  await expect(page.locator('#view')).toContainText('約 90 cm');
   await expect(page.locator('#view')).toContainText('僅供參考');
   await page.click('[data-aruse]');
-  await expect(page.locator('#m_corridor_cm')).toHaveValue('77');
+  await expect(page.locator('#m_corridor_cm')).toHaveValue('90');
   await expect(page.locator('#view')).toContainText('照片比例尺');
   expect(errs).toEqual([]);
 });
@@ -50,7 +53,8 @@ test('從相簿選照片量門檻高度（iPhone 也能用）', async ({ page },
   const png = await page.evaluate(() => { const c = document.createElement('canvas'); c.width = 1000; c.height = 600; const g = c.getContext('2d'); g.fillStyle = '#ddd'; g.fillRect(0, 0, 1000, 600); return c.toDataURL('image/png').split(',')[1]; });
   await page.setInputFiles('[data-arfile]', { name: 'door.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') });
   await expect(page.locator('#armC')).toBeVisible();
-  await tapPx(page, 100, 300); await tapPx(page, 528, 300); // 卡片長邊 428 px
+  await tapPx(page, 100, 300); await tapPx(page, 600, 300); // 尺上 0～10 cm 佔 500 px
+  await page.fill('#armRef', '10'); await page.click('[data-arref]');
   await tapPx(page, 600, 200); await tapPx(page, 600, 300); // 門檻 100 px → 2 cm
   await expect(page.locator('#view')).toContainText('約 2 cm');
   await page.click('[data-aruse]');
@@ -99,11 +103,12 @@ test('量測頁共用「AR 量測｜手動輸入」：量完不滿意改用手�
   await page.click('[data-arshot]');
   const [w] = await page.locator('#armC').evaluate(el => [el.width]);
   await tapPx(page, w * 0.1, 100); await tapPx(page, w * 0.2, 100);
+  await page.click('[data-arref]');
   await tapPx(page, w * 0.05, 200); await tapPx(page, w * 0.95, 200);
-  await expect(page.locator('#view')).toContainText('約 77 cm');
+  await expect(page.locator('#view')).toContainText('約 90 cm');
   await page.click('[data-arman]');
   await expect(page.locator('.armode [aria-pressed="true"]')).toHaveText('手動輸入');
-  await expect(page.locator('#m_corridor_cm')).toHaveValue('77');
+  await expect(page.locator('#m_corridor_cm')).toHaveValue('90');
   await expect(page.locator('#m_corridor_cm')).toBeFocused();
   await page.fill('#m_corridor_cm', '80');
   await expect(page.locator('#m_corridor_cm').locator('xpath=ancestor::label').locator('.tag')).toHaveText('手動');
