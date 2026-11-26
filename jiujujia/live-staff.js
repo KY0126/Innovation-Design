@@ -373,6 +373,152 @@
       window.JJJLAYOUT.editor(hid, (L) => { fpState[hid] = !!L; document.querySelectorAll('.lv-fp').forEach((x) => x.remove()); if (window.JJJAPP && window.JJJAPP.render) window.JJJAPP.render(); else if (window.JCON) window.JCON.render(); }).catch((x) => alert(x.message));
     });
 
+    // ── 技師（第 3 批） ──
+    const TECH = ['tech', 'hq'];
+    const STEPS = ['m', 'ph0', 'g', 's', 'b', 'scan', 'fine', 'test', 'ph1', 'rc', 'teach'];
+    // 工單詳情（同 Demo 的 Q4）：電話、地址到府當天或施工中才完整顯示
+    async function orderOut(b, c) {
+      const h = await q(db('households').select('*').eq('id', b.household_id).maybeSingle()) || {};
+      const [pl, as, ds, logs, pk] = await Promise.all([
+        q(db('plans').select('*').eq('household_id', h.id).eq('status', '已確認').order('id', { ascending: false }).limit(1)),
+        q(db('assessments').select('measures, dims').eq('household_id', h.id).order('id', { ascending: false }).limit(1)),
+        q(db('site_diffs').select('id, pkg, pin_id, level, text, photo, status, by_name, review_note, new_ver, created_at').eq('booking_id', b.id).order('id', { ascending: false })),
+        b.code ? q(db('audit').select('action, detail, at, user_id').eq('target', b.code).order('id')) : [],
+        work.packagesOf(b.id),
+      ]);
+      const N = await uname([...logs.map((x) => x.user_id), h.created_by, b.assignee_id]);
+      const show = c.role === 'hq' || (b.slot_start || '').slice(0, 10) === today() || b.status === '進行中', addr = h.address || '';
+      const fp = await q(db('floorplans').select('layout').eq('household_id', h.id).maybeSingle());
+      return { ...nf(b), assignee: N[b.assignee_id] || null, household_id: h.id, household: Ce(h), elder_name: h.elder_name, owner: N[h.created_by] || null,
+        phone: show ? h.phone : h.phone ? h.phone.slice(0, 4) + '-***-***' : null,
+        address: show ? addr : addr ? addr.slice(0, 6) + '（完整地址出發當天顯示）' : '尚未提供',
+        plan: oa(pl[0]), measures: as[0] ? u5(as[0]).measures : {}, obs: h.obs || null,
+        packages: pk.map((x) => ({ ...x, mine: c.role === 'hq' || x.assignee_id === c.uid })),
+        pv: await work.versionOut(await work.latestVersion(h.id)),
+        diffs: ds.map((d) => ({ ...d, photo: d.photo ? 1 : 0, created_at: ls(d.created_at), when: short(d.created_at) })),
+        acceptance: await work.acceptanceOf(b.id),
+        log: logs.map((x) => ({ action: x.action, detail: x.detail, at: ls(x.at), name: N[x.user_id] || null, when: short(x.at) })),
+        floorplan: fp ? fp.layout : null };
+    }
+    async function myOrder(c, id) {
+      const b = await q(db('bookings').select('*').eq('id', +id).maybeSingle());
+      if (!b || b.kind === '門市諮詢') throw new E('找不到工單', 404);
+      if (c.role !== 'hq' && b.assignee_id !== c.uid && !(await q(db('work_packages').select('id').eq('booking_id', b.id).eq('assignee_id', c.uid))).length) throw new E('這不是您的工單', 403);
+      return b;
+    }
+    async function myPkg(c, b, code) {
+      const P = (await work.packagesOf(b.id)).find((x) => x.code === String(code || '').toUpperCase());
+      if (!P) throw new E('找不到工作包', 404);
+      if (c.role !== 'hq' && P.assignee_id !== c.uid) throw new E(`工作包 ${P.code} 由${P.team}負責，您只能查看`, 403);
+      return P;
+    }
+    // 圖面標記狀態（同 Demo 的 s5）
+    async function pinState(hid, pkg, st, pid) {
+      const v = await work.latestVersion(hid); if (!v) return;
+      const pins = (v.pins || []).map((x) => ((pid ? x.id === pid : x.pkg === pkg) && x.k !== 'note' ? { ...x, st } : x));
+      await q(db('plan_versions').update({ pins }).eq('id', v.id));
+    }
+    const reload = async (b, c) => J(await orderOut(await q(db('bookings').select('*').eq('id', b.id).single()), c));
+    const stopped = async (b, pkg) => (await q(db('site_diffs').select('id').eq('booking_id', b.id).eq('pkg', pkg).eq('status', '待審核').eq('level', '暫停'))).length > 0;
+    add('GET', /^\/api\/tech\/orders$/, TECH, async (c) => {
+      const ST = ['已指派', '進行中', '待驗收', '已完成'];
+      let L;
+      if (c.role === 'hq') L = await q(db('bookings').select('*').neq('kind', '門市諮詢').in('status', ST).order('slot_start', { ascending: false }).limit(30));
+      else {
+        const pk = await q(db('work_packages').select('booking_id').eq('assignee_id', c.uid));
+        const a = await q(db('bookings').select('*').neq('kind', '門市諮詢').in('status', ST).eq('assignee_id', c.uid));
+        const b2 = pk.length ? await q(db('bookings').select('*').neq('kind', '門市諮詢').in('status', ST).in('id', [...new Set(pk.map((x) => x.booking_id))])) : [];
+        const seen = new Set(); L = [...a, ...b2].filter((x) => !seen.has(x.id) && seen.add(x.id));
+        L.sort((x, y) => (x.status === '已完成' ? 1 : 0) - (y.status === '已完成' ? 1 : 0) || String(x.slot_start).localeCompare(String(y.slot_start))); L = L.slice(0, 30);
+      }
+      return J({ today: today(), orders: await Promise.all(L.map((b) => orderOut(b, c))) });
+    });
+    add('GET', /^\/api\/tech\/orders\/(\d+)$/, TECH, async (c, m) => {
+      const o = await orderOut(await myOrder(c, m[1]), c);
+      if (window.JJJLAYOUT) window.JJJLAYOUT.setHome(o.floorplan || null); // 施工圖用這一家的真實格局
+      return J(o);
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/start$/, TECH, async (c, m) => {
+      const b = await myOrder(c, m[1]); if (!['已指派', '進行中'].includes(b.status)) throw new E('這張工單無法開始');
+      const A = (await work.packagesOf(b.id)).find((x) => x.code === 'A'); if (A && A.locked) throw new E(`請等前置工作包 ${A.prereq} 完成`);
+      await q(db('bookings').update({ status: '進行中', progress: Math.max(b.progress || 0, 2) }).eq('id', b.id));
+      if (A && ['未開始', '可施工'].includes(A.status)) await q(db('work_packages').update({ status: '進行中', started_at: A.started_at ? undefined : nowIso() }).eq('id', A.id));
+      await audit('開始安裝', b.code); return reload(b, c);
+    });
+    const pickSteps = (x) => { const o = {}; for (const k of STEPS) if (x && x[k]) o[k] = true; return o; };
+    add('PUT', /^\/api\/tech\/orders\/(\d+)\/steps$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]); if (b.status !== '進行中') throw new E('請先按「開始安裝」');
+      const st = pickSteps(body.steps), n = Object.keys(st).length, pr = Math.min(5, 2 + Math.floor((n / STEPS.length) * 3.99));
+      await q(db('bookings').update({ steps: st, diff: v2(body.diff, 100) || null, progress: pr }).eq('id', b.id));
+      return J({ ok: true, progress: pr });
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/complete$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]); if (b.status !== '進行中') throw new E('請先按「開始安裝」');
+      const st = pickSteps(body.steps); if (Object.keys(st).length < STEPS.length) throw new E('請完成全部安裝步驟');
+      if (await stopped(b, 'A')) throw new E('有暫停中的差異回報，請等生活顧問核准');
+      await q(db('work_packages').update({ status: '已完成', done_at: nowIso() }).eq('booking_id', b.id).eq('code', 'A'));
+      const left = (await q(db('work_packages').select('id').eq('booking_id', b.id).neq('status', '已完成'))).length;
+      await q(db('bookings').update({ status: left ? '進行中' : '待驗收', progress: 5, steps: st, diff: v2(body.diff, 100) || null }).eq('id', b.id));
+      await pinState(b.household_id, 'A', 'done');
+      await audit('完工', b.code, v2(body.diff, 100)); return reload(b, c);
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/packages\/([A-Za-z])\/start$/, TECH, async (c, m) => {
+      const b = await myOrder(c, m[1]), P = await myPkg(c, b, m[2]);
+      if (P.locked) throw new E(`請等前置工作包 ${P.prereq} 完成`); if (!['未開始', '可施工', '進行中'].includes(P.status)) throw new E('這個工作包無法開始');
+      await q(db('work_packages').update(Object.assign({ status: '進行中' }, P.started_at ? {} : { started_at: nowIso() })).eq('id', P.id));
+      if (b.status === '已指派') await q(db('bookings').update({ status: '進行中', progress: Math.max(b.progress || 0, 2) }).eq('id', b.id));
+      await audit(`開始工作包 ${P.code}`, b.code, P.name); return reload(b, c);
+    });
+    add('PUT', /^\/api\/tech\/orders\/(\d+)\/packages\/([A-Za-z])\/steps$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]), P = await myPkg(c, b, m[2]); if (P.status !== '進行中') throw new E('請先開始這個工作包');
+      const o = {}; (P.step_names || []).forEach((x, i) => { if (body.steps && body.steps[i]) o[i] = true; });
+      await q(db('work_packages').update({ steps: o }).eq('id', P.id)); return J({ ok: true });
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/packages\/([A-Za-z])\/complete$/, TECH, async (c, m) => {
+      const b = await myOrder(c, m[1]), P = await myPkg(c, b, m[2]);
+      if (P.code === 'A') throw new E('工作包 A 請用完工回報'); if (P.status !== '進行中') throw new E('請先開始這個工作包');
+      if (Object.keys(P.steps || {}).length < (P.step_names || []).length) throw new E('請完成全部步驟');
+      if (await stopped(b, P.code)) throw new E('有暫停中的差異回報，請等生活顧問核准');
+      await q(db('work_packages').update({ status: '已完成', done_at: nowIso() }).eq('id', P.id));
+      await pinState(b.household_id, P.code, 'done');
+      if (P.code === 'S') await q(db('devices').update({ status: '正常', warn: null }).eq('household_id', b.household_id).eq('source', '到府安裝').not('warn', 'is', null));
+      const left = (await q(db('work_packages').select('id').eq('booking_id', b.id).neq('status', '已完成'))).length;
+      if (!left && b.kind === '到府安裝') await q(db('bookings').update({ status: '待驗收', progress: 5 }).eq('id', b.id));
+      else if (!left) { await q(db('bookings').update({ status: '已完成', progress: 6, completed_at: nowIso() }).eq('id', b.id)); await q(db('reminders').update({ status: '已完成' }).eq('booking_id', b.id)); }
+      await audit(`完成${P.name}`, b.code, P.name); return reload(b, c);
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/pins\/([A-Za-z0-9]+)$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]), v = await work.latestVersion(b.household_id), pin = v && (v.pins || []).find((x) => x.id === m[2]);
+      if (!pin) throw new E('找不到圖面標記', 404);
+      const P = (await work.packagesOf(b.id)).find((x) => x.code === pin.pkg);
+      if (c.role !== 'hq' && (!P || P.assignee_id !== c.uid)) throw new E('這個標記屬於其他人員', 403);
+      if (P && P.locked) throw new E(`請等前置工作包 ${P.prereq} 完成`);
+      await pinState(b.household_id, pin.pkg, body.st === 'plan' ? 'plan' : 'done', pin.id); return reload(b, c);
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/diffs$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]), text = v2(body.text, 120); if (!text) throw new E('請描述現場差異');
+      const v = await work.latestVersion(b.household_id), pin = v && (v.pins || []).find((x) => x.id === v2(body.pin_id, 8));
+      const pkg = pin ? pin.pkg : ['A', 'B', 'C', 'S'].includes(body.pkg) ? body.pkg : 'A', level = body.level === '暫停' ? '暫停' : '輕微';
+      const move = body.move && Number.isFinite(Number(body.move.x)) ? { x: Number(body.move.x), y: Number(body.move.y) } : null;
+      const me = await q(db('profiles').select('display_name').eq('id', c.uid).maybeSingle());
+      await q(db('site_diffs').insert({ booking_id: b.id, household_id: b.household_id, pkg, pin_id: pin ? pin.id : null, level, text, photo: !!body.photo, move, by_id: c.uid, by_name: (me && me.display_name) || '技師', status: '待審核' }));
+      if (pin) await pinState(b.household_id, pkg, 'diff', pin.id);
+      if (level === '暫停') await q(db('work_packages').update({ status: '暫停' }).eq('booking_id', b.id).eq('code', pkg));
+      await audit(level === '暫停' ? '回報差異（暫停施工）' : '回報差異', b.code, text.slice(0, 40)); return reload(b, c);
+    });
+    add('POST', /^\/api\/tech\/orders\/(\d+)\/(accept|reject)$/, TECH, async (c, m, body) => {
+      const b = await myOrder(c, m[1]), h = await q(db('households').select('elder_name').eq('id', b.household_id).single());
+      if (m[2] === 'reject' && b.status !== '待驗收') throw new E('這張工單不在待驗收狀態');
+      const ok = m[2] === 'accept', note = v2(body.note, 100);
+      await rpc('install_finish', { p_booking: b.id, p_accept: ok, p_by_role: '長輩', p_by_name: h.elder_name, p_items: ok ? (Array.isArray(body.items) ? body.items.slice(0, 20) : []) : (body.areas || []), p_note: note || null });
+      await audit(ok ? '長輩驗收通過' : '驗收退回', b.code, ok ? `${h.elder_name}在現場驗收｜摘要已同步給家人` : `${(body.areas || []).join('、')}｜${note || ''}`);
+      if (ok) await rpc('notify_household', { p_household: b.household_id, p_kind: 'install', p_title: '到府安裝驗收通過', p_body: `${h.elder_name}在現場驗收通過，夜間關懷已啟用`, p_link: 'install' }).catch(() => {});
+      return reload(b, c);
+    });
+    add('POST', /^\/api\/tech\/acceptance-result$/, TECH, async (c, m, body) => {
+      await q(db('acceptance_results').upsert({ booking_code: String(body.code || '').slice(0, 30), first_pass: !!body.first_pass, by_id: c.uid })); return J({ ok: true });
+    });
+
     // 有人登入就記錄計時（Demo 的 /api/metrics）
     const mi = routes.findIndex((r) => r[0] === 'POST' && String(r[1]) === String(/^\/api\/metrics$/));
     if (mi >= 0) routes.splice(mi, 1);
