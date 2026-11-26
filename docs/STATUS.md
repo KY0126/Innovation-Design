@@ -1,13 +1,15 @@
 # 揪居家｜進度檔（STATUS）
 
 > 唯一的進度檔（CLAUDE.md W5）。每完成一件就更新；新視窗開工先讀這份（W6）。
-> 最後更新：2026/11/26 10:22
+> 最後更新：2026/11/26 12:55
 
 ## 目前版本
 
 | 項目 | 版本／位置 |
 |---|---|
-| 原型（Demo 版） | main（GitHub Pages `/app`、`/admin`），含 PR #43 圖 6 ② 3D 邊界修正 |
+| 原型（Demo 版） | main（GitHub Pages `/app/`、`/admin/`），含 PR #43、#47（`/app/` 轉址修 LINE 404） |
+| 原型（實用版） | 骨架已上線 `/live/app/`、`/live/admin/`（PR #48）；資料庫 jjj 區已建（分支 `stage2-live-db`，未開 PR） |
+| 實用版設計稿 | `docs/design/實用版_資料表權限與LINE循環.md`（v2，已確認） |
 | 決選構想計畫書 | 決選 v2（11/26 約 07:25，docx＋pdf＋md） |
 | 交接 zip | 最終版 v3（原型快照為 main 204e02f） |
 | LINE 官方帳號 | 五子登科：歡迎訊息、12 則自動回覆、頭貼、分頁圖文選單（richmenuswitch）已上線 |
@@ -17,6 +19,7 @@
 
 | 項目 | 你要做的事 |
 |---|---|
+| 第 6 步：LINE Developers 新增 LINE Login 設定（綁定現有五子登科） | K.Y. 回家再做；送出前再確認一次，金鑰由 K.Y. 自己貼進 Supabase |
 | 用語規範列出的 15 處禁用詞（基準線 9 組） | 決定要不要修 |
 | LINE 分頁選單與 12 個拼圖按鈕 | 用手機實測 |
 | 17 個 issue、標籤、里程碑（`docs/prd/issues.md`） | 同意後才建立（目前都還沒建） |
@@ -27,17 +30,19 @@
 - 新增專案規範：`CLAUDE.md`、`docs/context/` 七份、`docs/STATUS.md`。
 - 新增測試基礎：`tests/`、e2e 新 projects、CI `checks`。
 - 新增 `.claude/agents/`、`.claude/skills/`、`docs/prd/`、`.github/` 範本（PR #46 已合併，main 5d47e88）。
+- 原型快照換成 PR #47、#48 之後的 main（`/app/` 轉址、實用版骨架 `/live/`）。
+- 新增 `docs/design/`、`supabase/`（jjj 區，PR 合併後）。
 
 ## 進行中
 
 | 任務 | 步驟 | 狀態 | 時間 |
 |---|---|---|---|
-| 修 LINE「App 下載」連結 404（加 `/app/`、`/admin/` 轉址） | 1 轉址檔 ✅／2 開 PR ✅／3 等「合併」▶／4 手機重測 ⬜ | 進行中 | 11/26 10:30 |
+| 實用版拆分 | 1 決定 ✅／2 S01 示意 ✅／3 骨架 PR #48 ✅／4 設計稿 ✅／4-1 S02 示意 ✅／5 jjj 資料庫 ✅／6 LINE Login 設定 ⏸（K.Y. 回家做）／7 LINE 登入＋分享 S1、S3＋推播 P1、P3、P4，開 PR ⬜ | 暫停 | 11/26 12:55 |
 
 ## 之後要做
 
 | 時間 | 項目 |
 |---|---|
-| 12/11 起（已排提醒） | Demo／實用版拆分（`/live/app`、`/live/admin` 接 Supabase）；LINE 第二批 |
+| 12/11 起（已排提醒） | 實用版第三階段：主線接真實資料（US-01～US-12）；LINE 第二批（S2、P2、P5～P7） |
 | 12/14 | 實用版 MVP 里程碑 |
 | 12/16 | 決選交件 |
