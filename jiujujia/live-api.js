@@ -427,7 +427,7 @@
     }],
   ];
   // 其他角色（生活顧問、技師、總部、大使、企業）與 AI 轉真人：後續批次接上
-  const LATER = /^\/api\/(admin|amb|biz|support)\//;
+  const LATER = /^\/api\/(admin|amb|biz)\//;
 
   async function handle(method, path, body, qs, url, o) {
     for (const [mth, re, need, fn] of routes) {
@@ -529,6 +529,6 @@
   // 要包在 Demo 模擬後端（backend.js、store*.js）的外層，等頁面上的腳本都跑完再接手
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install); else install();
     // 給 live-staff.js（生活顧問、技師、總部）共用
-  const H = { OPEN, NOHH, q, rpc, db, sb, J, ERR, E, ctx, ls, nf, oa, u5, label, parse, R, T, work, touch, audit, uname, passJSON };
+  const H = { OPEN, NOHH, briefs, q, rpc, db, sb, J, ERR, E, ctx, ls, nf, oa, u5, label, parse, R, T, work, touch, audit, uname, passJSON };
   window.JJJLIVEAPI = { enter, active: () => active, busy: () => busy, install, _routes: routes, H, ready: (fn) => fn(H, routes) };
 })();

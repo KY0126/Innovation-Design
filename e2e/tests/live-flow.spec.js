@@ -83,39 +83,7 @@ test('實用版：LINE 登入設定還沒填 Channel ID 時，確認後提示設
   await expect(page.locator('.lv-toast')).toContainText('LINE 登入設定尚未完成');
 });
 
-test('實用版後台：總部登入（第 4 批前用簡化後台）、看到家庭、送出正式報價並通知家人（P1）', async ({ page }, info) => {
-  desktopOnly(info);
-  const errs = await fresh(page, false);
-  const M = createMock({
-    staff: [{ id: 'u-adv', email: 'advisor@store.example', password: 'pass12345' }],
-    db: {
-      profiles: [{ id: 'u-adv', display_name: '張經理', role: 'hq', store: null }],
-      households: [{ id: 7, elder_name: '林媽媽', store: 'Digital City 高雄民族店', stage: 0, created_at: new Date().toISOString() }],
-      members: [{ household_id: 7, user_id: 'a' }, { household_id: 7, user_id: 'b' }],
-      assessments: [{ household_id: 7, result: { lights: [{ c: 'r' }, { c: 'y' }, { c: 'g' }] }, created_at: new Date().toISOString() }],
-    },
-    functions: { 'line-push': (b) => ({ data: { ok: true, total: 2, sent: 0, line: false } }) },
-  });
-  await M.install(page);
-  await page.goto('/live/admin/');
-  await page.fill('#gEmail', 'advisor@store.example');
-  await page.fill('#gPw', 'pass12345');
-  await page.click('#gBtn');
-  await expect(page.locator('#lvAdm')).toContainText('全部家庭');
-  await expect(page.locator('#lvAdm')).toContainText('林媽媽家');
-  await expect(page.locator('#lvAdm')).toContainText('1 紅 1 黃');
-  await page.click('[data-la="quote"]');
-  await page.fill('#lvQF textarea', '感應小夜燈｜床邊,690\n浴室止滑條,450');
-  await page.click('#lvQF button[type="submit"]');
-  await expect(page.locator('.lv-toast')).toContainText('第 1 版正式報價已送出');
-  await expect(page.locator('.lv-toast')).toContainText('已通知 2 人');
-  const q = M.st.db.quotes[0];
-  expect(q).toMatchObject({ household_id: 7, version: 1, total: 1140, is_formal: true, advisor_id: 'u-adv' });
-  const call = M.st.calls.find((c) => c.name === 'line-push');
-  expect(call.body).toMatchObject({ action: 'quote', quote_id: q.id });
-  expect(call.auth).toMatch(/^Bearer /);
-  expect(errs).toEqual([]);
-});
+// 總部後台改用 Demo 同一套畫面，測試在 live-batch4.spec.js
 
 test('實用版後台：家庭帳號不能進後台', async ({ page }, info) => {
   desktopOnly(info);

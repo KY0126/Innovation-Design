@@ -519,6 +519,239 @@
       await q(db('acceptance_results').upsert({ booking_code: String(body.code || '').slice(0, 30), first_pass: !!body.first_pass, by_id: c.uid })); return J({ ok: true });
     });
 
+    // ── 總部後台（第 4 批）：生活顧問共用的列表限自己門市，總部看全部 ──
+    const HQ = ['hq'];
+    const staffFn = async (body) => {
+      const C = window.JJJ_LIVE_CFG, { data: { session } } = await window.JJJLIVEAPI.H.sb().auth.getSession();
+      const r = await fetch(C.supabaseUrl + '/functions/v1/staff-admin', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: C.supabaseKey, Authorization: 'Bearer ' + session.access_token }, body: JSON.stringify(body) });
+      const d = await r.json().catch(() => ({})); if (!r.ok) throw new E(d.error || '沒有成功', r.status); return d;
+    };
+    add('GET', /^\/api\/admin\/overview$/, ADV, async (c, m, b, qs) => {
+      const st = storeOf(c, qs), o = await rpc('admin_overview', { p_store: st || '' }), d = today();
+      const H = await storeHH(st), I = ids(H);
+      const tc = I.length ? await q(db('bookings').select('*').in('household_id', I).eq('kind', '門市諮詢').like('slot_start', d + '%').neq('status', '已取消').order('slot_start')) : [];
+      const act = c.role === 'hq' ? await q(db('audit').select('action, target, detail, at, user_id').order('id', { ascending: false }).limit(10)) : [];
+      const N = await uname(act.map((x) => x.user_id)), R0 = act.length ? await q(db('profiles').select('id, role').in('id', [...new Set(act.map((x) => x.user_id))])) : [];
+      const { funnel, store, ...kpi } = o;
+      return J({ store, today: d, kpi, funnel, today_consults: await jaList(tc), activity: act.map((x) => ({ action: x.action, target: x.target, detail: x.detail, at: ls(x.at), name: N[x.user_id] || null, role: (R0.find((r) => r.id === x.user_id) || {}).role || null, when: short(x.at) })) });
+    });
+    add('GET', /^\/api\/admin\/staff$/, ADV, async (c, m, b, qs) => {
+      const st = storeOf(c, qs), L = await q(inStore(db('profiles').select('id, display_name, store, role').in('role', ['advisor', 'tech']).eq('disabled', false), st).order('created_at'));
+      const f = (r) => L.filter((x) => x.role === r).map((x) => ({ id: x.id, name: x.display_name, store: x.store }));
+      return J({ advisors: f('advisor'), techs: f('tech') });
+    });
+    add('GET', /^\/api\/admin\/bookings$/, ADV, async (c, m, b, qs) => {
+      const st = storeOf(c, qs), since = new Date(Date.now() - 14 * 864e5).toISOString();
+      const [cs, ins] = await Promise.all([
+        q(inStore(db('bookings').select('*').eq('kind', '門市諮詢').or(`status.in.(待指派,已指派),created_at.gte.${since}`), st)),
+        q(inStore(db('bookings').select('*').neq('kind', '門市諮詢').neq('status', '已取消'), st).order('slot_start', { ascending: false }).limit(40)),
+      ]);
+      const O1 = { 待指派: 0, 已指派: 1 }, O2 = { 待排程: 0, 已指派: 1, 進行中: 2 };
+      cs.sort((x, y) => (O1[x.status] ?? 2) - (O1[y.status] ?? 2) || String(x.slot_start).localeCompare(String(y.slot_start)));
+      ins.sort((x, y) => (O2[x.status] ?? 3) - (O2[y.status] ?? 3));
+      const all = [...cs, ...ins], H = await hhMap(all.map((x) => x.household_id)), hids = Object.keys(H).map(Number);
+      const [pl, as] = hids.length ? await Promise.all([q(db('plans').select('household_id, sel').in('household_id', hids).eq('status', '已確認').order('id', { ascending: false })), q(db('assessments').select('*').in('household_id', hids).order('id', { ascending: false }))]) : [[], []];
+      const N = await uname(all.map((x) => x.assignee_id)), CAT = R().CATALOG;
+      const x = (bk) => { const h = H[bk.household_id] || {}, p = pl.find((y) => y.household_id === h.id);
+        return { ...nf(bk), assignee: N[bk.assignee_id] || null, household_id: h.id, household: Ce(h), elder_note: h.elder_note, address: h.address, phase: h.phase || 0, assessment: u5(as.find((y) => y.household_id === h.id)), items: p ? CAT.filter((a) => (p.sel || {})[a.id] && a.p).map((a) => a.n) : [] }; };
+      return J({ consults: cs.map(x), installs: ins.map(x) });
+    });
+    add('POST', /^\/api\/admin\/bookings\/(\d+)\/assign$/, ADV, async (c, m, body) => {
+      const g = await q(db('bookings').select('*').eq('id', +m[1]).eq('kind', '門市諮詢').maybeSingle()); if (!g) throw new E('找不到資料', 404);
+      if (c.role !== 'hq' && g.store !== c.store) throw new E('只能處理自己門市的資料', 403);
+      const a = await q(db('profiles').select('id, display_name, role, store, disabled').eq('id', String(body.assignee_id || '')).maybeSingle());
+      if (!a || a.role !== 'advisor' || a.disabled) throw new E('請選擇生活顧問'); if (a.store !== g.store) throw new E('只能指派同門市的生活顧問');
+      if (!['待指派', '已指派'].includes(g.status)) throw new E('這筆預約已結束');
+      await q(db('bookings').update({ assignee_id: a.id, status: '已指派' }).eq('id', g.id));
+      await audit('指派生活顧問', g.code, a.display_name); return J({ ok: true });
+    });
+    add('POST', /^\/api\/admin\/bookings\/(\d+)\/status$/, ADV, async (c, m, body) => {
+      const g = await q(db('bookings').select('*').eq('id', +m[1]).maybeSingle()); if (!g) throw new E('找不到資料', 404);
+      if (c.role !== 'hq' && g.store !== c.store) throw new E('只能處理自己門市的資料', 403);
+      if (!['已取消', '未到店'].includes(body.status)) throw new E('狀態不正確');
+      await q(db('bookings').update({ status: '已取消' }).eq('id', g.id));
+      await audit(body.status === '未到店' ? '標記未到店' : '取消預約', g.code); return J({ ok: true });
+    });
+    const WCLS = ['浴室安全', '夜間照明', '操作簡化', '數位陪伴', '設備維護', '其他'];
+    add('GET', /^\/api\/admin\/wishes$/, ADV, async (c, m, b, qs) => {
+      const st = storeOf(c, qs), L = await q(inStore(db('wishes').select('*'), st).order('id', { ascending: false }).limit(60));
+      L.sort((x, y) => (x.status === '已回覆' ? 1 : 0) - (y.status === '已回覆' ? 1 : 0));
+      const H = await hhMap(L.map((w) => w.household_id)), N = await uname(L.map((w) => w.replied_by));
+      return J({ wishes: L.map((w) => ({ id: w.id, code: w.code, household: H[w.household_id] ? Ce(H[w.household_id]) : '—', store: w.store, category: w.category, text: w.text, source: w.source, status: w.status, class: w.class, reply: w.reply, replied_by: N[w.replied_by] || null, when: short(w.created_at) })) });
+    });
+    add('POST', /^\/api\/admin\/wishes\/(\d+)$/, ADV, async (c, m, body) => {
+      const g = await q(db('wishes').select('*').eq('id', +m[1]).maybeSingle()); if (!g) throw new E('找不到資料', 404);
+      if (g.store && c.role !== 'hq' && g.store !== c.store) throw new E('只能處理自己門市的資料', 403);
+      const cls = WCLS.includes(body.class) ? body.class : g.class, rep = v2(body.reply, 300);
+      const up = { class: cls, status: rep ? '已回覆' : cls ? '已分類' : g.status }; if (rep) Object.assign(up, { reply: rep, replied_by: c.uid, replied_at: nowIso() });
+      await q(db('wishes').update(up).eq('id', g.id));
+      if (rep && g.household_id) await rpc('notify_household', { p_household: g.household_id, p_kind: 'wish', p_title: '門市回覆了您的心願', p_body: rep.slice(0, 100), p_link: 'wish' }).catch(() => {});
+      await audit(rep ? '回覆揪心願' : '分類揪心願', g.code, rep ? rep.slice(0, 30) : cls); return J({ ok: true });
+    });
+    add('GET', /^\/api\/admin\/households$/, ADV, async (c, m, b, qs) => {
+      const PH = ['尚未預約', '已預約門市', '方案待確認', '待到府安裝', '', '', '', '', '', '關懷中'];
+      const H = (await storeHH(storeOf(c, qs))).sort((x, y) => String(y.updated_at || y.created_at).localeCompare(String(x.updated_at || x.created_at))), N = await uname(H.map((h) => h.created_by));
+      return J({ households: H.map((h) => ({ id: h.id, name: Ce(h), elder_note: h.elder_note, owner: N[h.created_by] || null, store: h.store, phase: h.phase || 0, phase_label: PH[Math.min(9, h.phase || 0)] || '安裝中', updated: short(h.updated_at || h.created_at) })) });
+    });
+    add('GET', /^\/api\/admin\/workorders$/, ADV, async (c, m, b, qs) => {
+      const L = await q(inStore(db('bookings').select('*').neq('kind', '門市諮詢').neq('status', '已取消'), storeOf(c, qs)).order('slot_start', { ascending: false }).limit(40));
+      const O = { 待確認: 0, 待排程: 1, 進行中: 2, 已指派: 3 }; L.sort((x, y) => (O[x.status] ?? 4) - (O[y.status] ?? 4));
+      return J({ orders: await Promise.all(L.map((x) => orderOut(x, { role: 'hq', uid: c.uid }))) });
+    });
+    add('GET', /^\/api\/admin\/care$/, ADV, async (c, m, b, qs) => {
+      const H = await storeHH(storeOf(c, qs)), I = ids(H); if (!I.length) return J({ events: [] });
+      const L = await q(db('care_events').select('*').in('household_id', I).order('occurred_at', { ascending: false }).limit(60));
+      return J({ events: L.map((e) => { const h = H.find((x) => x.id === e.household_id); return { id: e.id, household: Ce(h), store: h.store, kind: e.kind, title: e.title, outcome: e.outcome, timeline: e.timeline || [], followed_up: !!e.followed_up, when: short(e.occurred_at) }; }) });
+    });
+    add('GET', /^\/api\/admin\/reminders$/, ADV, async (c, m, b, qs) => {
+      const H = await storeHH(storeOf(c, qs)), I = ids(H); if (!I.length) return J({ reminders: [] });
+      const L = await q(db('reminders').select('*').in('household_id', I).order('due')); const O = { 待處理: 0, 家人已預約: 1 };
+      L.sort((x, y) => (O[x.status] ?? 2) - (O[y.status] ?? 2));
+      return J({ reminders: L.map((r) => ({ id: r.id, household_id: r.household_id, household: Ce(H.find((h) => h.id === r.household_id)), device: r.device, kind: r.kind, reason: r.reason, due: r.due, status: r.status })) });
+    });
+    // 帳號（總部）：建立、停用、重設密碼走 staff-admin（需要服務端權限）
+    add('GET', /^\/api\/admin\/users$/, HQ, async () => J({ users: (await staffFn({ action: 'list' })).users }));
+    add('POST', /^\/api\/admin\/users$/, HQ, async (c, m, body) => { const d = await staffFn({ action: 'create', email: body.email, name: body.name, role: body.role, store: body.store }); return J({ id: d.id, temp_password: d.temp_password }); });
+    add('POST', /^\/api\/admin\/users\/([0-9a-f-]+)$/, HQ, async (c, m, body) => J(await staffFn(Object.assign({ action: 'update', id: m[1] }, body))));
+    // 試點指標（同 Demo store2.js 的 METRICS；數字由資料庫 admin_metrics 一次算好）
+    const pct = (a, b) => (b ? Math.round((a * 1000) / b) / 10 : null);
+    const MET = [
+      ['試點漏斗', 'diag', '完成居家評估的家庭', '戶', null, 1, 'assessments', (r) => r.diag],
+      ['試點漏斗', 'book', '評估後預約門市', '%', 60, 1, 'assessments、bookings', (r) => pct(r.booked, r.diag)],
+      ['試點漏斗', 'conv', '問診後確認方案', '%', 20, 1, 'bookings、plans', (r) => pct(r.conf, r.consulted)],
+      ['試點漏斗', 'inst', '到府安裝完成', '戶', null, 1, 'bookings', (r) => r.inst],
+      ['服務品質', 'plan_min', '單次規劃時間（平均）', '分', 30, 0, 'metrics（生活顧問計時）', (r) => (r.plan_s ? Math.round(r.plan_s / 6) / 10 : null)],
+      ['服務品質', 'first_pass', '驗收一次通過率', '%', 90, 1, 'acceptance_results', (r) => pct(r.fp, r.fpn)],
+      ['服務品質', 'diff', '技師現場差異（待核准）', '件', null, 1, 'site_diffs', (r) => r.diffs],
+      ['服務品質', 'bot', 'LINE 小幫手答得出來', '%', 80, 1, 'bot_logs（LINE 官方帳號）', (r) => pct(r.bota, r.bot)],
+      ['長輩關懷', 'care', '關懷事件', '件', null, 1, 'care_events', (r) => r.care],
+      ['長輩關懷', 'self', '長輩自己按「我很好」', '%', 60, 1, 'care_events', (r) => pct(r.self, r.act)],
+      ['長輩關懷', 'follow', '事後關心完成率', '%', 90, 1, 'care_events', (r) => pct(r.fol, r.care)],
+      ['長輩關懷', 'notify', '送出的通知', '則', null, 1, 'notifications', (r) => r.noti],
+      ['家庭與營收', 'req', '門市需求處理率', '%', 90, 1, 'requests', (r) => pct(r.reqd, r.reqn)],
+      ['家庭與營收', 'orders', '加購與訂閱訂單', '筆', null, 1, 'orders', (r) => r.ord],
+      ['家庭與營收', 'mrr', '加購月費合計', '元', null, 1, 'orders', (r) => r.mrr],
+      ['家庭與營收', 'wish', '揪心願', '件', null, 1, 'wishes', (r) => r.wish],
+      ['家庭與營收', 'wish_reply', '心願已回覆', '%', 80, 1, 'wishes', (r) => pct(r.wishr, r.wish)],
+      ['家庭與營收', 'video', '校園大使短影音送審', '支', null, 1, 'video_tasks', (r) => r.video],
+    ];
+    add('GET', /^\/api\/admin\/metrics$/, ADV, async (c, m, b, qs) => {
+      const d = await rpc('admin_metrics', { p_store: storeOf(c, qs) || '' }), raw = d.raw, G = [];
+      for (const [g, k, l, u, t, hi, src, f] of MET) { const v = f(raw); let x = G.find((y) => y.g === g); if (!x) G.push((x = { g, items: [] })); x.items.push({ k, l, u, v, t: t == null ? undefined : t, ok: t == null || v == null ? null : hi ? v >= t : v <= t, src }); }
+      return J({ groups: G, store: d.store, at: d.at });
+    });
+    add('GET', /^\/api\/admin\/wish-summary$/, ADV, async () => {
+      const W = await q(db('wishes').select('code, category, text, status, store, source, class, created_at').order('id', { ascending: false }));
+      const by = (col) => { const o = {}; W.forEach((w) => { const k = w[col] || '未填'; o[k] = (o[k] || 0) + 1; }); return Object.entries(o).map(([k, n]) => ({ k, n })).sort((a, b2) => b2.n - a.n); };
+      const [T0, cnt] = await Promise.all([q(db('wish_topics').select('*')), rpc('wish_topic_counts').catch(() => [])]);
+      const topics = T0.map((t) => ({ id: t.id, n: t.name, status: t.status, threshold: t.threshold, votes: (t.base || 0) + (((cnt || []).find((x) => x.topic_id === t.id) || {}).votes || 0) })).sort((a, b2) => b2.votes - a.votes).slice(0, 8);
+      return J({ total: W.length, byStatus: by('status'), byCat: by('category'), byClass: by('class'), byStore: by('store'), bySource: by('source'), topics, recent: W.slice(0, 6).map((w) => ({ ...w, created_at: ls(w.created_at) })) });
+    });
+    add('GET', /^\/api\/admin\/staff-stats$/, ADV, async () => {
+      const U = await q(db('profiles').select('id, display_name, role, store, disabled, last_login').in('role', ['advisor', 'tech', 'hq']).order('role'));
+      const I = U.map((u) => u.id);
+      const [bk, pl, qt, wp, ar] = I.length ? await Promise.all([q(db('bookings').select('assignee_id').in('assignee_id', I)), q(db('plans').select('advisor_id').in('advisor_id', I)), q(db('quotes').select('advisor_id').in('advisor_id', I)), q(db('work_packages').select('assignee_id, status').in('assignee_id', I)), q(db('acceptance_results').select('by_id').in('by_id', I))]) : [[], [], [], [], []];
+      const n = (L, k, id) => L.filter((x) => x[k] === id).length;
+      return J({ staff: U.map((x) => { const o = { id: x.id, name: x.display_name, role: x.role, store: x.store, disabled: x.disabled ? 1 : 0, last_login: ls(x.last_login) };
+        return x.role === 'advisor' ? { ...o, cases: n(bk, 'assignee_id', x.id), plans: n(pl, 'advisor_id', x.id), quotes: n(qt, 'advisor_id', x.id) } : x.role === 'tech' ? { ...o, pk: n(wp, 'assignee_id', x.id), pkDone: wp.filter((y) => y.assignee_id === x.id && y.status === '已完成').length, acc: n(ar, 'by_id', x.id) } : o; }) });
+    });
+    // 營運設定（關懷規則）
+    const RULE0 = { bath_min: 30, morning: '10:00', elder_wait: 5, family_wait: 5 };
+    add('GET', /^\/api\/admin\/settings$/, ADV, async () => { const r = await q(db('config').select('value').eq('key', 'care_rules').maybeSingle()); return J({ rules: r ? r.value : RULE0 }); });
+    add('PUT', /^\/api\/admin\/settings$/, HQ, async (c, m, body) => {
+      const r = body.rules || {}, v = { bath_min: Math.max(10, Math.min(90, r.bath_min | 0)), morning: /^\d\d:\d\d$/.test(r.morning) ? r.morning : '10:00', elder_wait: Math.max(1, Math.min(15, r.elder_wait | 0)), family_wait: Math.max(1, Math.min(15, r.family_wait | 0)) };
+      await q(db('config').upsert({ key: 'care_rules', value: v, updated_by: c.uid, updated_at: nowIso() }, { onConflict: 'key' })); await audit('更新關懷規則', '營運設定', `浴室 ${v.bath_min} 分`); return J({ rules: v });
+    });
+    // 客服轉真人：家人在揪問 AI 按「找真人」（Demo 的 /api/support/handoff）
+    routes.unshift(['POST', /^\/api\/support\/handoff$/, window.JJJLIVEAPI.H.NOHH, async (c, m, body) => J(await rpc('support_handoff', { p_target: body.target === 'cs' ? 'cs' : 'store', p_topic: v2(body.topic, 80), p_transcript: Array.isArray(body.transcript) ? body.transcript.map((x) => String(x).slice(0, 300)) : [] }))]);
+    add('GET', /^\/api\/admin\/support$/, ADV, async () => {
+      const L = await q(db('support_tickets').select('*').order('id', { ascending: false }).limit(50)), N = await uname(L.map((t) => t.user_id));
+      return J({ tickets: L.map((t) => ({ ...t, name: N[t.user_id] || '家人', transcript: t.transcript || [], created_at: ls(t.created_at), handled_at: ls(t.handled_at) })) });
+    });
+    add('POST', /^\/api\/admin\/support\/(\d+)\/close$/, ADV, async (c, m) => { await q(db('support_tickets').update({ status: '已回覆', handled_at: nowIso(), handled_by: c.uid }).eq('id', +m[1])); return J({ ok: true }); });
+    // FAQ：Demo 內建題庫＋總部新增或修改（jjj.faq）；缺口＝LINE 小幫手答不出來的問題（bot_logs）
+    add('GET', /^\/api\/admin\/faq$/, ADV, async (c) => {
+      const base = ((await window.JJJLIVEAPI.H.passJSON('/api/faq')).faq || []).map((f) => ({ ...f, hits: 0, up: 0, down: 0 }));
+      const own = await q(db('faq').select('*').order('id'));
+      const faq = [...base.filter((f) => !own.some((o) => o.q === f.q)), ...own.map((f) => ({ ...f, id: 'L' + f.id, updated_at: ls(f.updated_at), hits: 0, up: 0, down: 0 }))];
+      let gaps = [], stats = { asked: 0, matched: 0, handed: 0 };
+      if (c.role === 'hq') {
+        const B = await q(db('bot_logs').select('text, intent, answered, created_at').order('id', { ascending: false }).limit(1000));
+        const g = {}; B.filter((x) => !x.answered).forEach((x) => { const k = x.text; if (!g[k]) g[k] = { q: k, n: 0, last: ls(x.created_at) }; g[k].n++; });
+        gaps = Object.values(g).sort((a, b2) => b2.n - a.n).slice(0, 20);
+        stats = { asked: B.length, matched: B.filter((x) => x.answered).length, handed: B.filter((x) => x.intent === 'handoff').length };
+      }
+      return J({ faq, gaps, stats });
+    });
+    add('POST', /^\/api\/admin\/faq$/, HQ, async (c, m, b) => {
+      const f = { cat: v2(b.cat, 20), q: v2(b.q, 80), a: v2(b.a, 600), alias: v2(b.alias, 200), roles: ['all', 'family', 'advisor'].includes(b.roles) ? b.roles : 'all', status: b.status === '草稿' ? '草稿' : '上架', source: v2(b.source, 30) || '總部', url: v2(b.url, 200), updated_at: nowIso(), updated_by: (await q(db('profiles').select('display_name').eq('id', c.uid).maybeSingle()) || {}).display_name || '總部' };
+      if (!f.cat || !f.q || !f.a) throw new E('分類、問題、答案都要填');
+      const id = String(b.id || ''), own = /^L\d+$/.test(id) ? +id.slice(1) : null;
+      if (own) await q(db('faq').update(f).eq('id', own)); else { const ex = await q(db('faq').select('id').eq('q', f.q).maybeSingle()); if (ex) await q(db('faq').update(f).eq('id', ex.id)); else await q(db('faq').insert(f)); }
+      await audit('更新常見問題', f.q.slice(0, 30)); return J({ ok: true });
+    });
+    // 揪心願管理（同 store3.js）
+    add('GET', /^\/api\/admin\/wish\/board$/, ADV, async () => {
+      const W = await q(db('wish_works').select('*').order('id', { ascending: false }));
+      const br = await window.JJJLIVEAPI.H.briefs(W, null);
+      const S2 = W.length ? await q(db('wish_supports').select('work_id, buy, price, kind').in('work_id', W.map((w) => w.id)).eq('kind', 'support')) : [];
+      const works = br.map((d) => { const L = S2.filter((x) => x.work_id === d.id), w = W.find((x) => x.id === d.id);
+        return { ...d, buy: { 會: L.filter((x) => x.buy === '會').length, 看價格: L.filter((x) => x.buy === '看價格').length, 不會: L.filter((x) => x.buy === '不會').length }, price: L.reduce((a, x) => { if (x.price) a[x.price] = (a[x.price] || 0) + 1; return a; }, {}), review_note: w.review_note }; });
+      return J({ works, themes: (await q(db('wish_themes').select('*').order('id', { ascending: false }))).map((t) => ({ ...t, created_at: ls(t.created_at) })) });
+    });
+    add('POST', /^\/api\/admin\/wish\/works\/(\d+)\/status$/, HQ, async (c, m, body) => {
+      if (!['審查中', '評估中', '通過', '不通過', '預購', '量產'].includes(body.status)) throw new E('狀態不正確');
+      const note = v2(body.note, 200); if (body.status === '不通過' && !note) throw new E('不通過要寫理由');
+      const w = await q(db('wish_works').select('*').eq('id', +m[1]).maybeSingle()); if (!w) throw new E('找不到作品', 404);
+      await q(db('wish_works').update({ status: body.status, review_note: note, updated_at: nowIso() }).eq('id', w.id));
+      await q(db('wish_updates').insert({ work_id: w.id, by_name: '總部', text: `狀態更新：${body.status}${note ? '｜' + note : ''}` }));
+      const sup = await q(db('wish_supports').select('user_id').eq('work_id', w.id));
+      const hs = new Set([w.household_id, ...(sup.length ? (await q(db('members').select('household_id').in('user_id', sup.map((x) => x.user_id)))).map((x) => x.household_id) : [])].filter(Boolean));
+      for (const h of hs) await rpc('notify_household', { p_household: h, p_kind: 'wish', p_title: `揪心願「${w.title}」${body.status}`, p_body: note, p_link: 'wish:' + w.id }).catch(() => {});
+      if (body.status === '量產') await rpc('wish_add_points', { p_user: w.owner, p_work: w.id, p_reason: '作品量產（設計者回饋）', p_points: 1000 }).catch(() => {});
+      await audit(`揪心願${body.status}`, w.title); return J({ ok: true, notified: hs.size });
+    });
+    add('GET', /^\/api\/admin\/wish\/parts$/, ADV, async () => {
+      const P = await q(db('wish_cparts').select('*').order('id', { ascending: false })), W = P.length ? await q(db('wish_works').select('id, title, base').in('id', [...new Set(P.map((p) => p.work_id))])) : [];
+      const cnt = W.length ? await rpc('wish_support_counts', { p_ids: W.map((w) => w.id) }) : [], C2 = (id) => { const w = W.find((x) => x.id === id); const r = (cnt || []).find((x) => x.work_id === id); return r ? r.n : w ? w.base || 0 : 0; };
+      return J({ parts: P.map((p) => { const same = P.filter((x) => x.name.trim() === p.name.trim()), used = new Set(same.map((x) => x.work_id)).size, maxc = Math.max(0, ...same.map((x) => C2(x.work_id)));
+        return { ...p, work: (W.find((w) => w.id === p.work_id) || {}).title, photo: p.photo ? 1 : 0, used, maxc, ready: used >= 5 || maxc >= 100, created_at: ls(p.created_at) }; }) });
+    });
+    add('POST', /^\/api\/admin\/wish\/parts\/(\d+)$/, HQ, async (c, m, b) => { if (!['選品評估中', '通過', '不採用'].includes(b.status)) throw new E('狀態不正確'); await q(db('wish_cparts').update({ status: b.status }).eq('id', +m[1])); return J({ ok: true }); });
+    add('POST', /^\/api\/admin\/wish\/themes$/, HQ, async (c, m, b) => { const t = v2(b.title, 40); if (!t) throw new E('請寫題目'); await q(db('wish_themes').insert({ title: t, by_name: '全國電子', reward: v2(b.reward, 40) || '點數加倍', deadline: v2(b.deadline, 20), phase: b.phase | 0 })); return J({ ok: true }); });
+    add('GET', /^\/api\/admin\/wish\/points$/, ADV, async () => {
+      const L = await q(db('wish_points').select('*').order('id', { ascending: false }).limit(60)); L.sort((a, b2) => (a.status === '待檢核' ? 0 : 1) - (b2.status === '待檢核' ? 0 : 1));
+      const N = await uname(L.map((x) => x.user_id)), W = L.length ? await q(db('wish_works').select('id, title').in('id', [...new Set(L.map((x) => x.work_id).filter(Boolean))])) : [];
+      return J({ points: L.map((p) => ({ ...p, name: N[p.user_id] || '使用者', title: (W.find((w) => w.id === p.work_id) || {}).title || null, created_at: ls(p.created_at) })) });
+    });
+    add('POST', /^\/api\/admin\/wish\/points\/(\d+)$/, ADV, async (c, m, b) => { await q(db('wish_points').update({ status: b.ok ? '已入帳' : '退回', checked_at: nowIso() }).eq('id', +m[1])); return J({ ok: true }); });
+    add('GET', /^\/api\/admin\/wish\/comments$/, ADV, async () => {
+      const L = await q(db('wish_comments').select('*').eq('status', '待審核').order('id', { ascending: false })), W = L.length ? await q(db('wish_works').select('id, title').in('id', [...new Set(L.map((x) => x.work_id))])) : [];
+      return J({ comments: L.map((x) => ({ ...x, title: (W.find((w) => w.id === x.work_id) || {}).title, created_at: ls(x.created_at) })) });
+    });
+    add('POST', /^\/api\/admin\/wish\/comments\/(\d+)$/, ADV, async (c, m, b) => { await q(db('wish_comments').update({ status: b.show ? '顯示' : '隱藏' }).eq('id', +m[1])); return J({ ok: true }); });
+    add('GET', /^\/api\/admin\/videos$/, ADV, async () => { const L = await q(db('video_tasks').select('*').order('id', { ascending: false })), N = await uname(L.map((v) => v.user_id)); return J({ videos: L.map((v) => ({ ...v, name: N[v.user_id] || '使用者', created_at: ls(v.created_at), reviewed_at: ls(v.reviewed_at) })) }); });
+    add('POST', /^\/api\/admin\/videos\/(\d+)\/review$/, ADV, async (c, m, b) => { await q(db('video_tasks').update({ status: b.ok ? '已上架' : '需修改', review_note: v2(b.note, 200), reviewed_at: nowIso() }).eq('id', +m[1])); return J({ ok: true }); });
+    // 家人看到的常見問題：Demo 題庫＋總部新增的（同一題以總部版本為準）
+    routes.unshift(['GET', /^\/api\/faq$/, OPEN, async () => {
+      const base = (await window.JJJLIVEAPI.H.passJSON('/api/faq')).faq || [];
+      let own = []; try { own = await q(db('faq').select('*').eq('status', '上架').in('roles', ['all', 'family'])); } catch (e) {}
+      return J({ faq: [...base.filter((f) => !own.some((o) => o.q === f.q)), ...own.map((f) => ({ id: 'L' + f.id, cat: f.cat, q: f.q, a: f.a, source: f.source, url: f.url, updated_at: ls(f.updated_at) }))] });
+    }]);
+    // 關懷規則：總部在營運設定改的，家人端「關懷設定」讀同一份
+    routes.unshift(['GET', /^\/api\/care\/rules$/, OPEN, async () => { try { const r = await q(db('config').select('value').eq('key', 'care_rules').maybeSingle()); if (r) return J({ rules: r.value }); } catch (e) {} return J(await window.JJJLIVEAPI.H.passJSON('/api/care/rules')); }]);
+    // 營運階段（試點／擴展／延伸）：總部切換，存在 config；沒設定時用 Demo 預設
+    routes.unshift(['GET', /^\/api\/ops\/phase$/, OPEN, async () => { try { const r = await q(db('config').select('value').eq('key', 'phase').maybeSingle()); if (r) return J({ phase: +r.value }); } catch (e) {} return J(await window.JJJLIVEAPI.H.passJSON('/api/ops/phase')); }]);
+    add('PUT', /^\/api\/ops\/phase$/, HQ, async (c, m, b) => { const p = Math.max(0, Math.min(2, b.phase | 0)); await q(db('config').upsert({ key: 'phase', value: p, updated_by: c.uid, updated_at: nowIso() }, { onConflict: 'key' })); await audit('切換營運階段', String(p)); return J({ phase: p }); });
+    // 校園大使、商用客戶：試點沒有開放這兩種帳號，回真實的空清單（不放示範資料）
+    add('GET', /^\/api\/admin\/amb-visits$/, ADV, async () => J({ visits: [] }));
+    add('GET', /^\/api\/admin\/biz-repairs$/, ADV, async () => J({ repairs: [] }));
+    add('GET', /^\/api\/admin\/partner-orders$/, ADV, async (c, m, b, qs) => {
+      const H = await storeHH(storeOf(c, qs)), I = ids(H); if (!I.length) return J({ orders: [] });
+      const L = (await q(db('orders').select('*').in('household_id', I).order('id', { ascending: false }))).filter((o) => JSON.stringify(o.items || []).includes('異業加購'));
+      return J({ orders: L.map((o) => ({ ...o, items: o.items || [], household: Ce(H.find((h) => h.id === o.household_id)), created_at: ls(o.created_at) })) });
+    });
+
     // 有人登入就記錄計時（Demo 的 /api/metrics）
     const mi = routes.findIndex((r) => r[0] === 'POST' && String(r[1]) === String(/^\/api\/metrics$/));
     if (mi >= 0) routes.splice(mi, 1);
