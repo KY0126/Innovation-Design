@@ -9,8 +9,8 @@
   document.documentElement.classList.add('jjj-live');
 
   // 實用版才載入：Supabase、設定、登入後畫面（保持載入順序）
-  const V = '20261126g';
-  ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, ...(PAGE === 'app' ? ['live-measure.js?v=' + V, 'live-app.js?v=' + V] : ['live-admin.js?v=' + V])].forEach((src) => {
+  const V = '20261127a';
+  ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, ...(PAGE === 'app' ? ['live-rules.js?v=' + V, 'live-measure.js?v=' + V, 'live-app.js?v=' + V, 'live-api.js?v=' + V] : ['live-admin.js?v=' + V])].forEach((src) => {
     const s = document.createElement('script'); s.src = src; s.async = false; document.head.appendChild(s);
   });
 
@@ -78,8 +78,10 @@
     // 點首頁上的功能：未登入跳登入提示；已登入交給實用版畫面（試點只開放揪居家）
     const keyOf = (el) => el.matches('.hg1, [data-hb="0"], .lv-ban') || el.dataset.go === 'b1' || el.dataset.go === 'm2' ? 'jjj'
       : el.dataset.nav === 'm1' ? 'me' : el.dataset.go === 'inbox' ? 'inbox' : 'other';
+    // 已進入 Demo 畫面（live-api.js 接手資料）後不再攔截
+    const inApp = () => !!(window.JJJLIVEAPI && window.JJJLIVEAPI.active());
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.lv-mask') || e.target.closest('.lv-page')) return;
+      if (inApp() || e.target.closest('.lv-mask') || e.target.closest('.lv-page')) return;
       const el = e.target.closest('#view [data-go], #view [data-a], #view [data-hb], #view [data-nav], #view [data-aigo], #view .lv-ban, #view button');
       if (!el) return;
       if (el.dataset.a === 'big' || el.dataset.nav === 'home') return;
@@ -89,7 +91,7 @@
     }, true);
     // 首頁：標「實用版」；會員欄未登入換成註冊誘因橫幅，登入後換成揪居家入口
     (window.JJJHOOKS || (window.JJJHOOKS = [])).push((v, view) => {
-      if (v !== 'home') return;
+      if (v !== 'home' || inApp()) { if (v === 'home' && !view.querySelector('.lv-tag')) { const h0 = view.querySelector('img[src="home/header.png"]'); if (h0) h0.insertAdjacentHTML('afterend', '<span class="lv-tag">實用版</span>'); } return; }
       const hd = view.querySelector('img[src="home/header.png"]');
       if (hd && !view.querySelector('.lv-tag')) hd.insertAdjacentHTML('afterend', '<span class="lv-tag">實用版</span>');
       const mem = view.querySelector('.hmem img');
