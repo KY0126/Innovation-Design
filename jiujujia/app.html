@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="live.js?v=20261126d"></script>
+<script src="live.js?v=20261126e"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="phase.js?v=20261124a"></script>
@@ -284,6 +284,17 @@ details.basis summary{cursor:pointer;color:var(--brand);font-size:.9em;margin-to
 .hplan .hpw{position:relative;margin-top:8px;border-radius:10px;overflow:hidden;background:#F6F3EE}.hplan .hpw img{display:block;width:100%}.hplan .hpw svg{position:absolute;inset:0;width:100%;height:100%}.hplan .hpr{animation:hpPulse 1.6s ease-in-out infinite}@keyframes hpPulse{50%{fill-opacity:.5}}
 
 /* 示範帳號一鍵登入 */
+.lgv{padding:0 24px 24px}.lgbrand{text-align:center;font-size:30px;font-weight:900;color:var(--brand);letter-spacing:2px;margin:26px 0 4px}.lghi{text-align:center;color:var(--muted);font-size:.92em;margin-bottom:20px}
+.lgf .fld{margin-top:6px}.lgph{display:flex;align-items:center;gap:0;margin-top:6px}.lgph .cc{border:1px solid var(--line);border-right:0;border-radius:10px 0 0 10px;padding:0 12px;height:44px;display:flex;align-items:center;color:var(--ink);background:#fff}.lgph .fld{margin-top:0;border-radius:0 10px 10px 0}
+.lgrow{display:flex;justify-content:space-between;align-items:center;margin:10px 0 12px;font-size:.88em;color:var(--muted)}.lglink{border:0;background:none;color:var(--brand);font:inherit;padding:0;cursor:pointer}.lglink.b{font-weight:700}.lglink.u{color:var(--ink);text-decoration:underline}
+.lgf .btn{border-radius:24px}.lgor{display:flex;align-items:center;gap:10px;margin:20px 0 14px;color:var(--muted);font-size:.85em}.lgor:before,.lgor:after{content:'';flex:1;height:1px;background:var(--line)}
+.lgsso{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;height:46px;border-radius:23px;border:1px solid var(--line);background:#fff;font:inherit;margin-bottom:10px;cursor:pointer}.lgsso.line{background:#06C755;border-color:#06C755;color:#fff;font-weight:700}
+.lgsso .ic{min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:#fff;color:#06C755;padding:0 3px}.lgsso .ic.fb{background:#1877F2;color:#fff;font-size:13px}.lgsso .ic.gg{color:#4285F4;border:1px solid #ddd;font-size:12px}
+.lgreg{text-align:center;margin-top:14px}.lgnote{text-align:center;font-size:.82em;color:var(--muted);margin-top:6px}.lgstaff{text-align:center;font-size:.86em;color:var(--muted);margin-top:22px}.lgpad{height:104px}
+.demo-strip{position:absolute;left:12px;right:12px;bottom:58px;z-index:5;display:flex;justify-content:space-between;align-items:center;border:1px dashed #C9C3BD;border-radius:12px;background:#FAF8F6;padding:10px 12px;font:inherit;font-size:.85em;color:var(--muted);cursor:pointer}.demo-strip b{color:var(--ink)}.demo-strip .go{color:var(--brand)}
+.demo-sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);padding:12px 18px 18px;max-height:78%;overflow:auto;display:none}.demo-sheet.on{display:block}.demo-sheet .grab{width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 10px}
+.demo-sheet .dg{font-size:.78em;margin:12px 0 2px}.demo-sheet .dacc{display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:6px;background:#fff;font:inherit;cursor:pointer;text-align:left}.demo-sheet .dacc .r{font-size:.8em;color:var(--muted);text-align:right}
+
 .demo1{border:2px dashed #E6B3C3;margin:0 0 10px}.demo1 button{display:block;width:100%;margin-top:8px;border-radius:10px;padding:9px 10px;text-align:center}
 .demo1 .demo0{background:var(--brand-soft);color:var(--brand-ink);border:2px solid var(--brand);font-weight:900}.demo1 .demo2{border:1px solid var(--line);font-size:.92em;color:var(--muted)}
 .lgh .eh{flex:none}
@@ -572,19 +583,37 @@ function acctList(groups){return groups.map(([g,rows])=>`<div class="sec">${g}</
 function meCard(){return `<div class="card" style="display:flex;gap:12px;align-items:center;margin-top:12px"><span class="av">${esc((S.me.name||'?').slice(0,1))}</span><div><b style="font-size:1.08em">${esc(S.me.name||'')}</b><div class="muted">${esc(S.me.role==='tech'?'全國電子技師':S.me.role==='ambassador'?'校園大使':'生活顧問')}｜${esc(S.me.store||'全國電子')}</div></div></div>`}
 const V={
 boot:()=>`<div class="ld">載入中…</div>`,
-login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家'],['li@example.com','李小姐','關懷中家庭']]],['生活顧問',[['advisor@example.com','王小明','高雄民族店']]],['技師',[['tech@example.com','吳技師','全國電子技師']]],['延伸期新身分',[['amb@example.com','林同學','校園大使｜文藻外語大學'],['biz@example.com','王主任','商用客戶｜樂齡日照中心']]]];let k=0;
- return `<div class="top"><h1 style="color:var(--brand)">全國電子</h1></div><div class="scroll" style="padding-top:16px"><div class="pad">
- <div class="lgh"><span class="eh">♥</span><div><div class="big" style="margin:0">登入揪居家</div><div class="muted">家庭、生活顧問、技師都從這裡登入</div></div></div>
- <form id="loginForm" class="card" style="margin:14px 0 10px" novalidate>
-  <label class="muted">Email<input class="fld" id="lgEmail" name="email" type="email" autocomplete="username" inputmode="email" required></label>
-  <label class="muted" style="display:block;margin-top:10px">密碼<input class="fld" id="lgPw" name="password" type="password" autocomplete="current-password" required></label>
+login:()=>{const G=[['家庭',[['chen@example.com','陳小姐','三明治世代・林媽媽家','0912-000-001'],['li@example.com','李小姐','關懷中家庭','0912-000-002']]],['門市與技師（員工登入）',[['advisor@example.com','王小明','生活顧問・高雄民族店','E0002'],['tech@example.com','吳技師','全國電子技師','E0003']]],['延伸期新身分',[['amb@example.com','林同學','校園大使｜文藻外語大學','0912-000-005'],['biz@example.com','王主任','商用客戶｜樂齡日照中心','0912-000-006']]]];
+ return `<div class="top"><h1>會員登入</h1></div><div class="scroll lgv"><div class="lgbrand">全國電子</div><div class="lghi">Hello！請登入以獲得更完整體驗</div>
+ <form id="loginForm" class="lgf" novalidate>
+  <label class="muted">行動電話<span class="lgph"><span class="cc">+886</span><input class="fld" id="lgEmail" name="email" type="tel" autocomplete="username" inputmode="tel" placeholder="09xx-xxx-xxx" required></span></label>
+  <label class="muted" style="display:block;margin-top:12px">密碼<input class="fld" id="lgPw" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" required></label>
+  <div class="lgrow"><label><input type="checkbox" name="remember"> 記住我</label><button type="button" class="lglink" data-a="lgForgot">忘記密碼？</button></div>
   <div class="err" role="alert"></div>
-  <button class="btn" id="lgBtn" type="submit" style="margin-top:12px">登入</button>
+  <button class="btn" id="lgBtn" type="submit">登入</button>
  </form>
- <div class="card demo1"><b style="font-size:.85em;color:var(--brand-ink)">示範帳號</b>${G.map(([g,L])=>`<div class="muted" style="font-size:.78em;margin:8px 0 2px">${g}</div>${L.map(([e,n,r])=>`<button type="button" class="${k++?'demo2':'demo0'}" data-demo="${e}">${k===1?'▶ 一鍵登入｜':''}${n}（${r}）</button>`).join('')}`).join('')}</div>
- <button class="btn ghost" data-go="register">第一次使用？建立家庭帳號</button>
- <p class="muted" style="text-align:center;font-size:.88em">總部與門市主管 → <a href="admin.html">企業管理端（電腦版）</a></p>
-</div></div>`},
+ <div class="lgor">或是</div>
+ <button type="button" class="lgsso line" data-a="lgSso" data-p="LINE"><span class="ic">LINE</span>透過 LINE 繼續</button>
+ <button type="button" class="lgsso" data-a="lgSso" data-p="Facebook"><span class="ic fb">f</span>透過 Facebook 繼續</button>
+ <button type="button" class="lgsso" data-a="lgSso" data-p="Google"><span class="ic gg">G</span>透過 Google 繼續</button>
+ <div class="lgreg">還不是會員？<button type="button" class="lglink b" data-go="register">註冊會員</button></div>
+ <div class="lgnote">已是實體門市會員，也請點「註冊會員」用手機號碼開通</div>
+ <div class="lgstaff">門市人員、技師請由 <button type="button" class="lglink u" data-go="staffLogin">員工登入</button></div>
+ <div class="lgpad"></div></div>
+ <button type="button" class="demo-strip" data-a="demoSheet" aria-expanded="${!!S.demoOpen}"><span><b>展示用</b>｜示範帳號一鍵登入</span><span class="go">${S.demoOpen?'收合':'展開'} ›</span></button>
+ <div class="demo-sheet${S.demoOpen?' on':''}" aria-hidden="${!S.demoOpen}"><div class="grab"></div><b>展示用｜示範帳號</b><div class="muted" style="font-size:.85em">只在 Demo 版出現；資料都是示範，可重設。密碼皆為 demo1234</div>
+ ${G.map(([g,L])=>`<div class="muted dg">${g}</div>${L.map(([e,n,r,id])=>`<button type="button" class="dacc" data-demo="${e}"><span>${n}</span><span class="r">${r}｜${id}</span></button>`).join('')}`).join('')}
+ <button type="button" class="lglink" data-a="demoSheet" style="display:block;margin:12px auto 0">收合</button></div>`},
+staffLogin:()=>`${hdr('員工登入',{aplus:false})}<div class="scroll lgv"><div class="lgbrand">全國電子</div><div class="lghi">揪居家｜門市人員與技師專用</div>
+ <form id="staffForm" class="lgf" novalidate>
+  <label class="muted">員工編號<input class="fld" id="stId" name="email" autocomplete="username" autocapitalize="characters" placeholder="例如：E123456" required></label>
+  <label class="muted" style="display:block;margin-top:12px">密碼<input class="fld" id="stPw" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" required></label>
+  <div class="lgrow"><span></span><button type="button" class="lglink" data-a="lgForgot">忘記密碼請洽門市主管</button></div>
+  <div class="err" role="alert"></div>
+  <button class="btn" type="submit">登入</button>
+ </form>
+ <div class="lgnote" style="text-align:left;margin:16px 0 0;line-height:1.8">・生活顧問、技師共用這個入口，登入後依身分顯示工作畫面<br>・總部與門市主管請用 <a href="admin.html">企業管理端（電腦版）</a></div>
+ <div class="lgstaff">不是員工？<button type="button" class="lglink u" data-a="back">回會員登入</button></div></div>`,
 register:()=>{const st=(S.cfg&&S.cfg.stores)||[];return `${hdr('建立家庭帳號',{aplus:false})}<div class="scroll" style="padding-top:12px"><div class="pad">
  <form id="regForm" class="card" style="margin:0 0 10px" novalidate>
   <label class="muted">您的稱呼<input class="fld" name="name" autocomplete="name" placeholder="例如：王小姐" required></label>
@@ -1486,12 +1515,14 @@ function render(){
  if(window.JJJHOOKS)JJJHOOKS.forEach(f=>{try{f(v,view)}catch(e){console.error(e)}});
 }
 // 家庭端固定底部導覽（揪居家頁亮「首頁」）；流程頁、通知直達、長輩裝置不放
-const NO_NAV=['login','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct','u0','u1','uacct'];
+const DEMO_ID={'0912000001':'chen@example.com','0912000002':'li@example.com','0912000005':'amb@example.com','0912000006':'biz@example.com',E0002:'advisor@example.com',E0003:'tech@example.com'};
+function loginId(v){v=String(v||'').trim();if(v.includes('@'))return v;const k=/^e/i.test(v)?v.toUpperCase():v.replace(/\D/g,'');return DEMO_ID[k]||''}
+const NO_NAV=['login','staffLogin','register','boot','c2','e1','share','ar','b2','b3','b4','b5','wish','pw','n0'],STAFF_TOP=['a1','acases','amy','t1','thist','tacct','u0','u1','uacct'];
 // 測試與導覽用：讀狀態、切畫面
 window.JJJAPP={get S(){return S},go:v=>go(v),render:()=>render(),LOAD};
 function toC3(){const i=S.stack.lastIndexOf('n0');S.stack=(i>=0?S.stack.slice(0,i+1):S.stack).concat('c3');render()}
 document.getElementById('view').addEventListener('submit',e=>{e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]'),er=f.querySelector('.err');if(er)er.textContent='';
- if(f.id==='loginForm')busy(b,async()=>{const d=await api('/auth/login',{method:'POST',body:{email:f.email.value.trim(),password:f.password.value},noAuthRedirect:true});if(!roleOK(d.user.role)){await silentOut();if(er)er.innerHTML=WRONG[d.user.role]||'這個帳號不能在這裡登入。';return}S.me=d.user;await enter()},er);
+ if(f.id==='loginForm'||f.id==='staffForm')busy(b,async()=>{const email=loginId(f.email.value);if(!email){if(er)er.textContent=f.id==='staffForm'?'找不到這個員工編號':'找不到這個行動電話，請確認或先註冊會員';return}const d=await api('/auth/login',{method:'POST',body:{email,password:f.password.value},noAuthRedirect:true});if(!roleOK(d.user.role)){await silentOut();if(er)er.innerHTML=WRONG[d.user.role]||'這個帳號不能在這裡登入。';return}S.me=d.user;S.demoOpen=false;await enter()},er);
  else if(f.id==='regForm')busy(b,async()=>{const body={};['name','email','password','elder_name','elder_note','store','invite'].forEach(k=>body[k]=(f[k].value||'').trim());const d=await api('/auth/register',{method:'POST',body,noAuthRedirect:true});S.me=d.user;await enter()},er);
  else if(f.id==='pwForm')busy(b,async()=>{await api('/me/password',{method:'POST',body:{old:f.old.value,password:f.password.value}});toast('密碼已更新');back()},er)});
 document.getElementById('view').addEventListener('click',e=>{
@@ -1529,6 +1560,9 @@ document.getElementById('view').addEventListener('click',e=>{
  if(t.dataset.pinst){busy(t,async()=>{S.order=await api('/tech/orders/'+S.order.id+'/pins/'+S.tpin,{method:'POST',body:{st:t.dataset.pinst}});toast(t.dataset.pinst==='done'?'已標示完成':'已取消完成');rr()});return}
  if(t.dataset.tlv){S.tdf.level=t.dataset.tlv;rr();return}
  if(t.dataset.tdt){S.tdf.text=S.tdf.text===t.dataset.tdt?'':t.dataset.tdt;rr();return}
+ if(t.dataset.a==='demoSheet'){S.demoOpen=!S.demoOpen;render();return}
+ if(t.dataset.a==='lgForgot'){toast('展示版：忘記密碼會用手機簡訊驗證碼重設');return}
+ if(t.dataset.a==='lgSso'){toast('展示版未串接 '+t.dataset.p+' 登入，請用下方「展示用」帳號');return}
  if(t.dataset.demo){const em=t.dataset.demo;busy(t,async()=>{const d=await api('/auth/login',{method:'POST',body:{email:em,password:(S.cfg&&S.cfg.demo_password)||'demo1234'},noAuthRedirect:true});if(!roleOK(d.user.role)){await silentOut();return}S.me=d.user;await enter()});return}
  if(t.dataset.fill){const f=document.getElementById('loginForm');if(f){f.email.value=t.dataset.fill;f.password.value=S.cfg.demo_password||''}return}
  if(t.dataset.go){go(t.dataset.go);return}
@@ -1685,5 +1719,5 @@ window.JJJ={measSeg,nav,meCard,acctList,stf,snav,planName,api,esc,stepper,chd,fm
 })();
 </script>
 <script src="stage2.js?v=20261126a"></script><script src="family.js?v=20261126a"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261126a"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125c"></script><script src="wish.js?v=20261126a"></script>
-<script src="guide.js?v=20261126b"></script></body>
+<script src="guide.js?v=20261126c"></script></body>
 </html>

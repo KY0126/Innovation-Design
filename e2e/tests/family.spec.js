@@ -1,6 +1,6 @@
 // 工作包 4：擴展期家庭。全部服務 → 加購與訂閱 4 步 → 訂單存資料庫 → 生活顧問確認
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const J = (page, path, o) => page.evaluate(async ([p, o]) => { const r = await fetch('/api' + p, Object.assign({ headers: { 'Content-Type': 'application/json', 'X-JJJ': '1' } }, o || {})); return Object.assign({ _s: r.status }, await r.json()); }, [path, o ? Object.assign({}, o, { body: o.body ? JSON.stringify(o.body) : undefined }) : o]);
 const app = (page, f) => page.evaluate(new Function('return (' + f + ')(window.JJJAPP)'));
 
@@ -8,7 +8,7 @@ test('全家場域方案 → 加購與訂閱 4 步 → 全部訂單；生活顧�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   await app(page, "A=>{A.S.stack=['home','m2'];A.go('x0')}");
   await expect(page.locator('#view')).toContainText('全部服務');
   await page.click('.svc[data-go="x24"]');
@@ -26,12 +26,12 @@ test('全家場域方案 → 加購與訂閱 4 步 → 全部訂單；生活顧�
   expect(o.monthly).toBe(300);
   expect(o.items.map(i => i.id).sort()).toEqual(['food', 'wash']);
   await J(page, '/auth/logout', { method: 'POST' });
-  await page.goto('/jiujujia/app.html'); await page.click('[data-demo="advisor@example.com"]'); await page.waitForTimeout(1500);
+  await page.goto('/jiujujia/app.html'); await tapDemo(page, '[data-demo="advisor@example.com"]'); await page.waitForTimeout(1500);
   const ao = (await J(page, '/advisor/orders')).orders.find(x => x.code === o.code);
   expect(ao.household).toBe('李先生家');
   expect((await J(page, '/advisor/orders/' + ao.id + '/confirm', { method: 'POST' }))._s).toBe(200);
   await J(page, '/auth/logout', { method: 'POST' });
-  await page.goto('/jiujujia/app.html'); await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await page.goto('/jiujujia/app.html'); await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   expect((await J(page, '/home/orders')).orders[0].status).toBe('已確認');
   expect(errs).toEqual([]);
 });
@@ -40,7 +40,7 @@ test('進階影像版：沒有長輩本人同意不能訂；同意紀錄存資�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   const r = await J(page, '/home/orders', { method: 'POST', body: { items: ['cam'], pay: '信用卡每月扣款' } });
   expect(r._s).toBe(400);
   await app(page, "A=>{A.S.stack=['home','m2'];A.go('x31')}");
@@ -59,7 +59,7 @@ test('家電詳情分段：健康卡、保養、換新建議、以租代買、�
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page);
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   await app(page, "A=>{A.S.stack=['home','m2'];A.go('x0')}");
   await page.click('.svc[data-hcseg]');
   await expect(page.locator('[data-hcs]')).toHaveCount(5);

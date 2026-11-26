@@ -1,11 +1,11 @@
 // AR 量測：手機實測。照片＋尺的刻度當比例尺換算；結果帶回 AR 掃描頁同一份量測值
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 test.use({ launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] } });
 
 async function toArm(page) {
   await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="chen@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="chen@example.com"]'); await page.waitForTimeout(1500);
   await page.evaluate(() => { const S = JJJAPP.S; S.stack = ['home', 'm2', 'b1', 'ar']; S.armode = 'manual'; JJJAPP.render(); });
   await page.click('[data-go="arm"]');
 }
@@ -77,7 +77,7 @@ test('Android AR（模擬 WebXR）：準心、起點、虛線與即時距離，�
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/jiujujia/app.html'); await page.evaluate(() => { localStorage.clear(); localStorage.setItem('jjj_g_off', '1'); }); await page.goto('/jiujujia/app.html');
-  await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await tapDemo(page, '[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
   await page.evaluate(() => { JJJAPP.S.stack = ['home', 'm2']; JJJAPP.S.armode = 'manual'; JJJAPP.go('ar'); });
   await page.click('[data-go="arm"]'); await page.click('[data-arstart="xr"]');
   await page.evaluate(() => __tick());

@@ -1,5 +1,5 @@
 const { test } = require('playwright/test');
-const { fresh, expect } = require('./helpers');
+const { fresh, expect, tapDemo } = require('./helpers');
 const overflowX = page => page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth);
 
 test('電腦版：標準手機框 393×852 等比縮放，導覽面板在手機右側不重疊', async ({ page }, info) => {
@@ -29,9 +29,9 @@ for (const [name, url, demo] of [
   test(`${name}：登入頁與首頁沒有左右溢出`, async ({ page }) => {
     const errs = await fresh(page);
     await page.goto(url);
-    await expect(page.locator(demo)).toBeVisible();
+    await expect(page.locator(demo)).toBeAttached();
     expect(await overflowX(page), '登入頁').toBeLessThanOrEqual(1);
-    await page.click(demo); await page.waitForTimeout(2500);
+    await tapDemo(page, demo); await page.waitForTimeout(2500);
     expect(await overflowX(page), '登入後首頁').toBeLessThanOrEqual(1);
     expect(errs).toEqual([]);
   });

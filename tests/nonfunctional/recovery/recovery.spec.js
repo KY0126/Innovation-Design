@@ -6,7 +6,7 @@ test('本機資料被改壞後重新開啟，仍能看到登入頁、不白屏',
   const keys = await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('jjj')));
   await page.evaluate(ks => ks.forEach(k => { if (k !== 'jjj_g_off') localStorage.setItem(k, '{壞掉的資料'); }), keys);
   await page.goto('/jiujujia/app.html'); await page.waitForTimeout(2500);
-  await expect(page.locator('[data-demo]').first()).toBeVisible();
+  await expect(page.locator('#loginForm')).toBeVisible();
   expect(errs).toEqual([]);
 });
 
@@ -14,7 +14,7 @@ test('按「重設資料」回到示範狀態，示範作品還在', async ({ pa
   await fresh(page); await login(page, 'li@example.com');
   await page.evaluate(() => window.JJJWEB && window.JJJWEB.reset());
   await page.waitForTimeout(2500);
-  await page.goto('/jiujujia/app.html'); await page.click('[data-demo="li@example.com"]'); await page.waitForTimeout(1500);
+  await page.goto('/jiujujia/app.html'); await page.locator('[data-demo="li@example.com"]').waitFor({ state: 'attached' }); await page.$eval('[data-demo="li@example.com"]', (e) => e.click()); await page.waitForTimeout(1500);
   const n = await page.evaluate(async () => (await (await fetch('/api/wish/works?tab=all', { headers: { 'X-JJJ': '1' } })).json()).works.length);
   expect(n).toBeGreaterThan(0);
 });
