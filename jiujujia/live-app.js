@@ -110,11 +110,12 @@
   }
 
   // ── 居家評估：每一格都可以「用手機量」（live-measure.js），也可以用捲尺量好手動填 ──
-  const MEAS = { corridor: ['走道寬度', 'cm', 1], threshold: ['浴室門檻高度', 'cm', 0], dist: ['床邊到浴室門口的距離', '公尺', 1] };
+  const MEAS = { corridor: ['走道寬度', 'cm', 1, 'dist'], threshold: ['浴室門檻高度', 'cm', 1, 'height'], dist: ['床邊到浴室門口的距離', '公尺', 1, 'dist'] };
   const measBtn = (k) => `<button type="button" class="btn ghost lv-meas" data-lvm="${k}" style="margin-top:6px">用手機量${MEAS[k][0]}</button><span class="muted lv-msrc" data-msrc="${k}" style="display:block;font-size:.85em"></span>`;
   function assessForm() {
     page('居家評估', `<form class="card" id="lvAs" novalidate>
-      <p class="muted" style="margin:0 0 8px">每一格都可以按「用手機量」：Android 用 AR，iPhone 拍一張旁邊放了尺的照片；也可以用捲尺量好直接填。量不準的地方，生活顧問到府時會再確認。</p>
+      <div class="card" style="border:1px solid #D4003C;margin:0 0 12px"><b>用手機 AR 一次量完</b><div class="muted" style="font-size:.9em">走道寬、門檻高、床到浴室，順路標插座、確認材質，約 3 分鐘</div><button type="button" class="btn" data-lvwalk="1" style="margin-top:8px;width:100%">開始 AR 量測</button><div class="muted" style="font-size:.85em;text-align:center;margin-top:4px">iPhone 會改用照片＋尺</div><div class="muted" id="lvWalkSum" style="font-size:.85em;margin-top:6px"></div></div>
+      <p class="muted" style="margin:0 0 8px">每一格也可以單獨按「用手機量」，或用捲尺量好直接填。量不準的地方，生活顧問到府時會再確認。</p>
       <label class="muted">床邊到浴室的走道寬度（公分）<input class="fld" name="corridor" type="number" inputmode="decimal" min="30" max="300" step="0.5" required></label>${measBtn('corridor')}
       <label class="muted" style="display:block;margin-top:10px">浴室門檻高度（公分，沒有門檻填 0）<input class="fld" name="threshold" type="number" inputmode="decimal" min="0" max="30" step="0.1" required></label>${measBtn('threshold')}
       <label class="muted" style="display:block;margin-top:10px">床邊到浴室門口的距離（公尺）<input class="fld" name="dist" type="number" inputmode="decimal" min="0.5" max="30" step="0.1" required></label>${measBtn('dist')}
@@ -281,6 +282,8 @@
         const dims = { corridor_mm: Math.round(d.corridor_cm * 10), threshold_mm: Math.round(d.threshold_cm * 10), bed_bath_mm: Math.round(d.bed_bath_m * 1000), dark: d.dark };
         const methods = {}; ['corridor', 'threshold', 'dist'].forEach((k) => { methods[k] = f[k].dataset.src || 'manual'; });
         dims.methods = methods;
+        if (f.dataset.outlets != null) dims.outlets = Number(f.dataset.outlets);
+        if (f.dataset.mats) dims.materials = JSON.parse(f.dataset.mats);
         const source = Object.values(methods).some((m) => m !== 'manual') ? 'ar' : 'manual';
         const { error } = await sb.from('assessments').insert({ household_id: LV.hh.id, source, dims, result: { lights: L }, created_by: LV.user.id });
         if (error) return fail('儲存失敗，請再試一次');
@@ -297,12 +300,30 @@
 
   document.addEventListener('click', (e) => {
     const t = e.target.closest('[data-lvm]'); if (!t || !window.JJJMeasure) return;
-    const k = t.dataset.lvm, [label, unit, xrFit] = MEAS[k], f = t.closest('form');
-    window.JJJMeasure.open({ key: k, label, unit, xrFit: !!xrFit, onDone: (v, mode) => {
+    const k = t.dataset.lvm, [label, unit, xrFit, kind] = MEAS[k], f = t.closest('form');
+    window.JJJMeasure.open({ key: k, label, unit, kind, xrFit: !!xrFit, onDone: (v, mode) => {
       const inp = f && f[k]; if (!inp) return;
       inp.value = String(v); inp.dataset.src = mode;
       const m = f.querySelector(`[data-msrc="${k}"]`); if (m) m.textContent = mode === 'xr' ? '已用 AR 量（約 ±1～3 cm）；可直接改' : '已用照片量（約 ±3–5 cm，僅供參考）；可直接改';
       toast('已帶入：' + label + ' ' + v + ' ' + unit);
+    } });
+  });
+  // 一次量完：帶回 3 個數字、插座數、材質（材質「待顧問確認」也照存，顧問到府時確認）
+  const srcTxt = (mode) => (mode === 'xr' ? '已用 AR 量（約 ±1～3 cm）；可直接改' : '已用照片量（約 ±3–5 cm，僅供參考）；可直接改');
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-lvwalk]'); if (!t || !window.JJJMeasure) return;
+    const f = t.closest('form'); if (!f) return;
+    const vals = {}, modes = {};
+    ['corridor', 'threshold', 'dist'].forEach((k) => { if (f[k].dataset.src && f[k].value !== '') { vals[k] = Number(f[k].value); modes[k] = f[k].dataset.src; } });
+    window.JJJMeasure.walk({ init: { vals, modes, outlets: f.dataset.outlets != null ? Number(f.dataset.outlets) : 0, mats: f.dataset.mats ? JSON.parse(f.dataset.mats) : {} }, onDone: (r) => {
+      Object.keys(r.vals).forEach((k) => {
+        const inp = f[k]; if (!inp) return; inp.value = String(r.vals[k]); inp.dataset.src = r.modes[k] || 'photo';
+        const m = f.querySelector(`[data-msrc="${k}"]`); if (m) m.textContent = srcTxt(inp.dataset.src);
+      });
+      f.dataset.outlets = String(r.outlets); f.dataset.mats = JSON.stringify(r.mats);
+      const nm = Object.keys(r.mats).length, sum = f.querySelector('#lvWalkSum');
+      if (sum) sum.textContent = `已帶入：${Object.keys(r.vals).length}／3 項尺寸、沿路插座 ${r.outlets} 個、材質 ${nm}／3 項`;
+      toast('已帶入評估表');
     } });
   });
   document.addEventListener('input', (e) => {

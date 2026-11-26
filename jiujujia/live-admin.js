@@ -56,17 +56,20 @@
     const [{ data: hhs }, { data: mem }, { data: as }, { data: cs }, { data: sl }] = await Promise.all([
       sb.from('households').select('id, elder_name, elder_note, store, stage, created_at').order('created_at', { ascending: false }),
       sb.from('members').select('household_id'),
-      sb.from('assessments').select('household_id, result, created_at').order('created_at', { ascending: false }),
+      sb.from('assessments').select('household_id, result, dims, created_at').order('created_at', { ascending: false }),
       sb.from('consents').select('household_id'),
       ME.role === 'hq' ? sb.from('share_logs').select('kind') : Promise.resolve({ data: null }),
     ]);
     const H = hhs || [], cnt = (arr, id) => (arr || []).filter((x) => x.household_id === id).length;
+    // 評估帶來的插座數與材質（家人一次量完時填；「待顧問確認」要到府確認）
+    const MATN = { bath: '浴室地板', wall: '走廊牆面', door: '大門門框' };
+    const aExtra = (a) => { const d = a.dims || {}, M = d.materials || {}, ks = Object.keys(M); const p = []; if (d.outlets != null) p.push(`插座 ${d.outlets} 個`); if (ks.length) p.push(ks.map((k) => `${MATN[k] || k}：${esc(M[k])}`).join('、')); return p.length ? `<div class="mu">${p.join('｜')}</div>` : ''; };
     const lastA = (id) => (as || []).find((a) => a.household_id === id);
     const doneA = new Set((as || []).map((a) => a.household_id)), doneC = new Set((cs || []).map((c) => c.household_id));
     const conv = doneA.size ? Math.round(([...doneC].filter((x) => doneA.has(x)).length / doneA.size) * 100) + '%' : '—';
     root.innerHTML = `<header><b>揪居家企業管理端</b><span style="color:#C8003A;font-size:13px">實用版</span><span class="sp"></span><span class="mu">${esc(ROLE[ME.role])}｜${esc(ME.display_name || '')}${ME.store ? '｜' + esc(ME.store) : ''}</span><button class="b" data-la="out">登出</button></header>
       <main><div class="kpi" aria-label="試點指標（真實資料）"><div><span class="mu">家庭數</span><b>${H.length}</b></div><div><span class="mu">完成評估</span><b>${doneA.size}</b></div><div><span class="mu">長輩同意</span><b>${doneC.size}</b></div><div><span class="mu">成交轉換率</span><b>${conv}</b></div><div><span class="mu">分享次數</span><b>${sl ? sl.length : '—'}</b></div></div>
-      <div class="pn"><b>${ME.role === 'hq' ? '全部家庭' : '本門市家庭'}</b>${H.length ? `<table><thead><tr><th>長輩家</th><th>家人</th><th>最近評估</th><th>門市</th><th></th></tr></thead><tbody>${H.map((h) => { const a = lastA(h.id), L = a ? a.result.lights || [] : []; return `<tr><td><b>${esc(h.elder_name)}家</b><div class="mu">${esc(h.elder_note || '')}</div></td><td>${cnt(mem, h.id)} 人</td><td>${a ? `${L.filter((x) => x.c === 'r').length} 紅 ${L.filter((x) => x.c === 'y').length} 黃<div class="mu">${new Date(a.created_at).toLocaleDateString('zh-TW')}</div>` : '<span class="mu">未評估</span>'}</td><td>${esc(h.store || '')}</td><td style="white-space:nowrap"><button class="b pri" data-la="quote" data-id="${h.id}" data-n="${esc(h.elder_name)}">送出正式報價</button> <button class="b" data-la="care" data-id="${h.id}">記錄夜間關懷</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="mu">還沒有家庭。家庭用 LINE 登入揪居家 App、建立長輩家後就會出現在這裡。</p>'}</div>
+      <div class="pn"><b>${ME.role === 'hq' ? '全部家庭' : '本門市家庭'}</b>${H.length ? `<table><thead><tr><th>長輩家</th><th>家人</th><th>最近評估</th><th>門市</th><th></th></tr></thead><tbody>${H.map((h) => { const a = lastA(h.id), L = a ? a.result.lights || [] : []; return `<tr><td><b>${esc(h.elder_name)}家</b><div class="mu">${esc(h.elder_note || '')}</div></td><td>${cnt(mem, h.id)} 人</td><td>${a ? `${L.filter((x) => x.c === 'r').length} 紅 ${L.filter((x) => x.c === 'y').length} 黃<div class="mu">${new Date(a.created_at).toLocaleDateString('zh-TW')}</div>${aExtra(a)}` : '<span class="mu">未評估</span>'}</td><td>${esc(h.store || '')}</td><td style="white-space:nowrap"><button class="b pri" data-la="quote" data-id="${h.id}" data-n="${esc(h.elder_name)}">送出正式報價</button> <button class="b" data-la="care" data-id="${h.id}">記錄夜間關懷</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="mu">還沒有家庭。家庭用 LINE 登入揪居家 App、建立長輩家後就會出現在這裡。</p>'}</div>
       <div class="pn" id="lvQ" hidden></div></main>`;
   }
   function quoteForm(id, name) {
