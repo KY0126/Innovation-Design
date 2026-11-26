@@ -2,10 +2,10 @@ const { test } = require('playwright/test');
 const { fresh, expect } = require('./helpers');
 // 1. 入口：手機都進揪居家 App 的統一登入頁；電腦進企業管理端（總部）或生活顧問（門市電腦）
 const ENTRIES = [
-  ['app.html', /jiujujia\/app\.html/, '#loginForm', '登入揪居家'],
-  ['consumer.html', /jiujujia\/app\.html/, '#loginForm', '登入揪居家'],
-  ['technician.html', /jiujujia\/app\.html/, '#loginForm', '登入揪居家'],
-  ['admin.html', /admin\.html/, '#gForm', '企業管理端（電腦版）'],
+  ['app.html', /jiujujia\/app\.html/, '#loginForm', '會員登入'],
+  ['consumer.html', /jiujujia\/app\.html/, '#loginForm', '會員登入'],
+  ['technician.html', /jiujujia\/app\.html/, '#loginForm', '會員登入'],
+  ['admin.html', /admin\.html/, '#gForm', '員工登入'],
   ['consultant.html', /consultant\.html/, '#cLogin', '生活顧問登入'],
 ];
 for (const [entry, url, form, title] of ENTRIES) {

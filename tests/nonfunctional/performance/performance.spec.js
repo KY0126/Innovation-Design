@@ -4,7 +4,7 @@ const { test, expect, fresh, login, app } = require('../../_pw.cjs');
 test('App 開啟到出現登入按鈕 ≦ 4 秒', async ({ page }) => {
   await fresh(page);
   const t0 = Date.now(); await page.goto('/jiujujia/app.html');
-  await page.locator('[data-demo]').first().waitFor();
+  await page.locator('#lgBtn').waitFor();
   const ms = Date.now() - t0; console.log('App 首屏', ms, 'ms');
   expect(ms).toBeLessThan(4000);
 });

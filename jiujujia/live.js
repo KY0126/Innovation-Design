@@ -9,7 +9,7 @@
   document.documentElement.classList.add('jjj-live');
 
   // 實用版才載入：Supabase、設定、登入後畫面（保持載入順序）
-  const V = '20261126d';
+  const V = '20261126e';
   ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, ...(PAGE === 'app' ? ['live-measure.js?v=' + V, 'live-app.js?v=' + V] : ['live-admin.js?v=' + V])].forEach((src) => {
     const s = document.createElement('script'); s.src = src; s.async = false; document.head.appendChild(s);
   });
@@ -108,7 +108,7 @@
   }
 
   if (PAGE === 'adm') {
-    // 後台是工作用：打開先登入（員工 Email＋密碼，帳號由總部建立；D2）
+    // 後台是工作用：打開先登入（員工編號＋密碼，帳號由總部建立；D2）
     document.addEventListener('DOMContentLoaded', () => {
       const lg = document.querySelector('#gate .glogo');
       if (lg && !lg.querySelector('.lv-adm')) lg.insertAdjacentHTML('beforeend', '<span class="lv-adm" style="margin-left:8px;font-size:13px;color:#D4003C">實用版</span>');
@@ -119,7 +119,10 @@
       e.preventDefault(); e.stopImmediatePropagation();
       const f = e.target, er = f.querySelector('.gerr');
       if (!window.JJJLIVEADM) { if (er) er.textContent = '載入中，請稍後再試'; return; }
-      window.JJJLIVEADM.login(f.email.value.trim(), f.password.value, er);
+      // 員工編號登入：E123456 → e123456@staff.jiujujia.example（帳號由總部建立；也接受完整 Email）
+      const id = f.email.value.trim();
+      if (!id) { if (er) er.textContent = '請輸入員工編號'; return; }
+      window.JJJLIVEADM.login(id.includes('@') ? id : id.toLowerCase() + '@staff.jiujujia.example', f.password.value, er);
     }, true);
   }
 

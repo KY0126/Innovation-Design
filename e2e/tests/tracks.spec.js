@@ -1,5 +1,5 @@
 const { test } = require('playwright/test');
-const { expect } = require('./helpers');
+const { expect, tapDemo } = require('./helpers');
 // 分身分導覽：登入哪個身分就跑哪一套，每套 6～8 步；每步的編號框都要找得到
 async function panel(page) {
   return page.evaluate(() => {
@@ -19,7 +19,7 @@ for (const [role, url, demo, first] of [
     test.setTimeout(240_000);
     const errs = []; page.on('pageerror', e => errs.push(e.message));
     await page.goto(url); await page.evaluate(() => localStorage.clear()); await page.goto(url);
-    if (demo) { await page.click(`[data-demo="${demo}"]`); await page.waitForTimeout(2500); await page.evaluate(() => JJJGUIDE.start()); }
+    if (demo) { await tapDemo(page, `[data-demo="${demo}"]`); await page.waitForTimeout(2500); await page.evaluate(() => JJJGUIDE.start()); }
     else { await expect(page.locator('#jg [data-t="login"]')).toBeVisible({ timeout: 10_000 }); await page.click('#jg [data-t="login"]'); }
     await expect(page.locator('#jg h2')).toHaveText(first, { timeout: 20_000 });
     const seen = [];

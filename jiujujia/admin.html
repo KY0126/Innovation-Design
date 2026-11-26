@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="live.js?v=20261126d"></script>
+<script src="live.js?v=20261126e"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="phase.js?v=20261124a"></script>
@@ -247,10 +247,26 @@ svg text[font-size="8.5"],svg text[font-size="9"],svg text[font-size="9.5"],svg 
 .gantt text{font-size:9.5px!important}
 
 /* 上線版：登入與即時營運 */
-.gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;flex-direction:column;overflow-y:auto}
 .gate[hidden]{display:none}
-.gbox{width:min(480px,100%);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 20px}
-.glogo{font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;margin-bottom:4px}.glogo i{width:6px;height:20px;background:var(--brand);display:inline-block;border-radius:2px}
+.g-hd{flex:none;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid #EEE9E4}
+.glogo{font-weight:700;font-size:16px;display:flex;gap:14px;align-items:center;color:#4b4650}.glogo .g-brand{font-size:24px;color:var(--brand);font-weight:900;letter-spacing:1px}.glogo i{width:1px;height:22px;background:#DDD;display:inline-block}
+.g-links{display:flex;gap:22px;font-size:13.5px;color:var(--muted)}
+.g-main{flex:1;display:flex;min-height:560px}
+.g-hero{flex:1.25;position:relative;overflow:hidden;background:linear-gradient(135deg,#B3002F 0%,#D4003C 45%,#E8506F 100%);color:#fff;padding:72px}
+.g-hero:after{content:'';position:absolute;right:-120px;bottom:-140px;width:460px;height:460px;border-radius:50%;background:rgba(255,255,255,.08)}
+.g-hero h2{font-size:40px;margin:0 0 14px;line-height:1.35;font-weight:900}.g-hero p{font-size:17px;line-height:1.8;margin:0;opacity:.92;max-width:560px}
+.g-kpi{display:flex;gap:18px;margin-top:44px;flex-wrap:wrap}.g-kpi div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:16px 20px;min-width:150px}.g-kpi b{display:block;font-size:15px}.g-kpi span{font-size:13px;opacity:.85}
+.gbox{width:520px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding:32px 72px;background:#fff}
+.g-h1{font-size:28px;margin:0 0 6px}.g-sub{display:block;font-size:12.5px;margin-top:4px}
+.gbox .f label{font-size:14px}.gbox .fld{height:46px;border-radius:10px}
+.g-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--muted);margin:0 0 16px}.g-link{border:0;background:none;color:var(--brand);font:inherit;cursor:pointer;padding:0}
+#gBtn{width:100%;height:50px;border-radius:10px;font-size:16px;font-weight:700}
+.g-help{font-size:13px;margin:20px 0 0;line-height:1.7}
+.g-ft{flex:none;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-top:1px solid #EEE9E4;font-size:12.5px;color:var(--muted);background:#FAF8F6}.g-fl span+span{margin-left:18px}
+.g-demo{margin-top:16px;border:1px dashed #C9C3BD;border-radius:10px;background:#FAF8F6;font-size:12.5px;color:var(--muted)}.g-demo>button{display:flex!important;width:100%;justify-content:space-between!important;border:0!important;border-radius:10px;box-shadow:none!important;background:none!important;font:inherit;color:inherit;padding:9px 12px;cursor:pointer}.g-demo b{color:#4b4650}.g-demo .go{color:var(--brand)}
+.g-demo .lst{display:none;padding:0 12px 10px;gap:8px}.g-demo.on .lst{display:grid;grid-template-columns:1fr 1fr}.g-demo .lst button{border:1px solid #E6E2DE;border-radius:8px;background:#fff;padding:8px;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+@media (max-width:900px){.g-hero{display:none}.gbox{width:100%;padding:28px 20px}.g-links{display:none}.g-hd{padding:0 16px}.g-ft{height:auto;flex-direction:column;gap:4px;padding:10px 16px;text-align:center}}
 .gerr{color:var(--brand);font-size:13px;margin:0 0 8px}.gerr:empty{display:none}
 .demo-accounts{border:1px dashed var(--muted);border-radius:8px;padding:10px 12px;margin-top:14px;font-size:13.5px}
 .demo-accounts button{display:block;width:100%;text-align:left;padding:6px 0;border-top:1px solid var(--line)}
@@ -317,7 +333,17 @@ td.nw{white-space:nowrap}
 </style>
 </head>
 <body>
-<div id="gate" class="gate" hidden><div class="gbox"><div class="glogo"><i></i>揪居家企業營運資訊平台</div><p class="c-mu" style="margin:0 0 14px"><b>企業管理端（電腦版）</b>：總部、門市主管，以及生活顧問在門市電腦使用。家庭與技師請用<a href="app.html">揪居家 App（手機）</a>。</p><form id="gForm" novalidate><div class="f"><label for="gEmail">Email</label><input class="fld" id="gEmail" name="email" type="email" autocomplete="username"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password"></div><div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit" style="width:100%;padding:9px">登入</button></form><p class="c-mu" style="font-size:12.5px;margin:10px 0 0">忘記密碼請洽總部重設。</p><div id="gDemo"></div></div></div>
+<div id="gate" class="gate" hidden>
+<div class="g-hd"><span class="glogo"><b class="g-brand">全國電子</b><i></i>揪居家企業營運資訊平台</span><span class="g-links"><span>系統公告</span><span>操作手冊</span><span>資訊處服務台</span></span></div>
+<div class="g-main"><div class="g-hero"><h2>同一位生活顧問<br>陪你的家，從居家安全開始</h2><p>總部、門市主管與生活顧問的工作平台：預約與派工、正式報價、施工驗收、長輩關懷追蹤，一個地方看完。</p>
+<div class="g-kpi"><div><b>預約與派工</b><span>門市排程一次看</span></div><div><b>正式報價</b><span>送出即通知家人</span></div><div><b>關懷追蹤</b><span>異常先問長輩</span></div></div></div>
+<div class="gbox"><h1 class="g-h1">員工登入</h1><p class="c-mu" style="margin:0 0 22px">請使用公司配發的員工編號登入<span class="g-sub">（企業管理端（電腦版）：總部、門市主管與生活顧問在門市電腦使用）</span></p>
+<form id="gForm" novalidate><div class="f"><label for="gEmail">員工編號</label><input class="fld" id="gEmail" name="email" autocomplete="username" autocapitalize="characters" placeholder="例如：E123456"></div><div class="f"><label for="gPw">密碼</label><input class="fld" id="gPw" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼"></div>
+<div class="g-row"><label><input type="checkbox" name="remember"> 記住員工編號</label><button type="button" class="g-link" id="gForgot">忘記密碼？</button></div>
+<div class="gerr" role="alert"></div><button class="b pri" id="gBtn" type="submit">登入</button></form>
+<p class="c-mu g-help">家庭與技師請用手機的<a href="app.html">揪居家 App</a>。<br>首次登入或帳號鎖定，請洽資訊處服務台。</p><div id="gDemo"></div></div></div>
+<div class="g-ft"><span>© 全國電子股份有限公司　僅限授權員工使用，登入與操作會留存紀錄</span><span class="g-fl"><span>隱私權政策</span><span>資訊安全聲明</span><span>版本 2026.11</span></span></div>
+</div>
 <div id="envBadge" hidden>示範環境</div>
 <div class="app">
  <aside class="side" aria-label="主選單">
@@ -1111,7 +1137,7 @@ acct:()=>{const U=LD.users;if(!U)return LOADING;const st=(CFG&&CFG.stores)||[];
 });
 function showGate(msg){ME=null;document.getElementById('gate').hidden=false;const e=document.querySelector('#gate .gerr');if(e)e.textContent=msg||'';const d=document.getElementById('gDemo');
  const BT='display:block;width:100%;margin-top:8px;padding:8px;border-radius:10px;border:2px solid #D4003C;background:#FAE0E8;color:#A3002E;font-weight:900;cursor:pointer';
- d.innerHTML=CFG&&CFG.demo?`<div class="demo-accounts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px"><b>總部／門市主管</b><div class="c-mu" style="font-size:12px">即時總覽、派工、試點指標</div><button type="button" data-demo="manager@example.com" style="${BT}">▶ 一鍵登入｜張經理</button></div><div style="border:2px dashed #E6B3C3;border-radius:10px;padding:10px"><b>生活顧問（門市電腦）</b><div class="c-mu" style="font-size:12px">整合報價、排工作包、版本紀錄</div><button type="button" data-demo="advisor@example.com" style="${BT}">▶ 一鍵登入｜王小明</button></div></div>`:''}
+ d.innerHTML=CFG&&CFG.demo?`<div class="g-demo demo-accounts"><button type="button" id="gDemoT"><span><b>展示用</b>｜示範帳號一鍵登入</span><span class="go">展開 ›</span></button><div class="lst"><button type="button" data-demo="manager@example.com"><b>張經理</b><br><span class="c-mu">總部／門市主管｜E0001</span></button><button type="button" data-demo="advisor@example.com"><b>王小明</b><br><span class="c-mu">生活顧問（門市電腦）｜E0002</span></button></div></div>`:''}
 async function enterHQ(u){ME=u;
  if(u.role==='family'||u.role==='tech'){try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}showGate('這是'+(u.role==='tech'?'技師':'家庭')+'帳號，請改用揪居家 App（手機）。');return}
  if(u.role==='advisor'){location.href='consultant.html';return}
@@ -1130,8 +1156,8 @@ async function authStart(){
  if(!u){showGate();return}
  enterHQ(u)}
 document.getElementById('gForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]'),er=f.querySelector('.gerr');er.textContent='';b.disabled=true;
- try{const d=await api('/auth/login',{method:'POST',body:{email:f.email.value.trim(),password:f.password.value},noGate:true});f.password.value='';await enterHQ(d.user)}catch(x){er.textContent=x.message}finally{b.disabled=false}});
-document.getElementById('gate').addEventListener('click',async e=>{const dm=e.target.closest('button[data-demo]');if(dm){dm.disabled=true;try{const d=await api('/auth/login',{method:'POST',body:{email:dm.dataset.demo,password:(CFG&&CFG.demo_password)||'demo1234'},noGate:true});await enterHQ(d.user)}catch(x){const er=document.querySelector('#gate .gerr');if(er)er.textContent=x.message}finally{dm.disabled=false}return}const b=e.target.closest('button[data-fill]');if(!b)return;const f=document.getElementById('gForm');f.email.value=b.dataset.fill;f.password.value=(CFG&&CFG.demo_password)||''});
+ try{const id=f.email.value.trim(),SID={E0001:'manager@example.com',E0002:'advisor@example.com',E0003:'tech@example.com'},email=id.includes('@')?id:SID[id.toUpperCase()];if(!email){er.textContent='找不到這個員工編號';return}const d=await api('/auth/login',{method:'POST',body:{email,password:f.password.value},noGate:true});f.password.value='';await enterHQ(d.user)}catch(x){er.textContent=x.message}finally{b.disabled=false}});
+document.getElementById('gate').addEventListener('click',async e=>{if(e.target.closest('#gDemoT')){e.target.closest('.g-demo').classList.toggle('on');return}if(e.target.closest('#gForgot')){const er=document.querySelector('#gate .gerr');if(er)er.textContent='忘記密碼請洽資訊處服務台重設。';return}const dm=e.target.closest('button[data-demo]');if(dm){dm.disabled=true;try{const d=await api('/auth/login',{method:'POST',body:{email:dm.dataset.demo,password:(CFG&&CFG.demo_password)||'demo1234'},noGate:true});await enterHQ(d.user)}catch(x){const er=document.querySelector('#gate .gerr');if(er)er.textContent=x.message}finally{dm.disabled=false}return}const b=e.target.closest('button[data-fill]');if(!b)return;const f=document.getElementById('gForm');f.email.value=b.dataset.fill;f.password.value=(CFG&&CFG.demo_password)||''});
 document.getElementById('logoutBtn').addEventListener('click',async()=>{try{await api('/auth/logout',{method:'POST',noGate:true})}catch(e){}for(const k of ['ov','bk','staff','wl','hh','users'])delete LD[k];document.getElementById('gForm').reset();location.hash='';cur='live';showGate()});
 document.addEventListener('submit',e=>{if(e.target.id!=='myPwForm')return;e.preventDefault();const f=e.target,b=f.querySelector('button[type=submit]');
  lbusy(b,async()=>{await api('/me/password',{method:'POST',body:{old:f.old.value,password:f.password.value}});f.reset();toast('密碼已更新')})});
@@ -1214,5 +1240,5 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('.gb');if(g){const r=g.getBoundingClientRect();show(g,r.left,r.bottom)}});
 document.addEventListener('focusout',()=>{if(!pinned)hide()});
 addEventListener('scroll',()=>{if(!pinned)hide()},true)})();</script>
-<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261126b"></script></body>
+<div id="webDemo" style="position:fixed;right:10px;bottom:10px;z-index:9999;font:12px/1.4 sans-serif;background:rgba(43,43,41,.82);color:#fff;border-radius:14px;padding:5px 10px;display:flex;gap:8px;align-items:center">瀏覽器展示版<button onclick="if(this.dataset.arm){JJJWEB.reset()}else{this.dataset.arm=1;this.textContent='再按一次確認重設'}" style="font:inherit;color:#fff;background:#D4003C;border:0;border-radius:10px;padding:2px 8px;cursor:pointer">重設資料</button></div><script src="guide.js?v=20261126c"></script></body>
 </html>
