@@ -11,6 +11,8 @@ module.exports = defineConfig({
   webServer: { command: 'python3 -m http.server 8766 --bind 127.0.0.1 --directory ' + (process.env.REPO || '..') + '', url: 'http://127.0.0.1:8766/index.html', reuseExistingServer: true },
   projects: [
     { name: 'desktop', use: { viewport: { width: 1440, height: 900 } } },
+    // tests/ 底下的其他層（見 docs/context/測試規範.md L2、L4–L8）
+    ...['integration', 'acceptance', 'nonfunctional/security', 'nonfunctional/recovery', 'nonfunctional/performance', 'nonfunctional/stress'].map(d => ({ name: d.replace('nonfunctional/', ''), testDir: '../tests/' + d, use: { viewport: { width: 1440, height: 900 } } })),
     { name: 'mobile', use: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }, testMatch: /layout|entry|auth/ },
   ],
 });
