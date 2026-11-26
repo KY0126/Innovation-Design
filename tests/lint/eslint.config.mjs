@@ -2,7 +2,7 @@
 import globals from 'globals';
 const basePath = '../..'; // 設定檔放在 tests/lint，檢查範圍是 repo 根目錄
 export default [
-  { basePath, ignores: ['**/vendor/**', '**/backend.js', '**/node_modules/**', '**/_*'] },
+  { basePath, ignores: ['**/vendor/**', '**/backend.js', '**/live-rules.js', '**/node_modules/**', '**/_*'] },
   {
     basePath,
     files: ['**/*.js'],
