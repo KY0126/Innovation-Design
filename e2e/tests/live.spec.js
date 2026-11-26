@@ -25,6 +25,7 @@ test('實用版 App：打開就是首頁，標實用版，沒有示範帳號、�
 test('實用版 App：點揪居家、免費診斷、會員欄、會員中心都跳登入提示；返回關閉；登入設定未完成時確認後提示', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop');
   const errs = await fresh(page, false);
+  await page.addInitScript(() => { window.JJJ_LIVE_CFG_OVERRIDE = { lineLoginChannelId: '' }; });
   await page.goto('/live/app/');
   await expect(page.locator('.lv-tag')).toBeVisible();
   for (const sel of ['.hg1', '[data-hb="0"]', '.lv-ban', '[data-nav="m1"]', '[data-go="inbox"]']) {
