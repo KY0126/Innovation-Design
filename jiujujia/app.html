@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="live.js?v=20261126c"></script>
+<script src="live.js?v=20261126d"></script>
 <script src="backend.js?v=20261027i"></script>
-<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261125n"></script>
+<script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="phase.js?v=20261124a"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -622,7 +622,7 @@ ar:()=>{if((S.armode||'ar')==='ar')return arViewHTML();const m=S.meas,R=(S.cfg&&
  <div class="card" style="margin-top:12px">${AR_SVG}<div class="muted" style="font-size:.85em;margin-top:6px">從床邊走到浴室門口，量 A 走道寬度、B 浴室門檻高度、C 距離，也數一下沿路有幾個插座。</div></div>
  <div class="card"><div class="meas">${f('corridor_cm','A｜走道寬度','cm','例如 92','1')}${f('threshold_cm','B｜浴室門檻高度','cm','例如 2','0.5')}${f('bed_bath_m','C｜床邊到浴室門口','公尺','例如 5','0.5')}</div>
   <div class="mf" style="margin-top:12px"><span>沿路可用的插座</span><div style="margin-top:6px">${[['0','沒有'],['1','1 個'],['2','2 個以上']].map(([v,l])=>`<button class="chip" data-outlet="${v}" aria-pressed="${String(m.outlets??'')===v}">${l}</button>`).join('')}</div></div>
-  <div class="okbox" style="background:var(--note);color:var(--muted)">「AR 量測」：Android 手機用 AR 點兩點量距離；iPhone 與其他手機拍一張放了信用卡的照片換算長度（約 ±3–5 cm，門市到府會再複量）。也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「長輩家」、「我家」或這次先不儲存。</div></div>
+  <div class="okbox" style="background:var(--note);color:var(--muted)">「AR 量測」：Android 手機用 AR 點兩點量距離；iPhone 與其他手機拍一張旁邊放了尺的照片換算長度（約 ±3–5 cm，門市到府會再複量）。也可用捲尺量好後輸入。不拍人；原始影像只為分析暫存，分析完即清除，成果可存入「長輩家」、「我家」或這次先不儲存。</div></div>
  <div class="pad"><button class="btn" data-a="arNext">下一步：全國電子 AI 顧問阿國問答</button><button class="btn ghost" data-a="arSkip">先略過，到門市再請顧問量</button></div></div>`},
 b2:()=>{const i=S.qi||0,q=Q[i],sel=S.ans[q.k],qt=S.self?QS[q.k]:q.q;return `${hdr('全國電子 AI 顧問阿國居家診斷',{aplus:true})}<div class="scroll" style="padding-top:14px"><div class="pad">
  ${stepper(FSTEP,1)}<div class="muted" style="margin:6px 0">第 ${i+1} 題，共 ${Q.length} 題</div>
@@ -1684,6 +1684,6 @@ window.JJJ={measSeg,nav,meCard,acctList,stf,snav,planName,api,esc,stepper,chd,fm
  const rb=document.getElementById('endsReset');if(rb)rb.onclick=()=>{if(rb.dataset.arm){window.JJJWEB&&JJJWEB.reset()}else{rb.dataset.arm=1;rb.textContent='再按一次確認重設'}};
 })();
 </script>
-<script src="stage2.js?v=20261126a"></script><script src="family.js?v=20261126a"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261125i"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125c"></script><script src="wish.js?v=20261126a"></script>
+<script src="stage2.js?v=20261126a"></script><script src="family.js?v=20261126a"></script><script src="ai.js?v=20261125l"></script><script src="ar.js?v=20261126a"></script><script src="ext.js?v=20261125k"></script><script src="cad.js?v=20261125c"></script><script src="wish.js?v=20261126a"></script>
 <script src="guide.js?v=20261126b"></script></body>
 </html>

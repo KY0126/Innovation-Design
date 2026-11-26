@@ -1,12 +1,12 @@
 // 實用版：真的用手機量尺寸（居家評估的走道寬、門檻高、床到浴室距離）
 // 和示範版 ar.js 同一套量法，改成獨立的全螢幕畫面，量完把數字交回呼叫的人：
 //   1. Android（Chrome）：WebXR 偵測地面，點起點、終點量距離（約 ±1～3 cm）
-//   2. iPhone 與其他手機：拍一張放了信用卡的照片，先點卡片長邊兩端定比例，再點要量的兩端（約 ±3–5 cm，僅供參考）
+//   2. iPhone 與其他手機：拍一張旁邊放了尺的照片，點尺上兩個刻度、輸入相差幾公分定比例，再點要量的兩端（約 ±3–5 cm，僅供參考）
 //   3. 都不行：關掉回到表單手動填
 // 不上傳照片、不存影像，只回傳一個數字（docs/design/實用版_資料表權限與LINE循環.md M3）
 (function () {
   if (!window.JJJ_LIVE) return;
-  const CARD_CM = 8.56; // 信用卡長邊（ISO/IEC 7810 ID-1）
+  const REF_CM = 10; // 尺上兩個刻度預設相差 10 公分（可改）
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let xrOK = false;
   if (navigator.xr && navigator.xr.isSessionSupported) navigator.xr.isSessionSupported('immersive-ar').then((ok) => { xrOK = ok; }).catch(() => { xrOK = false; });
@@ -38,13 +38,15 @@
         const canXR = xrOK && opt.xrFit;
         body = `<div class="lvm-pad">
           ${canXR ? '<button class="btn" data-m="xr">用 AR 量（點起點、終點）</button>' : ''}
-          <button class="btn ${canXR ? 'ghost' : ''}" data-m="cam">拍照量（放一張信用卡當比例尺）</button>
+          <button class="btn ${canXR ? 'ghost' : ''}" data-m="cam">拍照量（旁邊放一把尺當比例尺）</button>
           <label class="btn ghost" style="text-align:center">從相簿選照片<input type="file" accept="image/*" capture="environment" data-mfile="1" hidden></label>
-          <div class="lvm-note">${canXR ? '這支手機支援 AR 量測。' : opt.xrFit ? '這支手機的瀏覽器不支援網頁 AR（iPhone 的 Safari 目前都不支援），請用拍照量。' : '門檻高度建議用拍照量：信用卡貼著門檻放。'}照片只在手機上計算，不上傳、不存。</div></div>`;
+          <div class="lvm-note">${canXR ? '這支手機支援 AR 量測。' : opt.xrFit ? '這支手機的瀏覽器不支援網頁 AR（iPhone 的 Safari 目前都不支援），請用拍照量。' : '門檻高度建議用拍照量：尺立在門檻旁。'}照片只在手機上計算，不上傳、不存。</div></div>`;
       } else if (st.step === 'live') {
-        body = `<div class="armw"><video id="lvmV" autoplay playsinline muted></video><div class="armh">把信用卡貼著要量的東西放好，整個畫面都拍進去</div></div><div class="lvm-pad"><button class="btn" data-m="shot">拍照</button><button class="btn ghost" data-m="pick">取消</button></div>`;
+        body = `<div class="armw"><video id="lvmV" autoplay playsinline muted></video><div class="armh">把尺或捲尺貼著要量的東西放好，刻度要拍清楚</div></div><div class="lvm-pad"><button class="btn" data-m="shot">拍照</button><button class="btn ghost" data-m="pick">取消</button></div>`;
+      } else if (st.step === 'ref') {
+        body = `<div class="armw"><canvas id="lvmC"></canvas><div class="armh">② 這兩個刻度相差幾公分？</div></div><div class="lvm-pad"><label class="muted" style="display:block">尺上兩點相差（公分）<input class="fld" id="lvmRef" type="number" inputmode="decimal" min="1" max="500" step="0.5" value="${st.refCm || REF_CM}"></label><button class="btn" data-m="ref">下一步</button><button class="btn ghost" data-m="recard">重點刻度</button></div>`;
       } else if (st.step === 'card' || st.step === 'target') {
-        const hint = st.step === 'card' ? `① 點信用卡<b>長邊</b>的兩端（${st.pts.length}／2）` : `② 點要量的${esc(opt.label)}兩端（${st.pts.length}／2）`;
+        const hint = st.step === 'card' ? `① 點尺上<b>兩個刻度</b>（例如 0 和 10 公分）（${st.pts.length}／2）` : `③ 點要量的${esc(opt.label)}兩端（${st.pts.length}／2）`;
         body = `<div class="armw"><canvas id="lvmC" data-m="tap"></canvas><div class="armh">${hint}</div></div><div class="lvm-pad">${st.pts.length ? '<button class="btn ghost" data-m="undo">重點這一步</button>' : ''}<button class="btn ghost" data-m="pick">重新拍</button></div>`;
       } else if (st.step === 'xr') {
         body = `<div class="lvm-pad" style="text-align:center"><b>AR 量測中</b><div class="lvm-note">慢慢移動手機找地面，出現圓圈後點一下放起點，再點一下放終點。</div><button class="btn ghost" data-m="pick">取消</button></div>`;
@@ -88,8 +90,8 @@
       st.pts.push([x, y]);
       if (st.pts.length === 2) {
         const d = Math.hypot(st.pts[0][0] - st.pts[1][0], st.pts[0][1] - st.pts[1][1]);
-        if (st.step === 'card') { if (d < 20) { st.pts = []; render(); return; } st.card = st.pts; st.cardPx = d; st.pts = []; st.step = 'target'; }
-        else { st.tgt = st.pts; st.val = d / st.cardPx * CARD_CM; st.pts = []; st.step = 'done'; }
+        if (st.step === 'card') { if (d < 20) { st.pts = []; render(); return; } st.card = st.pts; st.cardPx = d; st.pts = []; st.step = 'ref'; }
+        else { st.tgt = st.pts; st.val = d / st.cardPx * (st.refCm || REF_CM); st.pts = []; st.step = 'done'; }
       }
       render();
     }
@@ -165,11 +167,13 @@
       else if (m === 'shot') shot();
       else if (m === 'pick') { stop(); st.step = 'pick'; st.pts = []; st.card = null; st.tgt = null; render(); }
       else if (m === 'undo') { st.pts = []; render(); }
+      else if (m === 'recard') { st.pts = []; st.card = null; st.step = 'card'; render(); }
+      else if (m === 'ref') { const v = Number((box.querySelector('#lvmRef') || {}).value); if (!(v > 0)) { alertMsg('請輸入兩個刻度相差幾公分'); return; } st.refCm = v; st.step = 'target'; render(); }
       else if (m === 'tap') tap(e, t);
       else if (m === 'use') { const v = fmt(st.val), mode = st.mode; close(); opt.onDone && opt.onDone(v, mode); }
     });
     box.addEventListener('change', (e) => { if (e.target.dataset && e.target.dataset.mfile && e.target.files[0]) fromFile(e.target.files[0]); });
     render();
   }
-  window.JJJMeasure = { open, CARD_CM };
+  window.JJJMeasure = { open, REF_CM };
 })();

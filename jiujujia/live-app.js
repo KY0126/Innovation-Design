@@ -114,7 +114,7 @@
   const measBtn = (k) => `<button type="button" class="btn ghost lv-meas" data-lvm="${k}" style="margin-top:6px">用手機量${MEAS[k][0]}</button><span class="muted lv-msrc" data-msrc="${k}" style="display:block;font-size:.85em"></span>`;
   function assessForm() {
     page('居家評估', `<form class="card" id="lvAs" novalidate>
-      <p class="muted" style="margin:0 0 8px">每一格都可以按「用手機量」：Android 用 AR，iPhone 拍一張放了信用卡的照片；也可以用捲尺量好直接填。量不準的地方，生活顧問到府時會再確認。</p>
+      <p class="muted" style="margin:0 0 8px">每一格都可以按「用手機量」：Android 用 AR，iPhone 拍一張旁邊放了尺的照片；也可以用捲尺量好直接填。量不準的地方，生活顧問到府時會再確認。</p>
       <label class="muted">床邊到浴室的走道寬度（公分）<input class="fld" name="corridor" type="number" inputmode="decimal" min="30" max="300" step="0.5" required></label>${measBtn('corridor')}
       <label class="muted" style="display:block;margin-top:10px">浴室門檻高度（公分，沒有門檻填 0）<input class="fld" name="threshold" type="number" inputmode="decimal" min="0" max="30" step="0.1" required></label>${measBtn('threshold')}
       <label class="muted" style="display:block;margin-top:10px">床邊到浴室門口的距離（公尺）<input class="fld" name="dist" type="number" inputmode="decimal" min="0.5" max="30" step="0.1" required></label>${measBtn('dist')}

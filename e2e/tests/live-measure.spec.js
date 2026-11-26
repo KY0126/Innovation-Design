@@ -1,4 +1,4 @@
-// 實用版居家評估：真的用手機量（拍照＋信用卡比例尺；Android 模擬 WebXR），量完帶回表單並存成 AR 來源
+// 實用版居家評估：真的用手機量（拍照＋尺的刻度比例尺；Android 模擬 WebXR），量完帶回表單並存成 AR 來源
 const { test } = require('playwright/test');
 const { fresh, expect } = require('./helpers');
 const { createMock } = require('./live-mock');
@@ -39,12 +39,14 @@ test('實用版：走道寬用拍照量，帶回表單；門檻、距離手動�
   await page.click('.lvm [data-m="shot"]');
   const [w] = await page.locator('#lvmC').evaluate((el) => [el.width]);
   await tapPx(page, w * 0.1, 100); await tapPx(page, w * 0.2, 100);
+  await expect(page.locator('.lvm')).toContainText('相差幾公分');
+  await page.click('.lvm [data-m="ref"]');
   await expect(page.locator('.lvm')).toContainText('點要量的走道寬度兩端');
   await tapPx(page, w * 0.05, 200); await tapPx(page, w * 0.95, 200);
-  await expect(page.locator('.lvm')).toContainText('約 77 cm');
+  await expect(page.locator('.lvm')).toContainText('約 90 cm');
   await page.click('.lvm [data-m="use"]');
   await expect(page.locator('.lvm')).toHaveCount(0);
-  await expect(page.locator('#lvAs [name="corridor"]')).toHaveValue('77');
+  await expect(page.locator('#lvAs [name="corridor"]')).toHaveValue('90');
   await expect(page.locator('[data-msrc="corridor"]')).toContainText('已用照片量');
   await page.fill('#lvAs [name="threshold"]', '2');
   await page.fill('#lvAs [name="dist"]', '5');
@@ -52,7 +54,7 @@ test('實用版：走道寬用拍照量，帶回表單；門檻、距離手動�
   await expect.poll(() => M.st.db.assessments.length).toBe(1);
   const saved = M.st.db.assessments[0];
   expect(saved.source).toBe('ar');
-  expect(saved.dims).toMatchObject({ corridor_mm: 770, methods: { corridor: 'photo', threshold: 'manual', dist: 'manual' } });
+  expect(saved.dims).toMatchObject({ corridor_mm: 900, methods: { corridor: 'photo', threshold: 'manual', dist: 'manual' } });
   expect(errs).toEqual([]);
 });
 

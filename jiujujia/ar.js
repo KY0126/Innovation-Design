@@ -1,12 +1,12 @@
 // 揪居家｜AR 量測（手機實測）
 // 三條路，量到的數字都寫回同一份 S.meas（走道寬、門檻高、床到浴室距離），後面的燈號、顧問圖面、技師工單不用改：
 //   1. Android（Chrome）：WebXR 偵測地面，點起點、終點量距離（約 ±1～3 cm）
-//   2. iPhone 與其他手機：拍一張放了信用卡的照片，先點卡片長邊兩端定比例，再點要量的兩端（約 ±3–5 cm，僅供參考）
+//   2. iPhone 與其他手機：拍一張旁邊放了尺的照片，點尺上兩個刻度、輸入相差幾公分定比例，再點要量的兩端（約 ±3–5 cm，僅供參考）
 //   3. 都不行：手動輸入（原本的畫面）
 (function () {
   const J = window.JJJ; if (!J) return;
   const { V, S, esc, toast, render, go } = J;
-  const CARD_CM = 8.56; // 信用卡長邊（ISO/IEC 7810 ID-1）
+  const REF_CM = 10; // 尺上兩個刻度預設相差 10 公分（可改）
   const FIELDS = [['corridor_cm', 'A｜走道寬度', 'cm', 1], ['threshold_cm', 'B｜浴室門檻高度', 'cm', 0], ['bed_bath_m', 'C｜床邊到浴室門口', '公尺', 1]];
   let stream = null, img = null, xr = null;
   const A = () => S.arm || (S.arm = { k: 'corridor_cm', step: 'pick', pts: [], card: null, val: null, xrOK: null, mode: null });
@@ -22,17 +22,18 @@
     // 選項目與結果頁放「AR 量測｜手動輸入」切換；拍照點點時專心點，不放切換
     const top = a.step === 'pick' || a.step === 'done' ? bar + J.measSeg('ar') : bar;
     if (a.step === 'pick') return `${top}<div class="scroll" style="padding-top:12px">
-      <div class="sec">要量哪一項？</div><div class="glist">${FIELDS.map(([k, l, u, xrFit]) => `<button class="gi" data-armk="${k}" aria-pressed="${a.k === k}"><span><b>${a.k === k ? '◉' : '○'} ${l}</b><span class="muted" style="display:block;font-size:.88em">${xrFit ? 'AR 或照片都能量' : '建議用照片：卡片貼著門檻放'}${S.meas[k] != null ? `｜目前 ${esc(S.meas[k])} ${u}` : ''}</span></span></button>`).join('')}</div>
+      <div class="sec">要量哪一項？</div><div class="glist">${FIELDS.map(([k, l, u, xrFit]) => `<button class="gi" data-armk="${k}" aria-pressed="${a.k === k}"><span><b>${a.k === k ? '◉' : '○'} ${l}</b><span class="muted" style="display:block;font-size:.88em">${xrFit ? 'AR 或照片都能量' : '建議用照片：尺立在門檻旁'}${S.meas[k] != null ? `｜目前 ${esc(S.meas[k])} ${u}` : ''}</span></span></button>`).join('')}</div>
       <div class="sec">量測方式</div>
       <div class="pad">
         ${a.xrOK && f[3] ? '<button class="btn" data-arstart="xr">用 AR 量（點起點、終點）</button>' : ''}
-        <button class="btn ${a.xrOK && f[3] ? 'ghost' : ''}" data-arstart="cam">拍照量（放一張信用卡當比例尺）</button>
+        <button class="btn ${a.xrOK && f[3] ? 'ghost' : ''}" data-arstart="cam">拍照量（旁邊放一把尺當比例尺）</button>
         <label class="btn ghost" style="display:block;text-align:center">從相簿選照片<input type="file" accept="image/*" capture="environment" data-arfile="1" hidden></label>
         <div class="muted" style="font-size:.85em;margin-top:8px">${a.xrOK ? '這支手機支援 AR 量測。' : '這支手機的瀏覽器不支援網頁 AR（iPhone 的 Safari 目前都不支援），請用拍照量。'}不拍人臉；照片只在手機上計算，不上傳。</div>
       </div></div>`;
-    if (a.step === 'live') return `${top}<div class="armw"><video id="armV" autoplay playsinline muted></video><div class="armh">把信用卡貼著要量的東西放好，整個畫面都拍進去</div></div><div class="pad" style="padding:10px 12px"><button class="btn" data-arshot="1">拍照</button><button class="btn ghost" data-arback="pick">取消</button></div>`;
+    if (a.step === 'live') return `${top}<div class="armw"><video id="armV" autoplay playsinline muted></video><div class="armh">把尺或捲尺貼著要量的東西放好，刻度要拍清楚</div></div><div class="pad" style="padding:10px 12px"><button class="btn" data-arshot="1">拍照</button><button class="btn ghost" data-arback="pick">取消</button></div>`;
+    if (a.step === 'ref') return `${top}<div class="armw"><canvas id="armC"></canvas><div class="armh">② 這兩個刻度相差幾公分？</div></div><div class="pad" style="padding:10px 12px"><label class="muted" style="display:block">尺上兩點相差（公分）<input class="fld" id="armRef" type="number" inputmode="decimal" min="1" max="500" step="0.5" value="${a.refCm || REF_CM}"></label><button class="btn" data-arref="1">下一步</button><button class="btn ghost" data-arundo="card">重點刻度</button></div>`;
     if (a.step === 'card' || a.step === 'target') {
-      const hint = a.step === 'card' ? `① 點信用卡<b>長邊</b>的兩端（${a.pts.length}／2）` : `② 點要量的${esc(f[1].split('｜')[1])}兩端（${a.pts.length}／2）`;
+      const hint = a.step === 'card' ? `① 點尺上<b>兩個刻度</b>（例如 0 和 10 公分）（${a.pts.length}／2）` : `③ 點要量的${esc(f[1].split('｜')[1])}兩端（${a.pts.length}／2）`;
       return `${top}<div class="armw"><canvas id="armC" data-artap="1"></canvas><div class="armh">${hint}</div></div><div class="pad" style="padding:10px 12px">${a.pts.length ? '<button class="btn ghost" data-arundo="1">重點這一步</button>' : ''}<button class="btn ghost" data-arback="pick">重新拍</button></div>`;
     }
     if (a.step === 'xr') return `${top}<div class="scroll" style="padding-top:16px"><div class="card" style="text-align:center"><b>AR 量測中</b><div class="muted" style="margin-top:6px">慢慢移動手機找地面，出現圓圈後點一下放起點，再點一下放終點。</div></div><div class="pad"><button class="btn ghost" data-arback="pick">取消</button></div></div>`;
@@ -81,8 +82,8 @@
     a.pts.push([x, y]);
     if (a.pts.length === 2) {
       const d = Math.hypot(a.pts[0][0] - a.pts[1][0], a.pts[0][1] - a.pts[1][1]);
-      if (a.step === 'card') { if (d < 20) { a.pts = []; toast('兩點太近，請點卡片長邊的兩端'); render(); return; } a.card = a.pts; a.cardPx = d; a.pts = []; a.step = 'target'; }
-      else { a.tgt = a.pts; a.val = d / a.cardPx * CARD_CM; a.pts = []; a.step = 'done'; }
+      if (a.step === 'card') { if (d < 20) { a.pts = []; toast('兩點太近，請點尺上離遠一點的兩個刻度'); render(); return; } a.card = a.pts; a.cardPx = d; a.pts = []; a.step = 'ref'; }
+      else { a.tgt = a.pts; a.val = d / a.cardPx * (a.refCm || REF_CM); a.pts = []; a.step = 'done'; }
     }
     render();
   }
@@ -158,14 +159,15 @@
 
   const view = document.getElementById('view');
   view.addEventListener('click', e => {
-    const t = e.target.closest('[data-armk],[data-arstart],[data-arshot],[data-arback],[data-arundo],[data-aruse],[data-artap],[data-arman]'); if (!t) return; e.stopPropagation();
+    const t = e.target.closest('[data-armk],[data-arstart],[data-arshot],[data-arback],[data-arundo],[data-aruse],[data-artap],[data-arman],[data-arref]'); if (!t) return; e.stopPropagation();
     const a = A(), d = t.dataset;
     if (d.armk) { a.k = d.armk; render(); }
     else if (d.arstart === 'xr') startXR();
     else if (d.arstart === 'cam') openCam();
     else if (d.arshot) shot();
     else if (d.arback) { stop(); a.step = d.arback; a.pts = []; a.card = null; a.tgt = null; render(); }
-    else if (d.arundo) { a.pts = []; render(); }
+    else if (d.arundo) { a.pts = []; if (d.arundo === 'card') { a.card = null; a.step = 'card'; } render(); }
+    else if (d.arref) { const v = Number((document.getElementById('armRef') || {}).value); if (!(v > 0)) { toast('請輸入兩個刻度相差幾公分'); return; } a.refCm = v; a.step = 'target'; render(); }
     else if (d.artap) tap(e, t);
     else if (d.arman) {
       // 切到手動輸入；從結果頁來的，先把剛量到的數字填進去，游標停在那一格
@@ -184,5 +186,5 @@
   }, true);
   view.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.arfile && e.target.files[0]) fromFile(e.target.files[0]); }, true);
   J.NO_NAV.push('arm');
-  window.JJJAR = { A, CARD_CM, _setImage: c => { img = c; } };
+  window.JJJAR = { A, REF_CM, _setImage: c => { img = c; } };
 })();
