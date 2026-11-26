@@ -427,7 +427,7 @@
     }],
   ];
   // 其他角色（生活顧問、技師、總部、大使、企業）與 AI 轉真人：後續批次接上
-  const LATER = /^\/api\/(tech|admin|amb|biz|support)\//;
+  const LATER = /^\/api\/(admin|amb|biz|support)\//;
 
   async function handle(method, path, body, qs, url, o) {
     for (const [mth, re, need, fn] of routes) {
