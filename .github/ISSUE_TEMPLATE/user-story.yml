@@ -1,0 +1,47 @@
+name: 使用者故事（User Story）
+description: 新需求或功能，依 docs/prd/PRD.md 的格式
+title: "US-xx "
+labels: ["類型:user-story"]
+body:
+  - type: input
+    id: persona
+    attributes:
+      label: 角色（P1–P7）
+      description: 見 docs/context/使用者情境.md
+      placeholder: P1 陳小姐（付費子女）
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: 使用者故事
+      value: "身為…，我想要…，以便…。"
+    validations:
+      required: true
+  - type: textarea
+    id: ac
+    attributes:
+      label: 驗收條件（假如／當／那麼，標測試層 L1–L8）
+      value: |
+        - AC1 假如…，當…，那麼…。（L?）
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: 階段
+      options: [試點期, 擴展期, 延伸期]
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: 版本
+      options: [實用版, Demo, 兩者]
+    validations:
+      required: true
+  - type: input
+    id: rules
+    attributes:
+      label: 相關領域鐵律（R1–R15）
+      placeholder: R1、R8
