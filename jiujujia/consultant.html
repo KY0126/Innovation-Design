@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="live.js?v=20261127b"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="planmap.js?v=20261125a"></script>
@@ -131,7 +132,8 @@ const LC={r:['紅燈','var(--r)'],y:['黃燈','var(--y)'],g:['綠燈','var(--g)'
 const NAV=[['wb','今日案件'],['cases','案件'],['sched','排程與派工'],['after','售後與待辦'],['prod','商品與方案模板']];
 const NAVG={wb:'今日工作',after:'售後',prod:'工具'};
 const TABS=['案件摘要','AI 分析','空間與成果','改善方案','商品與款式','報價','確認與同意','工單與排程','驗收與售後'];
-const ST={view:'wb',hid:3,tab:0,me:null,home:null,todos:null,plans:{}};
+const ST={view:'wb',hid:3,tab:0,me:null,home:null,todos:null,plans:{},ids:[2,3,4]};
+const IDS=()=>ST.ids;
 // 四類改善方式（示範資料）：顧問依個案逐項調整
 const OPTS={
  '走道':{why:'夜間偏暗、有門檻，寬 92 cm',l:'r',items:[
@@ -147,10 +149,10 @@ const OPTS={
   {t:'簡易施工',n:'可從外側解鎖的把手',p:1800,est:false,d:'半天',by:'協力工班｜門窗（限浴室門）',dep:'—',acc:'外側解鎖測試',chk:'門扇材質'},
   {t:'改造工程',n:'改為外開門或橫拉門',p:null,est:true,d:'約 1–3 天',by:'協力工班｜門窗（限浴室門）',dep:'租屋須房東同意',acc:'協力工班書面保固',chk:'需到府估價'}]}};
 // 顧問勾選、正式報價、補助、家庭交付與款式都存在資料庫，經 /api 讀寫（工作包 1）
-const SEL={3:{'走道':[1],'浴室':[0],'浴室門':[1]}},QUO={},SUB={},CH={};let HO=[],DR=[];
+const SEL=window.JJJ_LIVE?{}:{3:{'走道':[1],'浴室':[0],'浴室門':[1]}},QUO={},SUB={},CH={};let HO=[],DR=[];
 const save=()=>{const hid=ST.hid;api('/advisor/selections/'+hid,{method:'PUT',body:{sel:SEL[hid]||{}}}).catch(()=>{});api('/advisor/subsidy/'+hid,{method:'PUT',body:{data:SUB[hid]||{}}}).catch(()=>{})};
 async function loadStore(){
- await Promise.all([2,3,4].map(async id=>{const [s,q,b,c]=await Promise.all([api('/advisor/selections/'+id),api('/advisor/quotes/'+id),api('/advisor/subsidy/'+id),api('/advisor/choices/'+id)]);if(s.sel)SEL[id]=s.sel;QUO[id]=q.quotes||[];SUB[id]=b.data||{};CH[id]=c.state||{}}));
+ await Promise.all(IDS().map(async id=>{const [s,q,b,c]=await Promise.all([api('/advisor/selections/'+id),api('/advisor/quotes/'+id),api('/advisor/subsidy/'+id),api('/advisor/choices/'+id)]);if(s.sel)SEL[id]=s.sel;QUO[id]=q.quotes||[];SUB[id]=b.data||{};CH[id]=c.state||{}}));
  const [h,d]=await Promise.all([api('/advisor/handoffs'),api('/advisor/drafts')]);HO=h.handoffs||[];DR=d.drafts||[]}
 const fmt=n=>n==null?'待估價':n===0?'免費':'NT$'+n.toLocaleString();
 const addM=(d,m)=>{const x=new Date(d.replace(' ','T'));x.setMonth(x.getMonth()+m);return x.toISOString().slice(0,10)};
@@ -167,7 +169,8 @@ async function boot(){
  if(!ST.me){ST.me=await gateLogin()}
  document.getElementById('who').textContent=ST.me.name;document.getElementById('store').textContent=ST.me.store;
  const [h,t]=await Promise.all([api('/advisor/home'),api('/advisor/todos')]);ST.home=h;ST.todos=t;
- for(const id of [2,3,4]){try{ST.plans[id]=await api('/advisor/plan/'+id)}catch(e){}}
+ if(window.JJJ_LIVE){try{ST.ids=((await api('/advisor/cases')).cases||[]).map(x=>x.hid)}catch(e){ST.ids=[]}if(!ST.ids.includes(ST.hid))ST.hid=ST.ids[0]||0}
+ for(const id of IDS()){try{ST.plans[id]=await api('/advisor/plan/'+id)}catch(e){}}
  try{await loadStore()}catch(e){console.warn(e)}
  if(window.JJJPHASE_READY)await JJJPHASE_READY;
  addEventListener('jjjphase',()=>render());
@@ -176,7 +179,7 @@ async function boot(){
  render();
 }
 const handoffs=()=>HO;
-function cases(){return [2,3,4].map(id=>ST.plans[id]).filter(Boolean)}
+function cases(){return IDS().map(id=>ST.plans[id]).filter(Boolean)}
 function JT(rows){return `<div class="jt">${rows.map(([st,d,t,sm])=>`<div class="it ${st||'td'}"><div class="d">${d||''}</div><div class="dt"><i></i></div><div class="t">${t}${sm?`<small>${sm}</small>`:''}</div></div>`).join('')}</div>`}
 function mdx(v){const m=String(v||'').match(/(\d{4}-)?(\d{1,2})[\/-](\d{1,2})/);return m?(+m[2])+'/'+m[3].padStart(2,'0'):''}
 function stage(p){if(!p)return ['—','gray'];if(p.phase>=9)return ['關懷中｜售後','ok'];if(p.phase>=3){const pv=p.pv||{};return [pv.status==='差異已核准'?'施工中｜差異已核准':'待施工排程','am']}if(p.phase===2)return ['待長輩確認','am'];if(p.phase===1)return ['新進案件｜待查看 AI 分析',''];return ['尚未評估','gray']}
@@ -265,7 +268,7 @@ function tQuote(p){return tQuote0(p)+tips(p)}
 function tQuote0(p){const hid=p.household_id,items=chosen(hid),L=quotes(hid),pl=p.plan||{};
  const dev=pl.one_time||5900,known=items.filter(i=>!i.est).reduce((a,b)=>a+(b.p||0),0),pend=items.filter(i=>i.est);
  const ho=handoffs()[0];
- return `${ho&&hid===3?`<div class="note" style="margin-bottom:12px">家庭交付（${esc(ho.at)}）：${ho.items.map(i=>esc(i.space+'｜'+i.type+'：'+i.name+(i.style?'（'+i.style+'）':''))).join('、')}</div>`:''}
+ return `${ho&&(window.JJJ_LIVE?ho.hid===hid:hid===3)?`<div class="note" style="margin-bottom:12px">家庭交付（${esc(ho.at)}）：${ho.items.map(i=>esc(i.space+'｜'+i.type+'：'+i.name+(i.style?'（'+i.style+'）':''))).join('、')}</div>`:''}
  <div class="grid"><div class="panel"><div class="ph">整合報價（編輯中）</div><div class="pb"><table><tr><th>項目</th><th>執行單位</th><th>價格來源</th><th>金額</th></tr>
  <tr><td>揪夜安設備＋設定費</td><td>全國電子</td><td>方案定價</td><td>NT$${dev.toLocaleString()}</td></tr>
  ${items.map(i=>`<tr><td>${esc(i.sp)}｜${esc(i.n)}</td><td>${esc(i.by)}</td><td>${i.est?'需到府估價':'示範資料'}</td><td>${fmt(i.p)}</td></tr>`).join('')}
@@ -328,7 +331,7 @@ function tAfter(p){const hid=p.household_id,s=SUB[hid]||{};const rq=(ST.todos.re
  <p class="mu sm">生活顧問協助轉介，不代辦、不保證核准；需事前核准的工程，核准前不派工。</p></div></div>
  <div class="panel"><div class="ph">驗收、保固與後續需求</div><div class="pb">${rq.map(r=>`<div class="item"><span class="t"><b>${esc(r.kind)}</b><div class="s">${esc(r.when)}｜${esc(r.note)}</div></span><span class="tag am">${esc(r.status)}</span></div>`).join('')||'<div class="mu">目前沒有售後需求。</div>'}
  <div class="item"><span class="t">設備保固</span><span class="tag gray">依商品保固</span></div><div class="item"><span class="t">協力工班施工保固</span><span class="tag gray">協力工班書面保固</span></div></div></div></div>`}
-function vProd(){ST.hid=ST.hid||3;return `<div class="note" style="margin-bottom:12px">以林媽媽家為例；實際操作請從「案件管理」進入個案。</div>${tProd()}<div style="height:12px"></div>${tOpt(ST.plans[3])}`}
+function vProd(){ST.hid=ST.hid||(window.JJJ_LIVE?IDS()[0]:3);return `<div class="note" style="margin-bottom:12px">${window.JJJ_LIVE?'以本門市第一個案件為例':'以林媽媽家為例'}；實際操作請從「案件管理」進入個案。</div>${tProd()}<div style="height:12px"></div>${tOpt(ST.plans[3])}`}
 function vQuoteList(){return `<div class="panel"><div class="ph">報價總覽</div><div class="pb">${cases().map(p=>{const L=quotes(p.household_id);return `<button class="item" data-case="${p.household_id}" data-tabgo="5"><span class="t"><b>${esc(p.household)}</b><div class="s">${L.length?`最新 v${L[0].v}｜NT$${L[0].total.toLocaleString()}`:'尚未送出報價'}</div></span><span class="tag ${L.length?'ok':'gray'}">${L.length?L.length+' 個版本':'待報價'}</span></button>`}).join('')}</div></div>`}
 function vSched(){return cases().filter(p=>p.phase>=3).map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tWork(p)}</div>`).join('')}
 function vAfter(){return cases().map(p=>`<div style="margin-bottom:12px"><h3 style="margin:0 0 8px;font-size:15px">${esc(p.household)}</h3>${tAfter(p)}</div>`).join('')}
@@ -358,13 +361,13 @@ const G=[['wb',null,'顧問工作台','首頁直接列出今天要做的事：�
  ['case',7,'工單與排程','協力工班先做需要動工的項目，全國電子技師再安裝設備，前置未完成就等待。'],
  ['case',8,'驗收與售後','記錄補助轉介 1966、核准狀態、保固與後續需求。導覽到這裡結束，可以自由操作。']];
 function guide(i){let g=document.getElementById('guide');if(i>=G.length){if(g)g.remove();return}const [v,tab,h,d]=G[i];
- if(v==='case'){ST.view='case';ST.hid=3;ST.tab=tab}else ST.view=v;render();
+ if(v==='case'){ST.view='case';ST.hid=window.JJJ_LIVE?(IDS()[0]||0):3;ST.tab=tab}else ST.view=v;render();
  if(!g){g=document.createElement('div');g.id='guide';document.body.appendChild(g)}
  g.innerHTML=`<div class="n">顧問端導覽 ${i+1}／${G.length}</div><h3>${h}</h3><p class="mu" style="margin:0 0 10px">${d}</p><div style="display:flex;gap:6px"><button class="b pri" id="gN">${i===G.length-1?'完成':'下一步'}</button><button class="b" id="gX">關閉</button></div>`;
  g.querySelector('#gN').onclick=()=>guide(i+1);g.querySelector('#gX').onclick=()=>g.remove()}
 document.getElementById('guideBtn').onclick=()=>window.JJJGUIDE&&JJJGUIDE.start();
 window.JCON={ST,render};
-boot().catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
+(window.JJJ_LIVE?window.JJJLIVEREADY:Promise.resolve()).then(boot).catch(e=>{document.getElementById('view').textContent='載入失敗：'+e.message});
 })();
 </script>
 <script src="guide.js?v=20261126c"></script>

@@ -6,7 +6,8 @@
 (function () {
   if (!window.JJJ_LIVE) return;
   const R = () => window.JJJRULES, T = () => window.JJJRULES.T;
-  const sb = () => window.JJJLIVEAPP && window.JJJLIVEAPP.sb;
+  // 家庭頁用 live-app.js 的連線；員工頁（後台、生活顧問電腦版）用 live-admin.js 的連線
+  const sb = () => window.JJJLIVESB || (window.JJJLIVEAPP && window.JJJLIVEAPP.sb);
   let active = false;           // 已登入、有長輩家，進入 Demo 畫面
   const J = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json' } });
   const ERR = (m, s = 400) => J({ error: m }, s);
@@ -34,14 +35,16 @@
     const { data: { session } } = await sb().auth.getSession();
     if (!session) throw new E('請先登入', 401);
     const uid = session.user.id;
-    const prof = (await q(db('profiles').select('id, display_name, role, store').eq('id', uid).maybeSingle())) || { id: uid, display_name: '', role: 'family' };
+    const prof = (await q(db('profiles').select('id, display_name, role, store, disabled').eq('id', uid).maybeSingle())) || { id: uid, display_name: '', role: 'family' };
+    if (prof.disabled) { await sb().auth.signOut(); throw new E('這個帳號已停用，請洽總部', 401); }
+    if (prof.role !== 'family') return { uid, email: session.user.email, prof, h: null, hid: null, staff: true, role: prof.role, store: prof.role === 'hq' ? null : prof.store };
     const mem = await q(db('members').select('household_id, relation').eq('user_id', uid).order('household_id').limit(1));
     let h = null;
     if (mem.length) { h = await q(db('households').select('*').eq('id', mem[0].household_id).maybeSingle()); if (h) h.relation = REL[mem[0].relation] || '家人'; }
     if (needHH && !h) throw new E('尚未建立家庭資料', 404);
     return { uid, email: session.user.email, prof, h, hid: h ? h.id : null };
   }
-  const meUser = (c) => ({ id: c.uid, name: c.prof.display_name || '家人', email: c.email && !/@line\.jiujujia/.test(c.email) ? c.email : '', role: c.prof.role || 'family', store: c.prof.store || null });
+  const meUser = (c) => ({ id: c.uid, name: c.prof.display_name || (c.staff ? '同仁' : '家人'), email: c.email && !/@line\.jiujujia/.test(c.email) ? c.email : '', role: c.prof.role || 'family', store: c.prof.store || null });
 
   // ── 輸出格式（同 Demo 後端） ──
   const label = (a, b) => T().label(a, b);
@@ -50,6 +53,35 @@
   const u5 = (a) => a ? { id: a.id, filled_by: a.filled_by || 'child', answers: a.answers || {}, measures: a.measures || mmToCm(a.dims), lights: a.lights || [], rec: a.rec || null, created_at: ls(a.created_at) } : null;
   const mmToCm = (d) => { d = d || {}; const o = {}; if (d.corridor_mm != null) o.corridor_cm = d.corridor_mm / 10; if (d.threshold_mm != null) o.threshold_cm = d.threshold_mm / 10; if (d.bed_bath_mm != null) o.bed_bath_m = d.bed_bath_mm / 1000; if (d.outlets != null) o.outlets = d.outlets; return o; };
 
+  // ── 方案圖面版本、工作包、驗收（同 Demo 的 Ya 模組；第 2 批起由生活顧問與技師寫入） ──
+  async function uname(ids) {
+    const L = [...new Set((ids || []).filter(Boolean))]; if (!L.length) return {};
+    const r = await rpc('user_names', { p_ids: L }); return Object.fromEntries((r || []).map((x) => [x.id, x.name]));
+  }
+  const PKG_STEPS = {
+    B: ['確認床邊與走道插座', '安裝感應小夜燈 ×3', '安裝門檻提示燈條', '關燈測試感應距離與亮度', '拍照回報'],
+    S: ['到場確認', '檢測設備與連線', '更換電池或零件', '測試事件回傳', '拍照回報'],
+  };
+  async function latestVersion(hid) { const r = await q(db('plan_versions').select('*').eq('household_id', hid).order('ver', { ascending: false }).limit(1)); return r[0] || null; }
+  async function versionOut(v) { if (!v) return null; const N = await uname([v.by_id]); return { id: v.id, ver: v.ver, status: v.status, reason: v.reason, pins: v.pins || [], created_at: ls(v.created_at), locked_at: ls(v.locked_at), by: N[v.by_id] || null }; }
+  async function versionsOf(hid) { return (await q(db('plan_versions').select('ver, status, reason, created_at, locked_at').eq('household_id', hid).order('ver'))).map((v) => ({ ...v, created_at: ls(v.created_at), locked_at: ls(v.locked_at) })); }
+  async function packagesOf(bid) {
+    const L = await q(db('work_packages').select('*').eq('booking_id', bid));
+    const ord = { B: 0, A: 1 }; L.sort((a, b) => (ord[a.code] ?? 2) - (ord[b.code] ?? 2));
+    const N = await uname(L.map((x) => x.assignee_id)), st = Object.fromEntries(L.map((x) => [x.code, x.status]));
+    return L.map((g) => { const pre = g.prereq && st[g.prereq], locked = !!(pre && pre !== '已完成') && g.status !== '已完成';
+      return { id: g.id, code: g.code, name: g.name, team: g.team, assignee_id: g.assignee_id, assignee: N[g.assignee_id] || null, prereq: g.prereq && pre ? g.prereq : null, locked, status: locked && g.status === '未開始' ? '等待前置' : g.status, steps: g.steps || {}, step_names: PKG_STEPS[g.code] || null, started_at: ls(g.started_at), done_at: ls(g.done_at) }; });
+  }
+  async function acceptanceOf(bid) { const r = await q(db('acceptances').select('*').eq('booking_id', bid).order('id', { ascending: false }).limit(1)); const g = r[0]; return g ? { result: g.result, by_role: g.by_role, by_name: g.by_name, items: g.items || [], note: g.note, when: T().short(ls(g.created_at)) } : null; }
+  async function work(hid, inst) {
+    const [v, vs, acc, pk] = await Promise.all([latestVersion(hid).then(versionOut), versionsOf(hid), inst ? acceptanceOf(inst.id) : null, inst ? packagesOf(inst.id) : []]);
+    return { pv: v, versions: vs, acceptance: acc, packages: pk.map((x) => ({ code: x.code, name: x.name, team: x.team, assignee: x.assignee, status: x.status, done_at: x.done_at })) };
+  }
+  // 員工操作紀錄（總部「最近動態」）
+  async function audit(action, target, detail) { try { await db('audit').insert({ action, target: target || null, detail: detail || null }); } catch (e) {} }
+  Object.assign(work, { latestVersion, versionOut, versionsOf, packagesOf, acceptanceOf, PKG_STEPS });
+
+  let FP = null; // 這一家的真實格局（生活顧問到府畫）
   async function home(c) {
     const hid = c.hid, h = c.h;
     const [mems, as, bks, pls, devs, wis, care, reqs, rems] = await Promise.all([
@@ -63,6 +95,9 @@
       q(db('requests').select('id, kind, note, status, created_at').eq('household_id', hid).order('id', { ascending: false }).limit(20)),
       q(db('reminders').select('id, device, kind, reason, due, status, booking_id').eq('household_id', hid).neq('status', '已略過').order('id')),
     ]);
+    const fp = await q(db('floorplans').select('layout, updated_at').eq('household_id', hid).maybeSingle());
+    FP = fp ? { at: ls(fp.updated_at) } : null;
+    if (window.JJJLAYOUT) window.JJJLAYOUT.setHome(fp ? fp.layout : null);
     const consult = bks.filter((b) => b.kind === '門市諮詢'), inst = bks.find((b) => b.kind === '到府安裝') || null;
     const owner = (mems || []).find((m) => m.user_id === h.created_by);
     const byId = Object.fromEntries(bks.map((b) => [b.id, b]));
@@ -75,7 +110,7 @@
       wishes: wis.map((w) => ({ ...w, created_at: ls(w.created_at) })),
       care: care.map((e) => { const t = ls(e.occurred_at); return { ...e, occurred_at: t, timeline: e.timeline || [], when: T().short(t) }; }),
       requests: reqs.map((r) => ({ ...r, created_at: ls(r.created_at) })),
-      pv: null, versions: [], acceptance: null, packages: [],
+      ...(await work(hid, inst)),
       reminders: rems.sort((a, b) => (a.status === '待處理' ? 0 : 1) - (b.status === '待處理' ? 0 : 1)).map((r) => { const b = r.booking_id && byId[r.booking_id]; return { id: r.id, device: r.device, kind: r.kind, reason: r.reason, due: r.due, status: r.status, booking: b ? { status: b.status, label: label(b.slot_start, b.slot_end) } : null }; }),
     };
   }
@@ -131,7 +166,19 @@
     // 帳號
     ['GET', /^\/api\/me$/, NOHH, async (c) => J({ user: meUser(c), household: c.h ? { id: c.h.id, name: c.h.elder_name + '家', phase: c.h.phase || 0, store: c.h.store } : null })],
     ['POST', /^\/api\/auth\/logout$/, OPEN, async () => { try { await sb().auth.signOut(); } catch (e) {} setTimeout(() => location.replace(location.pathname + '?mode=live'), 50); return J({ ok: true }); }],
-    ['POST', /^\/api\/auth\/(login|register)$/, OPEN, () => ERR('實用版請用 LINE 登入', 400)],
+    // 員工：員工編號＋密碼（E100001 → e100001@staff.jiujujia.example；帳號由總部建立）；家庭一律用 LINE 登入
+    ['POST', /^\/api\/auth\/login$/, OPEN, async (c, m, b) => {
+      const id = String(b.email || '').trim(), pw = String(b.password || '');
+      if (!id || !pw) throw new E('請輸入員工編號和密碼');
+      const email = id.includes('@') ? id : id.toLowerCase() + '@staff.jiujujia.example';
+      const { error } = await sb().auth.signInWithPassword({ email, password: pw });
+      if (error) throw new E('員工編號或密碼不正確', 401);
+      const c2 = await ctx(false);
+      if (!c2.staff) { await sb().auth.signOut(); throw new E('家庭帳號請用 LINE 登入揪居家 App', 403); }
+      try { await db('profiles').update({ last_login: new Date().toISOString() }).eq('id', c2.uid); } catch (e) {}
+      return J({ user: meUser(c2) });
+    }],
+    ['POST', /^\/api\/auth\/register$/, OPEN, () => ERR('實用版請用 LINE 登入', 400)],
     ['POST', /^\/api\/me\/password$/, OPEN, () => ERR('實用版用 LINE 登入，不需要密碼', 400)],
 
     // 揪居家首頁
@@ -380,7 +427,7 @@
     }],
   ];
   // 其他角色（生活顧問、技師、總部、大使、企業）與 AI 轉真人：後續批次接上
-  const LATER = /^\/api\/(advisor|tech|admin|amb|biz|support)\//;
+  const LATER = /^\/api\/(tech|admin|amb|biz|support)\//;
 
   async function handle(method, path, body, qs, url, o) {
     for (const [mth, re, need, fn] of routes) {
@@ -388,7 +435,13 @@
       if (need === 'pass') return pass(url, o);
       try {
         if (need === OPEN) return await fn(null, m, body || {}, qs);
+        if (Array.isArray(need)) {
+          const c = await ctx(false);
+          if (!need.includes(c.role)) throw new E(c.staff ? '這個帳號沒有權限' : '請用員工帳號登入', 403);
+          return await fn(c, m, body || {}, qs);
+        }
         const c = await ctx(need !== NOHH);
+        if (c.staff && need !== NOHH) throw new E('這是員工帳號，請改用員工畫面', 403);
         return await (typeof need === 'function' ? need : fn)(c, m, body || {}, qs);
       } catch (e) {
         if (e instanceof E) return ERR(e.message, e.status);
@@ -415,15 +468,24 @@
 
   // ── 進入 Demo 畫面：已登入、有長輩家才進來（沒有長輩家時由 live-app.js 先建立或加入） ──
   const KEY_VIEW = { inbox: 'inbox' };
+  let busy = false; // 進入畫面、載入首頁資料中：先不接受點擊，避免畫面用到還沒載入的資料
   async function enter(key) {
-    install();
+    install(); busy = true;
+    try { await enter0(key); } finally { busy = false; }
+  }
+  async function enter0(key) {
     const A = window.JJJAPP; if (!A) return;
     const S = A.S;
     S.cfg = await (await window.fetch('/api/config')).json();
     const me = await (await window.fetch('/api/me')).json();
     S.me = me.user; active = true;
     document.documentElement.classList.add('jjj-live-in');
-    if (typeof window.enter === 'function') await window.enter(); else { await A.LOAD.gl(); A.render(); }
+    // 同 app.html 的 enter()：家庭進首頁、生活顧問進今日行程（a1）、技師進今日工單（t1）
+    const r = S.me.role;
+    if (r === 'advisor') { await A.LOAD.a1(); S.stack = ['a1']; A.render(); }
+    else if (r === 'tech') { await A.LOAD.t1(); S.stack = ['t1']; A.render(); }
+    else if (r === 'hq') { location.href = 'admin.html?mode=live'; return; }
+    else if (typeof window.enter === 'function') await window.enter(); else { await A.LOAD.gl(); A.render(); }
     const v = KEY_VIEW[key];
     if (v && v !== 'home' && A.go) { try { A.go(v); } catch (e) {} }
   }
@@ -437,7 +499,7 @@
     if (!active) return;
     view.querySelectorAll('.tcad, .hpw, [data-w3d]').forEach((el) => {
       if (el.querySelector(':scope > .lv-demo-layout')) return;
-      el.insertAdjacentHTML('afterbegin', '<span class="lv-demo-layout">示意格局｜生活顧問到府後換成您家的格局</span>');
+      el.insertAdjacentHTML('afterbegin', FP ? `<span class="lv-demo-layout" style="background:rgba(31,35,40,.85)">您家的格局｜生活顧問 ${String(FP.at || '').slice(5, 10).replace('-', '/')} 更新</span>` : '<span class="lv-demo-layout">示意格局｜生活顧問到府後換成您家的格局</span>');
     });
   });
 
@@ -466,5 +528,7 @@
 
   // 要包在 Demo 模擬後端（backend.js、store*.js）的外層，等頁面上的腳本都跑完再接手
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install); else install();
-  window.JJJLIVEAPI = { enter, active: () => active, install, _routes: routes };
+    // 給 live-staff.js（生活顧問、技師、總部）共用
+  const H = { OPEN, NOHH, q, rpc, db, sb, J, ERR, E, ctx, ls, nf, oa, u5, label, parse, R, T, work, touch, audit, uname, passJSON };
+  window.JJJLIVEAPI = { enter, active: () => active, busy: () => busy, install, _routes: routes, H, ready: (fn) => fn(H, routes) };
 })();

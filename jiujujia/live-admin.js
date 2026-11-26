@@ -5,10 +5,12 @@
   const C = window.JJJ_LIVE_CFG;
   const sb = window.supabase.createClient(C.supabaseUrl, C.supabaseKey, {
     db: { schema: 'jjj' },
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'jjj-live-staff' },
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'jjj-live-auth' },
   });
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const toast = (m) => (window.JJJLIVE ? window.JJJLIVE.toast(m) : alert(m));
+  window.JJJLIVESB = sb;
+  const ADM = /admin\.html/.test(location.pathname);
   const ROLE = { advisor: '生活顧問', hq: '總部' };
   let ME = null;
 
@@ -29,14 +31,23 @@
     const { error } = await sb.auth.signInWithPassword({ email, password: pw });
     if (error) { if (er) er.textContent = '員工編號或密碼不正確'; return; }
     if (!(await loadMe())) { await sb.auth.signOut(); if (er) er.textContent = '這個帳號不是員工帳號；家庭請用揪居家 App（手機）。'; return; }
+    try { await sb.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', ME.id); } catch (e) {}
+    if (route()) return;
     render();
   }
   async function loadMe() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return null;
-    const { data } = await sb.from('profiles').select('id, display_name, role, store').eq('id', session.user.id).maybeSingle();
-    ME = data && (data.role === 'advisor' || data.role === 'hq') ? data : null;
+    const { data } = await sb.from('profiles').select('id, display_name, role, store, disabled').eq('id', session.user.id).maybeSingle();
+    ME = data && ['advisor', 'tech', 'hq'].includes(data.role) && !data.disabled ? data : null;
     return ME;
+  }
+  // 生活顧問：門市電腦版（consultant.html）；技師：揪居家 App（手機）
+  function route() {
+    if (!ADM || !ME) return false;
+    if (ME.role === 'advisor') { location.href = 'consultant.html?mode=live'; return true; }
+    if (ME.role === 'tech') { location.href = '../live/app/'; return true; }
+    return false;
   }
   async function call(action, body) {
     const { data: { session } } = await sb.auth.getSession();
@@ -107,5 +118,5 @@
 
   window.JJJLIVEADM = { login };
   // 已登入過就直接進後台
-  (async () => { if (await loadMe()) { const g = document.getElementById('gate'); if (g) g.hidden = true; render(); } })();
+  (async () => { if (!ADM) return; if (await loadMe()) { if (route()) return; const g = document.getElementById('gate'); if (g) g.hidden = true; render(); } })();
 })();
