@@ -1,9 +1,12 @@
 // 揪居家服務地圖：全台 → 縣市 → 門市街區，三層 Drill-Down／Roll-Up；選取後其他區塊轉灰
 // 門市清單與縣市人口為公開資料；訂閱家庭、技師位置等標示「模擬」；第三層工單、提醒、關懷事件讀取即時資料
 import * as THREE from '../vendor/three.module.min.js';
+import { loadScene, buildReal, housesNear, along, batch, townhouse, diagTex, winTex } from './l3real.js?v=20261127b';
 
-const G = window.SMGEO, ST = window.SMSTORES, AGE = window.SMAGE65, PILOT = window.SMPILOT;
-const TYN = { g: '一般門市', l: '大型門市', e: '體驗館門市', d: '百貨門市' };
+const G = window.SMGEO, ST = window.SMSTORES, AGE = window.SMAGE65, PILOT = window.SMPILOT, XY = window.SMXY || {};   // SMXY：高雄門市真實位置（khgeo.js）
+const TYN = { g: '一般門市', l: '大型門市', e: '數位家電體驗館', d: '百貨門市' };
+// 全國電子 11/27 簡報：門市 335 家、五區據點；新店型「嶄新概念店」待拿到新門市清單才能上圖
+const DECK = { total: 335, regions: [['北區', 92], ['桃竹苗區', 73], ['中區', 76], ['南區', 74], ['東區', 20]] };
 const TYC = { g: '#F6A5B9', l: '#C42D5A', e: '#8E1E42', d: '#E8577A' };
 const STAGES = { pilot: ['高雄市'], expand: ['台北市', '新北市', '桃園市', '台中市', '台南市', '高雄市'], extend: null };
 const STN = { pilot: '試點', expand: '擴展', extend: '延伸' };
@@ -20,7 +23,7 @@ const STORES = (() => {
     const t = TOWN[county + town], k = county + town, i = (seen[k] = (seen[k] || 0) + 1) - 1;
     const c = t ? t.c : (G.counties.find(x => x.n === county) || { c: [0, 0] }).c;
     const r = i ? 0.55 * Math.sqrt(i) + 0.25 : 0, a = i * 2.4 + hash(code) * 0.6;
-    return { code, name, short: short(name), type, dc: !!dc, county, town, addr, x: c[0] + r * Math.cos(a), y: c[1] + r * Math.sin(a), pilot: !!PILOT[code] };
+    return { code, name, short: short(name), type, dc: !!dc, county, town, addr, x: XY[code] ? XY[code][0] : c[0] + r * Math.cos(a), y: XY[code] ? XY[code][1] : c[1] + r * Math.sin(a), real: !!XY[code], pilot: !!PILOT[code] };
   });
 })();
 
@@ -29,6 +32,7 @@ const MAT = {};
 function mat(c, o = {}) { const k = c + JSON.stringify(o); return MAT[k] || (MAT[k] = new THREE.MeshStandardMaterial({ color: c, roughness: .85, metalness: 0, flatShading: true, ...o })); }
 const GRAYM = {};
 function grayOf(m) {
+  if (Array.isArray(m)) return m.map(grayOf);
   const k = m.uuid; if (GRAYM[k]) return GRAYM[k];
   const c = m.color ? m.color.clone() : new THREE.Color('#ccc'); const l = c.r * .3 + c.g * .59 + c.b * .11, v = .8 + l * .15;
   const g = m.clone(); g.color = new THREE.Color(v, v, v * 1.01); if (g.emissive) g.emissive = new THREE.Color(0, 0, 0); if (g.map) g.color = new THREE.Color(.85, .85, .86); g.transparent = true; g.opacity = .75;
@@ -46,17 +50,50 @@ function roof(w, d, h, c) { const s = new THREE.Shape(); s.moveTo(-w / 2 - .08, 
 function tree(s = 1, c = '#E9A3B8') { const g = new THREE.Group(); const t = new THREE.Mesh(new THREE.CylinderGeometry(.06 * s, .08 * s, .4 * s, 6), mat('#9C7B5B')); t.position.y = .2 * s; g.add(t); const a = new THREE.Mesh(new THREE.IcosahedronGeometry(.32 * s, 0), mat(c)); a.position.y = .6 * s; a.castShadow = true; g.add(a); return g; }
 function house(wall, rf, badge) { const g = new THREE.Group(), w = 1, d = 1.1, h = .85; g.add(bx(w, h, d, wall)); const r = roof(w, d, .55, rf); r.position.y = h; g.add(r); g.add(bx(.22, .4, .05, '#8B5E3C', .18, 0, d / 2)); g.add(bx(.25, .2, .04, '#FFE9A8', -.22, .4, d / 2 + .02, { emissive: '#FFE9A8', emissiveIntensity: .3 }));
   if (badge) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .05, 20), mat(badge, { emissive: badge, emissiveIntensity: .35 })); b.rotation.x = Math.PI / 2; b.position.set(-.25, h + .22, d / 2 + .1); g.add(b); } return g; }
-function van(stripe = BRAND) { const g = new THREE.Group(); g.add(bx(.9, .38, .45, '#FFFFFF', -.05, .1, 0)); g.add(bx(.32, .3, .44, '#FFFFFF', .48, .1, 0)); g.add(bx(.2, .18, .45, '#F3C7D3', .5, .25, 0)); g.add(bx(.92, .07, .46, stripe, -.04, .28, 0));
-  [[-.32, .24], [-.32, -.24], [.42, .24], [.42, -.24]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .06, 12), mat('#333')); w.rotation.x = Math.PI / 2; w.position.set(x, .1, z); g.add(w); }); return g; }
+// 技師工程車：墨灰車身＋車頂梯架（避免像計程車或救護車）
+function van(stripe = BRAND) { const g = new THREE.Group(), K = '#3A3D42'; g.add(bx(.9, .38, .45, K, -.05, .1, 0)); g.add(bx(.32, .3, .44, K, .48, .1, 0)); g.add(bx(.2, .18, .45, '#9FB6C4', .5, .25, 0)); g.add(bx(.92, .04, .46, stripe, -.04, .3, 0));
+  [-.16, .16].forEach(z => g.add(bx(.82, .03, .03, '#C9CDD2', -.08, .5, z))); for (let k = 0; k < 6; k++) g.add(bx(.03, .03, .32, '#C9CDD2', -.45 + k * .15, .5, 0));
+  [[-.32, .24], [-.32, -.24], [.42, .24], [.42, -.24]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .06, 12), mat('#222')); w.rotation.x = Math.PI / 2; w.position.set(x, .1, z); g.add(w); }); return g; }
 // 依官網店型建造有意義的建築
+// 第二層門市建築：比照民族店街區的寫實做法（白色斜紋外牆、紅色招牌帶、一樓玻璃、看板色塊），
+// 門前補一段人行道與道路；看板只用色塊，不放真實廣告。
+let DIAG = null, WIN = null;
 function storeBuilding(s) {
-  const g = new THREE.Group();
-  if (s.type === 'd') { g.add(bx(2.2, 2.8, 1.8, '#E9DCC8')); for (let i = 0; i < 4; i++) g.add(bx(2.24, .08, 1.84, '#C9A877', 0, .6 + i * .6, 0)); windows(g, 2, 2.4, 1.8, 4, 5, .3, '#FFF1C9'); const sg = sign(['百貨專櫃｜全國電子'], 1.6, .26, { w: 560, h: 92, px: 44 }); sg.position.set(0, .45, .92); g.add(sg); }
-  else if (s.type === 'e') { g.add(bx(2.4, 1.1, 1.6, '#FBEFF2')); g.add(bx(2.2, .7, .05, '#F3C7D3', 0, .1, .8, { transparent: true, opacity: .9 })); g.add(bx(2.44, .22, 1.64, '#8E1E42', 0, 1.1, 0)); const sg = sign(['數位家電體驗館'], 1.8, .3, { w: 560, h: 96, px: 48, bg: '#8E1E42' }); sg.position.set(0, .95, .83); g.add(sg); }
-  else if (s.type === 'l') { g.add(bx(3.2, 1.9, 2.4, '#F7F5F2')); g.add(bx(3.24, .42, 2.44, BRAND, 0, 1.9, 0)); g.add(bx(3, .9, .06, '#F6D5DE', 0, .15, 1.2, { transparent: true, opacity: .85 })); const sg = sign(s.dc ? ['全國電子', 'Digital City'] : ['全國電子', '大型門市'], 2.4, .6, { w: 640, h: 160 }); sg.position.set(0, 1.42, 1.23); g.add(sg);
-    if (s.pilot) { const r = sign(['揪居家情境角'], 1.2, .28, { bg: '#FFFFFF', fg: BRAND, w: 400, h: 96, px: 46 }); r.position.set(.85, .75, 1.24); g.add(r); } }
-  else { g.add(bx(1.4, 1, 1.1, '#FFF8EC')); const a = bx(1.5, .08, .45, '#E8577A', 0, .82, .7); a.rotation.x = .35; g.add(a); const sg = sign(['全國電子'], 1.2, .26, { w: 400, h: 96, px: 50 }); sg.position.set(0, .66, .56); g.add(sg); g.add(bx(1.1, .45, .04, '#F6D5DE', 0, .05, .56)); }
-  if (s.dc && s.type !== 'l') { const f = bx(.5, .3, .06, '#3D3A40', 0, 0, 0); f.position.set(0, (s.type === 'd' ? 2.95 : 1.4), .6); g.add(f); }
+  // 非試點門市：簡單方塊＋頂部店型色條，不搶民族店的焦點
+  if (!s.pilot) { const g = new THREE.Group(), [w, h, d] = { l: [2.4, 1.2, 1.8], e: [2, 1, 1.5], d: [2, 1.8, 1.6], g: [1.2, .8, 1] }[s.type] || [1.2, .8, 1];
+    g.add(bx(w * .8, h * .8, d * .8, '#F4F1EE')); g.add(bx(w * .8 + .02, .06, d * .8 + .02, '#D9D3CE', 0, h * .8, 0)); return g; }
+  const g = new THREE.Group(), RED = BRAND, glass = { roughness: .15, metalness: .3 }, H = hash(s.code);
+  DIAG = DIAG || diagTex(false); WIN = WIN || winTex(false, 'l2');
+  const box = (w, h, d, c, x, y, z, o) => { const m = bx(w, h, d, c, x, y, z, o); g.add(m); return m; };
+  let w = 1.4;
+  if (s.type === 'l') { w = 3.2; const h = 1.9, d = 2.4, wall = new THREE.MeshStandardMaterial({ map: DIAG, roughness: .8 }), m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [wall, wall, mat('#E9E7E4'), wall, wall, wall]); m.position.y = h / 2; m.castShadow = m.receiveShadow = true; g.add(m);
+    box(w - .06, .62, .05, '#3E5563', 0, 0, d / 2 + .01, glass); for (let k = 0; k < 6; k++) box(.12, .62, .08, '#F7F6F4', -w / 2 + .1 + k * (w - .2) / 5, 0, d / 2 + .04);
+    box(w + .04, .34, .1, RED, 0, .62, d / 2 + .04); box(.1, .34, d + .04, RED, -w / 2 - .04, .62, 0);
+    const sg = sign(s.dc ? ['全國電子', 'Digital City'] : ['全國電子'], 1.5, .3, { w: 520, h: 104, px: 46 }); sg.position.set(-.5, .79, d / 2 + .1); g.add(sg);
+    ['#2C4A7A', '#DCE8F2', '#1F2B3A'].forEach((c, k) => { box(.86, .62, .04, '#FFFFFF', -1.05 + k * 1.05, 1.06, d / 2 + .02); box(.78, .54, .05, c, -1.05 + k * 1.05, 1.1, d / 2 + .03); });
+    box(w + .08, .08, .08, RED, 0, h - .08, d / 2 + .02); box(.08, .08, d + .08, RED, -w / 2 - .02, h - .08, 0);
+    box(.9, 1.0, 1.6, '#F4F3F1', -w / 2 - .45, 0, .4); box(.94, .22, 1.64, RED, -w / 2 - .45, .7, .4); box(1, .05, .5, RED, -w / 2 - .45, .5, 1.3);
+    if (s.pilot) { const r = sign(['揪居家情境角'], 1.0, .24, { bg: '#FFFFFF', fg: BRAND, w: 400, h: 96, px: 46 }); r.position.set(1.05, .32, d / 2 + .05); g.add(r); } }
+  else if (s.type === 'e') { w = 2.4; const h = 1.4, d = 1.8; box(w, h, d, '#2F2C33'); box(w - .1, h - .4, .05, '#6F8796', 0, .05, d / 2 + .01, glass);
+    for (let k = 1; k < 6; k++) box(.04, h - .4, .07, '#E9E7E4', -w / 2 + k * w / 6, .05, d / 2 + .03); box(w + .04, .3, .08, '#8E1E42', 0, h - .34, d / 2 + .02);
+    const sg = sign(['數位家電體驗館'], 1.7, .24, { w: 560, h: 96, px: 44, bg: '#8E1E42' }); sg.position.set(0, h - .19, d / 2 + .07); g.add(sg); box(w + .06, .06, d + .06, '#E9E7E4', 0, h, 0); }
+  else if (s.type === 'd') { w = 2.4; const h = 3.4, d = 2.2, m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ map: WIN, color: '#F2E9DD', roughness: .8 })); m.position.y = h / 2; m.castShadow = true; g.add(m);
+    box(w + .04, .55, .06, '#3E5563', 0, 0, d / 2 + .01, glass); box(w + .1, .12, d + .1, '#B9A894', 0, h, 0); box(w + .04, .16, .08, '#C9A877', 0, .55, d / 2 + .02);
+    const sg = sign(['百貨專櫃｜全國電子'], 1.6, .24, { w: 560, h: 92, px: 44 }); sg.position.set(0, .3, d / 2 + .06); g.add(sg); }
+  else { // 一般門市：透天街屋一樓店面
+    const fl = 4, fh = .5, d = 1.3, face = ['#E9DFCF', '#D8D3CB', '#E7D5CC'][Math.floor(H * 3)];
+    box(w, fh, d - .3, '#5F5B57', 0, 0, -.15); box(w * .9, fh * .62, .04, '#93A9B5', 0, .03, d / 2 - .29, glass); box(w, .18, .3, RED, 0, fh - .02, d / 2 - .2);
+    const sg = sign(['全國電子'], w * .8, .15, { w: 400, h: 80, px: 44 }); sg.position.set(0, fh + .07, d / 2 - .04); g.add(sg);
+    box(w, fh * (fl - 1), d, face, 0, fh, 0); for (let k = 1; k < fl; k++) { box(w, .03, .14, '#B8B2A8', 0, k * fh, d / 2 + .07); box(w * .6, fh * .46, .02, '#56656D', 0, k * fh + .12, d / 2 + .01); if (hash(s.code + k) > .4) box(.2, .12, .09, '#EDEBE7', w / 2 - .18, k * fh + .05, d / 2 + .05); }
+    box(w, .05, d, '#A39D94', 0, fl * fh, 0); const t = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, .22, 10), mat('#D6DADD')); t.position.set(-w * .25, fl * fh + .16, -.2); g.add(t); }
+  if (s.dc && s.type !== 'l') { const f = bx(.5, .2, .06, '#3D3A40', 0, 0, 0); f.position.set(0, (s.type === 'd' ? 3.5 : 1.5), .8); g.add(f); }
+  // 試點門市特別標示：地面金色光圈＋頂上光柱
+  const HL = '#F2B705', halo = new THREE.Mesh(new THREE.RingGeometry(2.6, 3.1, 48), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .9, side: THREE.DoubleSide })); halo.rotation.x = -Math.PI / 2; halo.position.y = .03; g.add(halo);
+  const pad = new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .18 })); pad.rotation.x = -Math.PI / 2; pad.position.y = .02; g.add(pad);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 2.4, 10), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .75 })); beam.position.y = 3.2; g.add(beam);
+  // 門前人行道與一段道路（示意）
+  const dz = s.type === 'l' ? 1.2 : s.type === 'd' ? 1.1 : s.type === 'e' ? .9 : .65, L = w + (s.type === 'l' ? 1.4 : 0) + .6, ox = s.type === 'l' ? -.7 : 0;
+  box(L, .02, .4, '#DCD6CF', ox, 0, dz + .2); box(L, .03, .9, '#86848A', ox, 0, dz + .85); for (let x = -L / 2 + .3; x < L / 2; x += .9) box(.45, .01, .05, '#F4F2EE', x + ox, .035, dz + .85);
   return g;
 }
 function shapeOf(poly) { const s = new THREE.Shape(); poly.forEach(([x, y], i) => i ? s.lineTo(x, -y) : s.moveTo(x, -y)); return s; }
@@ -70,7 +107,7 @@ const HSC = { need: ['#FF7A59', '需要處理'], doing: ['#C42D5A', '進行中']
 export function mountServiceMap(root, opt = {}) {
   const api = opt.api || (async () => ({})), toast = opt.toast || (() => {});
   const LSK = 'jjj_sm_hint', lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
-  const S = { level: 1, county: null, store: null, sel: null, selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false } };
+  const S = { level: 1, county: null, store: null, sel: '高雄市', selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false, flow: true }, night: false, peak: new Date().getMonth() + 1, ar: false };
   const webgl = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
   S.flat = !webgl || root.clientWidth < 720;
   root.innerHTML = `<div class="sm">
@@ -79,8 +116,17 @@ export function mountServiceMap(root, opt = {}) {
     <span class="smdd"><button data-sm="menu" data-k="lay">圖層 ▾</button><div class="smmenu" data-menu="lay" hidden></div></span>
     <button class="smmode" data-sm="mode"></button></div>
    <div class="smk"></div><div class="smins" role="status"></div>
-   <div class="smmain"><div class="smstage"><div class="smcv"></div><svg class="smsvg" hidden></svg><div class="smlb"></div><div class="smleg"></div><div class="smhint" hidden>拖曳旋轉、滾輪縮放；點色塊或右側清單聚焦，雙擊往下一層<button data-sm="hintx">知道了</button></div></div><aside class="smside"></aside></div>
+   <div class="smmain"><div class="smstage"><div class="smcv"></div><svg class="smsvg" hidden></svg><div class="smlb"></div><div class="smleg"></div><div class="smops" hidden></div><div class="smdn" hidden></div><div class="smhint" hidden>拖曳旋轉、滾輪縮放；點色塊或右側清單聚焦，雙擊往下一層<button data-sm="hintx">知道了</button></div></div><aside class="smside"></aside></div>
    <div class="smsrc"></div></div>`;
+  if (!document.getElementById('smOpsCss')) { const st = document.createElement('style'); st.id = 'smOpsCss'; st.textContent = `
+.smsvg[hidden]{display:none!important}.smsvg path[data-k]{transition:transform .2s,filter .2s}.smsvg path[data-k]:hover{transform:translateY(-2px);filter:drop-shadow(0 3px 3px rgba(0,0,0,.25))}
+.smops{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:8px;max-width:270px;font-size:12px;z-index:3}
+.smdash,.smpeak{background:rgba(255,255,255,.93);border-radius:10px;padding:8px 10px;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:4px;color:#3D3A40}
+.smdash>div{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline}.smdash>div b{text-align:right}.smdash small,.smpeak small{grid-column:1/-1;color:#8A8189}
+.smpeak input{width:100%}.smpeak button{align-self:flex-start;border:1px solid #C42D5A;color:#C42D5A;background:#fff;border-radius:999px;padding:2px 10px;font:inherit;cursor:pointer}.smpeak button[aria-pressed=true]{background:#C42D5A;color:#fff}
+.smpeak .sim{font-weight:400;color:#8A8189;border:1px solid #DDD;border-radius:6px;padding:0 4px;font-size:11px}
+.smdn{position:absolute;right:10px;top:10px;display:flex;background:rgba(255,255,255,.93);border-radius:999px;padding:3px;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.smdn button{border:0;background:none;padding:4px 12px;border-radius:999px;font:12px/1.2 inherit;cursor:pointer;color:#3D3A40}.smdn button[aria-pressed=true]{background:#3D3A40;color:#fff}`; document.head.appendChild(st); }
   const $ = s => root.querySelector(s);
   const cv = $('.smcv'), lb = $('.smlb'), svg = $('.smsvg');
   if (!lsGet(LSK)) $('.smhint').hidden = false;
@@ -127,10 +173,10 @@ export function mountServiceMap(root, opt = {}) {
   function keyed(obj, key) { obj.userData.key = key; obj.traverse(o => { if (o.isMesh) { o.userData.key = key; pick.push(o); } }); return obj; }
   function hitKey(e) { const r = R.domElement.getBoundingClientRect(), m = new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), rc = new THREE.Raycaster(); rc.setFromCamera(m, cam); const hit = rc.intersectObjects(pick, false)[0]; return hit ? hit.object.userData.key : null; }
   const focused = k => !S.sel && !S.selGroup ? true : (k === S.sel || (S.selGroup && S.selGroup.includes(k)));
-  function refreshLabels() { labels.forEach(L => { L.off = !L.show(L); L.el.classList.toggle('dim', !!L.key && !focused(L.key)); L.el.classList.toggle('on', !!S.sel && L.key === S.sel); L.el.classList.toggle('hov', !!S.hover && L.key === S.hover); }); }
+  function refreshLabels() { labels.forEach(L => { L.off = !L.show(L); L.el.classList.toggle('dim', !!L.key && !focused(L.key) && L.key !== S.hover); L.el.classList.toggle('on', !!S.sel && L.key === S.sel); L.el.classList.toggle('hov', !!S.hover && L.key === S.hover); }); }
   function applyDim() {
     if (S.flat) return draw2d();
-    scene.traverse(o => { if (!o.isMesh || o.userData.base) return; const k = o.userData.key; if (!o.userData.m0) o.userData.m0 = o.material; o.material = k && !focused(k) ? grayOf(o.userData.m0) : o.userData.m0; });
+    scene.traverse(o => { if (!o.isMesh || o.userData.base) return; const k = o.userData.key; if (!o.userData.m0) o.userData.m0 = o.material; o.material = k && !focused(k) && S.level !== 2 ? grayOf(o.userData.m0) : o.userData.m0; });   // 第二層保留真實外觀，只用號碼標示焦點
     refreshLabels();
   }
   function hideHint() { const h = $('.smhint'); if (h && !h.hidden) { h.hidden = true; lsSet(LSK, '1'); } }
@@ -173,7 +219,9 @@ export function mountServiceMap(root, opt = {}) {
     const cnt = {}; visibleStores(STORES).forEach(s => cnt[s.county] = (cnt[s.county] || 0) + 1);
     for (const c of G.counties) {
       const n = cnt[c.n] || 0, h = 1 + n * .42;
-      const m = extrude(c.p, h, ramp(AGE[c.n] || 15)); keyed(m, c.n); scene.add(m);
+      const hi = c.n === '高雄市', m = extrude(c.p, h, hi ? BRAND : '#FFFFFF', hi ? { emissive: '#5A0F24', emissiveIntensity: .25 } : {}); keyed(m, c.n); m.userData.base = 1; scene.add(m);
+      const ed = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: hi ? '#8E1E42' : '#D9D2D6' })); m.add(ed);
+      movers.push(() => { const ty = S.hover === c.n ? 16 : hi ? 3 : 0; m.position.y += (ty - m.position.y) * .18; });
       if (n) label([c.c[0], h + .5, c.c[1]], esc(c.n.replace(/[縣市]$/, '')), 'cty', c.n, L => S.layers.names || (S.stage !== 'extend' && inStage(c.n)) || S.sel === c.n || S.hover === c.n || (S.selGroup && S.selGroup.includes(c.n) && S.open !== '延伸'));
     }
     const base = new THREE.Mesh(new THREE.CircleGeometry(320, 64), new THREE.ShadowMaterial({ opacity: .12 })); base.rotation.x = -Math.PI / 2; base.position.y = -.05; base.receiveShadow = true; base.userData.base = 1; scene.add(base);
@@ -185,54 +233,85 @@ export function mountServiceMap(root, opt = {}) {
     const rows = groupsL2().flatMap(g => g.rows), stores = rows.map(r => r.s), byTown = {}; stores.forEach(s => (byTown[s.town] = byTown[s.town] || []).push(s));
     const pts = (stores.length ? stores : STORES.filter(s => s.county === cn)).map(s => [s.x, s.y]), cb = pts.length ? pts.reduce((a, [x, y]) => [Math.min(a[0], x), Math.min(a[1], y), Math.max(a[2], x), Math.max(a[3], y)], [1e9, 1e9, -1e9, -1e9]) : bboxOf(cty.p);
     const span = Math.max(14, Math.max(cb[2] - cb[0], cb[3] - cb[1]) * 1.35), sc = span / 34, cx = (cb[0] + cb[2]) / 2, cy = (cb[1] + cb[3]) / 2;
-    for (const t of towns) { const has = byTown[t.n]; const m = extrude(t.p, .25 * sc, has ? '#F7EEEA' : '#EFEBEA'); m.userData.base = 1; m.receiveShadow = true; scene.add(m);
-      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: '#E2D2D6' })); edges.userData.base = 1; scene.add(edges);
-      if (has) label([t.c[0], .3 * sc, t.c[1]], esc(t.n), 'twn', null, () => S.layers.town || S.open === t.n); }
-    for (const r of rows) { const s = r.s, b = storeBuilding(s); b.scale.setScalar(sc * 1.15); b.position.set(s.x, .25 * sc, s.y); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
-      label([s.x, (s.type === 'd' ? 3.2 : 2.4) * sc * 1.15 + .3 * sc, s.y], String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.open === s.town || S.hover === s.code).el.style.setProperty('--c', TYC[s.type]); }
+    const LIFT = {};   // 行政區浮起高度：滑鼠移過去浮起，門市跟著一起浮
+    for (const t of towns) { const has = byTown[t.n], hi = t.n === '三民區', key = 'T:' + t.n; LIFT[t.n] = 0;
+      const m = extrude(t.p, .25 * sc, hi ? '#F9D77E' : has ? '#F7EEEA' : '#EFEBEA'); keyed(m, key); m.userData.base = 1; m.receiveShadow = true; scene.add(m);
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: hi ? '#C48A00' : '#E2D2D6' })); m.add(edges);
+      movers.push(() => { const ty = (S.hover === key ? .55 : hi ? .12 : 0) * sc; m.position.y += (ty - m.position.y) * .18; LIFT[t.n] = m.position.y; });
+      label([t.c[0], .3 * sc, t.c[1]], esc(t.n), 'twn', key, () => S.layers.town || S.open === t.n || S.hover === key || hi); }
+    for (const r of rows) { const s = r.s, b = storeBuilding(s), k = s.real ? (s.pilot ? .42 : .3) : sc * (s.pilot ? .9 : .7); /* 真實位置時用固定比例，避免蓋住行政區 */ b.scale.setScalar(k); b.position.set(s.x, .25 * sc, s.y); movers.push(() => { b.position.y = .25 * sc + (LIFT[s.town] || 0); }); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
+      label([s.x, (s.pilot ? 4.6 : s.type === 'd' ? 2 : 1.3) * k + .3 * sc, s.y], s.pilot ? '1｜民族店（試點）' : String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.hover === s.code).el.style.setProperty('--c', s.pilot ? '#C48A00' : TYC[s.type]); }
     if (cn === '高雄市') { const home = STORES.find(s => s.code === '07078'), dst = [[home.x + 2.2, home.y - 1.6], [home.x - 1.8, home.y + 2.4]];
       dst.forEach((d, i) => { const v = van(i ? '#8E1E42' : BRAND); v.scale.setScalar(sc * 1.1); v.position.set(home.x, .3 * sc, home.y); v.visible = S.layers.van; v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([home.x, 1, home.y], i ? '陳技師（模擬）' : '吳技師（模擬）', 'van', null, () => S.layers.van);
         movers.push(t => { v.visible = S.layers.van; const k = (Math.sin(t * .35 + i * 2) + 1) / 2, x = home.x + (d[0] - home.x) * k, z = home.y + (d[1] - home.y) * k; v.position.x = x; v.position.z = z; v.rotation.y = Math.atan2(-(d[1] - home.y), d[0] - home.x) + (Math.cos(t * .35 + i * 2) < 0 ? Math.PI : 0); L.p.set(x, sc * 1.1, z); }); }); }
-    target.set(cx, 0, cy); setShadow(span * 1.2); fly([cx, cy + span * .06], span * 1.35, -0.22, 0.78);
+    const P0 = stores.find(x => x.pilot && x.real);   // 有試點門市真實位置時，鏡頭以它為中心、框住市區
+    if (P0) { const sp = 24; target.set(P0.x, 0, P0.y + 2); setShadow(sp * 2); fly([P0.x, P0.y + 3], sp * 1.35, -0.22, 0.8); }
+    else { target.set(cx, 0, cy); setShadow(span * 1.2); fly([cx, cy + span * .06], span * 1.35, -0.22, 0.78); }
   }
   // ----- 第三層：民族店街區（真實示範家庭標號碼，其餘房子為背景） -----
-  const HOUSES = (() => { const H = [], rng = (i, k) => hash('h' + i + k); let i = 0;
-    for (let gx = -3; gx <= 3; gx++) for (let gz = -3; gz <= 3; gz++) { if (Math.abs(gx) < 1 && Math.abs(gz) < 1) continue; if (rng(i, 'skip') < .28) { i++; continue; }
-      H.push({ id: 'H' + i, x: gx * 4.2 + (rng(i, 'x') - .5) * 1.2, z: gz * 4.2 + (rng(i, 'z') - .5) * 1.2, sub: rng(i, 's') < .38, heat: rng(i, 'h') }); i++; }
-    return H; })();
-  const HPOS = ['H8', 'H17', 'H30', 'H38', 'H44', 'H12'];
-  function houseOf(realId) { const hh = (S.live && S.live.hh) || [], i = hh.findIndex(h => h.id === realId); return HOUSES.find(x => x.id === HPOS[i]) || HOUSES[i * 3]; }
+  // 背景住家取自真實街區的透天厝；家庭號碼放在其中幾棟（示範位置，不代表真實地址）
+  let REAL = null, HOUSES = [], SLOTS = [];
+  async function prepL3() { if (!REAL) REAL = await loadScene(); if (HOUSES.length) return;
+    HOUSES = housesNear(REAL, 24).map(h => ({ ...h, id: 'H' + h.i, sub: hash('s' + h.i) < .3, heat: hash('h' + h.i) }));
+    const C = HOUSES.filter(h => h.d > 6 && h.d < 14), ang = h => Math.atan2(h.z, h.x);   // 分散在門市四周，不擠在同一條巷子
+    SLOTS = [0, 4, 2, 6, 1, 5, 3, 7].map(k => { const t = -Math.PI + (k + .5) * Math.PI / 4; return C.filter(h => Math.abs(((ang(h) - t + 3 * Math.PI) % (2 * Math.PI)) - Math.PI) < Math.PI / 8).sort((a, b) => Math.abs(a.d - 9) - Math.abs(b.d - 9))[0]; }).filter(Boolean); }
+  function houseOf(realId) { const hh = (S.live && S.live.hh) || [], i = hh.findIndex(h => h.id === realId); return i < 0 || !SLOTS.length ? null : SLOTS[i % SLOTS.length]; }
+  const FLOW = { book: ['#5B8FD6', '預約'], ar: ['#8E5BD0', 'AR 量測'], quote: ['#E0A21B', '報價待長輩確認'], go: [BRAND, '技師出車施工'] };
+  function flowOf(r) { const wo = (S.live.wo || []).find(o => o.household_id === r.real.id && !['已完成', '已取消'].includes(o.status));
+    if (wo) return /量測|場勘/.test(wo.kind || '') ? 'ar' : 'go'; const ph = r.real.phase || 0; return ph === 1 ? 'book' : ph === 2 ? 'quote' : ph === 3 ? 'go' : null; }
   function buildL3() {
-    newScene(); const rows = groupsL3().flatMap(g => g.rows);
-    const ground = bx(34, .2, 34, '#F7EEF1'); ground.position.y = -.2; ground.userData.base = 1; scene.add(ground);
-    for (let k = -3; k <= 3; k++) { const a = bx(34, .04, .9, '#D9D2D5', 0, 0, k * 4.2 + 2.1); a.userData.base = 1; scene.add(a); const b = bx(.9, .04, 34, '#D9D2D5', k * 4.2 + 2.1, 0, 0); b.userData.base = 1; scene.add(b); }
-    const heat = []; for (const h of HOUSES) if (h.sub) { const d = new THREE.Mesh(new THREE.CircleGeometry(1.6 + h.heat, 24), new THREE.MeshBasicMaterial({ color: '#F6C6D3', transparent: true, opacity: .35 + h.heat * .25 })); d.rotation.x = -Math.PI / 2; d.position.set(h.x, .03, h.z); d.userData.base = 1; d.visible = S.layers.heat; heat.push(d); scene.add(d); }
-    movers.push(() => heat.forEach(d => d.visible = S.layers.heat));
-    const st = STORES.find(s => s.code === '07078'), sb = storeBuilding(st); sb.scale.setScalar(1.15); keyed(sb, '07078'); scene.add(sb); label([0, 3.4, 0], '民族店', 'st pil', '07078');
-    const used = {};
-    for (const r of rows) { const h = houseOf(r.real.id); if (!h) continue; used[h.id] = 1; const c = HSC[r.st][0], g = house('#FFFFFF', '#B9776B', c); g.position.set(h.x, 0, h.z); g.rotation.y = hash(h.id) > .5 ? 0 : Math.PI / 2; keyed(g, r.key); scene.add(g);
-      label([h.x, 1.9, h.z], String(r.no), 'num', r.key).el.style.setProperty('--c', c);
-      if (r.st === 'need') { const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1.1, 32), new THREE.MeshBasicMaterial({ color: c, transparent: true })); ring.rotation.x = -Math.PI / 2; ring.position.set(h.x, .06, h.z); ring.userData.base = 1; scene.add(ring); movers.push(t => { const k = (t % 1.6) / 1.6; ring.scale.setScalar(1 + k * 1.8); ring.material.opacity = 1 - k; }); }
+    newScene(); const rows = groupsL3().flatMap(g => g.rows), NIGHT = S.night;
+    if (NIGHT) scene.children.forEach(o => { if (o.isHemisphereLight) { o.color.set('#7183AE'); o.groundColor.set('#1D1B24'); o.intensity = .55; } if (o.isDirectionalLight) { o.color.set('#9FB3E0'); o.intensity = .5; } });
+    cv.style.background = NIGHT ? '#1B1A23' : '';
+    const used = new Map(); rows.forEach(r => { const h = houseOf(r.real.id); if (h && !used.has(h.i)) used.set(h.i, r); });
+    const W = buildReal(scene, REAL, { mat, NIGHT, skip: new Set(used.keys()) });
+    keyed(W.store, '07078'); label([0, 2.5, 0], '民族店', 'st pil', '07078');
+    const heat = []; for (const h of HOUSES) if (h.sub && h.d < 20) { const d = new THREE.Mesh(new THREE.CircleGeometry(.8 + h.heat * .6, 24), new THREE.MeshBasicMaterial({ color: '#F6C6D3', transparent: true, opacity: .35 + h.heat * .25 })); d.rotation.x = -Math.PI / 2; d.position.set(h.x, .05, h.z); d.userData.base = 1; d.visible = S.layers.heat; heat.push(d); scene.add(d); }
+    const flows = [];
+    for (const [i, r] of used) { const h = HOUSES.find(x => x.i === i), c = HSC[r.st][0], g = W.house(i); keyed(g, r.key); scene.add(g);
+      const cap = bx(1, .08, 1.4, c, 0, 2.75, 0); cap.position.set(h.x, 2.75, h.z); cap.rotation.y = h.a; keyed(cap, r.key); scene.add(cap);
+      label([h.x, 3.2, h.z], String(r.no), 'num', r.key).el.style.setProperty('--c', c);
+      if (r.st === 'need') { const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1.1, 32), new THREE.MeshBasicMaterial({ color: c, transparent: true })); ring.rotation.x = -Math.PI / 2; ring.position.set(h.x, .08, h.z); ring.userData.base = 1; scene.add(ring); movers.push(t => { const k = (t % 1.6) / 1.6; ring.scale.setScalar(1 + k * 1.8); ring.material.opacity = 1 - k; }); }
+      // 工單流動光線：門市 → 這一戶，顏色＝階段
+      const fk = flowOf(r); if (fk) { const col = FLOW[fk][0], cur = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 1.9, 0), new THREE.Vector3(h.x / 2, 4.2, h.z / 2), new THREE.Vector3(h.x, 2.9, h.z));
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(cur, 40, .04, 6), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); tube.userData.base = 1; scene.add(tube);
+        const dots = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(.13, 10, 8), new THREE.MeshBasicMaterial({ color: col })); m.userData.base = 1; scene.add(m); return m; });
+        flows.push(tube, ...dots); movers.push(t => { dots.forEach((m, k) => m.position.copy(cur.getPoint(((t * .25) + k / 3) % 1))); }); }
       const wo = (S.live.wo || []).find(o => o.household_id === r.real.id && (o.status === '已指派' || o.status === '進行中'));
       if (wo) { const v = van(BRAND); v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([0, 1, 0], `${r.no}｜${esc(wo.assignee || '技師')}`, 'van', r.key);
-        movers.push(t => { const k = Math.min(1, ((t * .08) % 1.3)), x = h.x * Math.min(1, k * 2), z = k < .5 ? 2.1 : 2.1 + (h.z - 2.1) * Math.min(1, (k - .5) * 2); v.position.set(x + 1, .02, z); v.rotation.y = k < .5 ? (h.x > 0 ? 0 : Math.PI) : (h.z > 2.1 ? -Math.PI / 2 : Math.PI / 2); L.p.set(x + 1, 1.2, z); }); } }
-    for (const h of HOUSES) { if (used[h.id]) continue; const g = house('#F4F1EC', '#D8CBC4'); g.position.set(h.x, 0, h.z); g.rotation.y = hash(h.id) > .5 ? 0 : Math.PI / 2; g.userData.base = 1; g.traverse(o => o.userData.base = 1); scene.add(g);
-      if (hash(h.id + 't') > .55) { const t = tree(1, hash(h.id) > .7 ? '#F2B8CB' : '#E9A3B8'); t.position.set(h.x + 1.3, 0, h.z - 1); t.traverse(o => o.userData.base = 1); scene.add(t); } }
-    target.set(0, 0, 0); setShadow(22); fly([0, 1], 46, -0.6, 0.86);
+        const path = W.graph.path([0, 3.4], [h.x, h.z]);
+        movers.push(t => { const k = Math.min(1, (t * .05) % 1.25), p = along(path, k); v.position.set(p.x, .02, p.z); v.rotation.y = p.ang - Math.PI / 2; L.p.set(p.x, 1.3, p.z); }); } }
+    movers.push(() => { heat.forEach(d => d.visible = S.layers.heat); flows.forEach(f => f.visible = S.layers.flow); });
+    target.set(0, 0, 0); setShadow(26); fly([0, 1], 40, -0.6, 0.86);
   }
-
+  // ----- 營運沙盤：儀表板、旺季模擬（只在第三層）-----
+  function ops() {
+    const el = $('.smops'), dn = $('.smdn'); el.hidden = dn.hidden = S.level !== 3; if (S.level !== 3) return;
+    dn.innerHTML = ['白天', '夜景'].map((n, i) => `<button data-sm="dn" data-k="${i}" aria-pressed="${!!S.night === !!i}">${n}</button>`).join('');
+    const wo = (S.live && S.live.wo) || [], act = wo.filter(o => ['已指派', '進行中', '待驗收'].includes(o.status)).length;
+    const by = {}; wo.filter(o => o.status === '已完成').forEach(o => by[o.household_id] = (by[o.household_id] || 0) + 1); const hs = Object.keys(by).length, rep = hs ? Math.round(Object.values(by).filter(n => n > 1).length / hs * 100) + '%' : '—';
+    const peak = S.peak >= 6 && S.peak <= 9;
+    el.innerHTML = `<div class="smdash"><b>今日營運</b>
+      <div><span>技師使用率</span><b style="color:${peak ? '#D4003C' : 'inherit'}">${peak ? '超過 80%' : '30–50%'}</b><small>${peak ? '旺季（訪談）' : '淡季（訪談）'}</small></div>
+      <div><span>技師今日工單</span><b>${act} 件</b><small>上限 10–12 件（訪談）</small></div>
+      <div><span>每組接待時間</span><b>—</b><small>現況 1–3 小時（訪談）</small></div>
+      <div><span>轉單率</span><b>—</b><small>試辦後接真實資料</small></div>
+      <div><span>重複到府率</span><b>${rep}</b><small>同一戶完工後再到府</small></div></div>
+     <div class="smpeak"><b>旺季模擬 <span class="sim">模擬</span></b><input type="range" min="1" max="12" value="${S.peak}" data-sm="peak" aria-label="模擬月份"><span>${S.peak} 月${peak ? '｜旺季' : ''}</span>
+      <button data-sm="ar" aria-pressed="${S.ar}">${S.ar ? '✓ ' : ''}AR 先量</button><small>${S.ar ? 'AR 先量：補量到府會減少，減少多少等試辦再填' : '沒有 AR：到府場勘要另外排一次'}${peak ? '；旺季技師超過負荷，建議把場勘移到淡季' : ''}</small></div>`;
+  }
   // ----- 平面備援（手機或不支援 WebGL）：同樣只畫號碼 -----
   function draw2d() {
     svg.hidden = false; cv.hidden = true; lb.innerHTML = '';
     let vb, body = ''; const P = ps => ps.map(p => 'M' + p.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join('L') + 'Z').join('');
     const dot = (x, y, r, c, k, t, f) => `<g data-k="${k}" opacity="${focused(k) ? 1 : .3}"><circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#fff" stroke-width="${r * .18}"/><text x="${x}" y="${y + r * .38}" font-size="${r * 1.05}" text-anchor="middle" fill="#fff" font-weight="700">${t}</text></g>`;
     if (S.level === 1) { const cnt = {}; visibleStores(STORES).forEach(s => cnt[s.county] = (cnt[s.county] || 0) + 1); vb = [-110, -210, 300, 400];
-      for (const c of G.counties) body += `<path d="${P(c.p)}" fill="${focused(c.n) ? ramp(AGE[c.n] || 15) : GRAY}" stroke="#fff" stroke-width=".6" data-k="${esc(c.n)}"/>${cnt[c.n] && (inStage(c.n) && S.stage !== 'extend' || S.sel === c.n) ? `<text x="${c.c[0]}" y="${c.c[1]}" font-size="7" text-anchor="middle" data-k="${esc(c.n)}" fill="#222">${esc(c.n.replace(/[縣市]$/, ''))}</text>` : ''}`; }
+      for (const c of G.counties) body += `<path d="${P(c.p)}" fill="${c.n === '高雄市' ? BRAND : '#FFFFFF'}" stroke="#D9D2D6" stroke-width=".6" data-k="${esc(c.n)}"/>${cnt[c.n] && (inStage(c.n) && S.stage !== 'extend' || S.sel === c.n) ? `<text x="${c.c[0]}" y="${c.c[1]}" font-size="7" text-anchor="middle" data-k="${esc(c.n)}" fill="#222">${esc(c.n.replace(/[縣市]$/, ''))}</text>` : ''}`; }
     else if (S.level === 2) { const cty = G.counties.find(c => c.n === S.county), bb = bboxOf(cty.p), pad = 3; vb = [bb[0] - pad, bb[1] - pad, bb[2] - bb[0] + pad * 2, bb[3] - bb[1] + pad * 2]; const f = (vb[2] / 100);
       for (const t of G.towns[S.county] || []) body += `<path d="${P(t.p)}" fill="#F7EEEA" stroke="#E2D2D6" stroke-width="${.3 * f}"/>`;
       for (const r of groupsL2().flatMap(g => g.rows)) body += dot(r.s.x, r.s.y, (r.s.pilot ? 2.2 : 1.6) * f, focused(r.key) ? TYC[r.s.type] : GRAY, r.key, r.no); }
     else { vb = [-17, -17, 34, 34]; body += `<rect x="-17" y="-17" width="34" height="34" fill="#F7EEF1"/><rect x="-1.6" y="-1.2" width="3.2" height="2.4" fill="${BRAND}" data-k="07078"/>`;
-      for (const h of HOUSES) body += `<rect x="${h.x - .5}" y="${h.z - .5}" width="1" height="1" rx=".2" fill="#F4F1EC" stroke="#ddd" stroke-width=".05"/>`;
+      for (const h of HOUSES.filter(h => Math.abs(h.x) < 17 && Math.abs(h.z) < 17)) body += `<rect x="${h.x - .5}" y="${h.z - .5}" width="1" height="1" rx=".2" fill="#F4F1EC" stroke="#ddd" stroke-width=".05"/>`;
       for (const r of groupsL3().flatMap(g => g.rows)) { const h = houseOf(r.real.id); if (h) body += dot(h.x, h.z, .9, focused(r.key) ? HSC[r.st][0] : GRAY, r.key, r.no); } }
     svg.setAttribute('viewBox', vb.join(' ')); svg.innerHTML = body;
   }
@@ -240,18 +319,19 @@ export function mountServiceMap(root, opt = {}) {
   svg.addEventListener('dblclick', () => { if (S.sel) enter(); });
 
   // ----- 選取、往下鑽、往上捲 -----
-  function select(k) { hideHint(); S.sel = k || null; if (k) { const g = groups().find(x => x.rows.some(r => r.key === k)); if (g && S.open !== g.id) openGroup(g.id); } S.tab = 'ops'; applyDim(); panel(); }
+  function select(k) { if (k && k.startsWith('T:')) { openGroup(k.slice(2)); return; } hideHint(); S.sel = k || null; if (k) { const g = groups().find(x => x.rows.some(r => r.key === k)); if (g && S.open !== g.id) openGroup(g.id); } S.tab = 'ops'; applyDim(); panel(); }
   function enter() {
-    if (S.level === 1 && S.sel) { S.county = S.sel; S.level = 2; S.sel = null; S.open = undefined; build(); }
+    if (S.level === 1 && S.sel) { S.county = S.sel; S.level = 2; S.sel = S.county === '高雄市' ? '07078' : null; S.open = undefined; build(); }
     else if (S.level === 2 && S.sel) { if (S.sel !== '07078') { toast('第三層街區先開放試點的民族店；其他門市於第二階段由企業提供資料後開放'); return; } S.store = S.sel; S.level = 3; S.sel = null; S.open = undefined; build(); }
   }
   function up() { if (S.level === 3) { S.level = 2; S.sel = S.store; } else if (S.level === 2) { S.level = 1; S.sel = S.county; } S.open = undefined; build(); }
   async function build() {
     if (S.level === 3 && !S.live) await loadLive();
+    if (S.level === 3) { try { await prepL3(); } catch (e) { toast('街區資料載入失敗：' + e.message); } } else cv.style.background = '';
     if (S.open === undefined) openGroup(defaultOpen(), false); else if (S.open !== null) openGroup(S.open, !!S.selGroup);
     if (S.sel && !allRows().some(r => r.key === S.sel)) { /* 上一層選取的項目保留 */ const g = groups().find(x => x.rows.some(r => r.key === S.sel)); if (g) openGroup(g.id); }
     if (S.flat) draw2d(); else { svg.hidden = true; cv.hidden = false; initGL(); size(); (S.level === 1 ? buildL1 : S.level === 2 ? buildL2 : buildL3)(); applyDim(); }
-    top(); kpis(); panel(); legend(); menus(); src();
+    top(); kpis(); panel(); legend(); menus(); src(); ops();
   }
 
   // ----- 介面 -----
@@ -264,8 +344,8 @@ export function mountServiceMap(root, opt = {}) {
   function kpis() {
     let K = [], ins = '';
     if (S.level === 1) { const v = visibleStores(STORES), dc = v.filter(s => s.dc).length, cs = new Set(v.map(s => s.county)).size;
-      K = [['門市', v.length, '公開'], ['Digital City', dc, '公開', 'dc'], ['涵蓋縣市', cs, '公開'], [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
-      ins = S.stage === 'pilot' ? '試點選高雄市三民區：民族、澄清、三民中華 3 家 Digital City 都在三民區，同一組技師可以統一排程、合併到府；三民區 65 歲以上約 7.2 萬人。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋 21 縣市 316 家門市；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
+      K = [['門市', DECK.total + ' 家', '簡報'], ['地圖已標', v.length + ' 家', '官網 10/24'], ['Digital City', dc, '公開', 'dc'], S.stage === 'pilot' ? ['試點門市', '民族店', '規劃', 'stage'] : [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
+      ins = S.stage === 'pilot' ? '試點只鎖定高雄三民區的民族店（Digital City）：2025/11 改裝後已有智慧居家情境體驗區與寶元快客櫃，三民區 65 歲以上約 7.2 萬人。其他門市照常列出基本資訊，擴展期再導入。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋全台門市（簡報 335 家；地圖先標官網 10/24 的 316 家，新清單到了再補）；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
     else if (S.level === 2) { const v = visibleStores(STORES.filter(s => s.county === S.county)), pil = v.filter(s => s.pilot);
       K = [['門市', v.length, '公開'], ['Digital City', v.filter(s => s.dc).length, '公開', 'dc'], ['65 歲以上占比', (AGE[S.county] || '—') + '%', '公開'], [pil.length ? '試點門市' : '一般門市', pil.length ? pil.length + ' 家' : v.filter(s => s.type === 'g').length + ' 家', pil.length ? '規劃' : '公開', pil.length ? 'pilot' : null]];
       ins = S.county === '高雄市' ? '民族店今天有合併到府工單：陳技師先裝夜燈與門檻燈條，吳技師再裝關懷設備。點清單裡的民族店，再「進入街區」。' : `${S.county}門市 ${v.length} 家；第二階段由企業提供營運資料後，才看得到揪居家與派工。`; }
@@ -303,24 +383,26 @@ export function mountServiceMap(root, opt = {}) {
        ${on ? g.rows.map(r => `<button class="smr ${S.sel === r.key ? 'on' : ''}" data-sm="sel" data-k="${esc(r.key)}">${r.no ? `<span class="nb" style="--c:${color(r)}">${r.no}</span>` : `<i class="dt" style="background:${color(r)}"></i>`}<span class="smrt"><b>${esc(r.title)}</b><small>${esc(r.sub)}</small></span></button>`).join('') : ''}</div>`; }).join('')}</div>`;
   }
   function legend() {
-    $('.smleg').innerHTML = S.level === 1 ? `<span>高度＝門市數</span><span><i class="ramp"></i>65 歲以上占比 15%→24%</span><span><i class="dt" style="background:${GRAY}"></i>未選取</span>`
-      : S.level === 2 ? Object.entries(TYN).map(([k, n]) => `<span><i class="dt" style="background:${TYC[k]}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span><span>位置為概略</span>'
-        : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>';
+    $('.smleg').innerHTML = S.level === 1 ? `<span><i class="dt" style="background:${BRAND}"></i>試點：高雄市</span><span><i class="dt" style="background:#FFFFFF;border:1px solid #D9D2D6"></i>其他縣市（滑鼠移過去會浮起）</span><span style="flex-basis:100%;height:0"></span><b>各區門市（簡報）</b>${DECK.regions.map(([n, c]) => `<span>${n} ${c}</span>`).join('')}<span style="flex-basis:100%;height:0"></span><span>高度＝門市數</span>`
+      : S.level === 2 ? '<span><i class="dt" style="background:#F2B705"></i>試點：民族店</span><span><i class="dt" style="background:#F4F1EE;border:1px solid #CCC"></i>其他門市（店型看右側清單）</span>' + (S.county === '高雄市' ? '<span><i class="dt" style="background:#F9D77E"></i>三民區（民族店所在）</span><span>門市位置依地址定位</span>' : '<span>位置為概略</span>')
+        : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>' + (S.layers.flow ? '<span style="flex-basis:100%;height:0"></span><b>工單光線</b>' + Object.values(FLOW).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') : '');
   }
   function menus() {
     const F = root.querySelector('[data-menu="flt"]'), L = root.querySelector('[data-menu="lay"]');
-    F.innerHTML = `<b>店型</b>${Object.entries(TYN).map(([k, n]) => `<label><input type="checkbox" data-smt="${k}" ${S.types[k] ? 'checked' : ''}><i class="dt" style="background:${TYC[k]}"></i>${n}</label>`).join('')}<label><input type="checkbox" data-smdc ${S.dcOnly ? 'checked' : ''}>只看 Digital City</label>
+    F.innerHTML = `<b>店型</b>${Object.entries(TYN).map(([k, n]) => `<label><input type="checkbox" data-smt="${k}" ${S.types[k] ? 'checked' : ''}><i class="dt" style="background:${TYC[k]}"></i>${n}</label>`).join('')}<label title="簡報新增的店型；拿到新門市清單後才上圖"><input type="checkbox" disabled><i class="dt" style="background:#5B8FD6"></i>嶄新概念店（待新清單）</label><label><input type="checkbox" data-smdc ${S.dcOnly ? 'checked' : ''}>只看 Digital City</label>
       ${S.level === 1 ? `<b>導入階段</b><span class="smseg">${Object.entries(STN).map(([k, n]) => `<button data-sm="stage" data-k="${k}" class="${S.stage === k ? 'on' : ''}">${n}</button>`).join('')}</span>` : ''}`;
-    const LY = S.level === 1 ? [['names', '顯示全部縣市名稱']] : S.level === 2 ? [['town', '行政區名稱'], ['van', '技師車（模擬）']] : [['heat', '訂閱熱度（模擬）']];
+    const LY = S.level === 1 ? [['names', '顯示全部縣市名稱']] : S.level === 2 ? [['town', '行政區名稱'], ['van', '技師車（模擬）']] : [['heat', '訂閱熱度（模擬）'], ['flow', '工單流動光線']];
     L.innerHTML = `<b>圖層</b>${LY.map(([k, n]) => `<label><input type="checkbox" data-sml="${k}" ${S.layers[k] ? 'checked' : ''}>${n}</label>`).join('')}`;
     F.hidden = S.menu !== 'flt'; L.hidden = S.menu !== 'lay';
   }
-  function src() { $('.smsrc').innerHTML = '資料來源：門市＝全國電子官網門市據點（2026/10/24 整理，316 家，位置依行政區概略標示）｜65 歲以上人口占比＝內政部 2025 年底（中央社 2026/1/9）｜行政區界＝內政部國土測繪中心開放資料｜第三層家庭、工單、關懷事件＝示範系統即時資料；房子位置、訂閱熱度、技師車為模擬。'; }
+  function src() { $('.smsrc').innerHTML = '資料來源：門市＝全國電子官網門市據點（2026/10/24 整理，316 家，位置依行政區概略標示）｜65 歲以上人口占比＝內政部 2025 年底（中央社 2026/1/9）｜行政區界＝內政部國土測繪中心開放資料｜第三層家庭、工單、關懷事件＝示範系統即時資料；道路、公園、大樓輪廓＝OpenStreetMap（© OpenStreetMap 貢獻者）；透天厝為沿真實街道補上的示意建物；民族店與鄰房依街景外觀重建（看板只用色塊）；家庭位置、訂閱熱度、技師車為模擬。'; }
 
   root.addEventListener('click', async e => {
     const b = e.target.closest('[data-sm]');
     if (!b) { if (S.menu && !e.target.closest('.smmenu')) { S.menu = null; menus(); } return; }
     if (b.disabled) return; const a = b.dataset.sm;
+    if (a === 'dn') { S.night = b.dataset.k === '1'; build(); return; }
+    if (a === 'ar') { S.ar = !S.ar; ops(); return; }
     if (a === 'up') up(); else if (a === 'enter') enter(); else if (a === 'sel') select(b.dataset.k); else if (a === 'clear') select(null);
     else if (a === 'bc') { const l = +b.dataset.l; while (S.level > l) { if (S.level === 3) { S.level = 2; S.sel = S.store; } else { S.level = 1; S.sel = S.county; } } S.open = undefined; build(); }
     else if (a === 'mode') { S.flat = !S.flat; build(); }
@@ -337,6 +419,7 @@ export function mountServiceMap(root, opt = {}) {
       else { const g = groups().find(x => x.st === k); if (g) { openGroup(g.id); S.sel = null; applyDim(); panel(); } else toast('目前沒有符合的家庭'); } }
     else if (a === 'draft') { b.disabled = true; try { const d = await api('/advisor/households/' + b.dataset.id + '/draft', { method: 'POST', body: { device: '感應小夜燈｜走道', kind: '年度健檢', reason: '服務地圖建立' } }); toast('已建立維護工單草稿 ' + d.code + '，生活顧問確認後派工'); await loadLive(); S.open = undefined; build(); } catch (x) { toast(x.message); b.disabled = false; } }
   });
+  root.addEventListener('input', e => { if (e.target.dataset.sm === 'peak') { S.peak = +e.target.value; ops(); } });
   root.addEventListener('change', e => { const t = e.target;
     if (t.dataset.smt) { S.types[t.dataset.smt] = t.checked ? 1 : 0; S.open = undefined; build(); }
     else if (t.dataset.smdc !== undefined) { S.dcOnly = t.checked; S.open = undefined; build(); }
