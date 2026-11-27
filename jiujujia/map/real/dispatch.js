@@ -7,9 +7,9 @@ const TECHS = [
   { n: '吳技師', st: '民族店', k: 'go', job: 'W-20261127-06｜李先生家｜夜間照明 3 盞', note: '7 分鐘後抵達', today: 4 },
   { n: '陳技師', st: '民族店', k: 'work', job: 'W-20261127-04｜林媽媽家｜夜燈＋門檻燈條', note: '預計 17:30 完成', today: 1, at: [120.3205, 22.6630] },
   { n: '林技師', st: '民族店', k: 'free', note: '下一件 18:00', today: 3 },
-  { n: '蔡技師', st: '澄清店', k: 'work', job: 'W-20261127-09｜周女士家｜安裝', note: '預計 17:50 完成', today: 3, at: [120.341, 22.6565] },
-  { n: '黃技師', st: '三民中華店', k: 'free', note: '下一件 17:40', today: 3, photo: false }
 ];
+// 非試點門市：只列基本資訊，不上地圖
+const OTHERS = [['蔡技師', '澄清店', '今日 3 件'], ['黃技師', '三民中華店', '今日 3 件']];
 const CAP = 12;
 let CACHE = null, F = 'all';
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -25,7 +25,8 @@ function side() {
    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px"><b>${go.n}｜${esc(go.job)}</b>
     <span style="font-size:12.5px">● 16:35 出發　○ 預計 16:42 抵達　○ 施工、長輩驗收</span>
     <span class="c-mu" style="font-size:12px">若比預計晚 15 分鐘，自動通知家庭與門市</span>
-    <div style="display:flex;gap:6px"><button class="b" data-dpa="re">改派給空檔技師</button><button class="b" data-dpa="call">撥給技師</button></div></div>`;
+    <div style="display:flex;gap:6px"><button class="b" data-dpa="re">改派給空檔技師</button><button class="b" data-dpa="call">撥給技師</button></div></div>
+   <div class="c-mu" style="font-size:12px;display:flex;flex-direction:column;gap:2px"><b style="color:inherit">其他門市（非試點，只列基本資訊）</b>${OTHERS.map(([n, s, t]) => `<span>${n}｜${s}｜${t}</span>`).join('')}</div>`;
 }
 export async function mountDispatch(el, { toast } = {}) {
   const sideEl = document.getElementById('dpSide');
@@ -33,11 +34,11 @@ export async function mountDispatch(el, { toast } = {}) {
   if (CACHE) { el.replaceWith(CACHE.box); CACHE.map.resize(); wire(); return; }
   const box = document.createElement('div'); box.id = 'dpMap'; box.style.cssText = el.style.cssText; el.replaceWith(box);
   const path = await R.demoRoute(), S = R.STORES;
-  const map = await R.createMap(box, { fit: [S.民族店, S.澄清店, S.三民中華店, R.HOME], padding: { top: 70, bottom: 40, left: 70, right: 110 } });
+  const map = await R.createMap(box, { fit: [S.民族店, R.HOME, [120.3205, 22.6630], [120.3121, 22.6535]], padding: { top: 90, bottom: 60, left: 90, right: 150 } });
   CACHE = { box, map, mk: [] };
   const s = R.split(path, .3); R.line(map, 'rest', s.rest, '#C42D5A', 4); R.line(map, 'done', s.done, '#9AA0A6', 4);
-  Object.entries(S).forEach(([n, p]) => R.storePin(map, p, n, 30)); R.homePin(map, R.HOME, 30);
-  const off = { 民族店: [[0, 0], [-0.0045, -0.0062]], 澄清店: [[-0.004, 0]], 三民中華店: [[0, 0], [0.0005, -0.0085]] }, used = {};
+  R.storePin(map, S.民族店, '民族店', 32); R.homePin(map, R.HOME, 30);
+  const off = { 民族店: [[0, 0], [-0.0045, -0.0062]] }, used = {};
   const draw = () => {
     CACHE.mk.forEach(m => m.remove()); CACHE.mk = [];
     TECHS.forEach(t => { if (F !== 'all' && t.k !== F) return;

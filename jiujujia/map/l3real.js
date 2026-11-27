@@ -13,7 +13,7 @@ export async function loadScene() { if (!DATA) DATA = await (await fetch(new URL
 
 // ---------- 合併繪製：同材質的方塊合成一個 Mesh，900 多棟透天厝也順 ----------
 const BOX = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(), CYL = new THREE.CylinderGeometry(.5, .5, 1, 12).toNonIndexed();
-function batch(mat) {
+export function batch(mat) {
   const G = {}, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
   const add = (geo, c, o, M) => { const k = c + JSON.stringify(o || {}); (G[k] || (G[k] = { c, o, L: [] })).L.push([geo, M]); };
   return {
@@ -36,7 +36,7 @@ const inZ = (x, z) => ZX.some(([a, b, c, d]) => x > a && x < b && z > c && z < d
 const FACADE = ['#E9DFCF', '#D8D3CB', '#E7D5CC', '#F1EEE8', '#CFC6B8', '#E3E0D6', '#D9CFC2'];
 
 // 透天厝：騎樓、陽台、鐵窗、冷氣、水塔、鐵皮加蓋、直招
-function townhouse(B, seed, M, NIGHT) {
+export function townhouse(B, seed, M, NIGHT) {
   const r = k => hash(seed + k), w = .9, d = 1.3, fl = 3 + Math.floor(r('f') * 3), fh = .5, H = fl * fh, face = FACADE[Math.floor(r('c') * FACADE.length)];
   const em = (c, i) => NIGHT ? { emissive: c, emissiveIntensity: i } : {};
   B.box(w, fh, d - .32, '#5F5B57', 0, 0, -.16, null, M);
@@ -52,13 +52,13 @@ function townhouse(B, seed, M, NIGHT) {
   if (r('sh') > .55) { B.box(w * .88, .3, d * .42, '#C4CACE', 0, H + .05, -d * .26, null, M); B.box(w * .94, .025, d * .48, '#6F93AA', 0, H + .36, -d * .26, null, M, .1); }
   if (r('sg') > .5) { const c = ['#C42D5A', '#2F6E9E', '#D99A16', '#3C8D5A'][Math.floor(r('sc') * 4)]; B.box(.035, .4, .2, c, w / 2 + .02, fh + .12, d / 2 - .08, em(c, .8), M); }
 }
-function winTex(NIGHT, seed) {
+export function winTex(NIGHT, seed) {
   const c = document.createElement('canvas'); c.width = 64; c.height = 64; const x = c.getContext('2d'); x.fillStyle = NIGHT ? '#4B4857' : '#DCE0E5'; x.fillRect(0, 0, 64, 64);
   for (let i = 0; i < 2; i++) { const on = NIGHT && hash(seed + i) > .4; x.fillStyle = NIGHT ? (on ? '#FFD27A' : '#2E2C36') : '#7E909C'; x.fillRect(8 + i * 28, 18, 20, 24); }
   x.fillStyle = NIGHT ? '#3A3845' : '#C4C9CF'; x.fillRect(0, 58, 64, 6);
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1.6, 2); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-function diagTex(NIGHT) {
+export function diagTex(NIGHT) {
   const c = document.createElement('canvas'); c.width = 128; c.height = 128; const x = c.getContext('2d'); x.fillStyle = NIGHT ? '#C9C7CC' : '#F4F3F1'; x.fillRect(0, 0, 128, 128);
   x.strokeStyle = NIGHT ? '#B3B1B8' : '#E2E0DD'; x.lineWidth = 3; for (let i = -128; i < 256; i += 16) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 128, 128); x.stroke(); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 2); t.colorSpace = THREE.SRGBColorSpace; return t;

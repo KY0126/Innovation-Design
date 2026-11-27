@@ -1,7 +1,7 @@
 // 揪居家服務地圖：全台 → 縣市 → 門市街區，三層 Drill-Down／Roll-Up；選取後其他區塊轉灰
 // 門市清單與縣市人口為公開資料；訂閱家庭、技師位置等標示「模擬」；第三層工單、提醒、關懷事件讀取即時資料
 import * as THREE from '../vendor/three.module.min.js';
-import { loadScene, buildReal, housesNear, along } from './l3real.js?v=20261127a';
+import { loadScene, buildReal, housesNear, along, batch, townhouse, diagTex, winTex } from './l3real.js?v=20261127b';
 
 const G = window.SMGEO, ST = window.SMSTORES, AGE = window.SMAGE65, PILOT = window.SMPILOT;
 const TYN = { g: '一般門市', l: '大型門市', e: '數位家電體驗館', d: '百貨門市' };
@@ -32,6 +32,7 @@ const MAT = {};
 function mat(c, o = {}) { const k = c + JSON.stringify(o); return MAT[k] || (MAT[k] = new THREE.MeshStandardMaterial({ color: c, roughness: .85, metalness: 0, flatShading: true, ...o })); }
 const GRAYM = {};
 function grayOf(m) {
+  if (Array.isArray(m)) return m.map(grayOf);
   const k = m.uuid; if (GRAYM[k]) return GRAYM[k];
   const c = m.color ? m.color.clone() : new THREE.Color('#ccc'); const l = c.r * .3 + c.g * .59 + c.b * .11, v = .8 + l * .15;
   const g = m.clone(); g.color = new THREE.Color(v, v, v * 1.01); if (g.emissive) g.emissive = new THREE.Color(0, 0, 0); if (g.map) g.color = new THREE.Color(.85, .85, .86); g.transparent = true; g.opacity = .75;
@@ -54,14 +55,38 @@ function van(stripe = BRAND) { const g = new THREE.Group(), K = '#3A3D42'; g.add
   [-.16, .16].forEach(z => g.add(bx(.82, .03, .03, '#C9CDD2', -.08, .5, z))); for (let k = 0; k < 6; k++) g.add(bx(.03, .03, .32, '#C9CDD2', -.45 + k * .15, .5, 0));
   [[-.32, .24], [-.32, -.24], [.42, .24], [.42, -.24]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .06, 12), mat('#222')); w.rotation.x = Math.PI / 2; w.position.set(x, .1, z); g.add(w); }); return g; }
 // 依官網店型建造有意義的建築
+// 第二層門市建築：比照民族店街區的寫實做法（白色斜紋外牆、紅色招牌帶、一樓玻璃、看板色塊），
+// 門前補一段人行道與道路；看板只用色塊，不放真實廣告。
+let DIAG = null, WIN = null;
 function storeBuilding(s) {
-  const g = new THREE.Group();
-  if (s.type === 'd') { g.add(bx(2.2, 2.8, 1.8, '#E9DCC8')); for (let i = 0; i < 4; i++) g.add(bx(2.24, .08, 1.84, '#C9A877', 0, .6 + i * .6, 0)); windows(g, 2, 2.4, 1.8, 4, 5, .3, '#FFF1C9'); const sg = sign(['百貨專櫃｜全國電子'], 1.6, .26, { w: 560, h: 92, px: 44 }); sg.position.set(0, .45, .92); g.add(sg); }
-  else if (s.type === 'e') { g.add(bx(2.4, 1.1, 1.6, '#FBEFF2')); g.add(bx(2.2, .7, .05, '#F3C7D3', 0, .1, .8, { transparent: true, opacity: .9 })); g.add(bx(2.44, .22, 1.64, '#8E1E42', 0, 1.1, 0)); const sg = sign(['數位家電體驗館'], 1.8, .3, { w: 560, h: 96, px: 48, bg: '#8E1E42' }); sg.position.set(0, .95, .83); g.add(sg); }
-  else if (s.type === 'l') { g.add(bx(3.2, 1.9, 2.4, '#F7F5F2')); g.add(bx(3.24, .42, 2.44, BRAND, 0, 1.9, 0)); g.add(bx(3, .9, .06, '#F6D5DE', 0, .15, 1.2, { transparent: true, opacity: .85 })); const sg = sign(s.dc ? ['全國電子', 'Digital City'] : ['全國電子', '大型門市'], 2.4, .6, { w: 640, h: 160 }); sg.position.set(0, 1.42, 1.23); g.add(sg);
-    if (s.pilot) { const r = sign(['揪居家情境角'], 1.2, .28, { bg: '#FFFFFF', fg: BRAND, w: 400, h: 96, px: 46 }); r.position.set(.85, .75, 1.24); g.add(r); } }
-  else { g.add(bx(1.4, 1, 1.1, '#FFF8EC')); const a = bx(1.5, .08, .45, '#E8577A', 0, .82, .7); a.rotation.x = .35; g.add(a); const sg = sign(['全國電子'], 1.2, .26, { w: 400, h: 96, px: 50 }); sg.position.set(0, .66, .56); g.add(sg); g.add(bx(1.1, .45, .04, '#F6D5DE', 0, .05, .56)); }
-  if (s.dc && s.type !== 'l') { const f = bx(.5, .3, .06, '#3D3A40', 0, 0, 0); f.position.set(0, (s.type === 'd' ? 2.95 : 1.4), .6); g.add(f); }
+  const g = new THREE.Group(), RED = BRAND, glass = { roughness: .15, metalness: .3 }, H = hash(s.code);
+  DIAG = DIAG || diagTex(false); WIN = WIN || winTex(false, 'l2');
+  const box = (w, h, d, c, x, y, z, o) => { const m = bx(w, h, d, c, x, y, z, o); g.add(m); return m; };
+  let w = 1.4;
+  if (s.type === 'l') { w = 3.2; const h = 1.9, d = 2.4, wall = new THREE.MeshStandardMaterial({ map: DIAG, roughness: .8 }), m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [wall, wall, mat('#E9E7E4'), wall, wall, wall]); m.position.y = h / 2; m.castShadow = m.receiveShadow = true; g.add(m);
+    box(w - .06, .62, .05, '#3E5563', 0, 0, d / 2 + .01, glass); for (let k = 0; k < 6; k++) box(.12, .62, .08, '#F7F6F4', -w / 2 + .1 + k * (w - .2) / 5, 0, d / 2 + .04);
+    box(w + .04, .34, .1, RED, 0, .62, d / 2 + .04); box(.1, .34, d + .04, RED, -w / 2 - .04, .62, 0);
+    const sg = sign(s.dc ? ['全國電子', 'Digital City'] : ['全國電子'], 1.5, .3, { w: 520, h: 104, px: 46 }); sg.position.set(-.5, .79, d / 2 + .1); g.add(sg);
+    ['#2C4A7A', '#DCE8F2', '#1F2B3A'].forEach((c, k) => { box(.86, .62, .04, '#FFFFFF', -1.05 + k * 1.05, 1.06, d / 2 + .02); box(.78, .54, .05, c, -1.05 + k * 1.05, 1.1, d / 2 + .03); });
+    box(w + .08, .08, .08, RED, 0, h - .08, d / 2 + .02); box(.08, .08, d + .08, RED, -w / 2 - .02, h - .08, 0);
+    box(.9, 1.0, 1.6, '#F4F3F1', -w / 2 - .45, 0, .4); box(.94, .22, 1.64, RED, -w / 2 - .45, .7, .4); box(1, .05, .5, RED, -w / 2 - .45, .5, 1.3);
+    if (s.pilot) { const r = sign(['揪居家情境角'], 1.0, .24, { bg: '#FFFFFF', fg: BRAND, w: 400, h: 96, px: 46 }); r.position.set(1.05, .32, d / 2 + .05); g.add(r); } }
+  else if (s.type === 'e') { w = 2.4; const h = 1.4, d = 1.8; box(w, h, d, '#2F2C33'); box(w - .1, h - .4, .05, '#6F8796', 0, .05, d / 2 + .01, glass);
+    for (let k = 1; k < 6; k++) box(.04, h - .4, .07, '#E9E7E4', -w / 2 + k * w / 6, .05, d / 2 + .03); box(w + .04, .3, .08, '#8E1E42', 0, h - .34, d / 2 + .02);
+    const sg = sign(['數位家電體驗館'], 1.7, .24, { w: 560, h: 96, px: 44, bg: '#8E1E42' }); sg.position.set(0, h - .19, d / 2 + .07); g.add(sg); box(w + .06, .06, d + .06, '#E9E7E4', 0, h, 0); }
+  else if (s.type === 'd') { w = 2.4; const h = 3.4, d = 2.2, m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ map: WIN, color: '#F2E9DD', roughness: .8 })); m.position.y = h / 2; m.castShadow = true; g.add(m);
+    box(w + .04, .55, .06, '#3E5563', 0, 0, d / 2 + .01, glass); box(w + .1, .12, d + .1, '#B9A894', 0, h, 0); box(w + .04, .16, .08, '#C9A877', 0, .55, d / 2 + .02);
+    const sg = sign(['百貨專櫃｜全國電子'], 1.6, .24, { w: 560, h: 92, px: 44 }); sg.position.set(0, .3, d / 2 + .06); g.add(sg); }
+  else { // 一般門市：透天街屋一樓店面
+    const fl = 4, fh = .5, d = 1.3, face = ['#E9DFCF', '#D8D3CB', '#E7D5CC'][Math.floor(H * 3)];
+    box(w, fh, d - .3, '#5F5B57', 0, 0, -.15); box(w * .9, fh * .62, .04, '#93A9B5', 0, .03, d / 2 - .29, glass); box(w, .18, .3, RED, 0, fh - .02, d / 2 - .2);
+    const sg = sign(['全國電子'], w * .8, .15, { w: 400, h: 80, px: 44 }); sg.position.set(0, fh + .07, d / 2 - .04); g.add(sg);
+    box(w, fh * (fl - 1), d, face, 0, fh, 0); for (let k = 1; k < fl; k++) { box(w, .03, .14, '#B8B2A8', 0, k * fh, d / 2 + .07); box(w * .6, fh * .46, .02, '#56656D', 0, k * fh + .12, d / 2 + .01); if (hash(s.code + k) > .4) box(.2, .12, .09, '#EDEBE7', w / 2 - .18, k * fh + .05, d / 2 + .05); }
+    box(w, .05, d, '#A39D94', 0, fl * fh, 0); const t = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, .22, 10), mat('#D6DADD')); t.position.set(-w * .25, fl * fh + .16, -.2); g.add(t); }
+  if (s.dc && s.type !== 'l') { const f = bx(.5, .2, .06, '#3D3A40', 0, 0, 0); f.position.set(0, (s.type === 'd' ? 3.5 : 1.5), .8); g.add(f); }
+  // 門前人行道與一段道路（示意）
+  const dz = s.type === 'l' ? 1.2 : s.type === 'd' ? 1.1 : s.type === 'e' ? .9 : .65, L = w + (s.type === 'l' ? 1.4 : 0) + .6, ox = s.type === 'l' ? -.7 : 0;
+  box(L, .02, .4, '#DCD6CF', ox, 0, dz + .2); box(L, .03, .9, '#86848A', ox, 0, dz + .85); for (let x = -L / 2 + .3; x < L / 2; x += .9) box(.45, .01, .05, '#F4F2EE', x + ox, .035, dz + .85);
   return g;
 }
 function shapeOf(poly) { const s = new THREE.Shape(); poly.forEach(([x, y], i) => i ? s.lineTo(x, -y) : s.moveTo(x, -y)); return s; }
@@ -75,7 +100,7 @@ const HSC = { need: ['#FF7A59', '需要處理'], doing: ['#C42D5A', '進行中']
 export function mountServiceMap(root, opt = {}) {
   const api = opt.api || (async () => ({})), toast = opt.toast || (() => {});
   const LSK = 'jjj_sm_hint', lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
-  const S = { level: 1, county: null, store: null, sel: null, selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false, flow: true }, night: false, peak: new Date().getMonth() + 1, ar: false };
+  const S = { level: 1, county: null, store: null, sel: '高雄市', selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false, flow: true }, night: false, peak: new Date().getMonth() + 1, ar: false };
   const webgl = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
   S.flat = !webgl || root.clientWidth < 720;
   root.innerHTML = `<div class="sm">
@@ -87,6 +112,7 @@ export function mountServiceMap(root, opt = {}) {
    <div class="smmain"><div class="smstage"><div class="smcv"></div><svg class="smsvg" hidden></svg><div class="smlb"></div><div class="smleg"></div><div class="smops" hidden></div><div class="smdn" hidden></div><div class="smhint" hidden>拖曳旋轉、滾輪縮放；點色塊或右側清單聚焦，雙擊往下一層<button data-sm="hintx">知道了</button></div></div><aside class="smside"></aside></div>
    <div class="smsrc"></div></div>`;
   if (!document.getElementById('smOpsCss')) { const st = document.createElement('style'); st.id = 'smOpsCss'; st.textContent = `
+.smsvg[hidden]{display:none!important}.smsvg path[data-k]{transition:transform .2s,filter .2s}.smsvg path[data-k]:hover{transform:translateY(-2px);filter:drop-shadow(0 3px 3px rgba(0,0,0,.25))}
 .smops{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:8px;max-width:270px;font-size:12px;z-index:3}
 .smdash,.smpeak{background:rgba(255,255,255,.93);border-radius:10px;padding:8px 10px;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:4px;color:#3D3A40}
 .smdash>div{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline}.smdash>div b{text-align:right}.smdash small,.smpeak small{grid-column:1/-1;color:#8A8189}
@@ -140,10 +166,10 @@ export function mountServiceMap(root, opt = {}) {
   function keyed(obj, key) { obj.userData.key = key; obj.traverse(o => { if (o.isMesh) { o.userData.key = key; pick.push(o); } }); return obj; }
   function hitKey(e) { const r = R.domElement.getBoundingClientRect(), m = new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), rc = new THREE.Raycaster(); rc.setFromCamera(m, cam); const hit = rc.intersectObjects(pick, false)[0]; return hit ? hit.object.userData.key : null; }
   const focused = k => !S.sel && !S.selGroup ? true : (k === S.sel || (S.selGroup && S.selGroup.includes(k)));
-  function refreshLabels() { labels.forEach(L => { L.off = !L.show(L); L.el.classList.toggle('dim', !!L.key && !focused(L.key)); L.el.classList.toggle('on', !!S.sel && L.key === S.sel); L.el.classList.toggle('hov', !!S.hover && L.key === S.hover); }); }
+  function refreshLabels() { labels.forEach(L => { L.off = !L.show(L); L.el.classList.toggle('dim', !!L.key && !focused(L.key) && L.key !== S.hover); L.el.classList.toggle('on', !!S.sel && L.key === S.sel); L.el.classList.toggle('hov', !!S.hover && L.key === S.hover); }); }
   function applyDim() {
     if (S.flat) return draw2d();
-    scene.traverse(o => { if (!o.isMesh || o.userData.base) return; const k = o.userData.key; if (!o.userData.m0) o.userData.m0 = o.material; o.material = k && !focused(k) ? grayOf(o.userData.m0) : o.userData.m0; });
+    scene.traverse(o => { if (!o.isMesh || o.userData.base) return; const k = o.userData.key; if (!o.userData.m0) o.userData.m0 = o.material; o.material = k && !focused(k) && S.level !== 2 ? grayOf(o.userData.m0) : o.userData.m0; });   // 第二層保留真實外觀，只用號碼標示焦點
     refreshLabels();
   }
   function hideHint() { const h = $('.smhint'); if (h && !h.hidden) { h.hidden = true; lsSet(LSK, '1'); } }
@@ -186,7 +212,9 @@ export function mountServiceMap(root, opt = {}) {
     const cnt = {}; visibleStores(STORES).forEach(s => cnt[s.county] = (cnt[s.county] || 0) + 1);
     for (const c of G.counties) {
       const n = cnt[c.n] || 0, h = 1 + n * .42;
-      const m = extrude(c.p, h, ramp(AGE[c.n] || 15)); keyed(m, c.n); scene.add(m);
+      const hi = c.n === '高雄市', m = extrude(c.p, h, hi ? BRAND : '#FFFFFF', hi ? { emissive: '#5A0F24', emissiveIntensity: .25 } : {}); keyed(m, c.n); m.userData.base = 1; scene.add(m);
+      const ed = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: hi ? '#8E1E42' : '#D9D2D6' })); m.add(ed);
+      movers.push(() => { const ty = S.hover === c.n ? 16 : hi ? 3 : 0; m.position.y += (ty - m.position.y) * .18; });
       if (n) label([c.c[0], h + .5, c.c[1]], esc(c.n.replace(/[縣市]$/, '')), 'cty', c.n, L => S.layers.names || (S.stage !== 'extend' && inStage(c.n)) || S.sel === c.n || S.hover === c.n || (S.selGroup && S.selGroup.includes(c.n) && S.open !== '延伸'));
     }
     const base = new THREE.Mesh(new THREE.CircleGeometry(320, 64), new THREE.ShadowMaterial({ opacity: .12 })); base.rotation.x = -Math.PI / 2; base.position.y = -.05; base.receiveShadow = true; base.userData.base = 1; scene.add(base);
@@ -201,8 +229,8 @@ export function mountServiceMap(root, opt = {}) {
     for (const t of towns) { const has = byTown[t.n]; const m = extrude(t.p, .25 * sc, has ? '#F7EEEA' : '#EFEBEA'); m.userData.base = 1; m.receiveShadow = true; scene.add(m);
       const edges = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: '#E2D2D6' })); edges.userData.base = 1; scene.add(edges);
       if (has) label([t.c[0], .3 * sc, t.c[1]], esc(t.n), 'twn', null, () => S.layers.town || S.open === t.n); }
-    for (const r of rows) { const s = r.s, b = storeBuilding(s); b.scale.setScalar(sc * 1.15); b.position.set(s.x, .25 * sc, s.y); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
-      label([s.x, (s.type === 'd' ? 3.2 : 2.4) * sc * 1.15 + .3 * sc, s.y], String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.open === s.town || S.hover === s.code).el.style.setProperty('--c', TYC[s.type]); }
+    for (const r of rows) { const s = r.s, b = storeBuilding(s); b.scale.setScalar(sc * (s.pilot ? .9 : .7)); b.position.set(s.x, .25 * sc, s.y); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
+      label([s.x, (s.type === 'd' ? 3.6 : 2.2) * sc * (s.pilot ? .9 : .7) + .3 * sc, s.y], String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.open === s.town || S.hover === s.code).el.style.setProperty('--c', TYC[s.type]); }
     if (cn === '高雄市') { const home = STORES.find(s => s.code === '07078'), dst = [[home.x + 2.2, home.y - 1.6], [home.x - 1.8, home.y + 2.4]];
       dst.forEach((d, i) => { const v = van(i ? '#8E1E42' : BRAND); v.scale.setScalar(sc * 1.1); v.position.set(home.x, .3 * sc, home.y); v.visible = S.layers.van; v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([home.x, 1, home.y], i ? '陳技師（模擬）' : '吳技師（模擬）', 'van', null, () => S.layers.van);
         movers.push(t => { v.visible = S.layers.van; const k = (Math.sin(t * .35 + i * 2) + 1) / 2, x = home.x + (d[0] - home.x) * k, z = home.y + (d[1] - home.y) * k; v.position.x = x; v.position.z = z; v.rotation.y = Math.atan2(-(d[1] - home.y), d[0] - home.x) + (Math.cos(t * .35 + i * 2) < 0 ? Math.PI : 0); L.p.set(x, sc * 1.1, z); }); }); }
@@ -266,7 +294,7 @@ export function mountServiceMap(root, opt = {}) {
     let vb, body = ''; const P = ps => ps.map(p => 'M' + p.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join('L') + 'Z').join('');
     const dot = (x, y, r, c, k, t, f) => `<g data-k="${k}" opacity="${focused(k) ? 1 : .3}"><circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#fff" stroke-width="${r * .18}"/><text x="${x}" y="${y + r * .38}" font-size="${r * 1.05}" text-anchor="middle" fill="#fff" font-weight="700">${t}</text></g>`;
     if (S.level === 1) { const cnt = {}; visibleStores(STORES).forEach(s => cnt[s.county] = (cnt[s.county] || 0) + 1); vb = [-110, -210, 300, 400];
-      for (const c of G.counties) body += `<path d="${P(c.p)}" fill="${focused(c.n) ? ramp(AGE[c.n] || 15) : GRAY}" stroke="#fff" stroke-width=".6" data-k="${esc(c.n)}"/>${cnt[c.n] && (inStage(c.n) && S.stage !== 'extend' || S.sel === c.n) ? `<text x="${c.c[0]}" y="${c.c[1]}" font-size="7" text-anchor="middle" data-k="${esc(c.n)}" fill="#222">${esc(c.n.replace(/[縣市]$/, ''))}</text>` : ''}`; }
+      for (const c of G.counties) body += `<path d="${P(c.p)}" fill="${c.n === '高雄市' ? BRAND : '#FFFFFF'}" stroke="#D9D2D6" stroke-width=".6" data-k="${esc(c.n)}"/>${cnt[c.n] && (inStage(c.n) && S.stage !== 'extend' || S.sel === c.n) ? `<text x="${c.c[0]}" y="${c.c[1]}" font-size="7" text-anchor="middle" data-k="${esc(c.n)}" fill="#222">${esc(c.n.replace(/[縣市]$/, ''))}</text>` : ''}`; }
     else if (S.level === 2) { const cty = G.counties.find(c => c.n === S.county), bb = bboxOf(cty.p), pad = 3; vb = [bb[0] - pad, bb[1] - pad, bb[2] - bb[0] + pad * 2, bb[3] - bb[1] + pad * 2]; const f = (vb[2] / 100);
       for (const t of G.towns[S.county] || []) body += `<path d="${P(t.p)}" fill="#F7EEEA" stroke="#E2D2D6" stroke-width="${.3 * f}"/>`;
       for (const r of groupsL2().flatMap(g => g.rows)) body += dot(r.s.x, r.s.y, (r.s.pilot ? 2.2 : 1.6) * f, focused(r.key) ? TYC[r.s.type] : GRAY, r.key, r.no); }
@@ -281,7 +309,7 @@ export function mountServiceMap(root, opt = {}) {
   // ----- 選取、往下鑽、往上捲 -----
   function select(k) { hideHint(); S.sel = k || null; if (k) { const g = groups().find(x => x.rows.some(r => r.key === k)); if (g && S.open !== g.id) openGroup(g.id); } S.tab = 'ops'; applyDim(); panel(); }
   function enter() {
-    if (S.level === 1 && S.sel) { S.county = S.sel; S.level = 2; S.sel = null; S.open = undefined; build(); }
+    if (S.level === 1 && S.sel) { S.county = S.sel; S.level = 2; S.sel = S.county === '高雄市' ? '07078' : null; S.open = undefined; build(); }
     else if (S.level === 2 && S.sel) { if (S.sel !== '07078') { toast('第三層街區先開放試點的民族店；其他門市於第二階段由企業提供資料後開放'); return; } S.store = S.sel; S.level = 3; S.sel = null; S.open = undefined; build(); }
   }
   function up() { if (S.level === 3) { S.level = 2; S.sel = S.store; } else if (S.level === 2) { S.level = 1; S.sel = S.county; } S.open = undefined; build(); }
@@ -304,8 +332,8 @@ export function mountServiceMap(root, opt = {}) {
   function kpis() {
     let K = [], ins = '';
     if (S.level === 1) { const v = visibleStores(STORES), dc = v.filter(s => s.dc).length, cs = new Set(v.map(s => s.county)).size;
-      K = [['門市', DECK.total + ' 家', '簡報'], ['地圖已標', v.length + ' 家', '官網 10/24'], ['Digital City', dc, '公開', 'dc'], [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
-      ins = S.stage === 'pilot' ? '試點選高雄市三民區：民族、澄清、三民中華 3 家 Digital City 都在三民區，同一組技師可以統一排程、合併到府；三民區 65 歲以上約 7.2 萬人。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋全台門市（簡報 335 家；地圖先標官網 10/24 的 316 家，新清單到了再補）；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
+      K = [['門市', DECK.total + ' 家', '簡報'], ['地圖已標', v.length + ' 家', '官網 10/24'], ['Digital City', dc, '公開', 'dc'], S.stage === 'pilot' ? ['試點門市', '民族店', '規劃', 'stage'] : [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
+      ins = S.stage === 'pilot' ? '試點只鎖定高雄三民區的民族店（Digital City）：2025/11 改裝後已有智慧居家情境體驗區與寶元快客櫃，三民區 65 歲以上約 7.2 萬人。其他門市照常列出基本資訊，擴展期再導入。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋全台門市（簡報 335 家；地圖先標官網 10/24 的 316 家，新清單到了再補）；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
     else if (S.level === 2) { const v = visibleStores(STORES.filter(s => s.county === S.county)), pil = v.filter(s => s.pilot);
       K = [['門市', v.length, '公開'], ['Digital City', v.filter(s => s.dc).length, '公開', 'dc'], ['65 歲以上占比', (AGE[S.county] || '—') + '%', '公開'], [pil.length ? '試點門市' : '一般門市', pil.length ? pil.length + ' 家' : v.filter(s => s.type === 'g').length + ' 家', pil.length ? '規劃' : '公開', pil.length ? 'pilot' : null]];
       ins = S.county === '高雄市' ? '民族店今天有合併到府工單：陳技師先裝夜燈與門檻燈條，吳技師再裝關懷設備。點清單裡的民族店，再「進入街區」。' : `${S.county}門市 ${v.length} 家；第二階段由企業提供營運資料後，才看得到揪居家與派工。`; }
@@ -343,7 +371,7 @@ export function mountServiceMap(root, opt = {}) {
        ${on ? g.rows.map(r => `<button class="smr ${S.sel === r.key ? 'on' : ''}" data-sm="sel" data-k="${esc(r.key)}">${r.no ? `<span class="nb" style="--c:${color(r)}">${r.no}</span>` : `<i class="dt" style="background:${color(r)}"></i>`}<span class="smrt"><b>${esc(r.title)}</b><small>${esc(r.sub)}</small></span></button>`).join('') : ''}</div>`; }).join('')}</div>`;
   }
   function legend() {
-    $('.smleg').innerHTML = S.level === 1 ? `<b>各區門市（簡報）</b>${DECK.regions.map(([n, c]) => `<span>${n} ${c}</span>`).join('')}<span style="flex-basis:100%;height:0"></span><span>高度＝門市數</span><span><i class="ramp"></i>65 歲以上占比 15%→24%</span><span><i class="dt" style="background:${GRAY}"></i>未選取</span>`
+    $('.smleg').innerHTML = S.level === 1 ? `<span><i class="dt" style="background:${BRAND}"></i>試點：高雄市</span><span><i class="dt" style="background:#FFFFFF;border:1px solid #D9D2D6"></i>其他縣市（滑鼠移過去會浮起）</span><span style="flex-basis:100%;height:0"></span><b>各區門市（簡報）</b>${DECK.regions.map(([n, c]) => `<span>${n} ${c}</span>`).join('')}<span style="flex-basis:100%;height:0"></span><span>高度＝門市數</span>`
       : S.level === 2 ? Object.entries(TYN).map(([k, n]) => `<span><i class="dt" style="background:${TYC[k]}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span><span>位置為概略</span>'
         : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>' + (S.layers.flow ? '<span style="flex-basis:100%;height:0"></span><b>工單光線</b>' + Object.values(FLOW).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') : '');
   }
