@@ -59,6 +59,9 @@ function van(stripe = BRAND) { const g = new THREE.Group(), K = '#3A3D42'; g.add
 // 門前補一段人行道與道路；看板只用色塊，不放真實廣告。
 let DIAG = null, WIN = null;
 function storeBuilding(s) {
+  // 非試點門市：簡單方塊＋頂部店型色條，不搶民族店的焦點
+  if (!s.pilot) { const g = new THREE.Group(), [w, h, d] = { l: [2.4, 1.2, 1.8], e: [2, 1, 1.5], d: [2, 1.8, 1.6], g: [1.2, .8, 1] }[s.type] || [1.2, .8, 1];
+    g.add(bx(w * .8, h * .8, d * .8, '#F4F1EE')); g.add(bx(w * .8 + .02, .06, d * .8 + .02, '#D9D3CE', 0, h * .8, 0)); return g; }
   const g = new THREE.Group(), RED = BRAND, glass = { roughness: .15, metalness: .3 }, H = hash(s.code);
   DIAG = DIAG || diagTex(false); WIN = WIN || winTex(false, 'l2');
   const box = (w, h, d, c, x, y, z, o) => { const m = bx(w, h, d, c, x, y, z, o); g.add(m); return m; };
@@ -84,6 +87,10 @@ function storeBuilding(s) {
     box(w, fh * (fl - 1), d, face, 0, fh, 0); for (let k = 1; k < fl; k++) { box(w, .03, .14, '#B8B2A8', 0, k * fh, d / 2 + .07); box(w * .6, fh * .46, .02, '#56656D', 0, k * fh + .12, d / 2 + .01); if (hash(s.code + k) > .4) box(.2, .12, .09, '#EDEBE7', w / 2 - .18, k * fh + .05, d / 2 + .05); }
     box(w, .05, d, '#A39D94', 0, fl * fh, 0); const t = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, .22, 10), mat('#D6DADD')); t.position.set(-w * .25, fl * fh + .16, -.2); g.add(t); }
   if (s.dc && s.type !== 'l') { const f = bx(.5, .2, .06, '#3D3A40', 0, 0, 0); f.position.set(0, (s.type === 'd' ? 3.5 : 1.5), .8); g.add(f); }
+  // 試點門市特別標示：地面金色光圈＋頂上光柱
+  const HL = '#F2B705', halo = new THREE.Mesh(new THREE.RingGeometry(2.6, 3.1, 48), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .9, side: THREE.DoubleSide })); halo.rotation.x = -Math.PI / 2; halo.position.y = .03; g.add(halo);
+  const pad = new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .18 })); pad.rotation.x = -Math.PI / 2; pad.position.y = .02; g.add(pad);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 2.4, 10), new THREE.MeshBasicMaterial({ color: HL, transparent: true, opacity: .75 })); beam.position.y = 3.2; g.add(beam);
   // 門前人行道與一段道路（示意）
   const dz = s.type === 'l' ? 1.2 : s.type === 'd' ? 1.1 : s.type === 'e' ? .9 : .65, L = w + (s.type === 'l' ? 1.4 : 0) + .6, ox = s.type === 'l' ? -.7 : 0;
   box(L, .02, .4, '#DCD6CF', ox, 0, dz + .2); box(L, .03, .9, '#86848A', ox, 0, dz + .85); for (let x = -L / 2 + .3; x < L / 2; x += .9) box(.45, .01, .05, '#F4F2EE', x + ox, .035, dz + .85);
@@ -230,7 +237,7 @@ export function mountServiceMap(root, opt = {}) {
       const edges = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: '#E2D2D6' })); edges.userData.base = 1; scene.add(edges);
       if (has) label([t.c[0], .3 * sc, t.c[1]], esc(t.n), 'twn', null, () => S.layers.town || S.open === t.n); }
     for (const r of rows) { const s = r.s, b = storeBuilding(s); b.scale.setScalar(sc * (s.pilot ? .9 : .7)); b.position.set(s.x, .25 * sc, s.y); b.rotation.y = hash(s.code) * .6 - .3; keyed(b, s.code); scene.add(b);
-      label([s.x, (s.type === 'd' ? 3.6 : 2.2) * sc * (s.pilot ? .9 : .7) + .3 * sc, s.y], String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.open === s.town || S.hover === s.code).el.style.setProperty('--c', TYC[s.type]); }
+      label([s.x, (s.pilot ? 4.6 : s.type === 'd' ? 2 : 1.3) * sc * (s.pilot ? .9 : .7) + .3 * sc, s.y], s.pilot ? '1｜民族店（試點）' : String(r.no), 'num' + (s.pilot ? ' pil' : ''), s.code, () => s.pilot || S.sel === s.code || S.hover === s.code).el.style.setProperty('--c', s.pilot ? '#C48A00' : TYC[s.type]); }
     if (cn === '高雄市') { const home = STORES.find(s => s.code === '07078'), dst = [[home.x + 2.2, home.y - 1.6], [home.x - 1.8, home.y + 2.4]];
       dst.forEach((d, i) => { const v = van(i ? '#8E1E42' : BRAND); v.scale.setScalar(sc * 1.1); v.position.set(home.x, .3 * sc, home.y); v.visible = S.layers.van; v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([home.x, 1, home.y], i ? '陳技師（模擬）' : '吳技師（模擬）', 'van', null, () => S.layers.van);
         movers.push(t => { v.visible = S.layers.van; const k = (Math.sin(t * .35 + i * 2) + 1) / 2, x = home.x + (d[0] - home.x) * k, z = home.y + (d[1] - home.y) * k; v.position.x = x; v.position.z = z; v.rotation.y = Math.atan2(-(d[1] - home.y), d[0] - home.x) + (Math.cos(t * .35 + i * 2) < 0 ? Math.PI : 0); L.p.set(x, sc * 1.1, z); }); }); }
@@ -372,7 +379,7 @@ export function mountServiceMap(root, opt = {}) {
   }
   function legend() {
     $('.smleg').innerHTML = S.level === 1 ? `<span><i class="dt" style="background:${BRAND}"></i>試點：高雄市</span><span><i class="dt" style="background:#FFFFFF;border:1px solid #D9D2D6"></i>其他縣市（滑鼠移過去會浮起）</span><span style="flex-basis:100%;height:0"></span><b>各區門市（簡報）</b>${DECK.regions.map(([n, c]) => `<span>${n} ${c}</span>`).join('')}<span style="flex-basis:100%;height:0"></span><span>高度＝門市數</span>`
-      : S.level === 2 ? Object.entries(TYN).map(([k, n]) => `<span><i class="dt" style="background:${TYC[k]}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span><span>位置為概略</span>'
+      : S.level === 2 ? '<span><i class="dt" style="background:#F2B705"></i>試點：民族店</span><span><i class="dt" style="background:#F4F1EE;border:1px solid #CCC"></i>其他門市（店型看右側清單）</span><span>位置為概略</span>'
         : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>' + (S.layers.flow ? '<span style="flex-basis:100%;height:0"></span><b>工單光線</b>' + Object.values(FLOW).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') : '');
   }
   function menus() {
