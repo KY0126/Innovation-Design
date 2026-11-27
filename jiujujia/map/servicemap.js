@@ -1,9 +1,12 @@
 // 揪居家服務地圖：全台 → 縣市 → 門市街區，三層 Drill-Down／Roll-Up；選取後其他區塊轉灰
 // 門市清單與縣市人口為公開資料；訂閱家庭、技師位置等標示「模擬」；第三層工單、提醒、關懷事件讀取即時資料
 import * as THREE from '../vendor/three.module.min.js';
+import { loadScene, buildReal, housesNear, along } from './l3real.js?v=20261127a';
 
 const G = window.SMGEO, ST = window.SMSTORES, AGE = window.SMAGE65, PILOT = window.SMPILOT;
-const TYN = { g: '一般門市', l: '大型門市', e: '體驗館門市', d: '百貨門市' };
+const TYN = { g: '一般門市', l: '大型門市', e: '數位家電體驗館', d: '百貨門市' };
+// 全國電子 11/27 簡報：門市 335 家、五區據點；新店型「嶄新概念店」待拿到新門市清單才能上圖
+const DECK = { total: 335, regions: [['北區', 92], ['桃竹苗區', 73], ['中區', 76], ['南區', 74], ['東區', 20]] };
 const TYC = { g: '#F6A5B9', l: '#C42D5A', e: '#8E1E42', d: '#E8577A' };
 const STAGES = { pilot: ['高雄市'], expand: ['台北市', '新北市', '桃園市', '台中市', '台南市', '高雄市'], extend: null };
 const STN = { pilot: '試點', expand: '擴展', extend: '延伸' };
@@ -46,8 +49,10 @@ function roof(w, d, h, c) { const s = new THREE.Shape(); s.moveTo(-w / 2 - .08, 
 function tree(s = 1, c = '#E9A3B8') { const g = new THREE.Group(); const t = new THREE.Mesh(new THREE.CylinderGeometry(.06 * s, .08 * s, .4 * s, 6), mat('#9C7B5B')); t.position.y = .2 * s; g.add(t); const a = new THREE.Mesh(new THREE.IcosahedronGeometry(.32 * s, 0), mat(c)); a.position.y = .6 * s; a.castShadow = true; g.add(a); return g; }
 function house(wall, rf, badge) { const g = new THREE.Group(), w = 1, d = 1.1, h = .85; g.add(bx(w, h, d, wall)); const r = roof(w, d, .55, rf); r.position.y = h; g.add(r); g.add(bx(.22, .4, .05, '#8B5E3C', .18, 0, d / 2)); g.add(bx(.25, .2, .04, '#FFE9A8', -.22, .4, d / 2 + .02, { emissive: '#FFE9A8', emissiveIntensity: .3 }));
   if (badge) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .05, 20), mat(badge, { emissive: badge, emissiveIntensity: .35 })); b.rotation.x = Math.PI / 2; b.position.set(-.25, h + .22, d / 2 + .1); g.add(b); } return g; }
-function van(stripe = BRAND) { const g = new THREE.Group(); g.add(bx(.9, .38, .45, '#FFFFFF', -.05, .1, 0)); g.add(bx(.32, .3, .44, '#FFFFFF', .48, .1, 0)); g.add(bx(.2, .18, .45, '#F3C7D3', .5, .25, 0)); g.add(bx(.92, .07, .46, stripe, -.04, .28, 0));
-  [[-.32, .24], [-.32, -.24], [.42, .24], [.42, -.24]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .06, 12), mat('#333')); w.rotation.x = Math.PI / 2; w.position.set(x, .1, z); g.add(w); }); return g; }
+// 技師工程車：墨灰車身＋車頂梯架（避免像計程車或救護車）
+function van(stripe = BRAND) { const g = new THREE.Group(), K = '#3A3D42'; g.add(bx(.9, .38, .45, K, -.05, .1, 0)); g.add(bx(.32, .3, .44, K, .48, .1, 0)); g.add(bx(.2, .18, .45, '#9FB6C4', .5, .25, 0)); g.add(bx(.92, .04, .46, stripe, -.04, .3, 0));
+  [-.16, .16].forEach(z => g.add(bx(.82, .03, .03, '#C9CDD2', -.08, .5, z))); for (let k = 0; k < 6; k++) g.add(bx(.03, .03, .32, '#C9CDD2', -.45 + k * .15, .5, 0));
+  [[-.32, .24], [-.32, -.24], [.42, .24], [.42, -.24]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .06, 12), mat('#222')); w.rotation.x = Math.PI / 2; w.position.set(x, .1, z); g.add(w); }); return g; }
 // 依官網店型建造有意義的建築
 function storeBuilding(s) {
   const g = new THREE.Group();
@@ -70,7 +75,7 @@ const HSC = { need: ['#FF7A59', '需要處理'], doing: ['#C42D5A', '進行中']
 export function mountServiceMap(root, opt = {}) {
   const api = opt.api || (async () => ({})), toast = opt.toast || (() => {});
   const LSK = 'jjj_sm_hint', lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
-  const S = { level: 1, county: null, store: null, sel: null, selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false } };
+  const S = { level: 1, county: null, store: null, sel: null, selGroup: null, open: undefined, hover: null, stage: 'pilot', types: { g: 1, l: 1, e: 1, d: 1 }, dcOnly: false, tab: 'ops', live: null, flat: false, menu: null, layers: { names: false, town: false, van: false, heat: false, flow: true }, night: false, peak: new Date().getMonth() + 1, ar: false };
   const webgl = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
   S.flat = !webgl || root.clientWidth < 720;
   root.innerHTML = `<div class="sm">
@@ -79,8 +84,16 @@ export function mountServiceMap(root, opt = {}) {
     <span class="smdd"><button data-sm="menu" data-k="lay">圖層 ▾</button><div class="smmenu" data-menu="lay" hidden></div></span>
     <button class="smmode" data-sm="mode"></button></div>
    <div class="smk"></div><div class="smins" role="status"></div>
-   <div class="smmain"><div class="smstage"><div class="smcv"></div><svg class="smsvg" hidden></svg><div class="smlb"></div><div class="smleg"></div><div class="smhint" hidden>拖曳旋轉、滾輪縮放；點色塊或右側清單聚焦，雙擊往下一層<button data-sm="hintx">知道了</button></div></div><aside class="smside"></aside></div>
+   <div class="smmain"><div class="smstage"><div class="smcv"></div><svg class="smsvg" hidden></svg><div class="smlb"></div><div class="smleg"></div><div class="smops" hidden></div><div class="smdn" hidden></div><div class="smhint" hidden>拖曳旋轉、滾輪縮放；點色塊或右側清單聚焦，雙擊往下一層<button data-sm="hintx">知道了</button></div></div><aside class="smside"></aside></div>
    <div class="smsrc"></div></div>`;
+  if (!document.getElementById('smOpsCss')) { const st = document.createElement('style'); st.id = 'smOpsCss'; st.textContent = `
+.smops{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:8px;max-width:270px;font-size:12px;z-index:3}
+.smdash,.smpeak{background:rgba(255,255,255,.93);border-radius:10px;padding:8px 10px;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:4px;color:#3D3A40}
+.smdash>div{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline}.smdash>div b{text-align:right}.smdash small,.smpeak small{grid-column:1/-1;color:#8A8189}
+.smpeak input{width:100%}.smpeak button{align-self:flex-start;border:1px solid #C42D5A;color:#C42D5A;background:#fff;border-radius:999px;padding:2px 10px;font:inherit;cursor:pointer}.smpeak button[aria-pressed=true]{background:#C42D5A;color:#fff}
+.smpeak .sim{font-weight:400;color:#8A8189;border:1px solid #DDD;border-radius:6px;padding:0 4px;font-size:11px}
+.smdn{position:absolute;right:10px;top:10px;display:flex;background:rgba(255,255,255,.93);border-radius:999px;padding:3px;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.smdn button{border:0;background:none;padding:4px 12px;border-radius:999px;font:12px/1.2 inherit;cursor:pointer;color:#3D3A40}.smdn button[aria-pressed=true]{background:#3D3A40;color:#fff}`; document.head.appendChild(st); }
   const $ = s => root.querySelector(s);
   const cv = $('.smcv'), lb = $('.smlb'), svg = $('.smsvg');
   if (!lsGet(LSK)) $('.smhint').hidden = false;
@@ -196,31 +209,57 @@ export function mountServiceMap(root, opt = {}) {
     target.set(cx, 0, cy); setShadow(span * 1.2); fly([cx, cy + span * .06], span * 1.35, -0.22, 0.78);
   }
   // ----- 第三層：民族店街區（真實示範家庭標號碼，其餘房子為背景） -----
-  const HOUSES = (() => { const H = [], rng = (i, k) => hash('h' + i + k); let i = 0;
-    for (let gx = -3; gx <= 3; gx++) for (let gz = -3; gz <= 3; gz++) { if (Math.abs(gx) < 1 && Math.abs(gz) < 1) continue; if (rng(i, 'skip') < .28) { i++; continue; }
-      H.push({ id: 'H' + i, x: gx * 4.2 + (rng(i, 'x') - .5) * 1.2, z: gz * 4.2 + (rng(i, 'z') - .5) * 1.2, sub: rng(i, 's') < .38, heat: rng(i, 'h') }); i++; }
-    return H; })();
-  const HPOS = ['H8', 'H17', 'H30', 'H38', 'H44', 'H12'];
-  function houseOf(realId) { const hh = (S.live && S.live.hh) || [], i = hh.findIndex(h => h.id === realId); return HOUSES.find(x => x.id === HPOS[i]) || HOUSES[i * 3]; }
+  // 背景住家取自真實街區的透天厝；家庭號碼放在其中幾棟（示範位置，不代表真實地址）
+  let REAL = null, HOUSES = [], SLOTS = [];
+  async function prepL3() { if (!REAL) REAL = await loadScene(); if (HOUSES.length) return;
+    HOUSES = housesNear(REAL, 24).map(h => ({ ...h, id: 'H' + h.i, sub: hash('s' + h.i) < .3, heat: hash('h' + h.i) }));
+    const C = HOUSES.filter(h => h.d > 6 && h.d < 14), ang = h => Math.atan2(h.z, h.x);   // 分散在門市四周，不擠在同一條巷子
+    SLOTS = [0, 4, 2, 6, 1, 5, 3, 7].map(k => { const t = -Math.PI + (k + .5) * Math.PI / 4; return C.filter(h => Math.abs(((ang(h) - t + 3 * Math.PI) % (2 * Math.PI)) - Math.PI) < Math.PI / 8).sort((a, b) => Math.abs(a.d - 9) - Math.abs(b.d - 9))[0]; }).filter(Boolean); }
+  function houseOf(realId) { const hh = (S.live && S.live.hh) || [], i = hh.findIndex(h => h.id === realId); return i < 0 || !SLOTS.length ? null : SLOTS[i % SLOTS.length]; }
+  const FLOW = { book: ['#5B8FD6', '預約'], ar: ['#8E5BD0', 'AR 量測'], quote: ['#E0A21B', '報價待長輩確認'], go: [BRAND, '技師出車施工'] };
+  function flowOf(r) { const wo = (S.live.wo || []).find(o => o.household_id === r.real.id && !['已完成', '已取消'].includes(o.status));
+    if (wo) return /量測|場勘/.test(wo.kind || '') ? 'ar' : 'go'; const ph = r.real.phase || 0; return ph === 1 ? 'book' : ph === 2 ? 'quote' : ph === 3 ? 'go' : null; }
   function buildL3() {
-    newScene(); const rows = groupsL3().flatMap(g => g.rows);
-    const ground = bx(34, .2, 34, '#F7EEF1'); ground.position.y = -.2; ground.userData.base = 1; scene.add(ground);
-    for (let k = -3; k <= 3; k++) { const a = bx(34, .04, .9, '#D9D2D5', 0, 0, k * 4.2 + 2.1); a.userData.base = 1; scene.add(a); const b = bx(.9, .04, 34, '#D9D2D5', k * 4.2 + 2.1, 0, 0); b.userData.base = 1; scene.add(b); }
-    const heat = []; for (const h of HOUSES) if (h.sub) { const d = new THREE.Mesh(new THREE.CircleGeometry(1.6 + h.heat, 24), new THREE.MeshBasicMaterial({ color: '#F6C6D3', transparent: true, opacity: .35 + h.heat * .25 })); d.rotation.x = -Math.PI / 2; d.position.set(h.x, .03, h.z); d.userData.base = 1; d.visible = S.layers.heat; heat.push(d); scene.add(d); }
-    movers.push(() => heat.forEach(d => d.visible = S.layers.heat));
-    const st = STORES.find(s => s.code === '07078'), sb = storeBuilding(st); sb.scale.setScalar(1.15); keyed(sb, '07078'); scene.add(sb); label([0, 3.4, 0], '民族店', 'st pil', '07078');
-    const used = {};
-    for (const r of rows) { const h = houseOf(r.real.id); if (!h) continue; used[h.id] = 1; const c = HSC[r.st][0], g = house('#FFFFFF', '#B9776B', c); g.position.set(h.x, 0, h.z); g.rotation.y = hash(h.id) > .5 ? 0 : Math.PI / 2; keyed(g, r.key); scene.add(g);
-      label([h.x, 1.9, h.z], String(r.no), 'num', r.key).el.style.setProperty('--c', c);
-      if (r.st === 'need') { const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1.1, 32), new THREE.MeshBasicMaterial({ color: c, transparent: true })); ring.rotation.x = -Math.PI / 2; ring.position.set(h.x, .06, h.z); ring.userData.base = 1; scene.add(ring); movers.push(t => { const k = (t % 1.6) / 1.6; ring.scale.setScalar(1 + k * 1.8); ring.material.opacity = 1 - k; }); }
+    newScene(); const rows = groupsL3().flatMap(g => g.rows), NIGHT = S.night;
+    if (NIGHT) scene.children.forEach(o => { if (o.isHemisphereLight) { o.color.set('#7183AE'); o.groundColor.set('#1D1B24'); o.intensity = .55; } if (o.isDirectionalLight) { o.color.set('#9FB3E0'); o.intensity = .5; } });
+    cv.style.background = NIGHT ? '#1B1A23' : '';
+    const used = new Map(); rows.forEach(r => { const h = houseOf(r.real.id); if (h && !used.has(h.i)) used.set(h.i, r); });
+    const W = buildReal(scene, REAL, { mat, NIGHT, skip: new Set(used.keys()) });
+    keyed(W.store, '07078'); label([0, 2.5, 0], '民族店', 'st pil', '07078');
+    const heat = []; for (const h of HOUSES) if (h.sub && h.d < 20) { const d = new THREE.Mesh(new THREE.CircleGeometry(.8 + h.heat * .6, 24), new THREE.MeshBasicMaterial({ color: '#F6C6D3', transparent: true, opacity: .35 + h.heat * .25 })); d.rotation.x = -Math.PI / 2; d.position.set(h.x, .05, h.z); d.userData.base = 1; d.visible = S.layers.heat; heat.push(d); scene.add(d); }
+    const flows = [];
+    for (const [i, r] of used) { const h = HOUSES.find(x => x.i === i), c = HSC[r.st][0], g = W.house(i); keyed(g, r.key); scene.add(g);
+      const cap = bx(1, .08, 1.4, c, 0, 2.75, 0); cap.position.set(h.x, 2.75, h.z); cap.rotation.y = h.a; keyed(cap, r.key); scene.add(cap);
+      label([h.x, 3.2, h.z], String(r.no), 'num', r.key).el.style.setProperty('--c', c);
+      if (r.st === 'need') { const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1.1, 32), new THREE.MeshBasicMaterial({ color: c, transparent: true })); ring.rotation.x = -Math.PI / 2; ring.position.set(h.x, .08, h.z); ring.userData.base = 1; scene.add(ring); movers.push(t => { const k = (t % 1.6) / 1.6; ring.scale.setScalar(1 + k * 1.8); ring.material.opacity = 1 - k; }); }
+      // 工單流動光線：門市 → 這一戶，顏色＝階段
+      const fk = flowOf(r); if (fk) { const col = FLOW[fk][0], cur = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 1.9, 0), new THREE.Vector3(h.x / 2, 4.2, h.z / 2), new THREE.Vector3(h.x, 2.9, h.z));
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(cur, 40, .04, 6), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); tube.userData.base = 1; scene.add(tube);
+        const dots = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(.13, 10, 8), new THREE.MeshBasicMaterial({ color: col })); m.userData.base = 1; scene.add(m); return m; });
+        flows.push(tube, ...dots); movers.push(t => { dots.forEach((m, k) => m.position.copy(cur.getPoint(((t * .25) + k / 3) % 1))); }); }
       const wo = (S.live.wo || []).find(o => o.household_id === r.real.id && (o.status === '已指派' || o.status === '進行中'));
       if (wo) { const v = van(BRAND); v.userData.base = 1; v.traverse(o => o.userData.base = 1); scene.add(v); const L = label([0, 1, 0], `${r.no}｜${esc(wo.assignee || '技師')}`, 'van', r.key);
-        movers.push(t => { const k = Math.min(1, ((t * .08) % 1.3)), x = h.x * Math.min(1, k * 2), z = k < .5 ? 2.1 : 2.1 + (h.z - 2.1) * Math.min(1, (k - .5) * 2); v.position.set(x + 1, .02, z); v.rotation.y = k < .5 ? (h.x > 0 ? 0 : Math.PI) : (h.z > 2.1 ? -Math.PI / 2 : Math.PI / 2); L.p.set(x + 1, 1.2, z); }); } }
-    for (const h of HOUSES) { if (used[h.id]) continue; const g = house('#F4F1EC', '#D8CBC4'); g.position.set(h.x, 0, h.z); g.rotation.y = hash(h.id) > .5 ? 0 : Math.PI / 2; g.userData.base = 1; g.traverse(o => o.userData.base = 1); scene.add(g);
-      if (hash(h.id + 't') > .55) { const t = tree(1, hash(h.id) > .7 ? '#F2B8CB' : '#E9A3B8'); t.position.set(h.x + 1.3, 0, h.z - 1); t.traverse(o => o.userData.base = 1); scene.add(t); } }
-    target.set(0, 0, 0); setShadow(22); fly([0, 1], 46, -0.6, 0.86);
+        const path = W.graph.path([0, 3.4], [h.x, h.z]);
+        movers.push(t => { const k = Math.min(1, (t * .05) % 1.25), p = along(path, k); v.position.set(p.x, .02, p.z); v.rotation.y = p.ang - Math.PI / 2; L.p.set(p.x, 1.3, p.z); }); } }
+    movers.push(() => { heat.forEach(d => d.visible = S.layers.heat); flows.forEach(f => f.visible = S.layers.flow); });
+    target.set(0, 0, 0); setShadow(26); fly([0, 1], 40, -0.6, 0.86);
   }
-
+  // ----- 營運沙盤：儀表板、旺季模擬（只在第三層）-----
+  function ops() {
+    const el = $('.smops'), dn = $('.smdn'); el.hidden = dn.hidden = S.level !== 3; if (S.level !== 3) return;
+    dn.innerHTML = ['白天', '夜景'].map((n, i) => `<button data-sm="dn" data-k="${i}" aria-pressed="${!!S.night === !!i}">${n}</button>`).join('');
+    const wo = (S.live && S.live.wo) || [], act = wo.filter(o => ['已指派', '進行中', '待驗收'].includes(o.status)).length;
+    const by = {}; wo.filter(o => o.status === '已完成').forEach(o => by[o.household_id] = (by[o.household_id] || 0) + 1); const hs = Object.keys(by).length, rep = hs ? Math.round(Object.values(by).filter(n => n > 1).length / hs * 100) + '%' : '—';
+    const peak = S.peak >= 6 && S.peak <= 9;
+    el.innerHTML = `<div class="smdash"><b>今日營運</b>
+      <div><span>技師使用率</span><b style="color:${peak ? '#D4003C' : 'inherit'}">${peak ? '超過 80%' : '30–50%'}</b><small>${peak ? '旺季（訪談）' : '淡季（訪談）'}</small></div>
+      <div><span>技師今日工單</span><b>${act} 件</b><small>上限 10–12 件（訪談）</small></div>
+      <div><span>每組接待時間</span><b>—</b><small>現況 1–3 小時（訪談）</small></div>
+      <div><span>轉單率</span><b>—</b><small>試辦後接真實資料</small></div>
+      <div><span>重複到府率</span><b>${rep}</b><small>同一戶完工後再到府</small></div></div>
+     <div class="smpeak"><b>旺季模擬 <span class="sim">模擬</span></b><input type="range" min="1" max="12" value="${S.peak}" data-sm="peak" aria-label="模擬月份"><span>${S.peak} 月${peak ? '｜旺季' : ''}</span>
+      <button data-sm="ar" aria-pressed="${S.ar}">${S.ar ? '✓ ' : ''}AR 先量</button><small>${S.ar ? 'AR 先量：補量到府會減少，減少多少等試辦再填' : '沒有 AR：到府場勘要另外排一次'}${peak ? '；旺季技師超過負荷，建議把場勘移到淡季' : ''}</small></div>`;
+  }
   // ----- 平面備援（手機或不支援 WebGL）：同樣只畫號碼 -----
   function draw2d() {
     svg.hidden = false; cv.hidden = true; lb.innerHTML = '';
@@ -232,7 +271,7 @@ export function mountServiceMap(root, opt = {}) {
       for (const t of G.towns[S.county] || []) body += `<path d="${P(t.p)}" fill="#F7EEEA" stroke="#E2D2D6" stroke-width="${.3 * f}"/>`;
       for (const r of groupsL2().flatMap(g => g.rows)) body += dot(r.s.x, r.s.y, (r.s.pilot ? 2.2 : 1.6) * f, focused(r.key) ? TYC[r.s.type] : GRAY, r.key, r.no); }
     else { vb = [-17, -17, 34, 34]; body += `<rect x="-17" y="-17" width="34" height="34" fill="#F7EEF1"/><rect x="-1.6" y="-1.2" width="3.2" height="2.4" fill="${BRAND}" data-k="07078"/>`;
-      for (const h of HOUSES) body += `<rect x="${h.x - .5}" y="${h.z - .5}" width="1" height="1" rx=".2" fill="#F4F1EC" stroke="#ddd" stroke-width=".05"/>`;
+      for (const h of HOUSES.filter(h => Math.abs(h.x) < 17 && Math.abs(h.z) < 17)) body += `<rect x="${h.x - .5}" y="${h.z - .5}" width="1" height="1" rx=".2" fill="#F4F1EC" stroke="#ddd" stroke-width=".05"/>`;
       for (const r of groupsL3().flatMap(g => g.rows)) { const h = houseOf(r.real.id); if (h) body += dot(h.x, h.z, .9, focused(r.key) ? HSC[r.st][0] : GRAY, r.key, r.no); } }
     svg.setAttribute('viewBox', vb.join(' ')); svg.innerHTML = body;
   }
@@ -248,10 +287,11 @@ export function mountServiceMap(root, opt = {}) {
   function up() { if (S.level === 3) { S.level = 2; S.sel = S.store; } else if (S.level === 2) { S.level = 1; S.sel = S.county; } S.open = undefined; build(); }
   async function build() {
     if (S.level === 3 && !S.live) await loadLive();
+    if (S.level === 3) { try { await prepL3(); } catch (e) { toast('街區資料載入失敗：' + e.message); } } else cv.style.background = '';
     if (S.open === undefined) openGroup(defaultOpen(), false); else if (S.open !== null) openGroup(S.open, !!S.selGroup);
     if (S.sel && !allRows().some(r => r.key === S.sel)) { /* 上一層選取的項目保留 */ const g = groups().find(x => x.rows.some(r => r.key === S.sel)); if (g) openGroup(g.id); }
     if (S.flat) draw2d(); else { svg.hidden = true; cv.hidden = false; initGL(); size(); (S.level === 1 ? buildL1 : S.level === 2 ? buildL2 : buildL3)(); applyDim(); }
-    top(); kpis(); panel(); legend(); menus(); src();
+    top(); kpis(); panel(); legend(); menus(); src(); ops();
   }
 
   // ----- 介面 -----
@@ -264,8 +304,8 @@ export function mountServiceMap(root, opt = {}) {
   function kpis() {
     let K = [], ins = '';
     if (S.level === 1) { const v = visibleStores(STORES), dc = v.filter(s => s.dc).length, cs = new Set(v.map(s => s.county)).size;
-      K = [['門市', v.length, '公開'], ['Digital City', dc, '公開', 'dc'], ['涵蓋縣市', cs, '公開'], [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
-      ins = S.stage === 'pilot' ? '試點選高雄市三民區：民族、澄清、三民中華 3 家 Digital City 都在三民區，同一組技師可以統一排程、合併到府；三民區 65 歲以上約 7.2 萬人。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋 21 縣市 316 家門市；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
+      K = [['門市', DECK.total + ' 家', '簡報'], ['地圖已標', v.length + ' 家', '官網 10/24'], ['Digital City', dc, '公開', 'dc'], [STN[S.stage] + '範圍', S.stage === 'extend' ? '全台' : STAGES[S.stage].length + ' 縣市', '規劃', 'stage']];
+      ins = S.stage === 'pilot' ? '試點選高雄市三民區：民族、澄清、三民中華 3 家 Digital City 都在三民區，同一組技師可以統一排程、合併到府；三民區 65 歲以上約 7.2 萬人。' : S.stage === 'expand' ? '擴展期往六都：台北市 65 歲以上占比 24.18% 全台最高，門市也最密集。' : '延伸期覆蓋全台門市（簡報 335 家；地圖先標官網 10/24 的 316 家，新清單到了再補）；嘉義縣、南投縣 65 歲以上占比高但門市較少，適合由大型門市支援。'; }
     else if (S.level === 2) { const v = visibleStores(STORES.filter(s => s.county === S.county)), pil = v.filter(s => s.pilot);
       K = [['門市', v.length, '公開'], ['Digital City', v.filter(s => s.dc).length, '公開', 'dc'], ['65 歲以上占比', (AGE[S.county] || '—') + '%', '公開'], [pil.length ? '試點門市' : '一般門市', pil.length ? pil.length + ' 家' : v.filter(s => s.type === 'g').length + ' 家', pil.length ? '規劃' : '公開', pil.length ? 'pilot' : null]];
       ins = S.county === '高雄市' ? '民族店今天有合併到府工單：陳技師先裝夜燈與門檻燈條，吳技師再裝關懷設備。點清單裡的民族店，再「進入街區」。' : `${S.county}門市 ${v.length} 家；第二階段由企業提供營運資料後，才看得到揪居家與派工。`; }
@@ -303,24 +343,26 @@ export function mountServiceMap(root, opt = {}) {
        ${on ? g.rows.map(r => `<button class="smr ${S.sel === r.key ? 'on' : ''}" data-sm="sel" data-k="${esc(r.key)}">${r.no ? `<span class="nb" style="--c:${color(r)}">${r.no}</span>` : `<i class="dt" style="background:${color(r)}"></i>`}<span class="smrt"><b>${esc(r.title)}</b><small>${esc(r.sub)}</small></span></button>`).join('') : ''}</div>`; }).join('')}</div>`;
   }
   function legend() {
-    $('.smleg').innerHTML = S.level === 1 ? `<span>高度＝門市數</span><span><i class="ramp"></i>65 歲以上占比 15%→24%</span><span><i class="dt" style="background:${GRAY}"></i>未選取</span>`
+    $('.smleg').innerHTML = S.level === 1 ? `<b>各區門市（簡報）</b>${DECK.regions.map(([n, c]) => `<span>${n} ${c}</span>`).join('')}<span style="flex-basis:100%;height:0"></span><span>高度＝門市數</span><span><i class="ramp"></i>65 歲以上占比 15%→24%</span><span><i class="dt" style="background:${GRAY}"></i>未選取</span>`
       : S.level === 2 ? Object.entries(TYN).map(([k, n]) => `<span><i class="dt" style="background:${TYC[k]}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span><span>位置為概略</span>'
-        : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>';
+        : Object.values(HSC).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') + '<span>號碼＝右側清單</span>' + (S.layers.flow ? '<span style="flex-basis:100%;height:0"></span><b>工單光線</b>' + Object.values(FLOW).map(([c, n]) => `<span><i class="dt" style="background:${c}"></i>${n}</span>`).join('') : '');
   }
   function menus() {
     const F = root.querySelector('[data-menu="flt"]'), L = root.querySelector('[data-menu="lay"]');
-    F.innerHTML = `<b>店型</b>${Object.entries(TYN).map(([k, n]) => `<label><input type="checkbox" data-smt="${k}" ${S.types[k] ? 'checked' : ''}><i class="dt" style="background:${TYC[k]}"></i>${n}</label>`).join('')}<label><input type="checkbox" data-smdc ${S.dcOnly ? 'checked' : ''}>只看 Digital City</label>
+    F.innerHTML = `<b>店型</b>${Object.entries(TYN).map(([k, n]) => `<label><input type="checkbox" data-smt="${k}" ${S.types[k] ? 'checked' : ''}><i class="dt" style="background:${TYC[k]}"></i>${n}</label>`).join('')}<label title="簡報新增的店型；拿到新門市清單後才上圖"><input type="checkbox" disabled><i class="dt" style="background:#5B8FD6"></i>嶄新概念店（待新清單）</label><label><input type="checkbox" data-smdc ${S.dcOnly ? 'checked' : ''}>只看 Digital City</label>
       ${S.level === 1 ? `<b>導入階段</b><span class="smseg">${Object.entries(STN).map(([k, n]) => `<button data-sm="stage" data-k="${k}" class="${S.stage === k ? 'on' : ''}">${n}</button>`).join('')}</span>` : ''}`;
-    const LY = S.level === 1 ? [['names', '顯示全部縣市名稱']] : S.level === 2 ? [['town', '行政區名稱'], ['van', '技師車（模擬）']] : [['heat', '訂閱熱度（模擬）']];
+    const LY = S.level === 1 ? [['names', '顯示全部縣市名稱']] : S.level === 2 ? [['town', '行政區名稱'], ['van', '技師車（模擬）']] : [['heat', '訂閱熱度（模擬）'], ['flow', '工單流動光線']];
     L.innerHTML = `<b>圖層</b>${LY.map(([k, n]) => `<label><input type="checkbox" data-sml="${k}" ${S.layers[k] ? 'checked' : ''}>${n}</label>`).join('')}`;
     F.hidden = S.menu !== 'flt'; L.hidden = S.menu !== 'lay';
   }
-  function src() { $('.smsrc').innerHTML = '資料來源：門市＝全國電子官網門市據點（2026/10/24 整理，316 家，位置依行政區概略標示）｜65 歲以上人口占比＝內政部 2025 年底（中央社 2026/1/9）｜行政區界＝內政部國土測繪中心開放資料｜第三層家庭、工單、關懷事件＝示範系統即時資料；房子位置、訂閱熱度、技師車為模擬。'; }
+  function src() { $('.smsrc').innerHTML = '資料來源：門市＝全國電子官網門市據點（2026/10/24 整理，316 家，位置依行政區概略標示）｜65 歲以上人口占比＝內政部 2025 年底（中央社 2026/1/9）｜行政區界＝內政部國土測繪中心開放資料｜第三層家庭、工單、關懷事件＝示範系統即時資料；道路、公園、大樓輪廓＝OpenStreetMap（© OpenStreetMap 貢獻者）；透天厝為沿真實街道補上的示意建物；民族店與鄰房依街景外觀重建（看板只用色塊）；家庭位置、訂閱熱度、技師車為模擬。'; }
 
   root.addEventListener('click', async e => {
     const b = e.target.closest('[data-sm]');
     if (!b) { if (S.menu && !e.target.closest('.smmenu')) { S.menu = null; menus(); } return; }
     if (b.disabled) return; const a = b.dataset.sm;
+    if (a === 'dn') { S.night = b.dataset.k === '1'; build(); return; }
+    if (a === 'ar') { S.ar = !S.ar; ops(); return; }
     if (a === 'up') up(); else if (a === 'enter') enter(); else if (a === 'sel') select(b.dataset.k); else if (a === 'clear') select(null);
     else if (a === 'bc') { const l = +b.dataset.l; while (S.level > l) { if (S.level === 3) { S.level = 2; S.sel = S.store; } else { S.level = 1; S.sel = S.county; } } S.open = undefined; build(); }
     else if (a === 'mode') { S.flat = !S.flat; build(); }
@@ -337,6 +379,7 @@ export function mountServiceMap(root, opt = {}) {
       else { const g = groups().find(x => x.st === k); if (g) { openGroup(g.id); S.sel = null; applyDim(); panel(); } else toast('目前沒有符合的家庭'); } }
     else if (a === 'draft') { b.disabled = true; try { const d = await api('/advisor/households/' + b.dataset.id + '/draft', { method: 'POST', body: { device: '感應小夜燈｜走道', kind: '年度健檢', reason: '服務地圖建立' } }); toast('已建立維護工單草稿 ' + d.code + '，生活顧問確認後派工'); await loadLive(); S.open = undefined; build(); } catch (x) { toast(x.message); b.disabled = false; } }
   });
+  root.addEventListener('input', e => { if (e.target.dataset.sm === 'peak') { S.peak = +e.target.value; ops(); } });
   root.addEventListener('change', e => { const t = e.target;
     if (t.dataset.smt) { S.types[t.dataset.smt] = t.checked ? 1 : 0; S.open = undefined; build(); }
     else if (t.dataset.smdc !== undefined) { S.dcOnly = t.checked; S.open = undefined; build(); }
