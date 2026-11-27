@@ -207,8 +207,12 @@
 
   // ── 路由 ──
   const NEED_HH = { assess: assessForm, quote: quotes, care, family, invite };
+  // 第 1 批起：已登入、有長輩家就進 Demo 同一套畫面（資料由 live-api.js 接 Supabase）；沒有長輩家先建立或加入
+  const toApp = (key) => window.JJJLIVEAPI.enter(key);
   async function open(key) {
     if (!LV.user) { if (window.JJJLIVE) window.JJJLIVE.needLogin(key); return; }
+    if (LV.me && LV.me.role !== 'family' && window.JJJLIVEAPI) return toApp('staff');
+    if (window.JJJLIVEAPI) { await loadHouseholds(); if (LV.hh) return toApp(key); return jjj(); }
     try {
       if (key === 'me') return me();
       if (key === 'inbox') return inbox();
@@ -224,8 +228,10 @@
     await open((saved && saved.target) || 'jjj');
   }
   async function supportWish(id) {
-    const { error } = await sb.from('wish_supports').insert({ work_id: Number(id), user_id: LV.user.id });
-    if (error && !/duplicate|23505/.test(error.code + error.message)) toast('沒有成功，請再試一次');
+    // 訂閱對應方案的家庭算「我也需要」，其他人先追蹤（同 Demo 規則，由資料庫函式判斷）
+    let { error } = await sb.rpc('wish_support', { p_work: Number(id), p_follow: false, p_buy: '', p_price: '' });
+    if (error) ({ error } = await sb.rpc('wish_support', { p_work: Number(id), p_follow: true, p_buy: '', p_price: '' }));
+    if (error) toast('沒有成功，請再試一次');
     location.href = C.base + 'wish/?id=' + encodeURIComponent(id);
   }
 
@@ -267,13 +273,13 @@
         const elder = f.elder.value.trim(); if (!elder) return fail('請填長輩的稱呼');
         const { data, error } = await sb.rpc('create_household', { p_elder_name: elder, p_elder_note: f.note.value.trim() || null, p_store: f.store.value });
         if (error) return fail('建立失敗，請再試一次');
-        await loadHouseholds(); LV.hh = LV.hhs.find((h) => h.id === data) || LV.hh; return jjj();
+        await loadHouseholds(); LV.hh = LV.hhs.find((h) => h.id === data) || LV.hh; return window.JJJLIVEAPI ? toApp('jjj') : jjj();
       }
       if (f.id === 'lvJoin') {
         const code = f.code.value.trim().toUpperCase(); if (!/^[A-Z0-9]{6}$/.test(code)) return fail('邀請碼是 6 碼英文或數字');
         const { data, error } = await sb.rpc('redeem_invite', { p_code: code });
         if (error) return fail('邀請碼無效或已使用');
-        await loadHouseholds(); LV.hh = LV.hhs.find((h) => h.id === data) || LV.hh; toast('已加入長輩家'); return jjj();
+        await loadHouseholds(); LV.hh = LV.hhs.find((h) => h.id === data) || LV.hh; toast('已加入長輩家'); return window.JJJLIVEAPI ? toApp('jjj') : jjj();
       }
       if (f.id === 'lvAs') {
         const d = { corridor_cm: Number(f.corridor.value), threshold_cm: Number(f.threshold.value), bed_bath_m: Number(f.dist.value), dark: f.dark.value === '1' };
@@ -341,6 +347,8 @@
     await loadMe();
     LV.ready = true;
     if (window.JJJAPP) window.JJJAPP.render();
+    // 員工（生活顧問、技師）在後台用員工編號登入後回到 App：直接進員工畫面（顧問 a1、技師 t1）
+    if (LV.user && LV.me && LV.me.role !== 'family' && window.JJJLIVEAPI) return toApp('staff');
     if (saved && LV.user) return afterLogin(saved);
     if (invite || wishId) {
       history.replaceState(null, '', location.pathname + '?mode=live');
@@ -349,7 +357,9 @@
       return;
     }
     const h = (location.hash || '').slice(1);
-    if (LV.user && ['quote', 'care', 'inbox', 'jjj', 'wish'].includes(h)) open(h);
+    if (LV.user && ['quote', 'care', 'inbox', 'jjj', 'wish'].includes(h)) return open(h);
+    // 已登入又有長輩家：直接進 App 畫面
+    if (LV.user && LV.hh && window.JJJLIVEAPI) return toApp('jjj');
   }
 
   window.JJJLIVEAPP = {

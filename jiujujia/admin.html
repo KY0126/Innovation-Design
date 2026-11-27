@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<script src="live.js?v=20261126e"></script>
+<script src="live.js?v=20261127b"></script>
 <script src="backend.js?v=20261027i"></script>
 <script src="store.js?v=20261125c"></script><script src="store2.js?v=20261125m"></script><script src="store3.js?v=20261126a"></script>
 <script src="phase.js?v=20261124a"></script>
@@ -1149,7 +1149,7 @@ async function enterHQ(u){ME=u;
  await liveRender()}
 async function liveRender(){if(ALIAS[cur])cur=ALIAS[cur];hqRender();if(LIVE.includes(cur)){try{await loadLive(cur)}catch(e){toast(e.message)}if(LIVE.includes(cur))hqRender()}}
 async function authStart(){
- if(window.JJJ_LIVE){showGate();return} // 實用版：打開先登入（live.js）
+ if(window.JJJ_LIVE){await window.JJJLIVEREADY;let u=null;try{u=(await api('/me',{noGate:true})).user}catch(e){}if(u&&u.role==='hq'){enterHQ(u);return}showGate();return} // 實用版：總部登入後用同一套後台，資料接 Supabase（live-staff.js）
  try{CFG=await api('/config',{noGate:true})}catch(e){}
  if(CFG&&CFG.demo)document.getElementById('envBadge').hidden=false;
  let u=null;try{u=(await api('/me',{noGate:true})).user}catch(e){}

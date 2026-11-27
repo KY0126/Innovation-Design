@@ -20,17 +20,35 @@ function createMock(opts = {}) {
   }, opts.db || {});
   const st = { db, calls: [], nextId: 100, me: null, functions: opts.functions || {}, rpc: opts.rpc || {} };
 
-  const filt = (rows, sp) => {
+  // PostgREST 篩選：eq、neq、is、in、gt、gte、lt、lte、like、not.is；order 欄位排序（沒指定時新的在前）
+  const cmp = (a, b) => (a == null ? -1 : b == null ? 1 : typeof a === 'number' && typeof b === 'number' ? a - b : String(a) < String(b) ? -1 : String(a) > String(b) ? 1 : 0);
+  const filt = (rows, sp, keepOrder) => {
     let out = rows;
     for (const [k, v] of sp.entries()) {
       if (['select', 'order', 'limit', 'offset', 'on_conflict', 'columns'].includes(k)) continue;
-      const m = /^(eq|is)\.(.*)$/.exec(v); if (!m) continue;
-      const val = m[2] === 'null' ? null : m[2];
-      out = out.filter((r) => (val === null ? r[k] == null : String(r[k]) === val));
+      const m = /^(not\.)?(eq|neq|is|in|gt|gte|lt|lte|like)\.(.*)$/.exec(v); if (!m) continue;
+      const neg = !!m[1], op = m[2], raw = m[3], val = raw === 'null' ? null : raw;
+      const test = (r) => {
+        const x = r[k];
+        if (op === 'eq') return String(x) === val;
+        if (op === 'neq') return String(x) !== val;
+        if (op === 'is') return val === null ? x == null : String(x) === val;
+        if (op === 'in') { const L = raw.replace(/^\(|\)$/g, '').split(',').map((y) => y.replace(/^"|"$/g, '')); return L.includes(String(x)); }
+        if (op === 'like') { const re = new RegExp('^' + raw.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[%*]/g, '.*') + '$'); return re.test(String(x == null ? '' : x)); }
+        const c = cmp(isNaN(+x) || isNaN(+val) ? x : +x, isNaN(+x) || isNaN(+val) ? val : +val);
+        return op === 'gt' ? c > 0 : op === 'gte' ? c >= 0 : op === 'lt' ? c < 0 : c <= 0;
+      };
+      out = out.filter((r) => (neg ? !test(r) : test(r)));
     }
+    const ord = sp.get('order');
+    if (ord) { const parts = ord.split(',').map((x) => x.split('.')); out = out.slice().sort((a, b) => { for (const [c0, dir] of parts) { const r = cmp(a[c0], b[c0]); if (r) return dir === 'desc' ? -r : r; } return 0; }); }
+    else if (!keepOrder) out = out.slice().reverse();
     const lim = sp.get('limit'); if (lim) out = out.slice(0, Number(lim));
     return out;
   };
+  // 資料表預設值（同 migration）
+  const DEF = { requests: { status: '待處理' }, wishes: { status: '待分類' }, wish_comments: { status: '待審核' }, video_tasks: { status: '待審核' }, consents: { agreed: true, revoked_at: null }, preorders: { status: '意向登記' } };
+  const PK = { hh_kv: ['household_id', 'k'], cart_items: ['user_id', 'sku'], wish_votes: ['topic_id', 'user_id'], preorders: ['topic_id', 'user_id'], members: ['household_id', 'user_id'], wish_supports: ['work_id', 'user_id'] };
 
   async function handle(route) {
     const req = route.request();
@@ -68,26 +86,38 @@ function createMock(opts = {}) {
       const fn = p.split('/').pop();
       const r = st.rpc[fn] ? st.rpc[fn](body, st) : null;
       if (r === null || r === undefined) return send(404, { message: 'no rpc mock: ' + fn });
+      if (r && r.__err) return send(400, { code: 'P0001', message: r.__err, details: null, hint: null });
       return send(200, r);
     }
     if (p.startsWith('/rest/v1/')) {
       const t = p.split('/').pop(); const rows = db[t] || (db[t] = []);
       const accept = req.headers()['accept'] || '';
       const one = /vnd\.pgrst\.object/.test(accept);
-      if (req.method() === 'GET') {
-        const out = filt(rows, u.searchParams).slice().reverse();
+      if (req.method() === 'GET' || req.method() === 'HEAD') {
+        const out = filt(rows, u.searchParams);
         if (one) return out.length ? send(200, out[0]) : send(406, { code: 'PGRST116', message: 'no rows', details: '', hint: null });
         return send(200, out);
       }
       if (req.method() === 'POST') {
-        const list = (Array.isArray(body) ? body : [body]).map((r) => ({ id: st.nextId++, created_at: new Date().toISOString(), ...r }));
-        rows.push(...list);
         const prefer = req.headers()['prefer'] || '';
+        const keys = (u.searchParams.get('on_conflict') || '').split(',').filter(Boolean).length ? u.searchParams.get('on_conflict').split(',') : PK[t];
+        const list = [];
+        for (const r of (Array.isArray(body) ? body : [body])) {
+          const ex = keys && rows.find((x) => keys.every((k) => String(x[k]) === String(r[k])));
+          if (ex && /merge-duplicates/.test(prefer)) { Object.assign(ex, r); list.push(ex); continue; }
+          if (ex && keys) return send(409, { code: '23505', message: 'duplicate key value violates unique constraint' });
+          const row = { id: st.nextId++, created_at: new Date().toISOString(), ...(DEF[t] || {}), ...r }; rows.push(row); list.push(row);
+        }
         if (/return=representation/.test(prefer)) return send(201, one ? list[0] : list);
         return send(201);
       }
       if (req.method() === 'PATCH') {
-        filt(rows, u.searchParams).forEach((r) => Object.assign(r, body));
+        filt(rows, u.searchParams, true).forEach((r) => Object.assign(r, body));
+        return send(204);
+      }
+      if (req.method() === 'DELETE') {
+        const gone = new Set(filt(rows, u.searchParams, true));
+        db[t] = rows.filter((r) => !gone.has(r));
         return send(204);
       }
       return send(405, {});

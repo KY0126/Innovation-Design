@@ -5,18 +5,20 @@
   const LIVE = /(^|[?&])mode=live(&|$)/.test(location.search.slice(1));
   window.JJJ_LIVE = LIVE;
   if (!LIVE) return;
-  const PAGE = /admin\.html/.test(location.pathname) ? 'adm' : 'app';
+  const PAGE = /admin\.html/.test(location.pathname) ? 'adm' : /consultant\.html/.test(location.pathname) ? 'con' : 'app';
   document.documentElement.classList.add('jjj-live');
 
   // 實用版才載入：Supabase、設定、登入後畫面（保持載入順序）
-  const V = '20261126g';
-  ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, ...(PAGE === 'app' ? ['live-measure.js?v=' + V, 'live-app.js?v=' + V] : ['live-admin.js?v=' + V])].forEach((src) => {
+  const V = '20261127b';
+  // 員工頁（後台 adm、生活顧問電腦版 con）也接同一套 API：live-admin.js 負責員工登入的連線
+  let ready; window.JJJLIVEREADY = new Promise((r) => { ready = r; }); window.JJJLIVEREADY_DONE = () => ready();
+  ['vendor/supabase-2.119.2.js', 'live-config.js?v=' + V, 'live-rules.js?v=' + V, 'live-layout.js?v=' + V, ...(PAGE === 'app' ? ['live-measure.js?v=' + V, 'live-app.js?v=' + V] : ['live-admin.js?v=' + V]), 'live-api.js?v=' + V, 'live-staff.js?v=' + V].forEach((src) => {
     const s = document.createElement('script'); s.src = src; s.async = false; document.head.appendChild(s);
   });
 
   // 登入提示方框：比例照全國電子 App 原本的登入提示（寬約 83%、左右留白約 9%、三行等行距）
   const CSS = `
-#webDemo,#envBadge{display:none!important}
+#webDemo,#envBadge,.jjj-live .dm,.jjj-live #gDemo{display:none!important}
 .lv-tag{position:absolute;left:33%;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:#D4003C;pointer-events:none}
 .lv-ban{display:block;position:relative;width:calc(100% - 32px);margin:30px 16px 14px;padding:0;min-height:0;height:88px;border:0;border-radius:16px;background:#F3E5E7;text-align:left;overflow:hidden;cursor:pointer;font:inherit}
 .lv-ban .s{position:absolute;left:20px;top:20px;font-size:13px;color:#666}
@@ -78,8 +80,11 @@
     // 點首頁上的功能：未登入跳登入提示；已登入交給實用版畫面（試點只開放揪居家）
     const keyOf = (el) => el.matches('.hg1, [data-hb="0"], .lv-ban') || el.dataset.go === 'b1' || el.dataset.go === 'm2' ? 'jjj'
       : el.dataset.nav === 'm1' ? 'me' : el.dataset.go === 'inbox' ? 'inbox' : 'other';
+    // 已進入 Demo 畫面（live-api.js 接手資料）後不再攔截
+    const inApp = () => !!(window.JJJLIVEAPI && window.JJJLIVEAPI.active());
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.lv-mask') || e.target.closest('.lv-page')) return;
+      if (window.JJJLIVEAPI && window.JJJLIVEAPI.busy && window.JJJLIVEAPI.busy() && e.target.closest('#view')) { e.preventDefault(); e.stopPropagation(); return; }
+      if (inApp() || e.target.closest('.lv-mask') || e.target.closest('.lv-page')) return;
       const el = e.target.closest('#view [data-go], #view [data-a], #view [data-hb], #view [data-nav], #view [data-aigo], #view .lv-ban, #view button');
       if (!el) return;
       if (el.dataset.a === 'big' || el.dataset.nav === 'home') return;
@@ -89,7 +94,7 @@
     }, true);
     // 首頁：標「實用版」；會員欄未登入換成註冊誘因橫幅，登入後換成揪居家入口
     (window.JJJHOOKS || (window.JJJHOOKS = [])).push((v, view) => {
-      if (v !== 'home') return;
+      if (v !== 'home' || inApp()) { if (v === 'home' && !view.querySelector('.lv-tag')) { const h0 = view.querySelector('img[src="home/header.png"]'); if (h0) h0.insertAdjacentHTML('afterend', '<span class="lv-tag">實用版</span>'); } return; }
       const hd = view.querySelector('img[src="home/header.png"]');
       if (hd && !view.querySelector('.lv-tag')) hd.insertAdjacentHTML('afterend', '<span class="lv-tag">實用版</span>');
       const mem = view.querySelector('.hmem img');

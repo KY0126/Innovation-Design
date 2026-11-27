@@ -3,6 +3,7 @@
 const { test } = require('playwright/test');
 const { fresh, expect } = require('./helpers');
 const { createMock } = require('./live-mock');
+const { familyDB } = require('./live-db');
 
 const desktopOnly = (info) => test.skip(info.project.name !== 'desktop');
 
@@ -18,10 +19,10 @@ function familyMock() {
   });
 }
 
-test('實用版：未登入點揪居家，確認後用 LINE 登入，回來直接進揪居家；建立長輩家、評估出燈號、分享給家人', async ({ page }, info) => {
+test('實用版：未登入點揪居家，確認後用 LINE 登入；沒有長輩家先建立，建立後直接進 Demo 同一套畫面（資料接 Supabase）', async ({ page }, info) => {
   desktopOnly(info);
   const errs = await fresh(page, false);
-  const M = familyMock();
+  const M = familyDB({ withHH: false });
   await M.install(page);
   await page.goto('/live/app/');
   await expect(page.locator('.lv-ban')).toContainText('註冊就送免費居家評估');
@@ -35,40 +36,20 @@ test('實用版：未登入點揪居家，確認後用 LINE 登入，回來直�
   expect(M.st.calls.find((c) => c.name === 'line-login').body.code).toBe('test-code');
   await expect(page).not.toHaveURL(/code=/);
   await expect(page.locator('#view')).toContainText('先建立長輩家');
-  await expect(page.locator('#view')).toContainText('免費居家評估');
 
-  // 建立長輩家
+  // 建立長輩家：建好就進 Demo 畫面（首頁、揪居家都是同一套）
   await page.click('[data-lv="newhh"]');
   await page.fill('#lvHH [name="elder"]', '媽媽');
   await page.click('#lvHH button[type="submit"]');
-  await expect(page.locator('#view')).toContainText('媽媽家');
-  await expect(page.locator('#view')).toContainText('邀家人一起加入');
-
-  // 居家評估：走道 75 cm、門檻 2 cm、偏暗，三項都是紅燈
-  await page.click('[data-lv="assess"]');
-  await page.fill('#lvAs [name="corridor"]', '75');
-  await page.fill('#lvAs [name="threshold"]', '2');
-  await page.fill('#lvAs [name="dist"]', '5');
-  await page.check('#lvAs [name="dark"][value="1"]');
-  await page.click('#lvAs button[type="submit"]');
-  await expect(page.locator('.lv-lights')).toContainText('紅燈');
-  const saved = M.st.db.assessments[0];
-  expect(saved.source).toBe('manual');
-  expect(saved.dims).toMatchObject({ corridor_mm: 750, threshold_mm: 20, bed_bath_mm: 5000, dark: true });
-
-  // 分享 S1：只寫燈號數量與邀請連結，不放地址、平面圖、尺寸
-  await page.click('[data-lv="shareS1"]');
-  await expect.poll(() => page.evaluate(() => window.__opened.length)).toBe(1);
-  const opened = decodeURIComponent((await page.evaluate(() => window.__opened[0])).split('text=')[1]);
-  expect(opened).toContain('3 紅 0 黃');
-  expect(opened).toContain('invite=ABC123');
-  expect(opened).not.toMatch(/75|cm|地址/);
-  expect(opened).not.toContain('全國電子');
-  expect(M.st.db.share_logs[0].kind).toBe('S1');
-
-  // 回首頁：會員欄變成揪居家入口
-  await page.click('[data-lv="back"]');
-  await expect(page.locator('.lv-ban.in')).toContainText('媽媽家');
+  await page.waitForFunction(() => window.JJJLIVEAPI.active() && window.JJJAPP.S.me && window.JJJAPP.S.hh);
+  expect(await page.evaluate(() => [window.JJJAPP.S.me.role, window.JJJAPP.S.hh.household.name, window.JJJAPP.S.cfg.demo])).toEqual(['family', '媽媽家', false]);
+  await expect(page.locator('.lv-tag')).toContainText('實用版');
+  await page.click('.hg1');
+  await expect(page.locator('#view')).toContainText('先幫長輩家做評估');
+  await expect(page.locator('#view')).toContainText('媽媽');
+  // 重新整理：已登入又有長輩家，直接進 App 畫面
+  await page.reload();
+  await page.waitForFunction(() => window.JJJLIVEAPI && window.JJJLIVEAPI.active() && window.JJJAPP.S.hh, null, { timeout: 15000 });
   expect(errs).toEqual([]);
 });
 
@@ -102,39 +83,7 @@ test('實用版：LINE 登入設定還沒填 Channel ID 時，確認後提示設
   await expect(page.locator('.lv-toast')).toContainText('LINE 登入設定尚未完成');
 });
 
-test('實用版後台：生活顧問登入、看到本門市家庭、送出正式報價並通知家人（P1）', async ({ page }, info) => {
-  desktopOnly(info);
-  const errs = await fresh(page, false);
-  const M = createMock({
-    staff: [{ id: 'u-adv', email: 'advisor@store.example', password: 'pass12345' }],
-    db: {
-      profiles: [{ id: 'u-adv', display_name: '王顧問', role: 'advisor', store: 'Digital City 高雄民族店' }],
-      households: [{ id: 7, elder_name: '林媽媽', store: 'Digital City 高雄民族店', stage: 0, created_at: new Date().toISOString() }],
-      members: [{ household_id: 7, user_id: 'a' }, { household_id: 7, user_id: 'b' }],
-      assessments: [{ household_id: 7, result: { lights: [{ c: 'r' }, { c: 'y' }, { c: 'g' }] }, created_at: new Date().toISOString() }],
-    },
-    functions: { 'line-push': (b) => ({ data: { ok: true, total: 2, sent: 0, line: false } }) },
-  });
-  await M.install(page);
-  await page.goto('/live/admin/');
-  await page.fill('#gEmail', 'advisor@store.example');
-  await page.fill('#gPw', 'pass12345');
-  await page.click('#gBtn');
-  await expect(page.locator('#lvAdm')).toContainText('本門市家庭');
-  await expect(page.locator('#lvAdm')).toContainText('林媽媽家');
-  await expect(page.locator('#lvAdm')).toContainText('1 紅 1 黃');
-  await page.click('[data-la="quote"]');
-  await page.fill('#lvQF textarea', '感應小夜燈｜床邊,690\n浴室止滑條,450');
-  await page.click('#lvQF button[type="submit"]');
-  await expect(page.locator('.lv-toast')).toContainText('第 1 版正式報價已送出');
-  await expect(page.locator('.lv-toast')).toContainText('已通知 2 人');
-  const q = M.st.db.quotes[0];
-  expect(q).toMatchObject({ household_id: 7, version: 1, total: 1140, is_formal: true, advisor_id: 'u-adv' });
-  const call = M.st.calls.find((c) => c.name === 'line-push');
-  expect(call.body).toMatchObject({ action: 'quote', quote_id: q.id });
-  expect(call.auth).toMatch(/^Bearer /);
-  expect(errs).toEqual([]);
-});
+// 總部後台改用 Demo 同一套畫面，測試在 live-batch4.spec.js
 
 test('實用版後台：家庭帳號不能進後台', async ({ page }, info) => {
   desktopOnly(info);

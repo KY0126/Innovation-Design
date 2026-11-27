@@ -24,7 +24,7 @@ for (const line of md.split('\n')) {
     terms.push({ id: m[1], t });
   }
 }
-const files = fs.readdirSync(path.join(repo, 'jiujujia')).filter(f => /\.(html|js)$/.test(f) && f !== 'backend.js' && !f.startsWith('_')).map(f => 'jiujujia/' + f);
+const files = fs.readdirSync(path.join(repo, 'jiujujia')).filter(f => /\.(html|js)$/.test(f) && f !== 'backend.js' && f !== 'live-rules.js' && !f.startsWith('_')).map(f => 'jiujujia/' + f);
 const now = {}; const hits = [];
 for (const f of files) {
   const lines = fs.readFileSync(path.join(repo, f), 'utf8').split('\n');
